@@ -55,11 +55,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install gitleaks CLI
-        shell: bash
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin
-
       - name: Run gitleaks
         shell: bash
-        run: gitleaks detect --source . --no-banner --redact --exit-code 1
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo" \
+            zricethezav/gitleaks:latest \
+            detect --source=/repo --no-banner --redact --exit-code 1
