@@ -108,12 +108,16 @@ jobs:
           echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
 
       - name: Enforce Vercel preflight (strict mode)
-        if: ${{ steps.vercel_pull.outcome != 'success' && env.VERCEL_FAIL_ON_PRECHECK == 'true' }}
+        if: ${{ steps.vercel_pull.outcome != 'success' }}
         shell: bash
         run: |
-          echo "Vercel preflight failed and VERCEL_FAIL_ON_PRECHECK=true."
-          echo "Verify VERCEL_TOKEN/VERCEL_ORG_ID/VERCEL_PROJECT_ID permissions."
-          exit 1
+          strict_mode=$(echo "${VERCEL_FAIL_ON_PRECHECK:-false}" | tr '[:upper:]' '[:lower:]')
+          if [ "$strict_mode" = "true" ]; then
+            echo "Vercel preflight failed and VERCEL_FAIL_ON_PRECHECK=true."
+            echo "Verify VERCEL_TOKEN/VERCEL_ORG_ID/VERCEL_PROJECT_ID permissions."
+            exit 1
+          fi
+          echo "Vercel preflight failed, but strict mode is disabled. Continuing without deploy."
 
       - name: Resolve smoke target
         id: smoke_target
