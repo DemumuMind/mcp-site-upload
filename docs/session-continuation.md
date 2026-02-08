@@ -1,5 +1,53 @@
 # Session Continuation
 
+## Latest Update (2026-02-08, Automation Delivery Finalization + GitHub Pipeline Stabilization)
+- Objective: finalize automation rollout end-to-end, configure GitHub/Vercel secrets/variables, and stabilize CI/Security/Deploy workflows on `main`.
+- Status: completed.
+- Implemented:
+  - Configured repository secrets in `DemumuMind/mcp-site-upload`:
+    - `VERCEL_TOKEN`
+    - `VERCEL_ORG_ID`
+    - `VERCEL_PROJECT_ID`
+    - `SMOKE_HEALTH_TOKEN`
+  - Configured repository variables:
+    - `SMOKE_BASE_URL`
+    - `SMOKE_ENABLED=false` (default off until public smoke target is validated)
+    - `VERCEL_DEPLOY_ENABLED=false` (prevents accidental deploy attempts while Vercel linkage is validated)
+  - Hardened workflow behavior:
+    - `.github/workflows/ci.yml`: smoke runs only when explicitly enabled or workflow input URL is provided
+    - `.github/workflows/deploy.yml`: deploy guarded behind `VERCEL_DEPLOY_ENABLED=true` with explicit disabled job
+    - `.github/workflows/nightly-smoke.yml`: correct conditional skip path when smoke is disabled
+    - `.github/workflows/security.yml`: secret scan switched to `gitleaks` Docker mode and limited to workspace (`--no-git`) to avoid historical-leak noise
+  - Updated docs and env guidance:
+    - `README.md`
+    - `.env.example`
+    - `docs/runbooks/deploy.md`
+- Commits:
+  - `7b6948d` chore(automation): implement ci cd security ops runbooks
+  - `6e306ff` chore(ci): harden workflow gates and deployment toggles
+  - `c025b23` fix(security): use gitleaks install script from main branch
+  - `7e9fb5a` fix(security): run gitleaks via docker image
+  - `285c923` fix(security): scan workspace only to avoid historical leak noise
+- Verification run (local):
+  - `npm run lint` (pass)
+  - `npm run build` (pass)
+  - `npm run smoke:check -- http://localhost:3000` (pass)
+  - `npm run ops:health-report -- --base-url http://localhost:3000` (pass)
+  - `npm run ops:backup-verify` (pass with local runtime manifest)
+- Verification run (GitHub Actions):
+  - `CI` run `21805262979` (success)
+  - `Security` run `21805262981` (success)
+  - `Deploy` run `21805262977` (success via guarded `deploy-disabled` job)
+  - `Nightly Smoke` manual run `21805283883` (success)
+- Next commands:
+  - When deployment path is ready, set:
+    - `VERCEL_DEPLOY_ENABLED=true`
+    - `SMOKE_ENABLED=true` (only after validating a public smoke URL returning expected status codes)
+  - Optionally rotate `VERCEL_TOKEN` because it was shared in chat context.
+- Open risks:
+  - `SMOKE_BASE_URL` currently points to a URL that may return non-app responses (404/401); keep `SMOKE_ENABLED=false` until corrected.
+  - Deploy workflow is intentionally gated off by variable and will not perform Vercel deploy until enabled.
+
 ## Latest Update (2026-02-08, Automation Plan Written to One File + Initial Automation Implementation)
 - Objective: store the approved automation plan in one file and implement core automation tracks (CI/CD, security scanning, ops scripts, runbooks, readiness docs).
 - Status: completed.
