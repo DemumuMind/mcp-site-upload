@@ -1,0 +1,7 @@
+{
+  "lastSuccessfulBackupAt": "2026-02-08T03:05:00Z",
+  "backupLocation": "s3://demumumind-mcp-backups/postgres/2026-02-08.sql.gz",
+  "retentionDays": 30,
+  "lastRestoreDrillAt": "2026-02-01T10:15:00Z",
+  "notes": "Template only. Keep real backup manifest in ops/backup-manifest.json and do not commit secrets."
+}

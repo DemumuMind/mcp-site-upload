@@ -7,7 +7,7 @@ Community-curated catalog of MCP (Model Context Protocol) servers with:
 - scheduled health checks and status indicators
 
 ## Tech Stack
-- Next.js 15 (App Router), React 19, TypeScript
+- Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS + shadcn/ui + Lucide icons
 - Supabase (PostgreSQL + RLS)
 - Vercel deployment + Vercel Analytics
@@ -96,6 +96,8 @@ npm run lint
 npm run build
 npm run start
 npm run smoke:check -- https://your-domain
+npm run ops:health-report -- --base-url https://your-domain
+npm run ops:backup-verify
 ```
 
 ## Catalog Data Defaults
@@ -150,12 +152,33 @@ What is checked:
 
 Workflow: `.github/workflows/deploy-smoke-check.yml`
 
-- Trigger manually via **Actions → Deploy Smoke Check → Run workflow**
+- Trigger manually via **Actions -> Deploy Smoke Check -> Run workflow**
 - Inputs:
   - `target_url` (required)
   - `include_health_probe` (optional boolean)
 - Optional repository secret:
   - `SMOKE_HEALTH_TOKEN` (required only when `include_health_probe=true`)
+
+## Automation Workflows
+
+| Workflow | Purpose |
+|---|---|
+| `.github/workflows/ci.yml` | PR/main gate: install, lint, build, optional smoke |
+| `.github/workflows/security.yml` | Dependency review, npm audit, secret scan |
+| `.github/workflows/deploy.yml` | Deploy orchestration to Vercel + post-deploy smoke |
+| `.github/workflows/nightly-smoke.yml` | Scheduled smoke checks against configured environment |
+| `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
+
+## Runbooks and Ops Docs
+
+- Plan in one file: `docs/automation-plan.md`
+- Production checklist: `docs/production-readiness-checklist.md`
+- Deploy runbook: `docs/runbooks/deploy.md`
+- Incident runbook: `docs/runbooks/incident.md`
+- Restore runbook: `docs/runbooks/restore.md`
+- Security runbook: `docs/runbooks/security.md`
+- Backup manifest template: `ops/backup-manifest.example.json`
+- Runtime backup manifest path: `ops/backup-manifest.json` (gitignored)
 
 ## Verification Before Merge
 

@@ -1,5 +1,41 @@
 # Session Continuation
 
+## Latest Update (2026-02-08, Automation Plan Written to One File + Initial Automation Implementation)
+- Objective: store the approved automation plan in one file and implement core automation tracks (CI/CD, security scanning, ops scripts, runbooks, readiness docs).
+- Status: completed.
+- Touched files:
+  - `.github/workflows/ci.yml`
+  - `.github/workflows/deploy.yml`
+  - `.github/workflows/nightly-smoke.yml`
+  - `.github/workflows/security.yml`
+  - `scripts/ops-health-report.mjs`
+  - `scripts/backup-verify.mjs`
+  - `ops/backup-manifest.example.json`
+  - `docs/automation-plan.md`
+  - `docs/runbooks/deploy.md`
+  - `docs/runbooks/incident.md`
+  - `docs/runbooks/restore.md`
+  - `docs/runbooks/security.md`
+  - `docs/production-readiness-checklist.md`
+  - `.env.example`
+  - `.gitignore`
+  - `package.json`
+  - `README.md`
+  - `docs/session-continuation.md`
+- Verification run:
+  - `npm run lint` (pass)
+  - `npm run build` (pass)
+  - `npm run smoke:check -- http://localhost:3000` (pass; authorized health probe skipped because token was not set)
+- Next commands:
+  - Configure GitHub secrets for deploy workflow (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, optional `SMOKE_HEALTH_TOKEN`).
+  - Configure repository variable `SMOKE_BASE_URL` for CI/nightly smoke.
+  - Create secure runtime backup manifest `ops/backup-manifest.json` from template and validate with `npm run ops:backup-verify`.
+  - Integrate Sentry DSN and Uptime Kuma monitors in target environments.
+- Open risks:
+  - Deploy workflow cannot run successfully until Vercel secrets are configured in GitHub.
+  - Backup verification script will fail until a real `ops/backup-manifest.json` exists and is maintained.
+  - Authorized health probe in automation remains inactive until `SMOKE_HEALTH_TOKEN` is provisioned.
+
 ## Latest Update (2026-02-08, Plan-site Future Roadmap Packaging)
 - Objective: convert future work roadmap into execution-ready folder structure under `Plan-site`.
 - Status: completed.

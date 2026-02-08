@@ -48,3 +48,7 @@ current-*.png
 logo-redesign-home-full.png
 playwright-home.png
 supabase/.temp/
+ops/backup-manifest.json
+
+.vercel
+.env*.local

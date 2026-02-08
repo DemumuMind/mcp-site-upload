@@ -1,0 +1,120 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment target"
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+      smoke_base_url:
+        description: "Optional URL override for smoke checks"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      SMOKE_HEALTH_TOKEN: ${{ secrets.SMOKE_HEALTH_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!key}" ]; then
+              echo "$key is required for deployment workflow."
+              exit 1
+            fi
+          done
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Resolve deployment mode
+        id: deploy_mode
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+            echo "prod=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+            echo "prod=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=preview" >> "$GITHUB_OUTPUT"
+            echo "prod=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pull Vercel environment
+        run: npx vercel pull --yes --environment="${{ steps.deploy_mode.outputs.environment }}" --token="$VERCEL_TOKEN"
+
+      - name: Build Vercel artifacts
+        shell: bash
+        run: |
+          if [ "${{ steps.deploy_mode.outputs.prod }}" = "true" ]; then
+            npx vercel build --prod --token="$VERCEL_TOKEN"
+          else
+            npx vercel build --token="$VERCEL_TOKEN"
+          fi
+
+      - name: Deploy to Vercel
+        id: deploy_result
+        shell: bash
+        run: |
+          if [ "${{ steps.deploy_mode.outputs.prod }}" = "true" ]; then
+            deployment_url=$(npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -n 1)
+          else
+            deployment_url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -n 1)
+          fi
+          echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve smoke target
+        id: smoke_target
+        shell: bash
+        run: |
+          target="${{ github.event.inputs.smoke_base_url || '' }}"
+          if [ -z "$target" ]; then
+            target="${{ steps.deploy_result.outputs.deployment_url }}"
+          fi
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Post-deploy smoke check
+        run: npm run smoke:check -- "${{ steps.smoke_target.outputs.target }}"
+
+      - name: Deployment summary
+        shell: bash
+        run: |
+          echo "Deployment environment: ${{ steps.deploy_mode.outputs.environment }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployment URL: ${{ steps.deploy_result.outputs.deployment_url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Smoke target: ${{ steps.smoke_target.outputs.target }}" >> "$GITHUB_STEP_SUMMARY"

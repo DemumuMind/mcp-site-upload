@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
-    "smoke:check": "node scripts/smoke-check.mjs"
+    "smoke:check": "node scripts/smoke-check.mjs",
+    "ops:health-report": "node scripts/ops-health-report.mjs",
+    "ops:backup-verify": "node scripts/backup-verify.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
