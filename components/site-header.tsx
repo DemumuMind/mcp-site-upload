@@ -9,6 +9,8 @@ import {
   House,
   LayoutGrid,
   Menu,
+  Newspaper,
+  Trophy,
   Wallet,
   Wrench,
   X,
@@ -35,6 +37,8 @@ const navLinkMap: readonly NavLinkItem[] = [
   { href: "/how-to-use", label: { en: "Setup", ru: "Настройка" }, icon: BookOpen },
   { href: "/tools", label: { en: "Tools", ru: "Инструменты" }, icon: Wrench },
   { href: "/mcp", label: { en: "MCP", ru: "MCP" }, icon: Cpu },
+  { href: "/blog", label: { en: "Blog", ru: "Блог" }, icon: Newspaper },
+  { href: "/vibeathon", label: { en: "Vibeathon", ru: "Vibeathon" }, icon: Trophy },
   { href: "/pricing", label: { en: "Pricing", ru: "Цены" }, icon: Wallet },
 ];
 

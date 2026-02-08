@@ -22,7 +22,10 @@ export function SiteFooter({ locale }: SiteFooterProps) {
     <footer className="border-t border-white/10 bg-[linear-gradient(180deg,#030812_0%,#02060d_100%)]">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-8">
         <div className="space-y-5">
-          <Link href="/" className="inline-flex items-center gap-2 text-slate-100">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          >
             <BrandLockup
               className="gap-2.5"
               markClassName="size-8"
@@ -45,7 +48,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={item.label}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-slate-900/70 text-slate-300 transition hover:border-white/25 hover:text-white"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-white/10 bg-slate-900/70 text-slate-300 transition hover:border-white/25 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:h-9 sm:w-9"
               >
                 <item.icon className="size-4" />
               </a>
@@ -58,23 +61,33 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             {tr(locale, "Explore", "Р Р°Р·РґРµР»С‹")}
           </p>
           <p>
-            <Link href="/catalog" className="text-slate-300 transition hover:text-white">
+            <Link href="/catalog" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Catalog", "РљР°С‚Р°Р»РѕРі")}
             </Link>
           </p>
           <p>
-            <Link href="/categories" className="text-slate-300 transition hover:text-white">
+            <Link href="/categories" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Categories", "РљР°С‚РµРіРѕСЂРёРё")}
             </Link>
           </p>
           <p>
-            <Link href="/mcp" className="text-slate-300 transition hover:text-white">
+            <Link href="/mcp" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "MCP Overview", "РћР±Р·РѕСЂ MCP")}
             </Link>
           </p>
           <p>
-            <Link href="/tools" className="text-slate-300 transition hover:text-white">
+            <Link href="/tools" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Tools", "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/blog" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Blog", "Blog")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/research/leaderboards" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Leaderboards", "Leaderboards")}
             </Link>
           </p>
         </div>
@@ -84,23 +97,38 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             {tr(locale, "Company", "Рћ РїСЂРѕРµРєС‚Рµ")}
           </p>
           <p>
-            <Link href="/about" className="text-slate-300 transition hover:text-white">
+            <Link href="/about" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "About Us", "Рћ РЅР°СЃ")}
             </Link>
           </p>
           <p>
-            <Link href="/pricing" className="text-slate-300 transition hover:text-white">
+            <Link href="/pricing" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Pricing", "Р¦РµРЅС‹")}
             </Link>
           </p>
           <p>
-            <Link href="/privacy" className="text-slate-300 transition hover:text-white">
+            <Link href="/contact" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Contact", "Contact")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/jobs" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Careers", "Careers")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/privacy" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Privacy Policy", "РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё")}
             </Link>
           </p>
           <p>
-            <Link href="/terms" className="text-slate-300 transition hover:text-white">
+            <Link href="/terms" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Terms of Service", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРµ СЃРѕРіР»Р°С€РµРЅРёРµ")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/sitemap" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Sitemap", "Sitemap")}
             </Link>
           </p>
         </div>
@@ -110,18 +138,48 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             {tr(locale, "Community", "РЎРѕРѕР±С‰РµСЃС‚РІРѕ")}
           </p>
           <p>
-            <Link href="/#submit" className="text-slate-300 transition hover:text-white">
+            <Link href="/discord" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Discord", "Discord")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/vibeathon" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Vibeathon", "Vibeathon")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/vibeathon/leaderboard" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "Vibeathon Leaderboard", "Vibeathon Leaderboard")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/ugc" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "UGC Program", "UGC Program")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/submit-server" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Submit Server", "РћС‚РїСЂР°РІРёС‚СЊ СЃРµСЂРІРµСЂ")}
             </Link>
           </p>
           <p>
-            <Link href="/how-to-use" className="text-slate-300 transition hover:text-white">
+            <Link href="/how-to-use" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Setup Guide", "Р“Р°Р№Рґ РїРѕ РЅР°СЃС‚СЂРѕР№РєРµ")}
             </Link>
           </p>
           <p>
-            <Link href="/auth" className="text-slate-300 transition hover:text-white">
+            <Link href="/auth" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Sign In", "Р’С…РѕРґ")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/faq/points" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "FAQ - Points", "FAQ - Points")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/faq/streaks" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+              {tr(locale, "FAQ - Streaks", "FAQ - Streaks")}
             </Link>
           </p>
         </div>
@@ -140,4 +198,3 @@ export function SiteFooter({ locale }: SiteFooterProps) {
     </footer>
   );
 }
-
