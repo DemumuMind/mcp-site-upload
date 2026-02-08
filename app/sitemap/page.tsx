@@ -52,22 +52,12 @@ const sections: readonly SiteMapSection[] = [
     ],
   },
   {
-    title: "Community & Events",
+    title: "Community",
     links: [
       {
         href: "/discord",
         title: "Discord Community",
         description: "Join the BridgeMind developer community.",
-      },
-      {
-        href: "/vibeathon",
-        title: "Vibeathon",
-        description: "Vibe coding hackathon for agentic coders.",
-      },
-      {
-        href: "/vibeathon/leaderboard",
-        title: "Vibeathon Leaderboard",
-        description: "Current hackathon standings and submissions.",
       },
     ],
   },
@@ -78,21 +68,6 @@ const sections: readonly SiteMapSection[] = [
         href: "/contact",
         title: "Contact",
         description: "Get in touch with the BridgeMind team.",
-      },
-      {
-        href: "/jobs",
-        title: "Careers",
-        description: "Job opportunities at BridgeMind.",
-      },
-      {
-        href: "/ugc",
-        title: "UGC Program",
-        description: "Creator program and user-generated content.",
-      },
-      {
-        href: "/ugc/brand-assets",
-        title: "Brand Assets",
-        description: "Logos and brand guidance for creators.",
       },
     ],
   },
@@ -108,16 +83,6 @@ const sections: readonly SiteMapSection[] = [
         href: "/privacy-policy",
         title: "Privacy Policy",
         description: "Data privacy and protection information.",
-      },
-      {
-        href: "/faq/points",
-        title: "FAQ - Points",
-        description: "How the BridgeMind points and rewards system works.",
-      },
-      {
-        href: "/faq/streaks",
-        title: "FAQ - Streaks",
-        description: "Streak mechanics and gamification details.",
       },
     ],
   },

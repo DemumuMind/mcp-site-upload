@@ -21,9 +21,9 @@ export default function BlogPage() {
           description: "Track AI model performance and compare practical coding capabilities.",
         },
         {
-          href: "/vibeathon",
-          label: "Vibeathon",
-          description: "Join the hackathon to test your agentic coding workflow in competition.",
+          href: "/contact",
+          label: "Contact",
+          description: "Reach the team for partnerships, editorial submissions, and collaboration.",
         },
       ]}
     />

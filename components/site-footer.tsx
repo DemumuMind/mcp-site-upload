@@ -112,11 +112,6 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             </Link>
           </p>
           <p>
-            <Link href="/jobs" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Careers", "Careers")}
-            </Link>
-          </p>
-          <p>
             <Link href="/privacy" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Privacy Policy", "РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё")}
             </Link>
@@ -143,21 +138,6 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             </Link>
           </p>
           <p>
-            <Link href="/vibeathon" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Vibeathon", "Vibeathon")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/vibeathon/leaderboard" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Vibeathon Leaderboard", "Vibeathon Leaderboard")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/ugc" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "UGC Program", "UGC Program")}
-            </Link>
-          </p>
-          <p>
             <Link href="/submit-server" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Submit Server", "РћС‚РїСЂР°РІРёС‚СЊ СЃРµСЂРІРµСЂ")}
             </Link>
@@ -170,16 +150,6 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           <p>
             <Link href="/auth" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Sign In", "Р’С…РѕРґ")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/faq/points" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "FAQ - Points", "FAQ - Points")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/faq/streaks" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "FAQ - Streaks", "FAQ - Streaks")}
             </Link>
           </p>
         </div>

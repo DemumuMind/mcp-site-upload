@@ -24,26 +24,19 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 - [Blog](${absoluteUrl("/blog", siteUrl)}): Articles on vibe coding, agentic coding, prompt engineering, and AI development best practices
 - [Research Leaderboards](${absoluteUrl("/research/leaderboards", siteUrl)}): AI model performance comparisons and rankings
 
-## Community & Events
+## Community
 
 - [Discord Community](${absoluteUrl("/discord", siteUrl)}): Join 20,000+ vibe coders in our developer community
-- [Vibeathon](${absoluteUrl("/vibeathon", siteUrl)}): Vibe coding hackathon with prizes for agentic coders
-- [Vibeathon Leaderboard](${absoluteUrl("/vibeathon/leaderboard", siteUrl)}): Current hackathon standings and submissions
 
 ## Company
 
 - [Contact](${absoluteUrl("/contact", siteUrl)}): Get in touch with the BridgeMind team
-- [Careers](${absoluteUrl("/jobs", siteUrl)}): Job opportunities at BridgeMind
-- [UGC Program](${absoluteUrl("/ugc", siteUrl)}): User-generated content and creator program
 
 ## Optional
 
 - [Terms of Service](${absoluteUrl("/terms-of-service", siteUrl)}): Legal terms and conditions
 - [Privacy Policy](${absoluteUrl("/privacy-policy", siteUrl)}): Data privacy and protection information
-- [FAQ - Points](${absoluteUrl("/faq/points", siteUrl)}): How the BridgeMind points and rewards system works
-- [FAQ - Streaks](${absoluteUrl("/faq/streaks", siteUrl)}): Streak information and gamification
 - [Sitemap](${absoluteUrl("/sitemap", siteUrl)}): Full site navigation
-- [Brand Assets](${absoluteUrl("/ugc/brand-assets", siteUrl)}): Logos and brand guidelines for creators
 `;
 }
 
