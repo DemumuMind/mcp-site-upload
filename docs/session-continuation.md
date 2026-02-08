@@ -1,5 +1,50 @@
 # Session Continuation
 
+## Latest Update (2026-02-08, User Sign In/Login Hardening + Account Cabinet)
+- Objective: implement approved Sign In/Login plan with SSR Supabase auth, protected user routes, auth callback, and user account page with own submissions.
+- Implemented:
+  - Added Supabase SSR auth clients:
+    - `lib/supabase/auth-server.ts` (server/auth cookies)
+    - `lib/supabase/proxy-auth.ts` (proxy/middleware auth cookies)
+    - migrated browser client to `@supabase/ssr` in `lib/supabase/browser.ts`
+  - Added auth callback route: `app/auth/callback/route.ts` with safe `next` normalization and callback error codes.
+  - Expanded route protection in `proxy.ts`:
+    - kept existing admin token-cookie guard
+    - added protected user routes: `/submit-server`, `/account`
+  - Updated auth UI flow:
+    - `app/auth/page.tsx` now forwards callback `error` code to sign-in panel
+    - `components/auth-sign-in-panel.tsx` now uses `/auth/callback?next=...` and surfaces callback errors
+    - `components/auth-nav-actions.tsx` now includes `My account` for signed-in users
+  - Added account cabinet:
+    - `app/account/page.tsx` (profile + read-only user submissions list)
+    - `components/account-sign-out-button.tsx`
+  - Hardened submit flow:
+    - `app/actions.ts` now resolves user server-side via cookies and writes `owner_user_id`
+    - `components/submission-form.tsx` no longer passes access token from client
+    - `components/submission-access-panel.tsx` updated not-configured messaging
+    - `components/submit-server-cta.tsx` updated auth redirect target to `/submit-server`
+  - Added DB migration for ownership and RLS:
+    - `supabase/migrations/20260208194500_user_owned_submissions.sql`
+      - adds `owner_user_id`
+      - removes anon insert policy
+      - enforces authenticated owned insert and own-row select policy
+  - Updated docs:
+    - `README.md` (auth callback, protected routes, new migration)
+- Verification run:
+  - `npm run lint` (pass)
+  - `npm run build` (pass)
+- Next commands:
+  - Apply migration in target Supabase project (`supabase db push` / deployment pipeline equivalent)
+  - Configure Supabase provider callback URLs to include `/auth/callback`
+  - Manual test matrix:
+    - unauthenticated access to `/submit-server` and `/account` redirects to `/auth`
+    - OAuth and magic link both return through `/auth/callback`
+    - authenticated submit creates row with `owner_user_id`
+    - account page lists only current user's submissions
+- Open risks:
+  - Existing legacy `servers` rows without `owner_user_id` remain intentionally unassigned and are not shown in account cabinet.
+  - Some existing files in worktree are pre-modified by prior work; this update was applied without reverting unrelated edits.
+
 ## Latest Update (2026-02-08, Brand Asset Pack Phase 2)
 - Objective: deliver the second branding pass with export-ready assets (light/dark logo variants, favicon set, social avatars, and OG image wiring).
 - Implemented:

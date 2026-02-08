@@ -1,6 +1,6 @@
-﻿"use server";
+"use server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseServerUser } from "@/lib/supabase/auth-server";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getSubmissionSchema, type SubmissionInput } from "@/lib/submission-schema";
@@ -22,7 +22,6 @@ function toSlug(name: string): string {
 
 export async function submitServerAction(
   input: SubmissionInput,
-  accessToken?: string | null,
 ): Promise<SubmissionActionResult> {
   const locale = await getLocale();
   const submissionSchema = getSubmissionSchema(locale);
@@ -31,7 +30,7 @@ export async function submitServerAction(
   if (!parsedSubmission.success) {
     const fieldErrors = Object.fromEntries(
       Object.entries(parsedSubmission.error.flatten().fieldErrors).map(
-        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Некорректное значение")],
+        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Invalid value")],
       ),
     );
 
@@ -40,47 +39,33 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Validation failed. Please check highlighted fields.",
-        "Проверка не пройдена. Исправьте выделенные поля.",
+        "Validation failed. Please check highlighted fields.",
       ),
       fieldErrors: fieldErrors as Partial<Record<keyof SubmissionInput, string>>,
     };
   }
 
   const data = parsedSubmission.data;
-  const supabaseClient = createSupabaseServerClient();
+  const { supabaseClient, user } = await getSupabaseServerUser();
 
   if (!supabaseClient) {
     return {
-      success: true,
+      success: false,
       message: tr(
         locale,
-        "Submission accepted in local mode. Configure Supabase env vars to persist records.",
-        "Заявка принята в локальном режиме. Настройте переменные Supabase для сохранения данных.",
+        "Auth is not configured. Set Supabase environment variables before submitting.",
+        "Auth is not configured. Set Supabase environment variables before submitting.",
       ),
     };
   }
 
-  if (!accessToken) {
+  if (!user) {
     return {
       success: false,
       message: tr(
         locale,
         "Login / Sign in is required before submitting a server.",
-        "Перед отправкой сервера необходимо войти в аккаунт.",
-      ),
-    };
-  }
-
-  const { data: authData, error: authError } =
-    await supabaseClient.auth.getUser(accessToken);
-
-  if (authError || !authData.user) {
-    return {
-      success: false,
-      message: tr(
-        locale,
-        "Session expired or invalid. Please sign in again.",
-        "Сессия истекла или недействительна. Войдите снова.",
+        "Login / Sign in is required before submitting a server.",
       ),
     };
   }
@@ -97,6 +82,7 @@ export async function submitServerAction(
       name: data.maintainerName,
       email: data.maintainerEmail,
     },
+    owner_user_id: user.id,
     status: "pending",
     verification_level: "community",
     tags: [],
@@ -105,7 +91,8 @@ export async function submitServerAction(
   if (error) {
     return {
       success: false,
-      message: tr(locale, "Submission failed", "Отправка не удалась") + `: ${error.message}`,
+      message:
+        tr(locale, "Submission failed", "Submission failed") + `: ${error.message}`,
     };
   }
 
@@ -114,7 +101,7 @@ export async function submitServerAction(
     message: tr(
       locale,
       "Server submitted successfully. Status: pending moderation.",
-      "Сервер успешно отправлен. Статус: ожидает модерации.",
+      "Server submitted successfully. Status: pending moderation.",
     ),
   };
 }

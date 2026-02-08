@@ -20,16 +20,18 @@ export async function generateMetadata(): Promise<Metadata> {
 type AuthPageProps = {
   searchParams: Promise<{
     next?: string;
+    error?: string;
   }>;
 };
 
 export default async function AuthPage({ searchParams }: AuthPageProps) {
-  const { next } = await searchParams;
+  const { next, error } = await searchParams;
   const nextPath = typeof next === "string" ? next : "/";
+  const errorCode = typeof error === "string" ? error : undefined;
 
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center px-4 py-12">
-      <AuthSignInPanel nextPath={nextPath} />
+      <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} />
     </div>
   );
 }

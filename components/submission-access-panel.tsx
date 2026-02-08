@@ -11,7 +11,7 @@ import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { tr } from "@/lib/i18n";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
-const authRedirectHref = "/auth?next=%2F%23submit";
+const authRedirectHref = "/auth?next=%2Fsubmit-server%23submit";
 
 export function SubmissionAccessPanel() {
   const locale = useLocale();
@@ -35,7 +35,23 @@ export function SubmissionAccessPanel() {
   }
 
   if (!isConfigured) {
-    return <SubmissionForm />;
+    return (
+      <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-6">
+        <h4 className="text-base font-semibold text-amber-200">
+          {tr(locale, "Auth is not configured", "Авторизация не настроена")}
+        </h4>
+        <p className="mt-2 text-sm text-amber-100/90">
+          {tr(
+            locale,
+            "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable server submissions.",
+            "Укажите NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY, чтобы включить отправку серверов.",
+          )}
+        </p>
+        <Button asChild className="mt-4 bg-blue-500 hover:bg-blue-400">
+          <Link href="/auth">{tr(locale, "Open sign in page", "Открыть страницу входа")}</Link>
+        </Button>
+      </div>
+    );
   }
 
   if (!user) {

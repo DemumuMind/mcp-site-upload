@@ -34,6 +34,8 @@ npm run dev
 
 4. Open:
 - `http://localhost:3000` (catalog)
+- `http://localhost:3000/auth` (user login/sign-in)
+- `http://localhost:3000/account` (user account, protected)
 - `http://localhost:3000/admin/login` (admin login)
 
 ## Environment Variables
@@ -50,6 +52,8 @@ npm run dev
 
 Notes:
 - If Supabase env vars are missing, app falls back to local mock data for public catalog.
+- User auth callbacks use `/auth/callback`. Configure this URL in Supabase Auth provider settings for each environment.
+- `/submit-server` and `/account` are protected routes and require a valid user session.
 - For production cron auth, set either `HEALTH_CHECK_CRON_SECRET` or `CRON_SECRET` (can be same value).
 
 ## Database Migrations
@@ -60,6 +64,7 @@ Current key migrations:
 - `20260208071000_init_mcp_catalog.sql` - base schema + RLS
 - `20260208074000_server_health_checks.sql` - health status fields
 - `20260208080000_seed_top_mcp_servers.sql` - cold-start seed dataset (idempotent upsert by slug)
+- `20260208194500_user_owned_submissions.sql` - user-owned submissions (`owner_user_id`) + stricter auth submit/read policies
 
 Apply migrations via Supabase CLI in your environment.
 

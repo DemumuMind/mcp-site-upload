@@ -21,7 +21,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { tr } from "@/lib/i18n";
 import { getSubmissionSchema, type SubmissionInput } from "@/lib/submission-schema";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 const defaultFormValues: SubmissionInput = {
   name: "",
@@ -54,15 +53,7 @@ export function SubmissionForm() {
 
   function onSubmit(values: SubmissionInput) {
     startTransition(async () => {
-      let accessToken: string | null = null;
-      const supabaseClient = createSupabaseBrowserClient();
-
-      if (supabaseClient) {
-        const { data } = await supabaseClient.auth.getSession();
-        accessToken = data.session?.access_token ?? null;
-      }
-
-      const result = await submitServerAction(values, accessToken);
+      const result = await submitServerAction(values);
 
       if (!result.success) {
         if (result.fieldErrors) {
@@ -96,6 +87,8 @@ export function SubmissionForm() {
         <Input
           id="name"
           placeholder={tr(locale, "Linear MCP", "Linear MCP")}
+          autoComplete="organization"
+          required
           className="border-white/10 bg-slate-950/80"
           {...form.register("name")}
         />
@@ -107,6 +100,8 @@ export function SubmissionForm() {
         <Input
           id="category"
           placeholder={tr(locale, "Project Management", "Управление проектами")}
+          autoComplete="off"
+          required
           className="border-white/10 bg-slate-950/80"
           {...form.register("category")}
         />
@@ -117,6 +112,10 @@ export function SubmissionForm() {
         <Label htmlFor="serverUrl">{tr(locale, "Server URL", "URL сервера")}</Label>
         <Input
           id="serverUrl"
+          type="url"
+          autoComplete="url"
+          spellCheck={false}
+          required
           placeholder="https://mcp.example.com/sse"
           className="border-white/10 bg-slate-950/80"
           {...form.register("serverUrl")}
@@ -149,6 +148,9 @@ export function SubmissionForm() {
         <Label htmlFor="repoUrl">{tr(locale, "Repository URL (optional)", "URL репозитория (опционально)")}</Label>
         <Input
           id="repoUrl"
+          type="url"
+          autoComplete="url"
+          spellCheck={false}
           placeholder="https://github.com/org/repo"
           className="border-white/10 bg-slate-950/80"
           {...form.register("repoUrl")}
@@ -161,6 +163,8 @@ export function SubmissionForm() {
         <Input
           id="maintainerName"
           placeholder={tr(locale, "Jane Doe", "Jane Doe")}
+          autoComplete="name"
+          required
           className="border-white/10 bg-slate-950/80"
           {...form.register("maintainerName")}
         />
@@ -171,6 +175,9 @@ export function SubmissionForm() {
         <Label htmlFor="maintainerEmail">{tr(locale, "Maintainer email", "Email мейнтейнера")}</Label>
         <Input
           id="maintainerEmail"
+          type="email"
+          autoComplete="email"
+          required
           placeholder="maintainer@example.com"
           className="border-white/10 bg-slate-950/80"
           {...form.register("maintainerEmail")}
@@ -183,6 +190,8 @@ export function SubmissionForm() {
         <Textarea
           id="description"
           rows={5}
+          autoComplete="off"
+          required
           placeholder={tr(
             locale,
             "Describe server capabilities, supported tools, and setup notes.",

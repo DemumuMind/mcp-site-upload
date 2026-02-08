@@ -15,19 +15,85 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AuthSignInPanelProps = {
   nextPath: string;
+  errorCode?: string;
 };
 
 function normalizeNextPath(nextPath: string): string {
-  if (!nextPath.startsWith("/")) {
+  const candidate = nextPath.trim();
+
+  if (!candidate.startsWith("/")) {
     return "/";
   }
 
-  return nextPath;
+  if (candidate.startsWith("//") || candidate.startsWith("/\\")) {
+    return "/";
+  }
+
+  if (/[\u0000-\u001F\u007F]/.test(candidate)) {
+    return "/";
+  }
+
+  try {
+    const parsed = new URL(candidate, "http://localhost");
+
+    if (parsed.origin !== "http://localhost") {
+      return "/";
+    }
+
+    const normalizedPath = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    if (!normalizedPath.startsWith("/") || normalizedPath.startsWith("//")) {
+      return "/";
+    }
+
+    return normalizedPath;
+  } catch {
+    return "/";
+  }
 }
 
-export function AuthSignInPanel({ nextPath }: AuthSignInPanelProps) {
+function getAuthErrorMessage(locale: "en" | "ru", errorCode?: string): string | null {
+  if (!errorCode) {
+    return null;
+  }
+
+  if (errorCode === "missing_code") {
+    return tr(
+      locale,
+      "Authentication code is missing. Please try signing in again.",
+      "Код авторизации не найден. Попробуйте войти снова.",
+    );
+  }
+
+  if (errorCode === "callback_error") {
+    return tr(
+      locale,
+      "Sign-in callback failed or link has expired. Start a new sign-in attempt.",
+      "Ошибка callback при входе или ссылка устарела. Начните вход заново.",
+    );
+  }
+
+  if (errorCode === "config_error") {
+    return tr(
+      locale,
+      "Auth callback is not configured. Check Supabase environment variables.",
+      "Auth callback не настроен. Проверьте переменные окружения Supabase.",
+    );
+  }
+
+  return tr(
+    locale,
+    "Authentication failed. Please try again.",
+    "Авторизация не выполнена. Попробуйте снова.",
+  );
+}
+
+export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
   const locale = useLocale();
   const safeNextPath = useMemo(() => normalizeNextPath(nextPath), [nextPath]);
+  const callbackErrorMessage = useMemo(
+    () => getAuthErrorMessage(locale, errorCode),
+    [errorCode, locale],
+  );
   const { isConfigured, isLoading, user } = useSupabaseUser();
   const [email, setEmail] = useState("");
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
@@ -42,7 +108,7 @@ export function AuthSignInPanel({ nextPath }: AuthSignInPanelProps) {
       return undefined;
     }
 
-    return `${window.location.origin}/auth?next=${encodeURIComponent(safeNextPath)}`;
+    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNextPath)}`;
   }
 
   async function signInWithProvider(provider: "google" | "github") {
@@ -183,6 +249,11 @@ export function AuthSignInPanel({ nextPath }: AuthSignInPanelProps) {
           "Войдите, чтобы отправлять MCP-серверы и управлять интеграциями.",
         )}
       </p>
+      {callbackErrorMessage ? (
+        <p className="mt-4 rounded-md border border-rose-400/35 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+          {callbackErrorMessage}
+        </p>
+      ) : null}
       {isLoading ? (
         <p className="mt-2 text-xs text-slate-400">
           {tr(locale, "Checking your session...", "Проверяем вашу сессию...")}

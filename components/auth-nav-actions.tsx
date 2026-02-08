@@ -13,8 +13,9 @@ type AuthNavActionsProps = {
   locale: Locale;
 };
 
-const submitHref = "/#submit";
-const authRedirectHref = "/auth?next=%2F%23submit";
+const submitHref = "/submit-server";
+const accountHref = "/account";
+const authRedirectHref = "/auth?next=%2Fsubmit-server%23submit";
 
 export function AuthNavActions({ locale }: AuthNavActionsProps) {
   const { isConfigured, user } = useSupabaseUser();
@@ -38,10 +39,10 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
 
   if (!isConfigured) {
     return (
-      <Button asChild className="h-9 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
-        <Link href={submitHref}>
-          <span className="sm:hidden">{tr(locale, "Submit", "Отправить")}</span>
-          <span className="hidden sm:inline">{tr(locale, "Submit Server", "Отправить сервер")}</span>
+      <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+        <Link href={authRedirectHref}>
+          <span className="sm:hidden">{tr(locale, "Login", "Войти")}</span>
+          <span className="hidden sm:inline">{tr(locale, "Login / Sign in", "Войти / Регистрация")}</span>
         </Link>
       </Button>
     );
@@ -49,7 +50,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
 
   if (!user) {
     return (
-      <Button asChild className="h-9 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+      <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={authRedirectHref}>
           <span className="sm:hidden">{tr(locale, "Login", "Войти")}</span>
           <span className="hidden sm:inline">{tr(locale, "Login / Sign in", "Войти / Регистрация")}</span>
@@ -60,7 +61,17 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <Button asChild className="h-9 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+      <Button
+        asChild
+        variant="outline"
+        className="h-11 rounded-full border-white/15 bg-white/[0.02] px-3 text-xs font-semibold hover:bg-white/[0.06] sm:h-10 sm:px-4 sm:text-sm"
+      >
+        <Link href={accountHref}>
+          <span className="sm:hidden">{tr(locale, "Account", "Аккаунт")}</span>
+          <span className="hidden sm:inline">{tr(locale, "My account", "Мой аккаунт")}</span>
+        </Link>
+      </Button>
+      <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={submitHref}>
           <span className="sm:hidden">{tr(locale, "Submit", "Отправить")}</span>
           <span className="hidden sm:inline">{tr(locale, "Submit Server", "Отправить сервер")}</span>
@@ -73,7 +84,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
         onClick={() => {
           void signOut();
         }}
-        className="h-9 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06] sm:h-10 sm:px-3 sm:text-sm"
+        className="h-11 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06] sm:h-10 sm:px-3 sm:text-sm"
         aria-label={tr(locale, "Sign out", "Выйти")}
       >
         <LogOut className="size-4" />

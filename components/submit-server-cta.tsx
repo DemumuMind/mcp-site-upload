@@ -7,14 +7,14 @@ import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { useLocale } from "@/components/locale-provider";
 import { tr } from "@/lib/i18n";
 
-const authRedirectHref = "/auth?next=%2F%23submit";
+const authRedirectHref = "/auth?next=%2Fsubmit-server%23submit";
 
 export function SubmitServerCta() {
-  const { isConfigured, user } = useSupabaseUser();
+  const { user } = useSupabaseUser();
   const locale = useLocale();
 
-  const href = !isConfigured || user ? "/#submit" : authRedirectHref;
-  const label = !isConfigured || user
+  const href = user ? "/submit-server" : authRedirectHref;
+  const label = user
     ? tr(locale, "Submit Server", "Отправить сервер")
     : tr(locale, "Login / Sign in", "Войти / Регистрация");
 
