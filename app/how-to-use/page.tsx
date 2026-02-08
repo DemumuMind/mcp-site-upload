@@ -22,7 +22,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getActiveServers } from "@/lib/servers";
 
 export const metadata: Metadata = {
-  title: "Setup Guide | DemumuMind MCP",
+  title: "Setup Guide",
   description: "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
 };
 
@@ -75,8 +75,8 @@ const setupSteps = [
 
 const prerequisites = [
   {
-    en: "MCP-compatible client (Claude Desktop, Cursor, or another compatible app).",
-    ru: "MCP-совместимый клиент (Claude Desktop, Cursor или другое совместимое приложение).",
+    en: "MCP-compatible client (OpenAI Codex, Claude Code, Cursor, Windsurf, GitHub Copilot, VS Code, or another compatible app).",
+    ru: "MCP-совместимый клиент (OpenAI Codex, Claude Code, Cursor, Windsurf, GitHub Copilot, VS Code или другое совместимое приложение).",
   },
   {
     en: "Access to your local MCP config file.",
@@ -92,18 +92,90 @@ const prerequisites = [
   },
 ] as const;
 
-const clientPaths = [
+const clientGuides = [
   {
-    os: "Windows",
-    path: "%APPDATA%\\Claude\\claude_desktop_config.json",
+    client: "OpenAI Codex",
+    badge: { en: "Codex", ru: "Codex" },
+    where: {
+      en: "Open MCP/Tools settings in Codex, add the server endpoint, provide auth credentials, then reload the workspace/session.",
+      ru: "Откройте настройки MCP/Tools в Codex, добавьте endpoint сервера, укажите auth-данные и перезапустите workspace/сессию.",
+    },
+    smoke: {
+      en: "Ask Codex to list tools from the connected server and execute one read-only tool call.",
+      ru: "Попросите Codex показать инструменты подключенного сервера и выполнить один read-only вызов.",
+    },
   },
   {
-    os: "macOS",
-    path: "~/Library/Application Support/Claude/claude_desktop_config.json",
+    client: "Claude Code",
+    badge: { en: "CLI Agent", ru: "CLI-агент" },
+    where: {
+      en: "Add the server in Claude Code MCP configuration, save, and restart the agent session to load tools.",
+      ru: "Добавьте сервер в MCP-конфиг Claude Code, сохраните и перезапустите сессию агента для загрузки инструментов.",
+    },
+    smoke: {
+      en: "Run one low-risk call (health/list/read) and verify stable output shape.",
+      ru: "Выполните один безопасный вызов (health/list/read) и проверьте стабильный формат ответа.",
+    },
   },
   {
-    os: "Linux",
-    path: "~/.config/Claude/claude_desktop_config.json",
+    client: "Cursor",
+    badge: { en: "IDE", ru: "IDE" },
+    where: {
+      en: "Open Cursor MCP/integrations settings, add server URL and token, then reload the IDE window.",
+      ru: "Откройте настройки MCP/интеграций в Cursor, добавьте URL сервера и токен, затем перезагрузите окно IDE.",
+    },
+    smoke: {
+      en: "Call a simple tool from chat/agent mode and confirm the response arrives without timeout.",
+      ru: "Вызовите простой инструмент из chat/agent-режима и убедитесь, что ответ приходит без таймаута.",
+    },
+  },
+  {
+    client: "Windsurf",
+    badge: { en: "IDE", ru: "IDE" },
+    where: {
+      en: "Configure MCP server in Windsurf integrations, map auth, and restart agent context.",
+      ru: "Настройте MCP-сервер в интеграциях Windsurf, укажите auth и перезапустите контекст агента.",
+    },
+    smoke: {
+      en: "Run a single deterministic tool action and verify identical output on repeat.",
+      ru: "Выполните одно детерминированное действие инструмента и проверьте одинаковый результат при повторе.",
+    },
+  },
+  {
+    client: "GitHub Copilot",
+    badge: { en: "Copilot", ru: "Copilot" },
+    where: {
+      en: "Use Copilot-compatible MCP integration path (extension/settings), register endpoint and credentials, then reload VS Code.",
+      ru: "Используйте MCP-интеграцию для Copilot (через extension/settings), добавьте endpoint и credentials, затем перезапустите VS Code.",
+    },
+    smoke: {
+      en: "Trigger a tool-assisted Copilot request and verify that MCP tool outputs are available to the agent.",
+      ru: "Запустите tool-assisted запрос Copilot и проверьте, что вывод MCP-инструментов доступен агенту.",
+    },
+  },
+  {
+    client: "VS Code",
+    badge: { en: "Editor", ru: "Редактор" },
+    where: {
+      en: "Configure MCP server through your chosen VS Code agent extension and keep endpoint/auth in local settings.",
+      ru: "Настройте MCP-сервер через выбранное агентное расширение VS Code и храните endpoint/auth в локальных settings.",
+    },
+    smoke: {
+      en: "Run one tool call from the extension chat and confirm logs show a successful MCP handshake.",
+      ru: "Выполните один вызов инструмента из чата расширения и проверьте в логах успешный MCP-handshake.",
+    },
+  },
+  {
+    client: "And more",
+    badge: { en: "Other clients", ru: "Другие клиенты" },
+    where: {
+      en: "For any MCP-compatible client: add endpoint, auth, and transport settings (SSE/HTTP/stdin) according to the client docs.",
+      ru: "Для любого MCP-совместимого клиента: добавьте endpoint, auth и transport-настройки (SSE/HTTP/stdin) по документации клиента.",
+    },
+    smoke: {
+      en: "Validate with the same 3-step test: list tools -> run read-only tool -> verify stable response schema.",
+      ru: "Проверьте тем же 3-шаговым тестом: list tools -> read-only вызов -> проверка стабильной схемы ответа.",
+    },
   },
 ] as const;
 
@@ -271,18 +343,71 @@ export default async function HowToUsePage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl text-slate-100">
               <KeyRound className="size-5 text-cyan-300" />
-              {tr(locale, "Claude Config Paths", "Пути к конфигу Claude")}
+              {tr(locale, "Client Setup Matrix", "Матрица настройки клиентов")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {clientPaths.map((item) => (
-              <div key={item.os} className="rounded-xl border border-white/10 bg-slate-900/70 p-3">
-                <p className="mb-2 text-xs font-semibold tracking-[0.1em] text-slate-400 uppercase">{item.os}</p>
-                <code className="block overflow-x-auto text-xs text-cyan-200">{item.path}</code>
+            {clientGuides.map((item) => (
+              <div key={item.client} className="rounded-xl border border-white/10 bg-slate-900/70 p-3">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold tracking-[0.1em] text-slate-200 uppercase">{item.client}</p>
+                  <Badge variant="outline" className="border-cyan-400/30 bg-cyan-500/10 text-cyan-200">
+                    {tr(locale, item.badge.en, item.badge.ru)}
+                  </Badge>
+                </div>
+                <p className="text-xs leading-6 text-slate-300">{tr(locale, item.where.en, item.where.ru)}</p>
               </div>
             ))}
           </CardContent>
         </Card>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
+        <div className="mb-5 space-y-2">
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">
+            {tr(
+              locale,
+              "Client-specific Setup (OpenAI Codex, Claude Code, Cursor, Windsurf, GitHub Copilot, VS Code, and more)",
+              "Настройка по клиентам (OpenAI Codex, Claude Code, Cursor, Windsurf, GitHub Copilot, VS Code и другие)",
+            )}
+          </h2>
+          <p className="text-sm text-slate-300 sm:text-base">
+            {tr(
+              locale,
+              "Follow the exact flow for your client and finish with a smoke test before enabling production workflows.",
+              "Используйте точный flow для вашего клиента и завершайте настройку smoke-тестом перед запуском production-workflow.",
+            )}
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {clientGuides.map((item) => (
+            <Card key={`${item.client}-setup`} className="border-white/10 bg-slate-950/75">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between gap-2 text-lg text-slate-100">
+                  <span>{item.client}</span>
+                  <Badge variant="outline" className="border-cyan-400/30 bg-cyan-500/10 text-cyan-200">
+                    {tr(locale, item.badge.en, item.badge.ru)}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm leading-7 text-slate-300">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.1em] text-slate-400 uppercase">
+                    {tr(locale, "Where to configure", "Где настраивать")}
+                  </p>
+                  <p>{tr(locale, item.where.en, item.where.ru)}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.1em] text-slate-400 uppercase">
+                    {tr(locale, "Smoke test", "Smoke-тест")}
+                  </p>
+                  <p>{tr(locale, item.smoke.en, item.smoke.ru)}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
@@ -349,7 +474,7 @@ export default async function HowToUsePage() {
               variant="outline"
               className="h-11 rounded-xl border-white/20 bg-slate-950/65 text-slate-100 hover:bg-slate-900"
             >
-              <Link href="/#submit">{tr(locale, "Submit Your Server", "Отправить свой сервер")}</Link>
+              <Link href="/submit-server#submit">{tr(locale, "Submit Your Server", "Отправить свой сервер")}</Link>
             </Button>
           </div>
         </div>

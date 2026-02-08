@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useMemo } from "react";
-import { CheckCircle2, Copy } from "lucide-react";
+import { CheckCircle2, Copy, FileCode2, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { useLocale } from "@/components/locale-provider";
@@ -80,7 +80,8 @@ export function HowToConnectSection({
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-white/10 bg-slate-950/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-slate-100">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-100">
+              <Search className="size-4 text-cyan-300" />
               {tr(locale, "1. Select server", "1. Выберите сервер")}
             </CardTitle>
           </CardHeader>
@@ -95,7 +96,8 @@ export function HowToConnectSection({
 
         <Card className="border-white/10 bg-slate-950/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-slate-100">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-100">
+              <FileCode2 className="size-4 text-cyan-300" />
               {tr(locale, "2. Add config", "2. Добавьте конфиг")}
             </CardTitle>
           </CardHeader>
@@ -110,7 +112,8 @@ export function HowToConnectSection({
 
         <Card className="border-white/10 bg-slate-950/60">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-slate-100">
+            <CardTitle className="flex items-center gap-2 text-base text-slate-100">
+              <CheckCircle2 className="size-4 text-emerald-300" />
               {tr(locale, "3. Verify tools", "3. Проверьте инструменты")}
             </CardTitle>
           </CardHeader>

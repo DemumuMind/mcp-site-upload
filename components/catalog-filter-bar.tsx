@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { Search } from "lucide-react";
+import { FolderTree, KeyRound, Languages, Search } from "lucide-react";
 
 import { useLocale } from "@/components/locale-provider";
 import { Input } from "@/components/ui/input";
@@ -66,7 +66,10 @@ export function CatalogFilterBar({
 
       <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
         <SelectTrigger className="border-white/10 bg-slate-950/80 text-slate-200">
-          <SelectValue placeholder={tr(locale, "Categories", "Категории")} />
+          <div className="flex items-center gap-2">
+            <FolderTree className="size-4 text-slate-400" />
+            <SelectValue placeholder={tr(locale, "Categories", "Категории")} />
+          </div>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{tr(locale, "All Categories", "Все категории")}</SelectItem>
@@ -80,7 +83,10 @@ export function CatalogFilterBar({
 
       <Select value={languageFilter} onValueChange={onLanguageFilterChange}>
         <SelectTrigger className="border-white/10 bg-slate-950/80 text-slate-200">
-          <SelectValue placeholder={tr(locale, "Languages", "Языки")} />
+          <div className="flex items-center gap-2">
+            <Languages className="size-4 text-slate-400" />
+            <SelectValue placeholder={tr(locale, "Languages", "Языки")} />
+          </div>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{tr(locale, "All Languages", "Все языки")}</SelectItem>
@@ -97,7 +103,10 @@ export function CatalogFilterBar({
         onValueChange={(value) => onAuthFilterChange(value as AuthType | "all")}
       >
         <SelectTrigger className="border-white/10 bg-slate-950/80 text-slate-200">
-          <SelectValue placeholder={tr(locale, "Auth type", "Тип авторизации")} />
+          <div className="flex items-center gap-2">
+            <KeyRound className="size-4 text-slate-400" />
+            <SelectValue placeholder={tr(locale, "Auth type", "Тип авторизации")} />
+          </div>
         </SelectTrigger>
         <SelectContent>
           {authFilterOptions.map((option) => (

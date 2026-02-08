@@ -1,7 +1,17 @@
 ﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  ExternalLink,
+  Handshake,
+  KeyRound,
+  LockKeyhole,
+  ShieldCheck,
+  Unlock,
+  Users,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +19,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { tr, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getServerBySlug } from "@/lib/servers";
-import type { HealthStatus } from "@/lib/types";
+import type { AuthType, HealthStatus, VerificationLevel } from "@/lib/types";
 
 type ServerDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -43,6 +53,21 @@ const healthBadgeConfig: Record<
     className: "border-white/10 bg-white/5 text-slate-300",
     dotClassName: "bg-slate-400",
   },
+};
+
+const authBadgeConfig: Record<AuthType, { labelEn: string; labelRu: string; icon: typeof Unlock }> = {
+  none: { labelEn: "Open", labelRu: "Открытый", icon: Unlock },
+  api_key: { labelEn: "API Key", labelRu: "API ключ", icon: KeyRound },
+  oauth: { labelEn: "OAuth", labelRu: "OAuth", icon: LockKeyhole },
+};
+
+const verificationBadgeConfig: Record<
+  VerificationLevel,
+  { labelEn: string; labelRu: string; icon: typeof ShieldCheck }
+> = {
+  community: { labelEn: "Community", labelRu: "Сообщество", icon: Users },
+  partner: { labelEn: "Partner", labelRu: "Партнер", icon: Handshake },
+  official: { labelEn: "Official", labelRu: "Официальный", icon: BadgeCheck },
 };
 
 function formatCheckedAt(value: string | undefined, locale: Locale): string {
@@ -112,6 +137,10 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
 
   const healthStatus = mcpServer.healthStatus ?? "unknown";
   const healthBadge = healthBadgeConfig[healthStatus];
+  const authBadge = authBadgeConfig[mcpServer.authType];
+  const AuthIcon = authBadge.icon;
+  const verificationBadge = verificationBadgeConfig[mcpServer.verificationLevel];
+  const VerificationIcon = verificationBadge.icon;
   const visitUrl = mcpServer.repoUrl || mcpServer.serverUrl;
 
   const jsonLd = {
@@ -152,11 +181,13 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
 
             <div className="flex flex-wrap gap-2">
               <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-              <Badge variant="secondary" className="bg-white/8 text-slate-300">
-                {mcpServer.authType}
+              <Badge variant="outline" className="border-white/10 bg-slate-950/70 text-slate-300">
+                <AuthIcon className="mr-1 size-3" />
+                {tr(locale, authBadge.labelEn, authBadge.labelRu)}
               </Badge>
               <Badge variant="outline" className="border-white/15 text-slate-300">
-                {mcpServer.verificationLevel}
+                <VerificationIcon className="mr-1 size-3" />
+                {tr(locale, verificationBadge.labelEn, verificationBadge.labelRu)}
               </Badge>
               <Badge variant="outline" className={healthBadge.className}>
                 <span className={`mr-1 inline-block size-1.5 rounded-full ${healthBadge.dotClassName}`} />

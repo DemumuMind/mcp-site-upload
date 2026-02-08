@@ -1,17 +1,24 @@
 import Link from "next/link";
 import {
+  type LucideIcon,
   Activity,
   ArrowRight,
+  BrainCircuit,
   Blocks,
+  BotMessageSquare,
   Bot,
   CheckCircle2,
+  Code2,
   Command,
+  Github,
   LayoutDashboard,
   MonitorSmartphone,
+  MousePointer2,
   Search,
   ShieldCheck,
   Sparkles,
   TerminalSquare,
+  Waves,
   Wrench,
 } from "lucide-react";
 
@@ -73,7 +80,7 @@ const workflowCards = [
       en: "Public submissions plus admin moderation keep the directory high-signal and production-ready.",
       ru: "Публичные заявки и модерация админом удерживают каталог качественным и готовым к продакшену.",
     },
-    href: "/#submit",
+    href: "/submit-server",
     cta: {
       en: "Submit server",
       ru: "Отправить сервер",
@@ -226,50 +233,58 @@ const icpCards = [
   },
 ] as const;
 
-const stackItems = [
+type StackItem = {
+  name: string;
+  icon: LucideIcon;
+  badge: Record<Locale, string>;
+  cardClass: string;
+  iconClass: string;
+};
+
+const stackItems: readonly StackItem[] = [
   {
     name: "Cursor",
-    glyph: "◈",
+    icon: MousePointer2,
     badge: { en: "IDE", ru: "IDE" },
     cardClass: "border-cyan-500/25 bg-cyan-500/8",
-    glyphClass: "border-cyan-400/30 bg-cyan-500/15 text-cyan-200",
+    iconClass: "border-cyan-400/30 bg-cyan-500/15 text-cyan-200",
   },
   {
     name: "Windsurf",
-    glyph: "W",
+    icon: Waves,
     badge: { en: "Agent IDE", ru: "Agent IDE" },
     cardClass: "border-emerald-500/25 bg-emerald-500/8",
-    glyphClass: "border-emerald-400/30 bg-emerald-500/15 text-emerald-200",
+    iconClass: "border-emerald-400/30 bg-emerald-500/15 text-emerald-200",
   },
   {
     name: "Claude Code",
-    glyph: "✦",
-    badge: { en: "CLI Agent", ru: "CLI-агент" },
+    icon: BotMessageSquare,
+    badge: { en: "CLI Agent", ru: "CLI-\u0430\u0433\u0435\u043d\u0442" },
     cardClass: "border-orange-500/25 bg-orange-500/8",
-    glyphClass: "border-orange-400/30 bg-orange-500/15 text-orange-200",
+    iconClass: "border-orange-400/30 bg-orange-500/15 text-orange-200",
   },
   {
     name: "OpenAI Codex",
-    glyph: "◎",
-    badge: { en: "Code Agent", ru: "Код-агент" },
+    icon: BrainCircuit,
+    badge: { en: "Code Agent", ru: "\u041a\u043e\u0434-\u0430\u0433\u0435\u043d\u0442" },
     cardClass: "border-blue-500/25 bg-blue-500/8",
-    glyphClass: "border-blue-400/30 bg-blue-500/15 text-blue-200",
+    iconClass: "border-blue-400/30 bg-blue-500/15 text-blue-200",
   },
   {
     name: "GitHub Copilot",
-    glyph: "↻",
+    icon: Github,
     badge: { en: "Pair AI", ru: "Pair AI" },
     cardClass: "border-violet-500/25 bg-violet-500/8",
-    glyphClass: "border-violet-400/30 bg-violet-500/15 text-violet-200",
+    iconClass: "border-violet-400/30 bg-violet-500/15 text-violet-200",
   },
   {
     name: "VS Code",
-    glyph: "⌘",
+    icon: Code2,
     badge: { en: "Workspace", ru: "Workspace" },
     cardClass: "border-slate-500/25 bg-slate-500/8",
-    glyphClass: "border-slate-400/30 bg-slate-500/15 text-slate-200",
+    iconClass: "border-slate-400/30 bg-slate-500/15 text-slate-200",
   },
-] as const;
+];
 
 const boardRowStyles = [
   "border-cyan-500/30 text-cyan-200",
@@ -377,7 +392,7 @@ export default async function HomePage() {
             variant="outline"
             className="h-12 w-full rounded-xl border-white/15 bg-slate-950/75 px-7 text-sm text-slate-100 hover:bg-slate-900 sm:w-auto"
           >
-            <Link href="/#submit">{tr(locale, "Submit Server", "Отправить сервер")}</Link>
+            <Link href="/submit-server">{tr(locale, "Submit Server", "Отправить сервер")}</Link>
           </Button>
         </div>
 
@@ -919,22 +934,25 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {stackItems.map((item) => (
-              <div
-                key={item.name}
-                className={`rounded-2xl border px-4 py-5 text-center transition hover:-translate-y-0.5 ${item.cardClass}`}
-              >
+            {stackItems.map((item) => {
+              const Icon = item.icon;
+              return (
                 <div
-                  className={`mx-auto mb-3 inline-flex size-10 items-center justify-center rounded-xl border text-sm font-semibold ${item.glyphClass}`}
+                  key={item.name}
+                  className={`rounded-2xl border px-4 py-5 text-center transition hover:-translate-y-0.5 ${item.cardClass}`}
                 >
-                  {item.glyph}
+                  <div
+                    className={`mx-auto mb-3 inline-flex size-10 items-center justify-center rounded-xl border ${item.iconClass}`}
+                  >
+                    <Icon aria-hidden className="size-5" strokeWidth={2.1} />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-100">{item.name}</p>
+                  <p className="mt-1 text-[11px] tracking-[0.14em] text-slate-400 uppercase">
+                    {item.badge[locale]}
+                  </p>
                 </div>
-                <p className="text-sm font-semibold text-slate-100">{item.name}</p>
-                <p className="mt-1 text-[11px] tracking-[0.14em] text-slate-400 uppercase">
-                  {item.badge[locale]}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

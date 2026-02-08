@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useMemo, useState } from "react";
+import { SearchX } from "lucide-react";
 
 import { CatalogFilterBar } from "@/components/catalog-filter-bar";
 import { useLocale } from "@/components/locale-provider";
@@ -78,7 +79,8 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       ) : (
         <Card className="border-white/10 bg-slate-900/50">
           <CardHeader>
-            <CardTitle className="text-slate-100">
+            <CardTitle className="flex items-center gap-2 text-slate-100">
+              <SearchX className="size-4 text-slate-300" />
               {tr(locale, "No servers found", "Серверы не найдены")}
             </CardTitle>
           </CardHeader>
