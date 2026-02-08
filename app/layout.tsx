@@ -71,7 +71,7 @@ export default async function RootLayout({
   const locale = await getServerLocale();
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale} className="dark" data-scroll-behavior="smooth">
       <body
         className="min-h-screen bg-slate-50 text-slate-900 antialiased transition-colors dark:bg-slate-950 dark:text-slate-50"
       >

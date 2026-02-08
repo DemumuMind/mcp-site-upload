@@ -8,7 +8,7 @@ import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 export const metadata: Metadata = {
-  title: "DemumuMind MCP",
+  title: "MCP Overview",
   description: "Overview of DemumuMind MCP and how it helps teams.",
 };
 

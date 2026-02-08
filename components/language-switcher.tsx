@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => handleSwitch("en")}
-        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition ${
+        className={`min-h-11 min-w-11 rounded-full px-3 py-2 text-xs font-semibold tracking-wide transition sm:min-h-9 sm:min-w-9 sm:px-2.5 sm:py-1 sm:text-[11px] ${
           locale === "en"
             ? "bg-blue-500 text-white"
             : "text-slate-300 hover:bg-white/10 hover:text-white"
@@ -40,7 +40,7 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => handleSwitch("ru")}
-        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition ${
+        className={`min-h-11 min-w-11 rounded-full px-3 py-2 text-xs font-semibold tracking-wide transition sm:min-h-9 sm:min-w-9 sm:px-2.5 sm:py-1 sm:text-[11px] ${
           locale === "ru"
             ? "bg-blue-500 text-white"
             : "text-slate-300 hover:bg-white/10 hover:text-white"

@@ -9,7 +9,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { getPendingServers } from "@/lib/servers";
 
 export const metadata: Metadata = {
-  title: "Moderation | DemumuMind MCP",
+  title: "Moderation",
   description: "Admin moderation dashboard for pending server submissions.",
 };
 

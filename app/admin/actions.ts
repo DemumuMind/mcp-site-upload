@@ -25,15 +25,20 @@ async function assertAdminSession() {
 }
 
 export async function loginAdminAction(formData: FormData) {
+  const expectedToken = getAdminAccessToken();
   const submittedToken = String(formData.get("token") || "");
   const redirectPath = String(formData.get("redirect") || "/admin");
+
+  if (!expectedToken) {
+    redirect("/admin/login?error=config");
+  }
 
   if (!isValidAdminToken(submittedToken)) {
     redirect("/admin/login?error=invalid");
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, getAdminAccessToken(), {
+  cookieStore.set(ADMIN_SESSION_COOKIE, expectedToken, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

@@ -4,12 +4,11 @@ import { loginAdminAction } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getAdminAccessToken } from "@/lib/admin-auth";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 export const metadata: Metadata = {
-  title: "Admin Login | DemumuMind MCP",
+  title: "Admin Login",
   description: "Restricted admin access for moderation actions.",
 };
 
@@ -29,17 +28,25 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
       ? tr(locale, "Invalid admin token.", "Неверный админ-токен.")
       : error === "session"
         ? tr(locale, "Session expired. Sign in again.", "Сессия истекла. Войдите снова.")
-        : undefined;
+        : error === "config"
+          ? tr(locale, "Admin access token is not configured.", "Токен админ-доступа не настроен.")
+          : undefined;
 
   const devHint =
-    process.env.ADMIN_ACCESS_TOKEN === undefined
-      ? tr(locale, "Dev token (fallback):", "Dev token (fallback):") + ` ${getAdminAccessToken()}`
+    process.env.NODE_ENV !== "production" && process.env.ADMIN_ACCESS_TOKEN === undefined
+      ? tr(
+          locale,
+          "Dev mode: set ADMIN_ACCESS_TOKEN in .env to disable fallback token.",
+          "Режим разработки: добавьте ADMIN_ACCESS_TOKEN в .env, чтобы отключить fallback-токен.",
+        )
       : null;
 
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col justify-center px-4 py-12">
       <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-        <h1 className="text-xl font-semibold text-slate-100">{tr(locale, "Admin access", "Доступ администратора")}</h1>
+        <h1 className="text-xl font-semibold text-slate-100">
+          {tr(locale, "Admin access", "Доступ администратора")}
+        </h1>
         <p className="mt-2 text-sm text-slate-300">
           {tr(locale, "Enter admin token to open moderation dashboard.", "Введите админ-токен, чтобы открыть панель модерации.")}
         </p>
@@ -58,6 +65,16 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
 
         <form action={loginAdminAction} className="mt-5 space-y-3">
           <input type="hidden" name="redirect" value={redirect || "/admin"} />
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            defaultValue="admin"
+            tabIndex={-1}
+            readOnly
+            aria-hidden="true"
+            className="sr-only"
+          />
 
           <div className="space-y-1.5">
             <Label htmlFor="token">{tr(locale, "Admin token", "Токен администратора")}</Label>
@@ -65,6 +82,7 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
               id="token"
               name="token"
               type="password"
+              autoComplete="current-password"
               required
               className="border-white/10 bg-slate-950/80"
             />

@@ -10,7 +10,7 @@ import {
 } from "@/lib/legal-content";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DemumuMind MCP",
+  title: "Privacy Policy",
   description: "Privacy policy for DemumuMind MCP.",
 };
 
