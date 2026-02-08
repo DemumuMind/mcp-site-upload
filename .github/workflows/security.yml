@@ -61,4 +61,4 @@ jobs:
           docker run --rm \
             -v "$PWD:/repo" \
             zricethezav/gitleaks:latest \
-            detect --source=/repo --no-banner --redact --exit-code 1
+            detect --source=/repo --no-git --no-banner --redact --exit-code 1
