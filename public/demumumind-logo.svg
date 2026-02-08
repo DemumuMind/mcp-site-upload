@@ -1,0 +1,85 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-main" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#030915" />
+      <stop offset="1" stop-color="#04122a" />
+    </linearGradient>
+    <radialGradient id="bg-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(286 234) rotate(43.4) scale(394 287)">
+      <stop stop-color="#0ea5e9" stop-opacity="0.32" />
+      <stop offset="1" stop-color="#0ea5e9" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="mark-bg" x1="0" y1="0" x2="166" y2="166" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#081833" />
+      <stop offset="1" stop-color="#020915" />
+    </linearGradient>
+    <linearGradient id="mark-border" x1="18" y1="18" x2="148" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8" />
+      <stop offset="1" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="mind-text" x1="570" y1="231" x2="811" y2="231" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7dd3fc" />
+      <stop offset="1" stop-color="#22d3ee" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg-main)" />
+  <rect width="1200" height="630" fill="url(#bg-glow)" />
+  <path d="M0 92H1200M0 537H1200M108 0V630M1092 0V630" stroke="#0f2747" stroke-opacity="0.7" />
+
+  <g transform="translate(120 232)">
+    <rect x="0" y="0" width="166" height="166" rx="44" fill="url(#mark-bg)" stroke="url(#mark-border)" stroke-width="6" />
+    <rect x="15" y="15" width="136" height="136" rx="34" fill="none" stroke="#0ea5e9" stroke-opacity="0.35" />
+    <path
+      d="M48 40V126H78C108 126 126 110 126 83C126 56 108 40 78 40H48Z"
+      stroke="#3b82f6"
+      stroke-width="9"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M58 107L80 72L96 92L118 62"
+      stroke="#22d3ee"
+      stroke-width="9"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle cx="58" cy="107" r="5.5" fill="#60a5fa" />
+    <circle cx="118" cy="62" r="6.2" fill="#22d3ee" />
+  </g>
+
+  <text
+    x="350"
+    y="295"
+    fill="#f1f5f9"
+    font-size="108"
+    font-family="Space Grotesk, Sora, Segoe UI, Arial, sans-serif"
+    font-weight="700"
+    letter-spacing="1.4"
+  >
+    Demumu<tspan fill="url(#mind-text)">Mind</tspan>
+  </text>
+  <text
+    x="352"
+    y="345"
+    fill="#38bdf8"
+    fill-opacity="0.9"
+    font-size="24"
+    font-family="Space Grotesk, Sora, Segoe UI, Arial, sans-serif"
+    font-weight="600"
+    letter-spacing="10.4"
+  >
+    MCP DIRECTORY
+  </text>
+  <text
+    x="352"
+    y="406"
+    fill="#93c5fd"
+    fill-opacity="0.92"
+    font-size="34"
+    font-family="Space Grotesk, Sora, Segoe UI, Arial, sans-serif"
+    font-weight="500"
+    letter-spacing="0.2"
+  >
+    Discover, validate, and ship trusted MCP integrations.
+  </text>
+</svg>

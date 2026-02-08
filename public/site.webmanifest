@@ -1,0 +1,25 @@
+{
+  "name": "DemumuMind MCP",
+  "short_name": "DemumuMind",
+  "description": "Community-curated MCP directory for discovering trusted servers and shipping AI integrations faster.",
+  "theme_color": "#030915",
+  "background_color": "#030915",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/demumumind-avatar-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

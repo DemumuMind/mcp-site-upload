@@ -1,0 +1,46 @@
+name: Deploy Smoke Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Deployed base URL to validate (e.g. https://mcp-catalog.example.com)"
+        required: true
+        type: string
+      include_health_probe:
+        description: "Also run authorized /api/health-check probe using SMOKE_HEALTH_TOKEN secret"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  smoke-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run baseline smoke check
+        run: npm run smoke:check -- "${{ inputs.target_url }}"
+
+      - name: Run authorized health probe
+        if: ${{ inputs.include_health_probe }}
+        env:
+          SMOKE_HEALTH_TOKEN: ${{ secrets.SMOKE_HEALTH_TOKEN }}
+        run: |
+          if [ -z "$SMOKE_HEALTH_TOKEN" ]; then
+            echo "SMOKE_HEALTH_TOKEN secret is required when include_health_probe=true"
+            exit 1
+          fi
+          npm run smoke:check -- "${{ inputs.target_url }}"
