@@ -1,5 +1,45 @@
 # Session Continuation
 
+## Latest Update (2026-02-08, Protected Smoke Mode + Deploy Preflight Resilience)
+- Objective: complete requested rollout items `1` and `2` by stabilizing smoke checks for protected preview URLs and making deploy workflow resilient to Vercel preflight access failures.
+- Status: completed.
+- Implemented:
+  - `scripts/smoke-check.mjs`
+    - added `SMOKE_ALLOW_PROTECTED=true` mode
+    - accepted protected responses (`401`) for core smoke routes in protected mode
+    - relaxed health route assertions in protected mode and skipped JSON parse checks when route remains protected
+  - `.github/workflows/ci.yml`
+    - propagated `SMOKE_ALLOW_PROTECTED` repository variable into smoke execution environment
+  - `.github/workflows/nightly-smoke.yml`
+    - propagated `SMOKE_ALLOW_PROTECTED` repository variable into smoke execution environment
+  - `.github/workflows/deploy.yml`
+    - added resilient Vercel preflight step (`vercel pull`) with optional strict fail gate via `VERCEL_FAIL_ON_PRECHECK`
+    - guarded build/deploy steps behind successful preflight
+    - added smoke target fallback chain: workflow input -> deployment URL -> `SMOKE_BASE_URL`
+    - added explicit smoke skip behavior and richer deployment summary fields
+  - Docs/config updates:
+    - `.env.example` (added `SMOKE_ALLOW_PROTECTED`, `VERCEL_FAIL_ON_PRECHECK`)
+    - `README.md` (documented protected smoke mode and strict preflight toggle)
+    - `docs/runbooks/deploy.md` (documented preflight behavior and strict mode)
+- GitHub repo settings updated (`DemumuMind/mcp-site-upload`):
+  - Variables:
+    - `SMOKE_ENABLED=true`
+    - `SMOKE_BASE_URL=https://mcp-site-83i29js8l-cardtest15-coders-projects.vercel.app`
+    - `SMOKE_ALLOW_PROTECTED=true`
+    - `VERCEL_DEPLOY_ENABLED=true`
+    - `VERCEL_FAIL_ON_PRECHECK=false`
+  - Secrets refreshed:
+    - `VERCEL_TOKEN`
+    - `VERCEL_ORG_ID`
+    - `VERCEL_PROJECT_ID`
+- Verification run (local):
+  - `npm run lint` (pass)
+  - `npm run build` (pass)
+  - `SMOKE_ALLOW_PROTECTED=true npm run smoke:check -- https://mcp-site-83i29js8l-cardtest15-coders-projects.vercel.app` (pass)
+- Open risks:
+  - current `VERCEL_TOKEN` still fails project preflight (`vercel pull`) in token mode, so deploy can be skipped (non-strict mode) until a fully authorized token is provided.
+  - protected smoke target validates availability and protection boundary, but not deep application route behavior behind auth wall.
+
 ## Latest Update (2026-02-08, Automation Delivery Finalization + GitHub Pipeline Stabilization)
 - Objective: finalize automation rollout end-to-end, configure GitHub/Vercel secrets/variables, and stabilize CI/Security/Deploy workflows on `main`.
 - Status: completed.

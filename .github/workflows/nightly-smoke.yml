@@ -16,6 +16,7 @@ jobs:
       SMOKE_ENABLED: ${{ vars.SMOKE_ENABLED || 'false' }}
       SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL }}
       SMOKE_HEALTH_TOKEN: ${{ secrets.SMOKE_HEALTH_TOKEN }}
+      SMOKE_ALLOW_PROTECTED: ${{ vars.SMOKE_ALLOW_PROTECTED || 'false' }}
 
     steps:
       - name: Checkout

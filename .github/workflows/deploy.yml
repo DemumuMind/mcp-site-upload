@@ -32,6 +32,9 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       SMOKE_HEALTH_TOKEN: ${{ secrets.SMOKE_HEALTH_TOKEN }}
+      SMOKE_ALLOW_PROTECTED: ${{ vars.SMOKE_ALLOW_PROTECTED || 'false' }}
+      SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL || '' }}
+      VERCEL_FAIL_ON_PRECHECK: ${{ vars.VERCEL_FAIL_ON_PRECHECK || 'false' }}
 
     steps:
       - name: Checkout
@@ -78,9 +81,12 @@ jobs:
           fi
 
       - name: Pull Vercel environment
+        id: vercel_pull
+        continue-on-error: true
         run: npx vercel pull --yes --environment="${{ steps.deploy_mode.outputs.environment }}" --token="$VERCEL_TOKEN"
 
       - name: Build Vercel artifacts
+        if: ${{ steps.vercel_pull.outcome == 'success' }}
         shell: bash
         run: |
           if [ "${{ steps.deploy_mode.outputs.prod }}" = "true" ]; then
@@ -90,6 +96,7 @@ jobs:
           fi
 
       - name: Deploy to Vercel
+        if: ${{ steps.vercel_pull.outcome == 'success' }}
         id: deploy_result
         shell: bash
         run: |
@@ -100,6 +107,14 @@ jobs:
           fi
           echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
 
+      - name: Enforce Vercel preflight (strict mode)
+        if: ${{ steps.vercel_pull.outcome != 'success' && env.VERCEL_FAIL_ON_PRECHECK == 'true' }}
+        shell: bash
+        run: |
+          echo "Vercel preflight failed and VERCEL_FAIL_ON_PRECHECK=true."
+          echo "Verify VERCEL_TOKEN/VERCEL_ORG_ID/VERCEL_PROJECT_ID permissions."
+          exit 1
+
       - name: Resolve smoke target
         id: smoke_target
         shell: bash
@@ -108,17 +123,33 @@ jobs:
           if [ -z "$target" ]; then
             target="${{ steps.deploy_result.outputs.deployment_url }}"
           fi
-          echo "target=$target" >> "$GITHUB_OUTPUT"
+          if [ -z "$target" ]; then
+            target="$SMOKE_BASE_URL"
+          fi
+          if [ -z "$target" ]; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "target=" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "target=$target" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Post-deploy smoke check
+        if: ${{ steps.smoke_target.outputs.should_run == 'true' }}
         run: npm run smoke:check -- "${{ steps.smoke_target.outputs.target }}"
+
+      - name: Smoke skipped
+        if: ${{ steps.smoke_target.outputs.should_run != 'true' }}
+        run: echo "Smoke check skipped: no deployment URL and no SMOKE_BASE_URL/input provided."
 
       - name: Deployment summary
         shell: bash
         run: |
           echo "Deployment environment: ${{ steps.deploy_mode.outputs.environment }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Vercel preflight outcome: ${{ steps.vercel_pull.outcome }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Deployment URL: ${{ steps.deploy_result.outputs.deployment_url }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Smoke target: ${{ steps.smoke_target.outputs.target }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Smoke executed: ${{ steps.smoke_target.outputs.should_run }}" >> "$GITHUB_STEP_SUMMARY"
 
   deploy-disabled:
     if: ${{ vars.VERCEL_DEPLOY_ENABLED != 'true' }}

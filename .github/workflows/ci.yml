@@ -19,6 +19,8 @@ jobs:
   lint-build-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      SMOKE_ALLOW_PROTECTED: ${{ vars.SMOKE_ALLOW_PROTECTED || 'false' }}
 
     steps:
       - name: Checkout

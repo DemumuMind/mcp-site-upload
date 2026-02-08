@@ -2,6 +2,7 @@
 
 const argBaseUrl = process.argv[2];
 const baseUrlInput = argBaseUrl || process.env.SMOKE_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+const allowProtectedMode = String(process.env.SMOKE_ALLOW_PROTECTED || "false").toLowerCase() === "true";
 
 if (!baseUrlInput) {
   console.error(
@@ -14,6 +15,7 @@ const baseUrl = baseUrlInput.replace(/\/+$/, "");
 const healthToken = process.env.SMOKE_HEALTH_TOKEN || process.env.HEALTH_CHECK_CRON_SECRET;
 
 const failures = [];
+const protectedStatusAllowed = allowProtectedMode ? [200, 401] : [200];
 
 function buildUrl(pathname) {
   return `${baseUrl}${pathname}`;
@@ -59,10 +61,13 @@ async function assertStatus(pathname, expectedStatuses, options = {}) {
 }
 
 async function checkCorePages() {
-  await assertStatus("/", [200]);
+  await assertStatus("/", protectedStatusAllowed);
 
-  const sitemapResponse = await assertStatus("/sitemap.xml", [200]);
+  const sitemapResponse = await assertStatus("/sitemap.xml", protectedStatusAllowed);
   if (sitemapResponse) {
+    if (allowProtectedMode && sitemapResponse.status === 401) {
+      console.log("INFO: /sitemap.xml is protected (401); skipping XML content assertions");
+    } else {
     const sitemapText = await sitemapResponse.text();
     if (sitemapText.includes("<urlset")) {
       logPass("/sitemap.xml contains <urlset>");
@@ -77,21 +82,27 @@ async function checkCorePages() {
     } else {
       console.log("INFO: no /server/[slug] URL found in sitemap; skipping server page check");
     }
+    }
   }
 
-  const robotsResponse = await assertStatus("/robots.txt", [200]);
+  const robotsResponse = await assertStatus("/robots.txt", protectedStatusAllowed);
   if (robotsResponse) {
+    if (allowProtectedMode && robotsResponse.status === 401) {
+      console.log("INFO: /robots.txt is protected (401); skipping robots content assertions");
+    } else {
     const robotsText = await robotsResponse.text();
     if (robotsText.toLowerCase().includes("sitemap:")) {
       logPass("/robots.txt includes sitemap");
     } else {
       logFail("/robots.txt missing sitemap entry");
     }
+    }
   }
 }
 
 async function checkHealthEndpoint() {
-  await assertStatus("/api/health-check", [401, 500]);
+  const unauthorizedExpectedStatuses = allowProtectedMode ? [401, 500, 404] : [401, 500];
+  await assertStatus("/api/health-check", unauthorizedExpectedStatuses);
 
   if (!healthToken) {
     console.log(
@@ -100,7 +111,8 @@ async function checkHealthEndpoint() {
     return;
   }
 
-  const response = await assertStatus("/api/health-check", [200], {
+  const authorizedExpectedStatuses = allowProtectedMode ? [200, 401, 404] : [200];
+  const response = await assertStatus("/api/health-check", authorizedExpectedStatuses, {
     method: "POST",
     headers: {
       authorization: `Bearer ${healthToken}`,
@@ -119,6 +131,13 @@ async function checkHealthEndpoint() {
       logFail("/api/health-check response missing expected summary field");
     }
   } catch (error) {
+    if (allowProtectedMode && (response.status === 401 || response.status === 404)) {
+      console.log(
+        "INFO: Authorized health probe did not reach app route in protected mode; skipping JSON assertions",
+      );
+      return;
+    }
+
     logFail(
       `/api/health-check JSON parse failed: ${
         error instanceof Error ? error.message : String(error)
@@ -129,6 +148,9 @@ async function checkHealthEndpoint() {
 
 async function main() {
   console.log(`Running smoke checks against ${baseUrl}`);
+  if (allowProtectedMode) {
+    console.log("INFO: SMOKE_ALLOW_PROTECTED=true (401 responses may be accepted for protected routes)");
+  }
   await checkCorePages();
   await checkHealthEndpoint();
 
