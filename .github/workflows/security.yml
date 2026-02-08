@@ -58,7 +58,7 @@ jobs:
       - name: Install gitleaks CLI
         shell: bash
         run: |
-          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Run gitleaks
         shell: bash
