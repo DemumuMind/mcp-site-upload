@@ -1,5 +1,35 @@
 # Session Continuation
 
+## Latest Update (2026-02-08, Plan-site Future Roadmap Packaging)
+- Objective: convert future work roadmap into execution-ready folder structure under `Plan-site`.
+- Status: completed.
+- Touched files:
+  - `Plan-site/README.md`
+  - `Plan-site/00-overview/roadmap.md`
+  - `Plan-site/00-overview/assumptions-kpis.md`
+  - `Plan-site/01-week-1-stabilization/01-pr-hygiene-and-scope-split.md`
+  - `Plan-site/01-week-1-stabilization/02-staging-migration-ownership.md`
+  - `Plan-site/01-week-1-stabilization/03-auth-flow-manual-matrix.md`
+  - `Plan-site/02-week-2-security/04-role-based-admin-auth.md`
+  - `Plan-site/02-week-2-security/05-admin-rate-limit-lockout.md`
+  - `Plan-site/02-week-2-security/06-moderation-audit-log.md`
+  - `Plan-site/03-week-3-account-flow/07-account-edit-and-resubmit.md`
+  - `Plan-site/03-week-3-account-flow/08-status-reason-ux.md`
+  - `Plan-site/04-week-4-reliability/09-playwright-ci-hardening.md`
+  - `Plan-site/04-week-4-reliability/10-observability-and-alerting.md`
+  - `Plan-site/05-week-5-growth/11-seo-hardening.md`
+  - `Plan-site/05-week-5-growth/12-funnel-analytics.md`
+- Next commands:
+  - Review ordering and estimates with product owner/tech lead.
+  - Create matching Linear or GitHub issues from each numbered plan file.
+  - Start execution from Week 1 (`01` -> `02` -> `03`).
+- Verification commands:
+  - `Get-ChildItem Plan-site -Recurse`
+  - `Get-Content Plan-site/README.md`
+- Open risks:
+  - Estimates are planning-level and may shift after first implementation spike.
+  - Security tracks (`04`, `05`, `06`) require final approval on auth model and log retention policy.
+
 ## Latest Update (2026-02-08, User Sign In/Login Hardening + Account Cabinet)
 - Objective: implement approved Sign In/Login plan with SSR Supabase auth, protected user routes, auth callback, and user account page with own submissions.
 - Implemented:
