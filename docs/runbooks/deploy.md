@@ -11,6 +11,7 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
   - `SMOKE_HEALTH_TOKEN` (optional but recommended)
 - Repository variable:
   - `SMOKE_BASE_URL` (recommended for CI and nightly smoke)
+  - `VERCEL_DEPLOY_ENABLED=true` to activate deploy steps in `.github/workflows/deploy.yml`
 
 ## Automated Path
 1. Merge to `main` or run `.github/workflows/deploy.yml` manually.

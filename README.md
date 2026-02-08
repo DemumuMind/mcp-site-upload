@@ -169,6 +169,10 @@ Workflow: `.github/workflows/deploy-smoke-check.yml`
 | `.github/workflows/nightly-smoke.yml` | Scheduled smoke checks against configured environment |
 | `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
 
+Repository variables controlling execution:
+- `SMOKE_ENABLED=true` enables automatic smoke checks via `SMOKE_BASE_URL`.
+- `VERCEL_DEPLOY_ENABLED=true` enables actual deploy steps in `deploy.yml`.
+
 ## Runbooks and Ops Docs
 
 - Plan in one file: `docs/automation-plan.md`

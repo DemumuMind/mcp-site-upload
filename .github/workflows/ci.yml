@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           target="${{ github.event.inputs.smoke_base_url || '' }}"
-          if [ -z "$target" ]; then
+          if [ -z "$target" ] && [ "${{ vars.SMOKE_ENABLED || 'false' }}" = "true" ]; then
             target="${{ vars.SMOKE_BASE_URL || '' }}"
           fi
           echo "target=$target" >> "$GITHUB_OUTPUT"
@@ -56,5 +56,5 @@ jobs:
       - name: Smoke check skipped
         if: ${{ steps.smoke_target.outputs.target == '' }}
         run: |
-          echo "No smoke target provided."
-          echo "Set workflow input smoke_base_url or repository variable SMOKE_BASE_URL."
+          echo "Smoke check skipped."
+          echo "Pass workflow input smoke_base_url, or set SMOKE_ENABLED=true and SMOKE_BASE_URL repository variable."
