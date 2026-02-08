@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
 import { AuthSignInPanel } from "@/components/auth-sign-in-panel";
 import { tr } from "@/lib/i18n";
@@ -30,7 +30,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const errorCode = typeof error === "string" ? error : undefined;
 
   return (
-    <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center px-4 py-12">
+    <div className="mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col justify-center px-4 py-12 sm:px-6">
       <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} />
     </div>
   );

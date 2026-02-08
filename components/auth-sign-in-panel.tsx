@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { type FormEvent, useMemo, useState } from "react";
@@ -103,6 +103,11 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
   const [isEmailPending, setIsEmailPending] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
 
+  const oauthButtonClass =
+    "h-12 w-full justify-start rounded-xl border border-slate-600/65 bg-slate-900/75 px-4 text-left text-sm font-semibold text-slate-100 transition hover:border-slate-400/70 hover:bg-slate-900 focus-visible:ring-slate-300/40";
+  const primaryActionButtonClass =
+    "h-11 w-full rounded-xl bg-slate-100 text-slate-950 transition hover:bg-white";
+
   function getRedirectTo(): string | undefined {
     if (typeof window === "undefined") {
       return undefined;
@@ -188,165 +193,210 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
 
   if (!isConfigured) {
     return (
-      <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-6">
-        <h1 className="text-xl font-semibold text-amber-200">
-          {tr(locale, "Auth is not configured", "Авторизация не настроена")}
-        </h1>
-        <p className="mt-2 text-sm text-amber-100/90">
-          {tr(
-            locale,
-            "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable Login/Sign.",
-            "Укажите NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY, чтобы включить вход.",
-          )}
-        </p>
-        <Button asChild className="mt-4 bg-blue-500 hover:bg-blue-400">
-          <Link href="/">{tr(locale, "Back to catalog", "Назад в каталог")}</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  if (user) {
-    return (
-      <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-        <h1 className="text-xl font-semibold text-slate-100">
-          {tr(locale, "You are signed in", "Вы уже вошли")}
-        </h1>
-        <p className="mt-2 text-sm text-slate-300">
-          {tr(locale, "Account:", "Аккаунт:")} {" "}
-          <span className="text-slate-100">
-            {user.email || tr(locale, "authenticated user", "авторизованный пользователь")}
-          </span>
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Button asChild className="bg-blue-500 hover:bg-blue-400">
-            <Link href={safeNextPath}>{tr(locale, "Continue", "Продолжить")}</Link>
-          </Button>
+      <div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-slate-950 p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
+        <div className="relative">
+          <h1 className="text-2xl font-semibold text-amber-100">
+            {tr(locale, "Auth is not configured", "Авторизация не настроена")}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-amber-50/85">
+            {tr(
+              locale,
+              "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable Login/Sign.",
+              "Укажите NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY, чтобы включить вход.",
+            )}
+          </p>
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              void signOut();
-            }}
-            className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
+            asChild
+            className="mt-6 h-10 rounded-xl bg-amber-300 text-slate-950 hover:bg-amber-200"
           >
-            {tr(locale, "Sign out", "Выйти")}
+            <Link href="/">{tr(locale, "Back to catalog", "Назад в каталог")}</Link>
           </Button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
-      <h1 className="text-2xl font-semibold text-slate-100">
-        {tr(locale, "Welcome to DemumuMind MCP", "Добро пожаловать в DemumuMind MCP")}
-      </h1>
-      <p className="mt-2 text-sm text-slate-300">
-        {tr(
-          locale,
-          "Sign in to submit MCP servers and manage your integrations.",
-          "Войдите, чтобы отправлять MCP-серверы и управлять интеграциями.",
-        )}
-      </p>
-      {callbackErrorMessage ? (
-        <p className="mt-4 rounded-md border border-rose-400/35 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
-          {callbackErrorMessage}
-        </p>
-      ) : null}
-      {isLoading ? (
-        <p className="mt-2 text-xs text-slate-400">
-          {tr(locale, "Checking your session...", "Проверяем вашу сессию...")}
-        </p>
-      ) : null}
-      <p className="mt-5 text-xs uppercase tracking-wide text-slate-400">
-        {tr(locale, "Login/Sign in with", "Войти через")}
-      </p>
-
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            void signInWithProvider("google");
-          }}
-          disabled={pendingOAuthProvider !== null || isEmailPending}
-          className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
-        >
-          {pendingOAuthProvider === "google" ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : null}
-          {tr(locale, "Continue with Google", "Продолжить с Google")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowEmailInput((prev) => !prev)}
-          disabled={pendingOAuthProvider !== null || isEmailPending}
-          className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
-        >
-          {tr(locale, "Continue with email", "Продолжить по email")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            void signInWithProvider("github");
-          }}
-          disabled={pendingOAuthProvider !== null || isEmailPending}
-          className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
-        >
-          {pendingOAuthProvider === "github" ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : null}
-          {tr(locale, "Continue with GitHub", "Продолжить с GitHub")}
-        </Button>
-      </div>
-
-      {showEmailInput ? (
-        <form className="mt-6 space-y-3" onSubmit={signInWithEmail}>
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              className="border-white/10 bg-slate-950/80"
-            />
+  if (user) {
+    return (
+      <div className="relative overflow-hidden rounded-[1.75rem] border border-slate-700/80 bg-slate-950 p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/30 to-transparent" />
+        <div className="relative">
+          <h1 className="text-2xl font-semibold text-slate-100">
+            {tr(locale, "You are signed in", "Вы уже вошли")}
+          </h1>
+          <p className="mt-2 text-sm text-slate-300">
+            {tr(locale, "Account:", "Аккаунт:")}{" "}
+            <span className="font-medium text-slate-100">
+              {user.email || tr(locale, "authenticated user", "авторизованный пользователь")}
+            </span>
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button asChild className="h-10 rounded-xl bg-slate-100 text-slate-950 hover:bg-white">
+              <Link href={safeNextPath}>{tr(locale, "Continue", "Продолжить")}</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void signOut();
+              }}
+              className="h-10 rounded-xl border-slate-600/70 bg-slate-900/70 hover:bg-slate-900"
+            >
+              {tr(locale, "Sign out", "Выйти")}
+            </Button>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          <Button
-            type="submit"
-            disabled={isEmailPending || pendingOAuthProvider !== null}
-            className="w-full bg-blue-500 hover:bg-blue-400"
-          >
-            {isEmailPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
-            {tr(locale, "Send magic link", "Отправить magic link")}
-          </Button>
-        </form>
-      ) : null}
+  return (
+    <section className="relative overflow-hidden rounded-[2rem] border border-slate-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/35 to-transparent" />
+      <div className="relative p-6 sm:p-10">
+        <span className="inline-flex rounded-full border border-slate-500/65 bg-slate-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-200">
+          {tr(locale, "Secure access", "Безопасный вход")}
+        </span>
 
-      {emailMessage ? (
-        <p className="mt-3 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-          {emailMessage}
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+          {tr(locale, "Welcome to DemumuMind MCP", "Добро пожаловать в DemumuMind MCP")}
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-200/85 sm:text-base">
+          {tr(
+            locale,
+            "Sign in to submit MCP servers and manage your integrations.",
+            "Войдите, чтобы отправлять MCP-серверы и управлять интеграциями.",
+          )}
         </p>
-      ) : null}
 
-      <p className="mt-4 text-xs text-slate-400">
-        {tr(locale, "By signing in, you agree to our", "Входя в систему, вы соглашаетесь с")}{" "}
-        <Link href="/terms" className="text-slate-200 hover:text-white">
-          {tr(locale, "Terms", "Условиями")}
-        </Link>{" "}
-        {tr(locale, "and", "и")}{" "}
-        <Link href="/privacy" className="text-slate-200 hover:text-white">
-          {tr(locale, "Privacy Policy", "Политикой конфиденциальности")}
-        </Link>
-        .
-      </p>
-    </div>
+        {callbackErrorMessage ? (
+          <p className="mt-5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100">
+            {callbackErrorMessage}
+          </p>
+        ) : null}
+
+        {isLoading ? (
+          <p className="mt-3 text-xs text-slate-300/70">
+            {tr(locale, "Checking your session...", "Проверяем вашу сессию...")}
+          </p>
+        ) : null}
+
+        <div className="mt-8">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+            {tr(locale, "Login/Sign in with", "Войти через")}
+          </p>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void signInWithProvider("google");
+              }}
+              disabled={pendingOAuthProvider !== null || isEmailPending}
+              className={oauthButtonClass}
+            >
+              {pendingOAuthProvider === "google" ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <span className="inline-flex size-6 items-center justify-center rounded-full border border-slate-500/70 bg-slate-800 text-xs font-bold text-slate-200">
+                  G
+                </span>
+              )}
+              <span>{tr(locale, "Continue with Google", "Продолжить с Google")}</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowEmailInput((prev) => !prev)}
+              disabled={pendingOAuthProvider !== null || isEmailPending}
+              className={oauthButtonClass}
+            >
+              <span className="inline-flex size-6 items-center justify-center rounded-full border border-slate-500/70 bg-slate-800 text-xs font-bold text-slate-200">
+                @
+              </span>
+              <span>{tr(locale, "Continue with email", "Продолжить по email")}</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void signInWithProvider("github");
+              }}
+              disabled={pendingOAuthProvider !== null || isEmailPending}
+              className={oauthButtonClass}
+            >
+              {pendingOAuthProvider === "github" ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <span className="inline-flex size-6 items-center justify-center rounded-full border border-slate-500/70 bg-slate-800 text-[10px] font-bold text-slate-200">
+                  GH
+                </span>
+              )}
+              <span>{tr(locale, "Continue with GitHub", "Продолжить с GitHub")}</span>
+            </Button>
+          </div>
+        </div>
+
+        {showEmailInput ? (
+          <form
+            className="mt-5 rounded-2xl border border-slate-700/80 bg-slate-950/70 p-4 sm:p-5"
+            onSubmit={signInWithEmail}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm text-slate-200">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                className="h-11 rounded-xl border-slate-600 bg-slate-900/90 text-slate-100 placeholder:text-slate-500 focus-visible:ring-slate-300/35"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isEmailPending || pendingOAuthProvider !== null}
+              className={`mt-4 ${primaryActionButtonClass}`}
+            >
+              {isEmailPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+              {tr(locale, "Send magic link", "Отправить magic link")}
+            </Button>
+          </form>
+        ) : null}
+
+        {emailMessage ? (
+          <p className="mt-4 rounded-xl border border-emerald-300/35 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-100">
+            {emailMessage}
+          </p>
+        ) : null}
+
+        <p className="mt-6 border-t border-slate-700/80 pt-4 text-xs leading-6 text-slate-400">
+          {tr(locale, "By signing in, you agree to our", "Входя в систему, вы соглашаетесь с")}{" "}
+          <Link
+            href="/terms"
+            className="font-semibold text-slate-200 underline underline-offset-4 transition hover:text-white"
+          >
+            {tr(locale, "Terms", "Условиями")}
+          </Link>{" "}
+          {tr(locale, "and", "и")}{" "}
+          <Link
+            href="/privacy"
+            className="font-semibold text-slate-200 underline underline-offset-4 transition hover:text-white"
+          >
+            {tr(locale, "Privacy Policy", "Политикой конфиденциальности")}
+          </Link>
+          .
+        </p>
+      </div>
+    </section>
   );
 }
