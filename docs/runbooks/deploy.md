@@ -13,7 +13,6 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
   - `SMOKE_BASE_URL` (recommended for CI and nightly smoke)
   - `SMOKE_ALLOW_PROTECTED=true` only if target URL is access-protected and returns `401` for anonymous probes
   - `VERCEL_DEPLOY_ENABLED=true` to activate deploy steps in `.github/workflows/deploy.yml`
-  - `VERCEL_FAIL_ON_PRECHECK=true` if you want deploy to fail hard on Vercel project access errors
 
 ## Automated Path
 1. Merge to `main` or run `.github/workflows/deploy.yml` manually.
@@ -21,12 +20,10 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
    - `npm ci`
    - `npm run lint`
    - `npm run build`
-   - Vercel preflight (`vercel pull`)
-   - if preflight passes: Vercel deploy + post-deploy `npm run smoke:check -- <target-url>`
-   - if preflight fails and strict mode is off: deployment is skipped with summary note
+   - Vercel deploy
+   - post-deploy `npm run smoke:check -- <target-url>`
 3. Confirm workflow summary includes:
    - environment (`preview` or `production`)
-   - Vercel preflight outcome
    - deployment URL
    - smoke target URL
 

@@ -179,7 +179,6 @@ Repository variables controlling execution:
 - `SMOKE_ENABLED=true` enables automatic smoke checks via `SMOKE_BASE_URL`.
 - `SMOKE_ALLOW_PROTECTED=true` allows smoke checks to accept `401` for protected preview URLs.
 - `VERCEL_DEPLOY_ENABLED=true` enables actual deploy steps in `deploy.yml`.
-- `VERCEL_FAIL_ON_PRECHECK=true` makes deploy workflow fail hard when `vercel pull` cannot access project settings.
 
 ## Runbooks and Ops Docs
 
