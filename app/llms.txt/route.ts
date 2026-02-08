@@ -22,7 +22,6 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 ## Resources
 
 - [Blog](${absoluteUrl("/blog", siteUrl)}): Articles on vibe coding, agentic coding, prompt engineering, and AI development best practices
-- [Research Leaderboards](${absoluteUrl("/research/leaderboards", siteUrl)}): AI model performance comparisons and rankings
 
 ## Community
 

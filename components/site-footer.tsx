@@ -2,6 +2,7 @@
 import { Github, MessageCircle, Send, Youtube } from "lucide-react";
 
 import { BrandLockup } from "@/components/brand-lockup";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
 import { tr, type Locale } from "@/lib/i18n";
 
 const socialLinks = [
@@ -85,11 +86,6 @@ export function SiteFooter({ locale }: SiteFooterProps) {
               {tr(locale, "Blog", "Blog")}
             </Link>
           </p>
-          <p>
-            <Link href="/research/leaderboards" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Leaderboards", "Leaderboards")}
-            </Link>
-          </p>
         </div>
 
         <div className="space-y-3 text-sm">
@@ -115,6 +111,9 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             <Link href="/privacy" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
               {tr(locale, "Privacy Policy", "РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё")}
             </Link>
+          </p>
+          <p>
+            <CookieSettingsButton label={tr(locale, "Cookie Settings", "Cookie Settings")} />
           </p>
           <p>
             <Link href="/terms" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">

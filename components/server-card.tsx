@@ -1,234 +1,255 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Copy, ExternalLink, KeyRound, LockKeyhole, ShieldCheck, Unlock } from "lucide-react";
-import { toast } from "sonner";
+import { useMemo, useState } from "react";
+import { Heart, Star } from "lucide-react";
 
 import { useLocale } from "@/components/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
-import type { AuthType, HealthStatus, McpServer } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import type { AuthType, McpServer, VerificationLevel } from "@/lib/types";
 
-const authBadgeConfig: Record<AuthType, { labelEn: string; labelRu: string; icon: typeof Unlock }> = {
-  none: { labelEn: "Open", labelRu: "Открытый", icon: Unlock },
-  api_key: { labelEn: "API Key", labelRu: "API ключ", icon: KeyRound },
-  oauth: { labelEn: "OAuth", labelRu: "OAuth", icon: LockKeyhole },
-};
-
-const verificationBadgeConfig = {
-  community: { en: "Community", ru: "Сообщество" },
-  partner: { en: "Partner", ru: "Партнер" },
-  official: { en: "Official", ru: "Официальный" },
-};
-
-const healthBadgeConfig: Record<
-  HealthStatus,
-  { labelEn: string; labelRu: string; className: string; dotClassName: string }
-> = {
-  healthy: {
-    labelEn: "Healthy",
-    labelRu: "Стабильно",
-    className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-    dotClassName: "bg-emerald-400",
-  },
-  degraded: {
-    labelEn: "Degraded",
-    labelRu: "Проблемы",
-    className: "border-amber-500/30 bg-amber-500/10 text-amber-200",
-    dotClassName: "bg-amber-300",
-  },
-  down: {
-    labelEn: "Down",
-    labelRu: "Недоступен",
-    className: "border-rose-500/30 bg-rose-500/10 text-rose-200",
-    dotClassName: "bg-rose-300",
-  },
-  unknown: {
-    labelEn: "Unknown",
-    labelRu: "Неизвестно",
-    className: "border-white/10 bg-white/5 text-slate-300",
-    dotClassName: "bg-slate-400",
-  },
-};
+type ServerCardViewMode = "grid" | "list";
 
 type ServerCardProps = {
   mcpServer: McpServer;
+  viewMode?: ServerCardViewMode;
+  score?: number;
 };
 
-export function ServerCard({ mcpServer }: ServerCardProps) {
-  const locale = useLocale();
-  const [toolsExpanded, setToolsExpanded] = useState(false);
-  const authBadge = authBadgeConfig[mcpServer.authType];
-  const AuthIcon = authBadge.icon;
-  const visitUrl = mcpServer.repoUrl || mcpServer.serverUrl;
-  const healthStatus = mcpServer.healthStatus ?? "unknown";
-  const healthBadge = healthBadgeConfig[healthStatus];
+type LogoStyle = {
+  symbol: string;
+  symbolClassName: string;
+  wordmark?: string;
+  wordmarkClassName?: string;
+};
 
-  async function handleCopyServerUrl() {
-    if (!mcpServer.serverUrl) {
-      toast.error(tr(locale, "Server URL is not available", "URL сервера недоступен"));
-      return;
-    }
+const verificationLabelByLevel: Record<VerificationLevel, { en: string; ru: string }> = {
+  official: { en: "Official MCP", ru: "Официальный MCP" },
+  partner: { en: "Partner MCP", ru: "Партнерский MCP" },
+  community: { en: "Community MCP", ru: "Community MCP" },
+};
 
-    try {
-      await navigator.clipboard.writeText(mcpServer.serverUrl);
-      toast.success(
-        tr(
-          locale,
-          `${mcpServer.name}: URL copied to clipboard`,
-          `${mcpServer.name}: URL скопирован в буфер обмена`,
-        ),
-      );
-    } catch {
-      toast.error(tr(locale, "Failed to copy URL", "Не удалось скопировать URL"));
-    }
+const accessLabelByAuthType: Record<AuthType, { en: string; ru: string }> = {
+  none: { en: "Free", ru: "Бесплатно" },
+  oauth: { en: "Freemium", ru: "Freemium" },
+  api_key: { en: "Paid", ru: "Платно" },
+};
+
+const accentClassByLevel: Record<VerificationLevel, string> = {
+  official: "from-orange-50 via-rose-50 to-orange-100",
+  partner: "from-sky-50 via-blue-50 to-indigo-100",
+  community: "from-emerald-50 via-cyan-50 to-sky-100",
+};
+
+const logoStyleBySlug: Record<string, LogoStyle> = {
+  linear: {
+    symbol: "◩",
+    symbolClassName: "text-slate-900",
+    wordmark: "Linear",
+    wordmarkClassName: "text-slate-900",
+  },
+  github: {
+    symbol: "◉",
+    symbolClassName: "text-slate-900",
+    wordmark: "GitHub",
+    wordmarkClassName: "text-slate-900",
+  },
+  figma: {
+    symbol: "⬣",
+    symbolClassName: "text-fuchsia-500",
+    wordmark: "Figma",
+    wordmarkClassName: "text-slate-900",
+  },
+  sentry: {
+    symbol: "⟟",
+    symbolClassName: "text-slate-900",
+    wordmark: "Sentry",
+    wordmarkClassName: "text-slate-900",
+  },
+  slack: {
+    symbol: "✶",
+    symbolClassName: "text-violet-500",
+    wordmark: "Slack",
+    wordmarkClassName: "text-slate-900",
+  },
+  postgres: {
+    symbol: "◍",
+    symbolClassName: "text-sky-600",
+    wordmark: "Postgres",
+    wordmarkClassName: "text-slate-900",
+  },
+};
+
+function getInitials(name: string): string {
+  const words = name
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+
+  if (words.length === 0) {
+    return "MCP";
   }
 
+  if (words.length === 1) {
+    return words[0].slice(0, 3).toUpperCase();
+  }
+
+  return `${words[0][0]}${words[1][0]}`.toUpperCase();
+}
+
+function resolveLogoStyle(mcpServer: McpServer): LogoStyle {
+  const predefined = logoStyleBySlug[mcpServer.slug];
+
+  if (predefined) {
+    return predefined;
+  }
+
+  return {
+    symbol: getInitials(mcpServer.name),
+    symbolClassName: "text-slate-900",
+  };
+}
+
+function getProductBadge(mcpServer: McpServer): { en: string; ru: string } {
+  const loweredCategory = mcpServer.category.toLowerCase();
+
+  if (loweredCategory.includes("model")) {
+    return { en: "AI Models", ru: "AI Models" };
+  }
+
+  if (loweredCategory.includes("agent")) {
+    return { en: "AI Agents", ru: "AI Agents" };
+  }
+
+  return { en: "MCPs", ru: "MCPs" };
+}
+
+function getRatingValue(mcpServer: McpServer, score?: number): number {
+  const fallbackScore = 2.1 + mcpServer.tools.length / 13;
+  const normalized = (score ?? fallbackScore) / 1.4;
+
+  return Math.max(1, Math.min(5, Number(normalized.toFixed(1))));
+}
+
+export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardProps) {
+  const locale = useLocale();
+  const [saved, setSaved] = useState(false);
+
+  const rating = useMemo(() => getRatingValue(mcpServer, score), [mcpServer, score]);
+  const logoStyle = useMemo(() => resolveLogoStyle(mcpServer), [mcpServer]);
+  const productBadge = useMemo(() => getProductBadge(mcpServer), [mcpServer]);
+  const verificationLabel = verificationLabelByLevel[mcpServer.verificationLevel];
+  const accessLabel = accessLabelByAuthType[mcpServer.authType];
+
   return (
-    <Card className="border-white/10 bg-slate-900/70 shadow-[0_0_0_1px_rgba(148,163,184,0.05)] transition hover:border-blue-400/45 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.4),0_0_24px_rgba(59,130,246,0.18)]">
-      <CardHeader className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-base leading-tight text-slate-100">
-            <Link className="hover:text-blue-300" href={`/server/${mcpServer.slug}`}>
+    <Card
+      className={cn(
+        "overflow-hidden border-slate-200 bg-white shadow-sm transition duration-200 hover:border-blue-300 hover:shadow-md",
+        viewMode === "list" && "md:grid md:grid-cols-[250px_1fr]",
+      )}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden border-b border-slate-200 bg-gradient-to-br p-3",
+          accentClassByLevel[mcpServer.verificationLevel],
+          viewMode === "grid" ? "h-44" : "md:h-full md:border-r md:border-b-0",
+        )}
+      >
+        <div className="absolute -right-10 -bottom-12 size-36 rounded-full bg-white/55 blur-[1px]" />
+        <div className="relative flex h-full flex-col gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <Badge className="border border-white/70 bg-white/85 text-[11px] font-medium text-slate-700 shadow-none">
+              {tr(locale, verificationLabel.en, verificationLabel.ru)}
+            </Badge>
+
+            <div className="flex items-center gap-1.5">
+              <Badge className="border border-white/70 bg-white/85 text-[11px] font-medium text-blue-700 shadow-none">
+                {tr(locale, productBadge.en, productBadge.ru)}
+              </Badge>
+              <button
+                type="button"
+                aria-label={tr(locale, "Save card", "Сохранить карточку")}
+                className={cn(
+                  "inline-flex size-7 items-center justify-center rounded-md border border-slate-200/80 bg-white/90 text-slate-500 transition hover:text-rose-500",
+                  saved && "text-rose-500",
+                )}
+                onClick={() => setSaved((isSaved) => !isSaved)}
+              >
+                <Heart className={cn("size-3.5", saved && "fill-current")} />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-auto flex flex-col items-center justify-center pb-2 text-center">
+            <p className={cn("text-5xl leading-none font-black tracking-tight", logoStyle.symbolClassName)}>
+              {logoStyle.symbol}
+            </p>
+            {logoStyle.wordmark ? (
+              <p className={cn("mt-2 text-sm font-bold tracking-tight", logoStyle.wordmarkClassName)}>
+                {logoStyle.wordmark}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col">
+        <CardHeader className="space-y-2 pb-2">
+          <CardTitle className="text-lg leading-tight text-slate-900">
+            <Link className="transition hover:text-blue-600" href={`/server/${mcpServer.slug}`}>
               {mcpServer.name}
             </Link>
           </CardTitle>
-          <Badge
-            variant="outline"
-            className="gap-1 border-white/10 bg-slate-950/70 text-slate-300"
-          >
-            <AuthIcon className="size-3" />
-            {tr(locale, authBadge.labelEn, authBadge.labelRu)}
-          </Badge>
-        </div>
+          <p className="text-xs text-slate-500">
+            {tr(locale, "by", "от")} {mcpServer.maintainer?.name ?? mcpServer.name}
+          </p>
+          <p className="line-clamp-2 text-sm text-slate-600">{mcpServer.description}</p>
+        </CardHeader>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-          <Badge variant="secondary" className="bg-white/5 text-slate-300">
-            <ShieldCheck className="mr-1 size-3" />
-            {tr(
-              locale,
-              verificationBadgeConfig[mcpServer.verificationLevel].en,
-              verificationBadgeConfig[mcpServer.verificationLevel].ru,
-            )}
-          </Badge>
-          <Badge variant="outline" className={healthBadge.className}>
-            <span className={`mr-1 inline-block size-1.5 rounded-full ${healthBadge.dotClassName}`} />
-            {tr(locale, healthBadge.labelEn, healthBadge.labelRu)}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        <p className="line-clamp-3 text-sm text-slate-300">{mcpServer.description}</p>
-
-        <div className="rounded-xl border border-white/10 bg-slate-950/70 p-3">
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="text-xs font-medium tracking-wide text-slate-400 uppercase">
-              {tr(locale, "Server URL", "URL сервера")}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopyServerUrl}
-              className="inline-flex items-center gap-1 text-xs text-blue-300 transition hover:text-blue-200"
-            >
-              <Copy className="size-3.5" />
-              {tr(locale, "Copy", "Копировать")}
-            </button>
+        <CardContent className="space-y-3 pt-0">
+          <div className="flex flex-wrap gap-1.5">
+            {mcpServer.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500"
+              >
+                {tag}
+              </span>
+            ))}
+            {mcpServer.tags.length > 3 ? (
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500">
+                +{mcpServer.tags.length - 3}
+              </span>
+            ) : null}
           </div>
-          <p className="truncate text-sm text-slate-200">{mcpServer.serverUrl || "N/A"}</p>
-        </div>
 
-        <div className="flex flex-wrap gap-2">
-          {mcpServer.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-slate-400"
-            >
-              #{tag}
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+              <Star className="size-3.5 fill-current" />
+              {rating.toFixed(1)}
+            </div>
+            <span className="text-sm font-semibold text-blue-600">
+              {tr(locale, accessLabel.en, accessLabel.ru)}
             </span>
-          ))}
-        </div>
-      </CardContent>
+          </div>
+        </CardContent>
 
-      <CardFooter className="grid w-full grid-cols-2 gap-2">
-        <Button
-          asChild
-          variant="outline"
-          className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
-        >
-          <Link href={`/server/${mcpServer.slug}`}>{tr(locale, "Details", "Детали")}</Link>
-        </Button>
-
-        {visitUrl ? (
+        <CardFooter className="mt-auto border-t border-slate-200 bg-slate-50/80 p-3">
           <Button
             asChild
             variant="outline"
-            className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
+            className="w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
           >
-            <Link href={visitUrl} target="_blank" rel="noreferrer">
-              {tr(locale, "Visit", "Открыть")}
-              <ExternalLink className="size-4" />
+            <Link href={`/server/${mcpServer.slug}`}>
+              {tr(locale, "View Details", "Подробнее")}
             </Link>
           </Button>
-        ) : (
-          <Button
-            variant="outline"
-            disabled
-            className="border-white/10 bg-white/[0.02]"
-          >
-            {tr(locale, "Visit", "Открыть")}
-          </Button>
-        )}
-
-        <Button
-          type="button"
-          variant="ghost"
-          className="col-span-2 bg-white/[0.02] hover:bg-blue-500/15"
-          onClick={() => setToolsExpanded((isExpanded) => !isExpanded)}
-        >
-          {toolsExpanded
-            ? tr(locale, "Hide Tools", "Скрыть инструменты")
-            : tr(locale, `Tools (${mcpServer.tools.length})`, `Инструменты (${mcpServer.tools.length})`)}
-        </Button>
-
-        {toolsExpanded ? (
-          <div className="col-span-2 space-y-3 rounded-xl border border-white/10 bg-slate-950/70 p-3">
-            {mcpServer.tools.length > 0 ? (
-              <div className="max-h-40 overflow-y-auto">
-                <div className="flex flex-wrap gap-2">
-                  {mcpServer.tools.map((toolName) => (
-                    <Badge
-                      key={toolName}
-                      variant="outline"
-                      className="border-white/12 text-slate-300"
-                    >
-                      {toolName}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-slate-400">
-                {tr(locale, "No tools published for this server yet.", "Для этого сервера пока не опубликованы инструменты.")}
-              </p>
-            )}
-
-            <Button
-              asChild
-              variant="outline"
-              className="w-full border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
-            >
-              <Link href={`/server/${mcpServer.slug}`}>
-                {tr(locale, "Open full details", "Открыть полные детали")}
-              </Link>
-            </Button>
-          </div>
-        ) : null}
-      </CardFooter>
+        </CardFooter>
+      </div>
     </Card>
   );
 }

@@ -44,11 +44,6 @@ const sections: readonly SiteMapSection[] = [
         title: "Blog",
         description: "Articles on vibe coding, agentic coding, and AI development best practices.",
       },
-      {
-        href: "/research/leaderboards",
-        title: "Research Leaderboards",
-        description: "AI model performance comparisons and rankings.",
-      },
     ],
   },
   {
