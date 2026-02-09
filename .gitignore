@@ -52,3 +52,8 @@ ops/backup-manifest.json
 
 .vercel
 .env*.local
+
+# local BridgeMind extracted bundles
+bridgemind-agents-full/
+bridgemind-prompts-full/
+bridgemind-skills-full/
