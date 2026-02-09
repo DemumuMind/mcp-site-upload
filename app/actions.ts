@@ -11,13 +11,24 @@ export type SubmissionActionResult = {
   fieldErrors?: Partial<Record<keyof SubmissionInput, string>>;
 };
 
+const SLUG_FALLBACK_PREFIX = "server";
+
 function toSlug(name: string): string {
-  return name
+  const normalized = name
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  if (normalized) {
+    return normalized;
+  }
+
+  return `${SLUG_FALLBACK_PREFIX}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 export async function submitServerAction(
@@ -30,7 +41,7 @@ export async function submitServerAction(
   if (!parsedSubmission.success) {
     const fieldErrors = Object.fromEntries(
       Object.entries(parsedSubmission.error.flatten().fieldErrors).map(
-        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Invalid value")],
+        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Некорректное значение")],
       ),
     );
 
@@ -39,7 +50,7 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Validation failed. Please check highlighted fields.",
-        "Validation failed. Please check highlighted fields.",
+        "Проверка данных не пройдена. Исправьте поля с ошибками.",
       ),
       fieldErrors: fieldErrors as Partial<Record<keyof SubmissionInput, string>>,
     };
@@ -54,7 +65,7 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Auth is not configured. Set Supabase environment variables before submitting.",
-        "Auth is not configured. Set Supabase environment variables before submitting.",
+        "Авторизация не настроена. Укажите переменные окружения Supabase перед отправкой.",
       ),
     };
   }
@@ -65,7 +76,7 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Login / Sign in is required before submitting a server.",
-        "Login / Sign in is required before submitting a server.",
+        "Перед отправкой сервера необходимо войти в аккаунт.",
       ),
     };
   }
@@ -89,10 +100,24 @@ export async function submitServerAction(
   });
 
   if (error) {
+    if (error.code === "23505") {
+      return {
+        success: false,
+        message: tr(
+          locale,
+          "A server with a similar name already exists. Please use a more specific name.",
+          "Сервер с похожим названием уже существует. Укажите более уникальное название.",
+        ),
+      };
+    }
+
     return {
       success: false,
-      message:
-        tr(locale, "Submission failed", "Submission failed") + `: ${error.message}`,
+      message: tr(
+        locale,
+        "Submission failed. Please try again later.",
+        "Не удалось отправить сервер. Попробуйте ещё раз позже.",
+      ),
     };
   }
 
@@ -101,7 +126,7 @@ export async function submitServerAction(
     message: tr(
       locale,
       "Server submitted successfully. Status: pending moderation.",
-      "Server submitted successfully. Status: pending moderation.",
+      "Сервер успешно отправлен. Статус: ожидает модерацию.",
     ),
   };
 }

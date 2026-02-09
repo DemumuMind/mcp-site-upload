@@ -33,8 +33,8 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 
 ## Optional
 
-- [Terms of Service](${absoluteUrl("/terms-of-service", siteUrl)}): Legal terms and conditions
-- [Privacy Policy](${absoluteUrl("/privacy-policy", siteUrl)}): Data privacy and protection information
+- [Terms of Service](${absoluteUrl("/terms", siteUrl)}): Legal terms and conditions
+- [Privacy Policy](${absoluteUrl("/privacy", siteUrl)}): Data privacy and protection information
 - [Sitemap](${absoluteUrl("/sitemap", siteUrl)}): Full site navigation
 `;
 }

@@ -1,3 +1,7 @@
+import { timingSafeEqual } from "node:crypto";
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -11,6 +15,17 @@ const DEFAULT_MAX_PROBE_ATTEMPTS = 2;
 const DEFAULT_RETRY_DELAY_MS = 400;
 const DEFAULT_PROBE_CONCURRENCY = 5;
 const DEFAULT_UPDATE_CONCURRENCY = 10;
+
+const blockedHostnames = new Set([
+  "localhost",
+  "localhost.localdomain",
+  "0",
+  "0.0.0.0",
+]);
+
+const blockedHostnameSuffixes = [".localhost", ".local", ".internal", ".home.arpa"];
+
+const hostnameSafetyCache = new Map<string, boolean>();
 
 type NumberEnvOptions = {
   min: number;
@@ -137,11 +152,157 @@ function delay(ms: number): Promise<void> {
   });
 }
 
+function normalizeHostname(hostname: string): string {
+  const trimmed = hostname.trim().toLowerCase();
+  const noBrackets = trimmed.replace(/^\[/, "").replace(/\]$/, "");
+  return noBrackets.endsWith(".") ? noBrackets.slice(0, -1) : noBrackets;
+}
+
+function isPrivateIpv4(address: string): boolean {
+  const octets = address.split(".").map((part) => Number.parseInt(part, 10));
+
+  if (octets.length !== 4 || octets.some((part) => Number.isNaN(part) || part < 0 || part > 255)) {
+    return true;
+  }
+
+  const [first, second] = octets;
+
+  if (first === 10) {
+    return true;
+  }
+
+  if (first === 127) {
+    return true;
+  }
+
+  if (first === 169 && second === 254) {
+    return true;
+  }
+
+  if (first === 172 && second >= 16 && second <= 31) {
+    return true;
+  }
+
+  if (first === 192 && second === 168) {
+    return true;
+  }
+
+  if (first === 100 && second >= 64 && second <= 127) {
+    return true;
+  }
+
+  if (first === 198 && (second === 18 || second === 19)) {
+    return true;
+  }
+
+  if (first === 0 || first >= 224) {
+    return true;
+  }
+
+  return false;
+}
+
+function isRestrictedIpv6(address: string): boolean {
+  const normalized = normalizeHostname(address);
+
+  if (normalized === "::" || normalized === "::1") {
+    return true;
+  }
+
+  if (normalized.startsWith("fe80:")) {
+    return true;
+  }
+
+  if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
+    return true;
+  }
+
+  if (normalized.startsWith("::ffff:")) {
+    const mappedIpv4 = normalized.slice("::ffff:".length);
+    return isPrivateIpv4(mappedIpv4);
+  }
+
+  return false;
+}
+
+function isRestrictedIpAddress(address: string): boolean {
+  const normalized = normalizeHostname(address);
+  const ipVersion = isIP(normalized);
+
+  if (ipVersion === 4) {
+    return isPrivateIpv4(normalized);
+  }
+
+  if (ipVersion === 6) {
+    return isRestrictedIpv6(normalized);
+  }
+
+  return false;
+}
+
+function isBlockedHostname(hostname: string): boolean {
+  const normalized = normalizeHostname(hostname);
+
+  if (!normalized) {
+    return true;
+  }
+
+  if (blockedHostnames.has(normalized)) {
+    return true;
+  }
+
+  return blockedHostnameSuffixes.some((suffix) => normalized.endsWith(suffix));
+}
+
+async function isSafeProbeHostname(hostname: string): Promise<boolean> {
+  const normalized = normalizeHostname(hostname);
+
+  if (!normalized) {
+    return false;
+  }
+
+  const cached = hostnameSafetyCache.get(normalized);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  if (isBlockedHostname(normalized)) {
+    hostnameSafetyCache.set(normalized, false);
+    return false;
+  }
+
+  if (isIP(normalized)) {
+    const safe = !isRestrictedIpAddress(normalized);
+    hostnameSafetyCache.set(normalized, safe);
+    return safe;
+  }
+
+  try {
+    const resolved = await lookup(normalized, { all: true, verbatim: true });
+
+    if (resolved.length === 0) {
+      hostnameSafetyCache.set(normalized, false);
+      return false;
+    }
+
+    const safe = resolved.every((record) => !isRestrictedIpAddress(record.address));
+    hostnameSafetyCache.set(normalized, safe);
+    return safe;
+  } catch {
+    hostnameSafetyCache.set(normalized, false);
+    return false;
+  }
+}
+
 function parseServerUrl(rawUrl: string): URL | null {
   try {
     const parsed = new URL(rawUrl);
 
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+
+    if (parsed.username || parsed.password) {
       return null;
     }
 
@@ -212,6 +373,17 @@ function getExpectedCronToken(): string | null {
   return process.env.HEALTH_CHECK_CRON_SECRET || process.env.CRON_SECRET || null;
 }
 
+function isValidCronToken(providedToken: string, expectedToken: string): boolean {
+  const provided = Buffer.from(providedToken);
+  const expected = Buffer.from(expectedToken);
+
+  if (provided.length !== expected.length) {
+    return false;
+  }
+
+  return timingSafeEqual(provided, expected);
+}
+
 async function probeServer(row: ActiveServerRow): Promise<HealthProbe> {
   const serverUrl = row.server_url?.trim();
 
@@ -234,6 +406,16 @@ async function probeServer(row: ActiveServerRow): Promise<HealthProbe> {
     };
   }
 
+  const safeHostname = await isSafeProbeHostname(parsedServerUrl.hostname);
+  if (!safeHostname) {
+    return {
+      id: row.id,
+      name: row.name,
+      healthStatus: "unknown",
+      healthError: "Unsafe server URL host",
+    };
+  }
+
   let lastError: string | null = null;
 
   for (let attempt = 1; attempt <= MAX_PROBE_ATTEMPTS; attempt += 1) {
@@ -252,10 +434,7 @@ async function probeServer(row: ActiveServerRow): Promise<HealthProbe> {
       const statusHealth = classifyHttpStatus(response.status);
       const statusError = `HTTP ${response.status}`;
 
-      if (
-        response.status >= 500 &&
-        attempt < MAX_PROBE_ATTEMPTS
-      ) {
+      if (response.status >= 500 && attempt < MAX_PROBE_ATTEMPTS) {
         lastError = statusError;
         await delay(RETRY_DELAY_MS * attempt);
         continue;
@@ -306,7 +485,7 @@ async function runHealthCheck(request: NextRequest) {
   }
 
   const providedToken = extractBearerToken(request);
-  if (!providedToken || providedToken !== expectedToken) {
+  if (!providedToken || !isValidCronToken(providedToken, expectedToken)) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 

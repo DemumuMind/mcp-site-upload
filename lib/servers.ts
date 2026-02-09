@@ -122,7 +122,7 @@ export async function getActiveServers(): Promise<McpServer[]> {
       .eq("status", "active")
       .order("created_at", { ascending: false });
 
-    if (error || !data || data.length === 0) {
+    if (error || !data) {
       return mockServers
         .filter((mcpServer) => mcpServer.status === "active")
         .map(withMockHealthFallback);

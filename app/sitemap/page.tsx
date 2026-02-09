@@ -70,12 +70,12 @@ const sections: readonly SiteMapSection[] = [
     title: "Legal & FAQ",
     links: [
       {
-        href: "/terms-of-service",
+        href: "/terms",
         title: "Terms of Service",
         description: "Legal terms and conditions.",
       },
       {
-        href: "/privacy-policy",
+        href: "/privacy",
         title: "Privacy Policy",
         description: "Data privacy and protection information.",
       },

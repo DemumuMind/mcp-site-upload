@@ -1,7 +1,69 @@
 #!/usr/bin/env node
 
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, "..");
+
+const envFilePaths = [path.join(repoRoot, ".env.local"), path.join(repoRoot, ".env")];
+
+function parseEnvFile(filePath) {
+  if (!existsSync(filePath)) {
+    return {};
+  }
+
+  const raw = readFileSync(filePath, "utf8");
+  const parsed = {};
+
+  for (const line of raw.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const withoutExport = trimmed.startsWith("export ")
+      ? trimmed.slice("export ".length)
+      : trimmed;
+
+    const separatorIndex = withoutExport.indexOf("=");
+    if (separatorIndex <= 0) {
+      continue;
+    }
+
+    const key = withoutExport.slice(0, separatorIndex).trim();
+    let value = withoutExport.slice(separatorIndex + 1).trim();
+
+    if (!key) {
+      continue;
+    }
+
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    parsed[key] = value;
+  }
+
+  return parsed;
+}
+
+const envFromFiles = {};
+for (const envFilePath of [...envFilePaths].reverse()) {
+  Object.assign(envFromFiles, parseEnvFile(envFilePath));
+}
+
+function getEnvValue(key) {
+  return process.env[key] ?? envFromFiles[key];
+}
+
 const argBaseUrl = process.argv[2];
-const baseUrlInput = argBaseUrl || process.env.SMOKE_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+const baseUrlInput = argBaseUrl || getEnvValue("SMOKE_BASE_URL") || getEnvValue("NEXT_PUBLIC_SITE_URL");
 const allowProtectedMode = String(process.env.SMOKE_ALLOW_PROTECTED || "false").toLowerCase() === "true";
 
 if (!baseUrlInput) {
@@ -12,7 +74,10 @@ if (!baseUrlInput) {
 }
 
 const baseUrl = baseUrlInput.replace(/\/+$/, "");
-const healthToken = process.env.SMOKE_HEALTH_TOKEN || process.env.HEALTH_CHECK_CRON_SECRET;
+const healthToken =
+  getEnvValue("SMOKE_HEALTH_TOKEN") ||
+  getEnvValue("HEALTH_CHECK_CRON_SECRET") ||
+  getEnvValue("CRON_SECRET");
 
 const failures = [];
 const protectedStatusAllowed = allowProtectedMode ? [200, 401] : [200];
