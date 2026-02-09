@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: tr(locale, "Login / Sign | DemumuMind MCP", "Вход / Регистрация | DemumuMind MCP"),
+    title: tr(locale, "Login / Sign", "Вход / Регистрация"),
     description: tr(
       locale,
       "Sign in to submit MCP servers to the catalog.",

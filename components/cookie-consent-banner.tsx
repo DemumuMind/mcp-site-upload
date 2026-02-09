@@ -3,18 +3,21 @@
 import { useEffect, useState } from "react";
 import { Cookie, X } from "lucide-react";
 
+import { useLocale } from "@/components/locale-provider";
 import {
   COOKIE_CONSENT_OPEN_EVENT,
   COOKIE_CONSENT_EVENT,
   type CookieConsentChoice,
   setCookieConsent,
 } from "@/lib/cookie-consent";
+import { tr } from "@/lib/i18n";
 
 type CookieConsentBannerProps = {
   initialConsent: CookieConsentChoice | null;
 };
 
 export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps) {
+  const locale = useLocale();
   const [consent, setConsent] = useState<CookieConsentChoice | null>(initialConsent);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -59,15 +62,22 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
           </div>
           <div className="flex-1">
             <h2 className="text-[1.03rem] font-semibold text-slate-800 dark:text-slate-100">
-              We value your privacy
+              {tr(locale, "We value your privacy", "Мы ценим вашу приватность")}
             </h2>
             <p className="mt-1 text-[1.05rem] leading-8 text-slate-600 dark:text-slate-300">
-              We use cookies to enhance your browsing experience, serve personalized content, and
-              analyze our traffic.
+              {tr(
+                locale,
+                "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.",
+                "Мы используем cookie, чтобы улучшать ваш пользовательский опыт, персонализировать контент и анализировать трафик.",
+              )}
             </p>
             {consent !== null && isSettingsOpen ? (
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                You can update your cookie preferences at any time.
+                {tr(
+                  locale,
+                  "You can update your cookie preferences at any time.",
+                  "Вы можете изменить настройки cookie в любое время.",
+                )}
               </p>
             ) : null}
           </div>
@@ -78,7 +88,7 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
                 setIsSettingsOpen(false);
               }}
               className="inline-flex size-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f7fa] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus-visible:ring-white dark:focus-visible:ring-offset-slate-900"
-              aria-label="Close cookie settings"
+              aria-label={tr(locale, "Close cookie settings", "Закрыть настройки cookie")}
             >
               <X className="size-4" />
             </button>
@@ -93,7 +103,7 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
             }}
             className="inline-flex min-h-12 w-full items-center justify-center rounded-[10px] border border-black bg-black px-4 text-[1.05rem] font-semibold text-white transition hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f7fa] dark:border-white dark:bg-white dark:text-black dark:hover:bg-slate-100 dark:focus-visible:ring-white dark:focus-visible:ring-offset-slate-900"
           >
-            Accept All
+            {tr(locale, "Accept All", "Принять все")}
           </button>
           <button
             type="button"
@@ -102,7 +112,7 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
             }}
             className="inline-flex min-h-12 w-full items-center justify-center rounded-[10px] border border-slate-300 bg-transparent px-4 text-[1.05rem] font-medium text-slate-800 transition hover:bg-white/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f7fa] dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
           >
-            Necessary Cookies Only
+            {tr(locale, "Necessary Cookies Only", "Только необходимые cookie")}
           </button>
         </div>
       </section>

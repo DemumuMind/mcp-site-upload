@@ -16,6 +16,9 @@ type SiteFooterProps = {
   locale: Locale;
 };
 
+const footerLinkClass =
+  "inline-flex min-h-11 min-w-11 items-center rounded-sm py-1 text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:py-0";
+
 export function SiteFooter({ locale }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
@@ -38,7 +41,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
             {tr(
               locale,
               "Community-curated MCP directory for discovering trusted servers, reviewing auth and verification signals, and submitting integrations.",
-              "РљР°С‚Р°Р»РѕРі MCP-СЃРµСЂРІРµСЂРѕРІ РѕС‚ СЃРѕРѕР±С‰РµСЃС‚РІР°: РїРѕРёСЃРє РЅР°РґРµР¶РЅС‹С… СЃРµСЂРІРµСЂРѕРІ, РїСЂРѕРІРµСЂРєР° auth/verification-СЃРёРіРЅР°Р»РѕРІ Рё РѕС‚РїСЂР°РІРєР° РёРЅС‚РµРіСЂР°С†РёР№ РЅР° РјРѕРґРµСЂР°С†РёСЋ.",
+              "Каталог MCP-серверов от сообщества: поиск надежных серверов, проверка auth/verification-сигналов и отправка интеграций на модерацию.",
             )}
           </p>
           <div className="flex items-center gap-2">
@@ -59,96 +62,96 @@ export function SiteFooter({ locale }: SiteFooterProps) {
 
         <div className="space-y-3 text-sm">
           <p className="text-xs tracking-[0.16em] text-slate-400 uppercase">
-            {tr(locale, "Explore", "Р Р°Р·РґРµР»С‹")}
+            {tr(locale, "Explore", "Разделы")}
           </p>
           <p>
-            <Link href="/catalog" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Catalog", "РљР°С‚Р°Р»РѕРі")}
+            <Link href="/catalog" className={footerLinkClass}>
+              {tr(locale, "Catalog", "Каталог")}
             </Link>
           </p>
           <p>
-            <Link href="/categories" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Categories", "РљР°С‚РµРіРѕСЂРёРё")}
+            <Link href="/categories" className={footerLinkClass}>
+              {tr(locale, "Categories", "Категории")}
             </Link>
           </p>
           <p>
-            <Link href="/mcp" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "MCP Overview", "РћР±Р·РѕСЂ MCP")}
+            <Link href="/mcp" className={footerLinkClass}>
+              {tr(locale, "MCP Overview", "Обзор MCP")}
             </Link>
           </p>
           <p>
-            <Link href="/tools" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Tools", "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹")}
+            <Link href="/tools" className={footerLinkClass}>
+              {tr(locale, "Tools", "Инструменты")}
             </Link>
           </p>
           <p>
-            <Link href="/blog" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Blog", "Blog")}
-            </Link>
-          </p>
-        </div>
-
-        <div className="space-y-3 text-sm">
-          <p className="text-xs tracking-[0.16em] text-slate-400 uppercase">
-            {tr(locale, "Company", "Рћ РїСЂРѕРµРєС‚Рµ")}
-          </p>
-          <p>
-            <Link href="/about" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "About Us", "Рћ РЅР°СЃ")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/pricing" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Pricing", "Р¦РµРЅС‹")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/contact" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Contact", "Contact")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/privacy" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Privacy Policy", "РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё")}
-            </Link>
-          </p>
-          <p>
-            <CookieSettingsButton label={tr(locale, "Cookie Settings", "Cookie Settings")} />
-          </p>
-          <p>
-            <Link href="/terms" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Terms of Service", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРµ СЃРѕРіР»Р°С€РµРЅРёРµ")}
-            </Link>
-          </p>
-          <p>
-            <Link href="/sitemap" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Sitemap", "Sitemap")}
+            <Link href="/blog" className={footerLinkClass}>
+              {tr(locale, "Blog", "Блог")}
             </Link>
           </p>
         </div>
 
         <div className="space-y-3 text-sm">
           <p className="text-xs tracking-[0.16em] text-slate-400 uppercase">
-            {tr(locale, "Community", "РЎРѕРѕР±С‰РµСЃС‚РІРѕ")}
+            {tr(locale, "Company", "О проекте")}
           </p>
           <p>
-            <Link href="/discord" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+            <Link href="/about" className={footerLinkClass}>
+              {tr(locale, "About Us", "О нас")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/pricing" className={footerLinkClass}>
+              {tr(locale, "Pricing", "Цены")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/contact" className={footerLinkClass}>
+              {tr(locale, "Contact", "Контакты")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/privacy" className={footerLinkClass}>
+              {tr(locale, "Privacy Policy", "Политика конфиденциальности")}
+            </Link>
+          </p>
+          <p>
+            <CookieSettingsButton label={tr(locale, "Cookie Settings", "Настройки cookie")} />
+          </p>
+          <p>
+            <Link href="/terms" className={footerLinkClass}>
+              {tr(locale, "Terms of Service", "Пользовательское соглашение")}
+            </Link>
+          </p>
+          <p>
+            <Link href="/sitemap" className={footerLinkClass}>
+              {tr(locale, "Sitemap", "Карта сайта")}
+            </Link>
+          </p>
+        </div>
+
+        <div className="space-y-3 text-sm">
+          <p className="text-xs tracking-[0.16em] text-slate-400 uppercase">
+            {tr(locale, "Community", "Сообщество")}
+          </p>
+          <p>
+            <Link href="/discord" className={footerLinkClass}>
               {tr(locale, "Discord", "Discord")}
             </Link>
           </p>
           <p>
-            <Link href="/submit-server" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Submit Server", "РћС‚РїСЂР°РІРёС‚СЊ СЃРµСЂРІРµСЂ")}
+            <Link href="/submit-server" className={footerLinkClass}>
+              {tr(locale, "Submit Server", "Отправить сервер")}
             </Link>
           </p>
           <p>
-            <Link href="/how-to-use" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Setup Guide", "Р“Р°Р№Рґ РїРѕ РЅР°СЃС‚СЂРѕР№РєРµ")}
+            <Link href="/how-to-use" className={footerLinkClass}>
+              {tr(locale, "Setup Guide", "Гайд по настройке")}
             </Link>
           </p>
           <p>
-            <Link href="/auth" className="rounded-sm text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
-              {tr(locale, "Sign In", "Р’С…РѕРґ")}
+            <Link href="/auth" className={footerLinkClass}>
+              {tr(locale, "Sign In", "Вход")}
             </Link>
           </p>
         </div>
@@ -158,11 +161,11 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         <p>
           {tr(
             locale,
-            `В© ${year} DemumuMind. All rights reserved.`,
-            `В© ${year} DemumuMind. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.`,
+            `© ${year} DemumuMind. All rights reserved.`,
+            `© ${year} DemumuMind. Все права защищены.`,
           )}
         </p>
-        <p>{tr(locale, "Built for modern AI agent workflows.", "РЎРѕР·РґР°РЅРѕ РґР»СЏ СЃРѕРІСЂРµРјРµРЅРЅС‹С… AI-Р°РіРµРЅС‚РЅС‹С… workflow.")}</p>
+        <p>{tr(locale, "Built for modern AI agent workflows.", "Создано для современных AI-агентных workflow.")}</p>
       </div>
     </footer>
   );

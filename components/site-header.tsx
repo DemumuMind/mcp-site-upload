@@ -31,13 +31,13 @@ type NavLinkItem = {
 };
 
 const navLinkMap: readonly NavLinkItem[] = [
-  { href: "/", label: { en: "Overview", ru: "РћР±Р·РѕСЂ" }, icon: House },
-  { href: "/catalog", label: { en: "Catalog", ru: "РљР°С‚Р°Р»РѕРі" }, icon: LayoutGrid },
-  { href: "/how-to-use", label: { en: "Setup", ru: "РќР°СЃС‚СЂРѕР№РєР°" }, icon: BookOpen },
-  { href: "/tools", label: { en: "Tools", ru: "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹" }, icon: Wrench },
+  { href: "/", label: { en: "Overview", ru: "Обзор" }, icon: House },
+  { href: "/catalog", label: { en: "Catalog", ru: "Каталог" }, icon: LayoutGrid },
+  { href: "/how-to-use", label: { en: "Setup", ru: "Настройка" }, icon: BookOpen },
+  { href: "/tools", label: { en: "Tools", ru: "Инструменты" }, icon: Wrench },
   { href: "/mcp", label: { en: "MCP", ru: "MCP" }, icon: Cpu },
-  { href: "/blog", label: { en: "Blog", ru: "Р‘Р»РѕРі" }, icon: Newspaper },
-  { href: "/pricing", label: { en: "Pricing", ru: "Р¦РµРЅС‹" }, icon: Wallet },
+  { href: "/blog", label: { en: "Blog", ru: "Блог" }, icon: Newspaper },
+  { href: "/pricing", label: { en: "Pricing", ru: "Цены" }, icon: Wallet },
 ];
 
 type SiteHeaderProps = {
@@ -51,8 +51,8 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
     icon: item.icon,
   }));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const menuLabel = locale === "en" ? "Menu" : "РњРµРЅСЋ";
-  const closeLabel = locale === "en" ? "Close menu" : "Р—Р°РєСЂС‹С‚СЊ РјРµРЅСЋ";
+  const menuLabel = locale === "en" ? "Menu" : "Меню";
+  const closeLabel = locale === "en" ? "Close menu" : "Закрыть меню";
 
   useEffect(() => {
     if (!isMobileMenuOpen) {
@@ -122,7 +122,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         <nav
           id="mobile-site-nav"
           className="border-t border-white/10 bg-slate-950/95 px-4 py-3 sm:px-6 lg:hidden"
-          aria-label={locale === "en" ? "Mobile navigation" : "РњРѕР±РёР»СЊРЅР°СЏ РЅР°РІРёРіР°С†РёСЏ"}
+          aria-label={locale === "en" ? "Mobile navigation" : "Мобильная навигация"}
         >
           <div className="mx-auto grid w-full max-w-7xl gap-2">
             {navLinks.map((link) => (
