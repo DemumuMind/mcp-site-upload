@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { HowToConnectSection } from "@/components/how-to-connect-section";
+import { PageFrame } from "@/components/page-templates";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -245,7 +246,7 @@ export default async function HowToUsePage() {
   const sampleServer = catalogSnapshot.sampleServer;
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="content">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02070f_0%,#030a15_42%,#050814_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(circle_at_14%_4%,rgba(56,189,248,0.28),transparent_42%),radial-gradient(circle_at_84%_6%,rgba(59,130,246,0.18),transparent_38%)]" />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(56,189,248,0.06)_1px,transparent_1px),linear-gradient(rgba(56,189,248,0.05)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30" />
@@ -487,6 +488,6 @@ export default async function HowToUsePage() {
           </div>
         </div>
       </section>
-    </div>
+    </PageFrame>
   );
 }

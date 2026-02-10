@@ -205,7 +205,9 @@ export default async function AccountPage() {
   const isEmailVerified = Boolean(userData.user.email_confirmed_at);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+    <div className="relative overflow-hidden border-t border-white/10">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#060a14_0%,#070c18_48%,#050913_100%)]" />
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <section className="rounded-2xl border border-white/10 bg-slate-900/72 p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
@@ -441,6 +443,7 @@ export default async function AccountPage() {
             })}
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );
