@@ -1,5 +1,235 @@
 # Session Continuation
 
+## Latest Update (2026-02-10, Nightly Smoke 500 Resolved via Production Redeploy)
+- Objective: resolve `Nightly Smoke` failure on authorized `/api/health-check` probe (`500`) after switching to production alias target.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Confirmed failure mode on alias target (`https://mcp-site-silk.vercel.app`): authorized health probe returned `500` with message `Failed to query active servers: TypeError: fetch failed`.
+  - Validated that required production Vercel env vars were present and aligned with local source of truth.
+  - Performed fresh production deployment to ensure current Vercel env values were applied to runtime:
+    - `Deploy` run `21857318553` (success)
+    - alias reattached to latest production deployment.
+  - Re-ran nightly smoke against production alias:
+    - `Nightly Smoke` run `21857412643` (success)
+    - authorized probe now returns `200` with expected JSON `summary`.
+- Verification commands:
+  - `npm run smoke:check -- https://mcp-site-silk.vercel.app` (before fix: fail)
+  - `gh workflow run Deploy --repo DemumuMind/mcp-site-upload -f environment=production`
+  - `gh run watch 21857318553 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh workflow run "Nightly Smoke" --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21857412643 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `npm run smoke:check -- https://mcp-site-silk.vercel.app` (after fix: pass)
+- Verification results:
+  - pre-fix smoke: failed (`/api/health-check` authorized probe `500`)
+  - deploy run `21857318553`: success
+  - nightly smoke run `21857412643`: success
+  - post-fix local smoke against alias: success
+- Next commands:
+  - Monitor next scheduled nightly run to confirm continued stability without manual trigger.
+  - If `/api/health-check` regresses, inspect Vercel env change history and redeploy recency first.
+- Open risks:
+  - Deploy smoke currently passes even when authorized probe is `401` in protected mode; it may not catch app-route health regressions on every deployment target.
+
+## Latest Update (2026-02-10, Production Alias Smoke Recovery + Nightly Smoke Green)
+- Objective: finish requested `SMOKE_BASE_URL` switch to production alias and get manual nightly smoke validation back to green.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Confirmed smoke target variable is set to production alias:
+    - `SMOKE_BASE_URL=https://mcp-site-silk.vercel.app`
+  - Ran manual nightly smoke and captured failure for diagnosis:
+    - `Nightly Smoke` run `21856892618` (failed)
+  - Diagnosed production runtime/env drift:
+    - `NEXT_PUBLIC_SUPABASE_URL` had wrong project URL with trailing `\\r\\n`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` had trailing `\\r\\n`
+    - `NEXTAUTH_URL` had trailing `\\r\\n`
+    - health-check secrets/runtime values required re-sync for production smoke auth
+  - Replaced production Vercel environment values from local `.env` and normalized auth URL:
+    - `NEXT_PUBLIC_SUPABASE_URL`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+    - `NEXTAUTH_URL=https://mcp-site-silk.vercel.app`
+    - `SUPABASE_SERVICE_ROLE_KEY`
+    - `HEALTH_CHECK_CRON_SECRET`
+    - `CRON_SECRET`
+  - Updated GitHub secret to align smoke probe auth token:
+    - `SMOKE_HEALTH_TOKEN` (set from current `HEALTH_CHECK_CRON_SECRET`)
+  - Redeployed production to apply env corrections:
+    - `Deploy` run `21857252209` (success)
+    - production URL `https://mcp-site-m4efk727x-cardtest15-coders-projects.vercel.app`
+    - alias `https://mcp-site-silk.vercel.app`
+  - Re-ran nightly smoke after fixes:
+    - `Nightly Smoke` run `21857334678` (success)
+- Verification commands:
+  - `gh variable set SMOKE_BASE_URL --repo DemumuMind/mcp-site-upload --body "https://mcp-site-silk.vercel.app"`
+  - `gh variable list --repo DemumuMind/mcp-site-upload`
+  - `gh workflow run "Nightly Smoke" --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21856892618 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `npx vercel env pull .env.prod.check --environment=production --token <VERCEL_TOKEN>`
+  - `gh secret set SMOKE_HEALTH_TOKEN --repo DemumuMind/mcp-site-upload --body "<HEALTH_CHECK_CRON_SECRET>"`
+  - `gh workflow run Deploy --repo DemumuMind/mcp-site-upload -f environment=production`
+  - `gh run watch 21857252209 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh workflow run "Nightly Smoke" --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21857334678 --repo DemumuMind/mcp-site-upload --exit-status`
+- Open risks:
+  - Production env drift can reintroduce smoke failures; keep Vercel project env values synchronized with source-of-truth secrets.
+  - Smoke still validates endpoint/status-level health; it does not replace deeper authenticated behavioral testing.
+
+## Latest Update (2026-02-10, Smoke Base URL Switched to Production Alias + Nightly Smoke Validation)
+- Objective: switch smoke target to stable production alias and run manual nightly smoke validation.
+- Status: completed with blocker identified (nightly smoke failed).
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Updated repository variable in `DemumuMind/mcp-site-upload`:
+    - `SMOKE_BASE_URL=https://mcp-site-silk.vercel.app`
+  - Triggered `Nightly Smoke` manually after variable update.
+- Verification commands:
+  - `gh variable set SMOKE_BASE_URL --repo DemumuMind/mcp-site-upload --body https://mcp-site-silk.vercel.app`
+  - `gh variable list --repo DemumuMind/mcp-site-upload`
+  - `gh workflow run "Nightly Smoke" --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21857101681 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh run view 21857101681 --repo DemumuMind/mcp-site-upload --log`
+- Verification results:
+  - variable update applied (confirmed via `gh variable list`)
+  - `Nightly Smoke` run `21857101681` failed in `Run smoke check`
+  - smoke details from logs:
+    - `PASS`: `/`, `/sitemap.xml`, `/server/linear`, `/robots.txt`
+    - `PASS`: `/api/health-check -> 401` (protected-mode accepted)
+    - `FAIL`: authorized `/api/health-check` check returned `500` and missing expected summary field
+- Next commands:
+  - Validate production health-check runtime config (`HEALTH_CHECK_CRON_SECRET` / service-role envs) and authorized response path.
+  - Re-run `Nightly Smoke` after fixing `/api/health-check` `500` on authorized probe.
+- Open risks:
+  - Nightly smoke remains red until authorized health-check probe stops returning `500`.
+  - Monitoring may be partially blind if health endpoint keeps failing for authenticated probe scenarios.
+
+## Latest Update (2026-02-10, Production Deploy via Workflow Dispatch, Run 21856928166)
+- Objective: execute production deployment after explicit approval and verify post-deploy smoke in pipeline.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Triggered `Deploy` workflow in `DemumuMind/mcp-site-upload` with input `environment=production`.
+  - Verified deploy job completed all stages: lint, build, Vercel pull/build/deploy, smoke check, summary.
+  - Confirmed resulting production deployment URLs from run logs:
+    - deployment URL: `https://mcp-site-8bplpjjru-cardtest15-coders-projects.vercel.app`
+    - alias URL: `https://mcp-site-silk.vercel.app`
+- Verification commands:
+  - `gh workflow run Deploy --repo DemumuMind/mcp-site-upload -f environment=production`
+  - `gh run watch 21856928166 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh run view 21856928166 --repo DemumuMind/mcp-site-upload --log`
+- Verification results:
+  - `Deploy` run `21856928166` (success)
+  - post-deploy smoke check step passed in workflow
+- Next commands:
+  - Optionally set `SMOKE_BASE_URL` to the production alias URL (`https://mcp-site-silk.vercel.app`) for more stable nightly smoke targeting.
+  - Optionally run `Nightly Smoke` manually after updating `SMOKE_BASE_URL`.
+- Open risks:
+  - If nightly smoke stays on ephemeral preview URLs, future URL rotation can cause false failures.
+  - Protected smoke mode still validates boundary/availability (`401`) rather than full authenticated user journeys.
+
+## Latest Update (2026-02-10, Production Deploy via Workflow Dispatch)
+- Objective: execute requested production deployment from GitHub Actions and confirm post-deploy smoke checks.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Triggered `Deploy` workflow in `DemumuMind/mcp-site-upload` with:
+    - `environment=production`
+  - Confirmed successful run:
+    - workflow run `21856283442`
+    - `deploy` job succeeded (including lint, build, Vercel deploy, and post-deploy smoke check)
+  - Captured deployment outputs from logs:
+    - production URL: `https://mcp-site-c9d842yvg-cardtest15-coders-projects.vercel.app`
+    - aliased URL: `https://mcp-site-silk.vercel.app`
+- Verification commands:
+  - `gh workflow run Deploy --repo DemumuMind/mcp-site-upload -f environment=production`
+  - `gh run watch 21856283442 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh run view 21856283442 --repo DemumuMind/mcp-site-upload --json databaseId,status,conclusion,url,workflowName,createdAt,updatedAt,headSha`
+- Next commands:
+  - Optionally set `SMOKE_BASE_URL` to `https://mcp-site-silk.vercel.app` for a stable nightly smoke target.
+  - Optionally run `Nightly Smoke` manually to validate target behavior immediately after production deploy.
+- Open risks:
+  - Nightly smoke target may still point to an older preview URL if `SMOKE_BASE_URL` is not updated.
+  - Protected smoke mode behavior (`SMOKE_ALLOW_PROTECTED=true`) should match production access policy expectations.
+
+## Latest Update (2026-02-10, Optional Manual CI Confirmation Run)
+- Objective: execute the optional CI confirmation pass from the prior handoff and verify pipeline stability after deploy/smoke revalidation.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Triggered `CI` workflow manually in `DemumuMind/mcp-site-upload`.
+  - Confirmed `lint-build-smoke` job completed successfully.
+- Verification commands:
+  - `gh workflow run CI --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21856241275 --repo DemumuMind/mcp-site-upload --exit-status`
+- Verification results:
+  - `CI` run `21856241275` (success)
+- Next commands:
+  - If ready for release from workflow dispatch, run `Deploy` with `environment=production`.
+  - Optionally re-run `Nightly Smoke` after each preview URL rotation.
+- Open risks:
+  - Smoke currently targets a preview URL and can break when preview aliases rotate or are removed.
+  - Protected smoke mode (`401` acceptance) verifies availability boundary, not full behind-auth behavior.
+
+## Latest Update (2026-02-10, Manual CI Confirmation Pass)
+- Objective: continue from prior handoff and run the optional extra CI validation pass in GitHub Actions.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Triggered CI workflow manually in `DemumuMind/mcp-site-upload`:
+    - run `21856208138`
+  - Confirmed workflow completion status:
+    - `lint-build-smoke` job succeeded
+    - smoke step was intentionally skipped by workflow condition
+- Verification commands:
+  - `gh workflow run CI --repo DemumuMind/mcp-site-upload`
+  - `gh run watch 21856208138 --repo DemumuMind/mcp-site-upload --exit-status`
+- Next commands:
+  - Optionally trigger `Deploy` with `environment=production` when production rollout is approved.
+  - Keep `SMOKE_BASE_URL` updated to a live preview URL for nightly smoke stability.
+- Open risks:
+  - CI success here validates pipeline health, but does not replace production deploy verification.
+  - Nightly smoke still depends on preview URL lifetime and may fail if that deployment is pruned.
+
+## Latest Update (2026-02-10, Vercel Token Recovery + Deploy/Smoke Revalidation)
+- Objective: remove deploy-token uncertainty, refresh GitHub deploy credentials, and revalidate deploy/smoke automation end-to-end.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Implemented:
+  - Verified token-mode access locally with:
+    - `vercel pull --yes --environment=production --token=<VERCEL_TOKEN>` (success)
+  - Refreshed GitHub repository secrets in `DemumuMind/mcp-site-upload`:
+    - `VERCEL_TOKEN`
+    - `VERCEL_ORG_ID`
+    - `VERCEL_PROJECT_ID`
+  - Reconfirmed deploy/smoke variables are enabled:
+    - `VERCEL_DEPLOY_ENABLED=true`
+    - `SMOKE_ENABLED=true`
+    - `SMOKE_ALLOW_PROTECTED=true`
+  - Triggered and passed manual workflow validations:
+    - `Deploy` (workflow_dispatch, preview) run `21854998936` (success)
+    - `Nightly Smoke` (workflow_dispatch) run `21855077924` (success)
+  - Updated smoke target variable to latest successful preview URL:
+    - `SMOKE_BASE_URL=https://mcp-site-h1gqhnnrn-cardtest15-coders-projects.vercel.app`
+- Verification commands:
+  - `vercel pull --yes --environment=production --token=<VERCEL_TOKEN>`
+  - `npm run smoke:check -- https://mcp-site-83i29js8l-cardtest15-coders-projects.vercel.app`
+  - `gh run watch 21854998936 --repo DemumuMind/mcp-site-upload --exit-status`
+  - `gh run watch 21855077924 --repo DemumuMind/mcp-site-upload --exit-status`
+- Next commands:
+  - Optionally run `gh workflow run CI --repo DemumuMind/mcp-site-upload` for an extra manual CI confirmation pass.
+  - If moving to production from workflow_dispatch, run `Deploy` with `environment=production`.
+- Open risks:
+  - `SMOKE_BASE_URL` points to a preview deployment URL; future cleanup or URL invalidation can break nightly smoke unless variable is refreshed.
+  - Protected smoke mode confirms boundary/availability (`401`) but does not fully validate behind-auth route behavior.
+
 ## Latest Update (2026-02-08, Protected Smoke Mode + Deploy Workflow Recovery)
 - Objective: complete requested rollout items `1` and `2` by stabilizing smoke checks for protected preview URLs and keeping deployment automation valid.
 - Status: completed (with deploy-token blocker documented).
@@ -516,3 +746,12 @@ Implement the DemumuMind MCP website in the current repository workspace using P
 - External MCP endpoints may rate-limit or timeout intermittently; current probe strategy is a direct HTTP GET with fixed timeout and simple status classification.
 - Admin auth currently uses a token cookie model (`ADMIN_ACCESS_TOKEN`) suitable for MVP; production setup should move to stronger identity/auth provider.
 - Build intermittently hit stale `.next` artifacts (`MODULE_NOT_FOUND ./611.js`) in this environment; clean rebuild (`rmdir /s /q .next && npm run build`) resolved it.
+
+
+
+
+
+
+
+
+
