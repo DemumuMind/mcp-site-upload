@@ -12,14 +12,33 @@ import type {
 } from "@/lib/catalog/types";
 import type { AuthType, McpServer } from "@/lib/types";
 
-export function useCatalogState(initialServers: McpServer[]) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedAuthTypes, setSelectedAuthTypes] = useState<AuthType[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortField, setSortField] = useState<CatalogSortField>("rating");
-  const [sortDirection, setSortDirection] = useState<CatalogSortDirection>("desc");
-  const [viewMode, setViewMode] = useState<CatalogViewMode>("grid");
+type CatalogStateInitialValues = {
+  searchQuery?: string;
+  selectedCategories?: string[];
+  selectedAuthTypes?: AuthType[];
+  selectedTags?: string[];
+  sortField?: CatalogSortField;
+  sortDirection?: CatalogSortDirection;
+  viewMode?: CatalogViewMode;
+};
+
+export function useCatalogState(
+  initialServers: McpServer[],
+  initialValues: CatalogStateInitialValues = {},
+) {
+  const [searchQuery, setSearchQuery] = useState(initialValues.searchQuery ?? "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialValues.selectedCategories ?? [],
+  );
+  const [selectedAuthTypes, setSelectedAuthTypes] = useState<AuthType[]>(
+    initialValues.selectedAuthTypes ?? [],
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(initialValues.selectedTags ?? []);
+  const [sortField, setSortField] = useState<CatalogSortField>(initialValues.sortField ?? "rating");
+  const [sortDirection, setSortDirection] = useState<CatalogSortDirection>(
+    initialValues.sortDirection ?? "desc",
+  );
+  const [viewMode, setViewMode] = useState<CatalogViewMode>(initialValues.viewMode ?? "grid");
 
   const facets = useMemo(() => getCatalogFacets(initialServers), [initialServers]);
 
