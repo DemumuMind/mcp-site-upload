@@ -1,4 +1,42 @@
-﻿## Latest Update (2026-02-10, Section-Based Content Infrastructure for Blog + Catalog)
+﻿## Latest Update (2026-02-10, Real Catalog Entries + Section Index Extended)
+- Objective: continue previous content-infrastructure work by (1) adding real disk catalog entries and (2) extending section-index metadata wiring beyond blog/catalog.
+- Status: completed (pending/after verification commands below).
+- Touched files:
+  - `app/categories/page.tsx`
+  - `app/tools/page.tsx`
+  - `app/mcp/page.tsx`
+  - `app/how-to-use/page.tsx`
+  - `content/categories/_index.json` (new)
+  - `content/tools/_index.json` (new)
+  - `content/mcp/_index.json` (new)
+  - `content/how-to-use/_index.json` (new)
+  - `content/catalog/entries/openai-developer-docs.json` (new)
+  - `content/catalog/entries/exa-search.json` (new)
+  - `content/catalog/entries/playwright-browser-automation.json` (new)
+  - `content/catalog/entries/chrome-devtools-inspector.json` (new)
+  - `content/catalog/entries/local-filesystem-ops.json` (new)
+  - `docs/content-infrastructure.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added section-level copy files for `categories`, `tools`, `mcp`, and `how-to-use`.
+  - Wired metadata (`generateMetadata`) and hero text in those pages to `getSectionIndex`/`getSectionLocaleCopy` with safe fallbacks.
+  - Added five real infrastructure-focused disk catalog entries (OpenAI docs, Exa, Playwright, Chrome DevTools, Filesystem).
+  - Updated content infrastructure docs with new section index files and seeded real entry paths.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3111`
+  - Playwright UI checks:
+    - `http://localhost:3111/categories`
+    - `http://localhost:3111/tools`
+    - `http://localhost:3111/mcp`
+    - `http://localhost:3111/how-to-use`
+    - `http://localhost:3111/catalog`
+- Open risks:
+  - Existing repo contains many unrelated in-progress changes; keep merge scope isolated.
+
+## Latest Update (2026-02-10, Section-Based Content Infrastructure for Blog + Catalog)
 - Objective: use `sereja.tech`-style section infrastructure as a base for Blog and Catalog content.
 - Status: completed (local verification + UI validation).
 - Touched files:

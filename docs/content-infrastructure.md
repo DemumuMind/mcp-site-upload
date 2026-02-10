@@ -1,4 +1,4 @@
-# Content infrastructure (Blog + Catalog)
+# Content infrastructure (section-based content)
 
 This project now supports a section-oriented content layout inspired by `sereja.tech`:
 
@@ -11,6 +11,10 @@ Used by page metadata and heroes.
 
 - `content/blog/_index.json`
 - `content/catalog/_index.json`
+- `content/categories/_index.json`
+- `content/tools/_index.json`
+- `content/mcp/_index.json`
+- `content/how-to-use/_index.json`
 
 Schema is handled by `lib/content/section-index.ts`:
 
@@ -62,3 +66,11 @@ Scaffold command:
 ```bash
 npm run catalog:new -- --slug my-server --name "My Server" --auth oauth --category "Developer Tools" --tags "official" --tools "list_items,create_item"
 ```
+
+Current real infrastructure entries included in this repo:
+
+- `content/catalog/entries/openai-developer-docs.json`
+- `content/catalog/entries/exa-search.json`
+- `content/catalog/entries/playwright-browser-automation.json`
+- `content/catalog/entries/chrome-devtools-inspector.json`
+- `content/catalog/entries/local-filesystem-ops.json`
