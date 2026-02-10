@@ -17,6 +17,8 @@ import {
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
+export const dynamic = "force-dynamic";
+
 type BlogPageProps = {
   searchParams: Promise<{
     tag?: string;

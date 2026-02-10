@@ -185,7 +185,7 @@ export async function createBlogPostFromResearch(
   const runningOnVercel = Boolean(process.env.VERCEL);
 
   try {
-    const storedInDatabase = await saveBlogPostToSupabase({
+    const storageTarget = await saveBlogPostToSupabase({
       slug,
       tags,
       publishedAt: postPayload.publishedAt,
@@ -196,11 +196,17 @@ export async function createBlogPostFromResearch(
       research: postPayload.research,
     });
 
-    if (storedInDatabase) {
+    if (storageTarget) {
       return {
         slug,
-        postPath: `supabase://public.blog_posts/${slug}`,
-        researchPath: `supabase://public.blog_posts/${slug}#research`,
+        postPath:
+          storageTarget === "table"
+            ? `supabase://public.blog_posts/${slug}`
+            : `supabase://storage/${slug}`,
+        researchPath:
+          storageTarget === "table"
+            ? `supabase://public.blog_posts/${slug}#research`
+            : `supabase://storage/${slug}#research`,
         sourceCount: input.packet.sources.length,
       };
     }

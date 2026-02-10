@@ -153,6 +153,7 @@ export async function createBlogPostFromDeepResearchAction(formData: FormData) {
 
     revalidatePath("/blog");
     revalidatePath(`/blog/${result.slug}`);
+    revalidatePath("/sitemap.xml");
     revalidatePath("/admin/blog");
     updateTag(BLOG_POSTS_CACHE_TAG);
 

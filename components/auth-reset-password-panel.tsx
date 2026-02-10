@@ -12,10 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { tr } from "@/lib/i18n";
-import { getPasswordStrengthScore, type PasswordStrengthScore } from "@/lib/password-strength";
+import {
+  getPasswordRuleChecks,
+  getPasswordStrengthScore,
+  PASSWORD_MIN_LENGTH,
+  type PasswordStrengthScore,
+} from "@/lib/password-strength";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-
-const PASSWORD_MIN_LENGTH = 8;
 const REDIRECT_DELAY_SECONDS = 5;
 
 type ResetValues = {
@@ -99,6 +102,42 @@ function getStrengthTextClass(score: PasswordStrengthScore): string {
   return "text-emerald-300";
 }
 
+function getPasswordChecklistItems(locale: "en" | "ru", password: string) {
+  const checks = getPasswordRuleChecks(password);
+
+  return [
+    {
+      key: "length",
+      passed: checks.minLength,
+      label: tr(
+        locale,
+        `At least ${PASSWORD_MIN_LENGTH} characters`,
+        `Минимум ${PASSWORD_MIN_LENGTH} символов`,
+      ),
+    },
+    {
+      key: "lowercase",
+      passed: checks.hasLowercase,
+      label: tr(locale, "At least one lowercase letter", "Хотя бы одна строчная буква"),
+    },
+    {
+      key: "uppercase",
+      passed: checks.hasUppercase,
+      label: tr(locale, "At least one uppercase letter", "Хотя бы одна заглавная буква"),
+    },
+    {
+      key: "number",
+      passed: checks.hasNumber,
+      label: tr(locale, "At least one number", "Хотя бы одна цифра"),
+    },
+    {
+      key: "symbol",
+      passed: checks.hasSymbol,
+      label: tr(locale, "At least one symbol", "Хотя бы один спецсимвол"),
+    },
+  ] as const;
+}
+
 export function AuthResetPasswordPanel() {
   const router = useRouter();
   const locale = useLocale();
@@ -114,6 +153,10 @@ export function AuthResetPasswordPanel() {
   const passwordStrengthScore = useMemo(
     () => getPasswordStrengthScore(values.newPassword),
     [values.newPassword],
+  );
+  const passwordChecklistItems = useMemo(
+    () => getPasswordChecklistItems(locale, values.newPassword),
+    [locale, values.newPassword],
   );
 
   useEffect(() => {
@@ -324,25 +367,44 @@ export function AuthResetPasswordPanel() {
               )}
               className="h-11 rounded-xl border-slate-600 bg-slate-900/90 text-slate-100 placeholder:text-slate-500 focus-visible:ring-slate-300/35"
             />
-            {values.newPassword ? (
-              <div className="space-y-1.5">
-                <div className="grid grid-cols-4 gap-1">
-                  {[0, 1, 2, 3].map((index) => (
-                    <span
-                      key={index}
-                      className={`h-1.5 rounded-full ${
-                        index < passwordStrengthScore
-                          ? getStrengthColorClass(passwordStrengthScore)
-                          : "bg-slate-700/80"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className={`text-xs ${getStrengthTextClass(passwordStrengthScore)}`}>
-                  {getStrengthLabel(locale, passwordStrengthScore)}
-                </p>
+            <div className="space-y-1.5">
+              <div className="grid grid-cols-4 gap-1">
+                {[0, 1, 2, 3].map((index) => (
+                  <span
+                    key={index}
+                    className={`h-1.5 rounded-full ${
+                      index < passwordStrengthScore
+                        ? getStrengthColorClass(passwordStrengthScore)
+                        : "bg-slate-700/80"
+                    }`}
+                  />
+                ))}
               </div>
-            ) : null}
+              <p className={`text-xs ${getStrengthTextClass(passwordStrengthScore)}`}>
+                {getStrengthLabel(locale, passwordStrengthScore)}
+              </p>
+              <ul className="space-y-1 text-xs">
+                {passwordChecklistItems.map((item) => (
+                  <li
+                    key={item.key}
+                    className={`flex items-center gap-2 ${
+                      item.passed ? "text-emerald-300" : "text-slate-400"
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${
+                        item.passed
+                          ? "border-emerald-400/60 bg-emerald-400/20"
+                          : "border-slate-600/80 bg-slate-800/80"
+                      }`}
+                    >
+                      {item.passed ? "✓" : "•"}
+                    </span>
+                    <span>{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             {errors.newPassword ? <p className="text-xs text-rose-300">{errors.newPassword}</p> : null}
           </div>
 

@@ -110,6 +110,7 @@ async function runAutoPublish(request: NextRequest) {
   });
 
   revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
   for (const createdPost of result.created) {
     revalidatePath(`/blog/${createdPost.slug}`);
   }

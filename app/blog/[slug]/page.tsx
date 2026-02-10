@@ -16,6 +16,8 @@ import {
 import { tr, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
+export const dynamic = "force-dynamic";
+
 type BlogArticlePageProps = {
   params: Promise<{ slug: string }>;
 };

@@ -2,15 +2,16 @@
 
 ## What is automated now
 
-Blog publishing is **storage-first**:
+Blog publishing is **Supabase-first**:
 
-- **Primary (production):** `public.blog_posts` in Supabase
-- **Fallback (local/dev):**
+- **Primary:** `public.blog_posts` table in Supabase
+- **Automatic fallback (if table is unavailable):** Supabase Storage bucket `blog-automation/posts/*.json`
+- **Local/dev fallback:**
   - `content/blog/posts/*.json` — article files
   - `content/blog/tags.json` — tag catalog
   - `content/blog/research/*.json` — deep research packets
 
-This removes the read-only filesystem blocker for production cron runs.
+This removes the read-only filesystem blocker for production cron runs, even before DB migration is applied.
 
 ## Mandatory policy before article creation
 
@@ -35,7 +36,11 @@ Open `/admin/blog` and submit:
 - recency window in days
 - max curated sources
 
-The action runs deep research + verification, then persists to Supabase (`blog_posts`).
+The action runs deep research + verification, then persists to Supabase:
+
+- first tries `blog_posts` table
+- falls back to Storage bucket automatically if table is missing
+
 If Supabase admin credentials are unavailable in local dev, it falls back to local JSON files.
 
 ## Scheduled auto-publishing (4+ posts/day)
