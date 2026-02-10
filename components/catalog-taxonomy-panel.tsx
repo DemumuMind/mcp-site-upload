@@ -98,89 +98,89 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
 
   if (isFilterMode(props)) {
     return (
-      <aside className="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-24">
+      <aside className="h-fit overflow-hidden rounded-2xl border border-white/10 bg-slate-950/72 shadow-[0_0_0_1px_rgba(148,163,184,0.08)] lg:sticky lg:top-24">
         <div className="flex items-center justify-between px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-900">{tr(localeFromContext, "Filters", "Фильтры")}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">{tr(localeFromContext, "Filters", "Фильтры")}</h2>
           <button
             type="button"
-            className="text-xs font-medium text-slate-500 transition hover:text-slate-900"
+            className="text-xs font-medium text-slate-400 transition hover:text-slate-100"
             onClick={props.onClearAll}
           >
             {tr(localeFromContext, "Clear All", "Сбросить")}
           </button>
         </div>
 
-        <div className="border-t border-slate-200 px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-800">
+        <div className="border-t border-white/10 px-4 py-4">
+          <h3 className="mb-2 text-sm font-semibold text-slate-100">
             {tr(localeFromContext, "Categories", "Категории")}
           </h3>
           <div className="max-h-52 space-y-1 overflow-y-auto pr-1">
             {props.categoryEntries.map(([categoryName, count]) => (
               <label
                 key={categoryName}
-                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-50"
+                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-900"
               >
                 <span className="inline-flex items-center gap-2">
                   <input
                     type="checkbox"
-                    className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="size-4 rounded border-slate-500 bg-slate-900 text-blue-500 focus:ring-blue-500"
                     checked={props.selectedCategories.includes(categoryName)}
                     onChange={() => props.onToggleCategory(categoryName)}
                   />
-                  <span className="text-sm text-slate-700">{categoryName}</span>
+                  <span className="text-sm text-slate-300">{categoryName}</span>
                 </span>
-                <span className="text-xs text-slate-400">{count}</span>
+                <span className="text-xs text-slate-500">{count}</span>
               </label>
             ))}
           </div>
         </div>
 
-        <div className="border-t border-slate-200 px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-800">
+        <div className="border-t border-white/10 px-4 py-4">
+          <h3 className="mb-2 text-sm font-semibold text-slate-100">
             {tr(localeFromContext, "Pricing", "Стоимость")}
           </h3>
           <div className="space-y-1">
             {props.authTypeOptions.map((option) => (
               <label
                 key={option.value}
-                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-50"
+                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-900"
               >
                 <span className="inline-flex items-center gap-2">
                   <input
                     type="checkbox"
-                    className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="size-4 rounded border-slate-500 bg-slate-900 text-blue-500 focus:ring-blue-500"
                     checked={props.selectedAuthTypes.includes(option.value)}
                     onChange={() => props.onToggleAuthType(option.value)}
                   />
-                  <span className="text-sm text-slate-700">{option.label}</span>
+                  <span className="text-sm text-slate-300">{option.label}</span>
                 </span>
-                <span className="text-xs text-slate-400">{option.count}</span>
+                <span className="text-xs text-slate-500">{option.count}</span>
               </label>
             ))}
           </div>
         </div>
 
-        <div className="border-t border-slate-200 px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-800">
+        <div className="border-t border-white/10 px-4 py-4">
+          <h3 className="mb-2 text-sm font-semibold text-slate-100">
             {tr(localeFromContext, "Tags", "Теги")}
           </h3>
           <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
             {props.tagEntries.slice(0, CATALOG_VISIBLE_TAG_LIMIT).map(([tag, count]) => (
               <label
                 key={tag}
-                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-50"
+                className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-900"
               >
                 <span className="inline-flex items-center gap-2">
                   <input
                     type="checkbox"
-                    className="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="size-4 rounded border-slate-500 bg-slate-900 text-blue-500 focus:ring-blue-500"
                     checked={props.selectedTags.includes(tag)}
                     onChange={() => props.onToggleTag(tag)}
                   />
                   <span className={cn("inline-block size-2 rounded-full", getTagDotClass(tag))} />
-                  <span className="text-sm text-slate-700">{tag}</span>
+                  <span className="text-sm text-slate-300">{tag}</span>
                 </span>
-                <span className="text-xs text-slate-400">{count}</span>
+                <span className="text-xs text-slate-500">{count}</span>
               </label>
             ))}
           </div>
