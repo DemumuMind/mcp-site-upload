@@ -1,27 +1,28 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Bell, CheckCheck, CircleDot, Megaphone } from "lucide-react";
+import { Bell, CheckCheck, CircleDot, Filter, Megaphone, Trash2 } from "lucide-react";
 
 import { tr, type Locale } from "@/lib/i18n";
 import type { SiteNotificationItem } from "@/lib/notifications/types";
 import { cn } from "@/lib/utils";
 
 const READ_NOTIFICATIONS_STORAGE_KEY = "demumumind.notifications.read.v1";
+const DISMISSED_NOTIFICATIONS_STORAGE_KEY = "demumumind.notifications.dismissed.v1";
 
 type SiteNotificationCenterProps = {
   locale: Locale;
   notifications: SiteNotificationItem[];
 };
 
-function loadReadNotificationIds(): string[] {
+function loadStoredNotificationIds(key: string): string[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const raw = window.localStorage.getItem(READ_NOTIFICATIONS_STORAGE_KEY);
+    const raw = window.localStorage.getItem(key);
 
     if (!raw) {
       return [];
@@ -53,8 +54,12 @@ function formatNotificationDate(value: string, locale: Locale): string {
 
 export function SiteNotificationCenter({ locale, notifications }: SiteNotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showOnlyUnread, setShowOnlyUnread] = useState(false);
   const [readIds, setReadIds] = useState<string[]>(() =>
-    typeof window === "undefined" ? [] : loadReadNotificationIds(),
+    typeof window === "undefined" ? [] : loadStoredNotificationIds(READ_NOTIFICATIONS_STORAGE_KEY),
+  );
+  const [dismissedIds, setDismissedIds] = useState<string[]>(() =>
+    typeof window === "undefined" ? [] : loadStoredNotificationIds(DISMISSED_NOTIFICATIONS_STORAGE_KEY),
   );
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -65,6 +70,14 @@ export function SiteNotificationCenter({ locale, notifications }: SiteNotificati
 
     window.localStorage.setItem(READ_NOTIFICATIONS_STORAGE_KEY, JSON.stringify(readIds));
   }, [readIds]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(DISMISSED_NOTIFICATIONS_STORAGE_KEY, JSON.stringify(dismissedIds));
+  }, [dismissedIds]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -100,10 +113,24 @@ export function SiteNotificationCenter({ locale, notifications }: SiteNotificati
   }, [isOpen]);
 
   const readIdSet = useMemo(() => new Set(readIds), [readIds]);
+  const dismissedIdSet = useMemo(() => new Set(dismissedIds), [dismissedIds]);
+
+  const availableNotifications = useMemo(
+    () => notifications.filter((notification) => !dismissedIdSet.has(notification.id)),
+    [notifications, dismissedIdSet],
+  );
+
+  const visibleNotifications = useMemo(
+    () =>
+      showOnlyUnread
+        ? availableNotifications.filter((notification) => !readIdSet.has(notification.id))
+        : availableNotifications,
+    [availableNotifications, showOnlyUnread, readIdSet],
+  );
 
   const unreadCount = useMemo(
-    () => notifications.reduce((count, item) => count + (readIdSet.has(item.id) ? 0 : 1), 0),
-    [notifications, readIdSet],
+    () => availableNotifications.reduce((count, item) => count + (readIdSet.has(item.id) ? 0 : 1), 0),
+    [availableNotifications, readIdSet],
   );
 
   function markAsRead(notificationId: string) {
@@ -117,12 +144,29 @@ export function SiteNotificationCenter({ locale, notifications }: SiteNotificati
   }
 
   function markAllAsRead() {
-    const notificationIds = notifications.map((notification) => notification.id);
+    const notificationIds = availableNotifications.map((notification) => notification.id);
     setReadIds((current) => [...new Set([...current, ...notificationIds])]);
   }
 
+  function clearVisibleNotifications() {
+    const notificationIds = visibleNotifications.map((notification) => notification.id);
+
+    if (notificationIds.length === 0) {
+      return;
+    }
+
+    setDismissedIds((current) => [...new Set([...current, ...notificationIds])]);
+  }
+
   const panelLabel = tr(locale, "Notifications", "Уведомления");
-  const emptyStateLabel = tr(locale, "No notifications yet.", "Пока уведомлений нет.");
+  const emptyStateLabel = showOnlyUnread
+    ? tr(locale, "No unread notifications.", "Непрочитанных уведомлений нет.")
+    : tr(locale, "No notifications yet.", "Пока уведомлений нет.");
+  const markAllLabel = tr(locale, "Mark all read", "Прочитать всё");
+  const clearLabel = tr(locale, "Clear visible", "Очистить видимые");
+  const filterLabel = showOnlyUnread
+    ? tr(locale, "Show all", "Показать все")
+    : tr(locale, "Unread only", "Только непрочитанные");
 
   return (
     <div ref={rootRef} className="relative">
@@ -155,21 +199,48 @@ export function SiteNotificationCenter({ locale, notifications }: SiteNotificati
           aria-label={panelLabel}
           className="absolute right-0 top-[calc(100%+0.65rem)] z-50 w-[min(92vw,24rem)] overflow-hidden rounded-xl border border-white/15 bg-slate-950/95 shadow-2xl backdrop-blur-2xl"
         >
-          <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-            <p className="text-sm font-semibold text-slate-100">{panelLabel}</p>
-            <button
-              type="button"
-              onClick={markAllAsRead}
-              className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-slate-300 transition hover:bg-white/[0.08] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              <CheckCheck className="size-3.5" />
-              {tr(locale, "Mark all read", "Прочитать всё")}
-            </button>
+          <header className="space-y-2 border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-slate-100">{panelLabel}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOnlyUnread((current) => !current);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-slate-300 transition hover:bg-white/[0.08] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                aria-pressed={showOnlyUnread}
+              >
+                <Filter className="size-3.5" />
+                {filterLabel}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={markAllAsRead}
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-slate-300 transition hover:bg-white/[0.08] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={unreadCount === 0}
+              >
+                <CheckCheck className="size-3.5" />
+                {markAllLabel}
+              </button>
+
+              <button
+                type="button"
+                onClick={clearVisibleNotifications}
+                className="inline-flex items-center gap-1.5 rounded-md border border-rose-300/25 bg-rose-500/10 px-2.5 py-1 text-xs text-rose-200 transition hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={visibleNotifications.length === 0}
+              >
+                <Trash2 className="size-3.5" />
+                {clearLabel}
+              </button>
+            </div>
           </header>
 
           <div className="max-h-[22rem] space-y-2 overflow-auto px-3 py-3">
-            {notifications.length > 0 ? (
-              notifications.map((notification) => {
+            {visibleNotifications.length > 0 ? (
+              visibleNotifications.map((notification) => {
                 const isUnread = !readIdSet.has(notification.id);
 
                 const content = (
@@ -190,7 +261,11 @@ export function SiteNotificationCenter({ locale, notifications }: SiteNotificati
                             : "border-emerald-400/40 bg-emerald-500/15 text-emerald-200",
                         )}
                       >
-                        {notification.kind === "blog" ? <CircleDot className="size-3.5" /> : <Megaphone className="size-3.5" />}
+                        {notification.kind === "blog" ? (
+                          <CircleDot className="size-3.5" />
+                        ) : (
+                          <Megaphone className="size-3.5" />
+                        )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold text-slate-100">{notification.title}</p>
