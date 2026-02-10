@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BridgePageShell } from "@/components/bridge-page-shell";
+import { PageFrame, PageHero, PageSection } from "@/components/page-templates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -43,8 +43,8 @@ const sections: readonly SiteMapSection[] = [
       {
         href: "/about",
         title: {
-          en: "About BridgeMind",
-          ru: "О BridgeMind",
+          en: "About DemumuMind",
+          ru: "О DemumuMind",
         },
         description: {
           en: "Mission, vision, and operating model for MCP delivery.",
@@ -103,12 +103,12 @@ const sections: readonly SiteMapSection[] = [
       {
         href: "/discord",
         title: {
-          en: "Discord Community",
+          en: "Discord community",
           ru: "Discord-сообщество",
         },
         description: {
-          en: "Join the BridgeMind developer community.",
-          ru: "Присоединяйтесь к сообществу разработчиков BridgeMind.",
+          en: "Join the DemumuMind developer community.",
+          ru: "Присоединяйтесь к сообществу разработчиков DemumuMind.",
         },
       },
       {
@@ -163,8 +163,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: tr(locale, "Sitemap", "Карта сайта"),
     description: tr(
       locale,
-      "Full BridgeMind site navigation.",
-      "Полная навигация по сайту BridgeMind.",
+      "Full DemumuMind site navigation.",
+      "Полная навигация по сайту DemumuMind.",
     ),
   };
 }
@@ -173,63 +173,64 @@ export default async function SitemapPage() {
   const locale = await getLocale();
 
   return (
-    <div className="space-y-6 pb-12">
-      <BridgePageShell
-        eyebrow={tr(locale, "Navigation", "Навигация")}
-        title={tr(locale, "BridgeMind Sitemap", "Карта сайта BridgeMind")}
-        description={tr(
-          locale,
-          "A complete index of core pages, resources, community hubs, and policy pages.",
-          "Полный индекс ключевых страниц, ресурсов, community-разделов и policy-документов.",
-        )}
-        links={[
-          {
-            href: "/sitemap.xml",
-            label: tr(locale, "Machine-readable sitemap.xml", "Машиночитаемый sitemap.xml"),
-            description: tr(
-              locale,
-              "XML sitemap for search engines and crawlers.",
-              "XML-карта сайта для поисковых систем и краулеров.",
-            ),
-          },
-          {
-            href: "/llms.txt",
-            label: tr(locale, "Machine-readable llms.txt", "Машиночитаемый llms.txt"),
-            description: tr(
-              locale,
-              "Structured overview for AI assistants and LLM crawlers.",
-              "Структурированное описание сайта для AI-ассистентов и LLM-краулеров.",
-            ),
-          },
-        ]}
-      />
-
-      <div className="mx-auto grid w-full max-w-5xl gap-5 px-4 sm:px-6">
-        {sections.map((section) => (
-          <section key={section.title.en} className="space-y-3">
-            <h2 className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
-              {tr(locale, section.title.en, section.title.ru)}
-            </h2>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {section.links.map((item) => (
-                <Card key={item.href} className="border-white/10 bg-slate-900/65">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-slate-100">
-                      <Link href={item.href} className="transition hover:text-white">
-                        {tr(locale, item.title.en, item.title.ru)}
-                      </Link>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm text-slate-300">
-                    {tr(locale, item.description.en, item.description.ru)}
-                  </CardContent>
-                </Card>
-              ))}
+    <PageFrame variant="content">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
+        <PageHero
+          badgeTone="violet"
+          eyebrow={tr(locale, "Navigation", "Навигация")}
+          title={tr(locale, "DemumuMind Sitemap", "Карта сайта DemumuMind")}
+          description={tr(
+            locale,
+            "A complete index of core pages, resources, community hubs, and legal documents.",
+            "Полный индекс ключевых страниц, ресурсов, community-разделов и юридических документов.",
+          )}
+          actions={
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/sitemap.xml"
+                className="inline-flex h-11 items-center rounded-xl border border-white/20 bg-slate-950/70 px-4 text-sm text-slate-100 transition hover:bg-slate-900"
+              >
+                {tr(locale, "Open sitemap.xml", "Открыть sitemap.xml")}
+              </Link>
+              <Link
+                href="/llms.txt"
+                className="inline-flex h-11 items-center rounded-xl border border-white/20 bg-slate-950/70 px-4 text-sm text-slate-100 transition hover:bg-slate-900"
+              >
+                {tr(locale, "Open llms.txt", "Открыть llms.txt")}
+              </Link>
             </div>
-          </section>
-        ))}
+          }
+        />
+
+        <PageSection>
+          <div className="grid gap-5">
+            {sections.map((section) => (
+              <section key={section.title.en} className="space-y-3">
+                <h2 className="text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase">
+                  {tr(locale, section.title.en, section.title.ru)}
+                </h2>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {section.links.map((item) => (
+                    <Card key={item.href} className="border-white/10 bg-slate-900/65">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base text-slate-100">
+                          <Link href={item.href} className="transition hover:text-white">
+                            {tr(locale, item.title.en, item.title.ru)}
+                          </Link>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm text-slate-300">
+                        {tr(locale, item.description.en, item.description.ru)}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </PageSection>
       </div>
-    </div>
+    </PageFrame>
   );
 }

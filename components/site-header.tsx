@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   type LucideIcon,
   BookOpen,
@@ -19,7 +20,8 @@ import { AuthNavActions } from "@/components/auth-nav-actions";
 import { BrandLockup } from "@/components/brand-lockup";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
-import type { Locale } from "@/lib/i18n";
+import { tr, type Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 type NavLinkItem = {
   href: string;
@@ -45,6 +47,7 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ locale }: SiteHeaderProps) {
+  const pathname = usePathname();
   const navLinks = navLinkMap.map((item) => ({
     href: item.href,
     label: item.label[locale],
@@ -53,6 +56,20 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuLabel = locale === "en" ? "Menu" : "Меню";
   const closeLabel = locale === "en" ? "Close menu" : "Закрыть меню";
+  const catalogCtaLabel = tr(locale, "Catalog", "Каталог");
+  const submitCtaLabel = tr(locale, "Submit", "Отправить");
+
+  function isNavLinkActive(href: string): boolean {
+    if (!pathname) {
+      return false;
+    }
+
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 
   useEffect(() => {
     if (!isMobileMenuOpen) {
@@ -90,7 +107,12 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
             <Link
               key={link.href}
               href={link.href}
-              className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs tracking-wide text-slate-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                isNavLinkActive(link.href)
+                  ? "bg-cyan-500/12 text-cyan-200"
+                  : "text-slate-300 hover:text-white",
+              )}
             >
               <link.icon aria-hidden className="size-3.5 opacity-85" />
               {link.label}
@@ -99,6 +121,20 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <div className="hidden items-center gap-2 xl:flex">
+            <Link
+              href="/catalog"
+              className="inline-flex h-9 items-center rounded-md border border-white/15 bg-slate-900/70 px-3 text-xs font-medium text-slate-100 transition hover:bg-slate-900"
+            >
+              {catalogCtaLabel}
+            </Link>
+            <Link
+              href="/submit-server"
+              className="inline-flex h-9 items-center rounded-md bg-blue-500 px-3 text-xs font-semibold text-white transition hover:bg-blue-400"
+            >
+              {submitCtaLabel}
+            </Link>
+          </div>
           <button
             type="button"
             className="inline-flex h-11 min-w-11 items-center justify-center rounded-full border border-white/15 bg-slate-900/70 px-3 text-slate-300 transition hover:bg-slate-900 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 lg:hidden"
@@ -138,6 +174,26 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
                 {link.label}
               </Link>
             ))}
+            <div className="mt-2 grid gap-2 border-t border-white/10 pt-3">
+              <Link
+                href="/catalog"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 bg-slate-900/70 px-3 text-sm font-medium text-slate-100 transition hover:bg-slate-900"
+              >
+                {catalogCtaLabel}
+              </Link>
+              <Link
+                href="/submit-server"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-500 px-3 text-sm font-semibold text-white transition hover:bg-blue-400"
+              >
+                {submitCtaLabel}
+              </Link>
+            </div>
           </div>
         </nav>
       ) : null}
