@@ -235,7 +235,7 @@ function mergePostsBySlug(primary: BlogPost[], secondary: BlogPost[]): BlogPost[
 }
 
 export async function getBlogPostsFromSupabase(): Promise<BlogPost[]> {
-  const supabaseClient = createSupabaseServerClient() ?? createSupabaseAdminClient();
+  const supabaseClient = createSupabaseAdminClient() ?? createSupabaseServerClient();
 
   if (!supabaseClient) {
     return [];

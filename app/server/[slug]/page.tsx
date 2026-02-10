@@ -13,6 +13,8 @@ import {
   Users,
 } from "lucide-react";
 
+import { PageFrame } from "@/components/page-templates";
+import { ServerLogo } from "@/components/server-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -154,107 +156,118 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <PageFrame variant="directory">
+      <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
 
-      <div className="mb-6">
-        <Button asChild variant="ghost" className="px-0 text-slate-300 hover:text-white">
-          <Link href="/">
-            <ArrowLeft className="size-4" />
-            {tr(locale, "Back to catalog", "Назад в каталог")}
-          </Link>
-        </Button>
-      </div>
+        <div className="mb-6">
+          <Button asChild variant="ghost" className="px-0 text-slate-300 hover:text-white">
+            <Link href="/catalog">
+              <ArrowLeft className="size-4" />
+              {tr(locale, "Back to catalog", "Назад в каталог")}
+            </Link>
+          </Button>
+        </div>
 
-      <Card className="border-white/10 bg-slate-900/70">
-        <CardHeader className="space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-100">
-                {mcpServer.name}
-              </h1>
-              <p className="text-sm text-slate-300">{mcpServer.description}</p>
-            </div>
+        <Card className="border-white/10 bg-slate-900/70">
+          <CardHeader className="space-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-start gap-4">
+                <ServerLogo
+                  mcpServer={mcpServer}
+                  className="size-16 border-white/20 bg-white/90 sm:size-20"
+                  imageClassName="h-full w-full object-contain p-2"
+                  symbolClassName="text-3xl sm:text-4xl"
+                />
 
-            <div className="flex flex-wrap gap-2">
-              <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-              <Badge variant="outline" className="border-white/10 bg-slate-950/70 text-slate-300">
-                <AuthIcon className="mr-1 size-3" />
-                {tr(locale, authBadge.labelEn, authBadge.labelRu)}
-              </Badge>
-              <Badge variant="outline" className="border-white/15 text-slate-300">
-                <VerificationIcon className="mr-1 size-3" />
-                {tr(locale, verificationBadge.labelEn, verificationBadge.labelRu)}
-              </Badge>
-              <Badge variant="outline" className={healthBadge.className}>
-                <span className={`mr-1 inline-block size-1.5 rounded-full ${healthBadge.dotClassName}`} />
-                {tr(locale, healthBadge.labelEn, healthBadge.labelRu)}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
-            <p className="mb-2 text-xs font-medium tracking-wide text-slate-400 uppercase">
-              {tr(locale, "Server URL", "URL сервера")}
-            </p>
-            <p className="break-all text-sm text-slate-200">{mcpServer.serverUrl}</p>
-          </div>
-
-          <div className="space-y-3">
-            <h2 className="text-lg font-medium text-slate-100">
-              {tr(locale, "Available tools", "Доступные инструменты")}
-            </h2>
-            {mcpServer.tools.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {mcpServer.tools.map((toolName) => (
-                  <Badge key={toolName} variant="outline" className="border-white/12 text-slate-300">
-                    {toolName}
-                  </Badge>
-                ))}
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-semibold tracking-tight text-slate-100">
+                    {mcpServer.name}
+                  </h1>
+                  <p className="text-sm text-slate-300">{mcpServer.description}</p>
+                </div>
               </div>
-            ) : (
-              <p className="text-sm text-slate-400">
-                {tr(locale, "No tool list published yet.", "Список инструментов пока не опубликован.")}
-              </p>
-            )}
-          </div>
 
-          <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
-            <p className="mb-2 text-xs font-medium tracking-wide text-slate-400 uppercase">
-              {tr(locale, "Health check", "Проверка состояния")}
-            </p>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
-              <span>
-                {tr(locale, "Status", "Статус")}: {tr(locale, healthBadge.labelEn, healthBadge.labelRu)}
-              </span>
-              <span>
-                {tr(locale, "Last checked", "Последняя проверка")}: {formatCheckedAt(mcpServer.healthCheckedAt, locale)}
-              </span>
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
+                <Badge variant="outline" className="border-white/10 bg-slate-950/70 text-slate-300">
+                  <AuthIcon className="mr-1 size-3" />
+                  {tr(locale, authBadge.labelEn, authBadge.labelRu)}
+                </Badge>
+                <Badge variant="outline" className="border-white/15 text-slate-300">
+                  <VerificationIcon className="mr-1 size-3" />
+                  {tr(locale, verificationBadge.labelEn, verificationBadge.labelRu)}
+                </Badge>
+                <Badge variant="outline" className={healthBadge.className}>
+                  <span className={`mr-1 inline-block size-1.5 rounded-full ${healthBadge.dotClassName}`} />
+                  {tr(locale, healthBadge.labelEn, healthBadge.labelRu)}
+                </Badge>
+              </div>
             </div>
-            {mcpServer.healthError ? (
-              <p className="mt-2 text-xs text-rose-200">
-                {tr(locale, "Last error", "Последняя ошибка")}: {mcpServer.healthError}
-              </p>
-            ) : null}
-          </div>
+          </CardHeader>
 
-          <div className="flex flex-wrap gap-3">
-            {visitUrl ? (
-              <Button asChild className="bg-blue-500 hover:bg-blue-400">
-                <Link href={visitUrl} target="_blank" rel="noreferrer">
-                  {tr(locale, "Visit", "Открыть")}
-                  <ExternalLink className="size-4" />
-                </Link>
-              </Button>
-            ) : null}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <CardContent className="space-y-6">
+            <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+              <p className="mb-2 text-xs font-medium tracking-wide text-slate-400 uppercase">
+                {tr(locale, "Server URL", "URL сервера")}
+              </p>
+              <p className="break-all text-sm text-slate-200">{mcpServer.serverUrl}</p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-lg font-medium text-slate-100">
+                {tr(locale, "Available tools", "Доступные инструменты")}
+              </h2>
+              {mcpServer.tools.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {mcpServer.tools.map((toolName) => (
+                    <Badge key={toolName} variant="outline" className="border-white/12 text-slate-300">
+                      {toolName}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400">
+                  {tr(locale, "No tool list published yet.", "Список инструментов пока не опубликован.")}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+              <p className="mb-2 text-xs font-medium tracking-wide text-slate-400 uppercase">
+                {tr(locale, "Health check", "Проверка состояния")}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
+                <span>
+                  {tr(locale, "Status", "Статус")}: {tr(locale, healthBadge.labelEn, healthBadge.labelRu)}
+                </span>
+                <span>
+                  {tr(locale, "Last checked", "Последняя проверка")}: {formatCheckedAt(mcpServer.healthCheckedAt, locale)}
+                </span>
+              </div>
+              {mcpServer.healthError ? (
+                <p className="mt-2 text-xs text-rose-200">
+                  {tr(locale, "Last error", "Последняя ошибка")}: {mcpServer.healthError}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              {visitUrl ? (
+                <Button asChild className="bg-blue-500 hover:bg-blue-400">
+                  <Link href={visitUrl} target="_blank" rel="noreferrer">
+                    {tr(locale, "Visit", "Открыть")}
+                    <ExternalLink className="size-4" />
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageFrame>
   );
 }

@@ -1,0 +1,102 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/migrations/**"
+      - ".github/workflows/supabase-migrations.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run only (do not apply migrations)"
+        required: true
+        default: false
+        type: boolean
+      include_all:
+        description: "Include all migrations not found in remote history"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-migrations-main
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: ${{ vars.SUPABASE_MIGRATIONS_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secret
+        shell: bash
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "SUPABASE_DB_URL secret is required for migration workflow."
+            exit 1
+          fi
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.75.0
+
+      - name: Supabase CLI version
+        run: supabase --version
+
+      - name: Resolve migration mode
+        id: migration_mode
+        shell: bash
+        run: |
+          apply_migrations=true
+          include_all_flag=""
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            apply_migrations=false
+          fi
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.include_all }}" = "true" ]; then
+            include_all_flag="--include-all"
+          fi
+
+          echo "apply_migrations=$apply_migrations" >> "$GITHUB_OUTPUT"
+          echo "include_all_flag=$include_all_flag" >> "$GITHUB_OUTPUT"
+
+      - name: Supabase migration dry-run
+        shell: bash
+        run: |
+          supabase db push --db-url "$SUPABASE_DB_URL" --dry-run --yes ${{ steps.migration_mode.outputs.include_all_flag }}
+
+      - name: Apply Supabase migrations
+        if: ${{ steps.migration_mode.outputs.apply_migrations == 'true' }}
+        shell: bash
+        run: |
+          supabase db push --db-url "$SUPABASE_DB_URL" --yes ${{ steps.migration_mode.outputs.include_all_flag }}
+
+      - name: Migration summary
+        shell: bash
+        run: |
+          echo "Supabase migration workflow completed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Apply mode: ${{ steps.migration_mode.outputs.apply_migrations }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Include-all flag: ${{ steps.migration_mode.outputs.include_all_flag || '(none)' }}" >> "$GITHUB_STEP_SUMMARY"
+
+  migrate-disabled:
+    if: ${{ vars.SUPABASE_MIGRATIONS_ENABLED != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow disabled
+        run: |
+          echo "SUPABASE_MIGRATIONS_ENABLED is not true."
+          echo "Set repository variable SUPABASE_MIGRATIONS_ENABLED=true to enable automatic DB migration pushes."
+

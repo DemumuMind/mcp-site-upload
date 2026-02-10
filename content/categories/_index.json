@@ -1,0 +1,19 @@
+{
+  "section": "categories",
+  "locale": {
+    "en": {
+      "title": "Categories",
+      "description": "Browse DemumuMind MCP categories and language filters.",
+      "eyebrow": "Taxonomy Map",
+      "heroTitle": "Catalog Categories & Languages",
+      "heroDescription": "Explore available taxonomy values used by the catalog filters."
+    },
+    "ru": {
+      "title": "Категории",
+      "description": "Просматривайте категории DemumuMind MCP и языковые фильтры.",
+      "eyebrow": "Карта таксономии",
+      "heroTitle": "Категории и языки каталога",
+      "heroDescription": "Изучите значения таксономии, используемые фильтрами каталога."
+    }
+  }
+}

@@ -6,7 +6,7 @@
     "quality"
   ],
   "publishedAt": "2026-02-10T15:41:13.270Z",
-  "updatedAt": "2026-02-10T15:41:13.270Z",
+  "updatedAt": "2026-02-10T17:03:11.100Z",
   "readTimeMinutes": 3,
   "featured": false,
   "locale": {
@@ -51,25 +51,25 @@
     },
     "ru": {
       "title": "Управление затратами в agentic-инженерных workflow",
-      "excerpt": "Материал подготовлен на основе 6 актуальных источников по теме: Cost governance in agentic development.",
+      "excerpt": "Материал подготовлен на основе 6 актуальных источников с обязательной многоэтапной проверкой.",
       "seoTitle": "Управление затратами в agentic-инженерных workflow",
-      "seoDescription": "Статья на основе deep research по теме Cost governance in agentic development с многоэтапной проверкой источников.",
+      "seoDescription": "Статья на основе deep research с проверкой релевантности, свежести, разнообразия доменов и подтверждения сигналов.",
       "contentBlocks": [
         {
           "heading": "Область исследования",
           "paragraphs": [
-            "Тема: Cost governance in agentic development. Фокус: How teams manage model spend without reducing delivery speed.",
+            "Тема материала: Управление затратами в agentic-инженерных workflow.",
             "Источники отобраны за последние 14 дней и прошли многоэтапную верификацию."
           ]
         },
         {
           "heading": "Подтверждённые выводы",
           "paragraphs": [
-            "Signal 1: agentic. Repeated in 4 independent sources. Подтверждающие источники: src-9, src-2, src-7, src-14.",
-            "Signal 2: governance. Repeated in 3 independent sources. Подтверждающие источники: src-2, src-11, src-7.",
-            "Signal 3: model. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-6.",
-            "Signal 4: learn. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-11.",
-            "Signal 5: why. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-6."
+            "Сигнал 1: подтверждён в независимых источниках (src-9, src-2, src-7, src-14).",
+            "Сигнал 2: подтверждён в независимых источниках (src-2, src-11, src-7).",
+            "Сигнал 3: подтверждён в независимых источниках (src-9, src-6).",
+            "Сигнал 4: подтверждён в независимых источниках (src-9, src-11).",
+            "Сигнал 5: подтверждён в независимых источниках (src-9, src-6)."
           ]
         },
         {

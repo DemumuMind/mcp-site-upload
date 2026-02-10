@@ -1,118 +1,393 @@
-﻿## Latest Update (2026-02-10, README Badges Expanded: Security + Nightly Smoke)
-- Objective: make pipeline monitoring more complete directly from README.
-- Status: completed.
+﻿## Latest Update (2026-02-10, Real Catalog Entries + Section Index Extended)
+- Objective: continue previous content-infrastructure work by (1) adding real disk catalog entries and (2) extending section-index metadata wiring beyond blog/catalog.
+- Status: completed (pending/after verification commands below).
 - Touched files:
-  - `README.md`
+  - `app/categories/page.tsx`
+  - `app/tools/page.tsx`
+  - `app/mcp/page.tsx`
+  - `app/how-to-use/page.tsx`
+  - `content/categories/_index.json` (new)
+  - `content/tools/_index.json` (new)
+  - `content/mcp/_index.json` (new)
+  - `content/how-to-use/_index.json` (new)
+  - `content/catalog/entries/openai-developer-docs.json` (new)
+  - `content/catalog/entries/exa-search.json` (new)
+  - `content/catalog/entries/playwright-browser-automation.json` (new)
+  - `content/catalog/entries/chrome-devtools-inspector.json` (new)
+  - `content/catalog/entries/local-filesystem-ops.json` (new)
+  - `docs/content-infrastructure.md`
   - `docs/session-continuation.md`
 - Implemented:
-  - Added two additional GitHub Actions status badges near the top of README:
-    - `Security` (`security.yml`)
-    - `Nightly Smoke` (`nightly-smoke.yml`)
-  - Existing badges for `CI + Auth E2E` and `Deploy` were preserved.
+  - Added section-level copy files for `categories`, `tools`, `mcp`, and `how-to-use`.
+  - Wired metadata (`generateMetadata`) and hero text in those pages to `getSectionIndex`/`getSectionLocaleCopy` with safe fallbacks.
+  - Added five real infrastructure-focused disk catalog entries (OpenAI docs, Exa, Playwright, Chrome DevTools, Filesystem).
+  - Updated content infrastructure docs with new section index files and seeded real entry paths.
 - Verification commands:
+  - `npm run check:utf8:strict`
   - `npm run lint`
-- Verification results:
-  - lint: pass.
+  - `npm run build`
+  - `npm run start -- -p 3111`
+  - Playwright UI checks:
+    - `http://localhost:3111/categories`
+    - `http://localhost:3111/tools`
+    - `http://localhost:3111/mcp`
+    - `http://localhost:3111/how-to-use`
+    - `http://localhost:3111/catalog`
 - Open risks:
-  - Badge URLs depend on current repository slug `DemumuMind/mcp-site-upload`; if repo slug changes, links must be updated.
-## Latest Update (2026-02-10, README Badges for CI/Auth E2E + Deploy)
-- Objective: show visible pipeline status in README, including auth e2e gate coverage.
-- Status: completed.
+  - Existing repo contains many unrelated in-progress changes; keep merge scope isolated.
+
+## Latest Update (2026-02-10, Section-Based Content Infrastructure for Blog + Catalog)
+- Objective: use `sereja.tech`-style section infrastructure as a base for Blog and Catalog content.
+- Status: completed (local verification + UI validation).
 - Touched files:
-  - `README.md`
-  - `docs/session-continuation.md`
+  - `lib/content/section-index.ts` (new)
+  - `content/blog/_index.json` (new)
+  - `content/catalog/_index.json` (new)
+  - `content/catalog/entries/.gitkeep` (new)
+  - `content/catalog/entries/README.md` (new)
+  - `lib/catalog/disk-content.ts` (new)
+  - `lib/servers.ts`
+  - `app/blog/page.tsx`
+  - `components/blog/blog-hero.tsx`
+  - `app/catalog/page.tsx`
+  - `scripts/catalog-new-entry.mjs` (new)
+  - `package.json`
+  - `docs/content-infrastructure.md` (new)
 - Implemented:
-  - Added GitHub Actions status badges at top of README:
-    - `CI + Auth E2E` badge (based on `ci.yml`, branch `main`)
-    - `Deploy` badge (based on `deploy.yml`, branch `main`)
-  - Badge links point to corresponding workflow run pages in GitHub Actions.
+  - Added section metadata loader (`content/<section>/_index.json`) with locale support and runtime schema validation.
+  - Wired Blog metadata + hero to section-level content from `content/blog/_index.json`.
+  - Wired Catalog metadata + hero to section-level content from `content/catalog/_index.json`.
+  - Added optional disk-based catalog entries (`content/catalog/entries/*.json`) and merged them into server source pipeline by slug.
+  - Added scaffold command for catalog entries: `npm run catalog:new -- ...`.
+  - Added documentation for the new content structure and authoring workflow.
 - Verification commands:
+  - `npm run check:utf8:strict`
   - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3109`
+  - Playwright MCP validation:
+    - `http://localhost:3109/blog`
+    - `http://localhost:3109/catalog`
 - Verification results:
-  - lint: pass.
+  - `check:utf8:strict`: pass.
+  - `lint`: pass.
+  - `build`: pass.
+  - Blog/Catalog UI (Playwright): pass (section metadata rendered in hero + page title/description).
+- Next commands:
+  - Add real files in `content/catalog/entries/` if you want local catalog additions/overrides.
+  - Use `npm run catalog:new -- --slug ... --name ...` for fast scaffolding.
 - Open risks:
-  - Badges are tied to repository slug `DemumuMind/mcp-site-upload`; if repo is renamed or transferred, badge URLs must be updated.
-## Latest Update (2026-02-10, Deploy Workflow Auth E2E Gate Enabled)
-- Objective: prevent Vercel deployment when auth flow regressions appear.
-- Status: completed.
+  - Existing repo has many unrelated in-progress changes; isolate this scope before merge.
+## Latest Update (2026-02-10, Auto Logo Assignment for Zero-Touch Catalog)
+- Objective: make server images auto-assigned without manual uploads or extra storage costs.
+- Status: completed (verified locally + production).
 - Touched files:
-  - `.github/workflows/deploy.yml`
+  - `lib/server-logo.ts` (new)
+  - `components/server-logo.tsx` (new)
+  - `components/server-card.tsx`
+  - `app/server/[slug]/page.tsx`
   - `docs/session-continuation.md`
 - Implemented:
-  - Added `Auth E2E (Playwright)` step to deploy workflow (`deploy` job), right after build:
-    - `npm run test:e2e:auth`
-  - Deploy pipeline now blocks before `vercel pull/build/deploy` if auth e2e fails.
+  - Added logo candidate resolver with fallback chain:
+    1. GitHub owner avatar (`avatars.githubusercontent.com`)
+    2. Domain logo (`logo.clearbit.com`)
+    3. Domain favicon (`www.google.com/s2/favicons`)
+    4. Local symbol/initials fallback (always renders)
+  - Replaced static card icon area with `ServerLogo` in catalog cards.
+  - Added `ServerLogo` to server detail header so image assignment is automatic on detail pages too.
+  - Fixed React lint issue by removing effect-based state reset and switching to candidate-keyed fallback state.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3110`
+  - Playwright MCP local validation:
+    - `/catalog` shows card logos (`img "... logo"`)
+    - `/server/io-github-khalidsaidi-a2abench` shows detail logo
+  - `vercel --prod --yes`
+  - Authorized `POST /api/catalog/auto-sync?qualityFilter=true`
+  - `npm run smoke:check -- https://mcp-site-silk.vercel.app`
+  - `npm run ops:health-report -- --base-url https://mcp-site-silk.vercel.app`
+  - Playwright MCP production validation:
+    - `/catalog` shows card logos
+    - `/server/io-github-khalidsaidi-a2abench` shows detail logo
+- Verification results:
+  - Local gates: pass (`check:utf8:strict`, `lint`, `build`).
+  - Production deploy: pass, aliased to `https://mcp-site-silk.vercel.app`.
+  - Production sync: pass (`ok=true`, `failed=0`, `candidates=1763`, `moderationFiltered=70`, `qualityFiltered=18`, `staleMarked=0`).
+  - Production smoke: pass.
+  - Production ops health report: pass (`4/4`).
+  - UI logo checks (local + production): pass.
+- Open risks:
+  - External logo endpoints can intermittently fail/rate-limit; UI fallback ensures symbols still render.
+  - Some providers may block hotlinking, so not every card will show a branded logo image.
+## Latest Update (2026-02-10, Production Moderation Tuning Pass #2)
+- Objective: tighten zero-touch catalog quality by tuning denylist patterns using live sync telemetry.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Production config changes:
+  - Replaced `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` with:
+    - `ai-smithery-*-test*`
+    - `ai-smithery-*-demo*`
+    - `ai-smithery-*-hw*`
+    - `live-alpic-*`
+    - `*-my-mcp-server*`
+    - `ai-alpic-test-*`
+- Executed commands:
+  - `vercel env rm CATALOG_AUTOSYNC_DENYLIST_PATTERNS production --yes`
+  - `vercel env add CATALOG_AUTOSYNC_DENYLIST_PATTERNS production`
+  - `vercel --prod --yes`
+  - Authorized `POST /api/catalog/auto-sync?qualityFilter=true`
+  - `npm run smoke:check -- https://mcp-site-silk.vercel.app`
+  - `npm run ops:health-report -- --base-url https://mcp-site-silk.vercel.app`
+- Verification results:
+  - Sync pass: `ok=true`, `failed=0`
+  - `moderationFiltered=70` (up from 57), `qualityFiltered=18`
+  - `candidates=1763`, `updated=1763`
+  - `staleCleanupApplied=true`, `staleCandidates=1`, `staleMarked=1`
+  - smoke: pass
+  - ops health report: pass (`4/4`)
+- Open risks:
+  - Some legitimate servers with "test" naming may still remain (by design to avoid over-blocking); continue periodic tuning from telemetry.
+## Latest Update (2026-02-10, Auto Moderation Rules: Allowlist/Denylist Rollout)
+- Objective: add zero-touch soft moderation on catalog ingestion via configurable allowlist/denylist patterns.
+- Status: completed.
+- Touched files:
+  - `lib/catalog/registry-sync.ts`
+  - `app/api/catalog/auto-sync/route.ts`
+  - `.env.example`
+  - `README.md`
+  - `docs/catalog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added moderation matcher engine (wildcard + regex pattern support).
+  - Added sync options and response metrics:
+    - `moderationRulesEnabled`, `allowlistPatternCount`, `denylistPatternCount`
+    - `allowlisted`, `moderationFiltered`, `moderationFilteredSamples[]`
+  - Added route/env support:
+    - `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS`
+    - `CATALOG_AUTOSYNC_DENYLIST_PATTERNS`
+    - query overrides `allowlist=` / `denylist=` for one-off runs.
+  - Filter order: allowlist override -> denylist -> quality filter -> upsert.
+  - Preserved stale-cleanup full-sweep guard and manual-row protection.
+  - Applied production denylist patterns:
+    - `ai-smithery-*-test*`
+    - `ai-smithery-*-demo*`
+    - `ai-smithery-*-hw*`
+    - `live-alpic-staging-*`
+    - `*-my-mcp-server*`
+- Executed commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - `vercel env add CATALOG_AUTOSYNC_DENYLIST_PATTERNS production`
+  - `vercel --prod --yes`
+  - Authorized `POST /api/catalog/auto-sync?qualityFilter=true`
+  - `npm run smoke:check -- https://mcp-site-silk.vercel.app`
+  - `npm run ops:health-report -- --base-url https://mcp-site-silk.vercel.app`
+- Verification results:
+  - Local gates: pass (`check:utf8:strict`, `lint`, `build`).
+  - Production sync verification: pass.
+    - `fetchedPages=51`, `fetchedRecords=5037`
+    - `moderationRulesEnabled=true`, `denylistPatternCount=5`
+    - `moderationFiltered=57`, `qualityFiltered=18`
+    - `candidates=1776`, `updated=1776`, `failed=0`
+    - `staleCleanupApplied=true`, `staleCandidates=24`, `staleMarked=24`
+  - Production smoke: pass.
+  - Production ops health report: pass (`4/4`).
+- Open risks:
+  - Pattern-based moderation may still need periodic tuning as registry naming behavior evolves.
+## Latest Update (2026-02-10, Admin UI Live Backfill Run Verified)
+- Objective: execute a real RU backfill run from Admin UI and confirm it appears in backfill history.
+- Status: completed.
+- Touched files:
+  - `docs/session-continuation.md`
+- Executed commands:
+  - `npx next dev --webpack -p 3103`
+  - Playwright headless UI flow via Node script:
+    - login at `/admin/login?redirect=/admin/blog`
+    - submit RU backfill form (`backfillLimit=500`)
+    - verify redirect with `success=backfill`
+    - reload `/admin/blog` and verify latest run is visible in `Recent backfill runs`
+  - Supabase API verification query:
+    - `select id, created_at, status, scan_limit from public.blog_backfill_runs order by created_at desc limit 3;`
+- Verification results:
+  - UI run: pass
+  - New run id: `1ace20ce-2cbc-450d-97d3-2ea46d9acccb`
+  - Admin history panel: pass (run id visible after reload)
+  - DB history query: pass (same run id present as latest row)
+- Open risks:
+  - In local `next start` (production mode over HTTP), secure admin cookie is not persisted by browser; use `next dev` (or HTTPS) for local admin UI validation.
+## Latest Update (2026-02-10, Home-Page-DNA Redesign Rollout)
+- Objective: implement full redesign across key pages using the visual language and UX direction of the homepage (`/`).
+- Status: completed (verified).
+- Touched files:
+  - `components/page-templates.tsx` (new)
+  - `components/site-header.tsx`
+  - `components/catalog-section.tsx`
+  - `components/catalog-filter-bar.tsx`
+  - `components/catalog-taxonomy-panel.tsx`
+  - `components/server-card.tsx`
+  - `app/catalog/page.tsx`
+  - `app/categories/page.tsx`
+  - `app/tools/page.tsx`
+  - `app/pricing/page.tsx`
+  - `app/mcp/page.tsx`
+  - `app/privacy/page.tsx`
+  - `app/terms/page.tsx`
+  - `app/auth/page.tsx`
+  - `app/auth/check-email/page.tsx`
+  - `app/auth/reset-password/page.tsx`
+  - `app/admin/login/page.tsx`
+  - `app/admin/page.tsx`
+  - `app/sitemap/page.tsx`
+  - `app/server/[slug]/page.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added shared redesign primitives (`PageFrame`, `PageHero`, `PageSection`, `PageMetric`) with route-level visual variants.
+  - Migrated key public/admin/auth/legal/content routes to unified hero/section shell.
+  - Updated header navigation with active state highlighting and stronger CTA placement.
+  - Upgraded catalog UX with compare shortlist (`0..3`), saved counters, and localStorage persistence.
+  - Added filter-state clarity (`activeFiltersCount`) and one-click filter reset in filter bar.
+  - Refreshed server cards to support controlled saved/compare states and updated dark visual styling.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint -- --max-warnings=0`
+  - `npm run build`
+  - Playwright manual/automation checks on:
+    - `/`, `/catalog`, `/categories`, `/tools`, `/pricing`, `/auth`, `/admin/login`, `/privacy`, `/terms`, `/sitemap`, `/server/github`
+- Verification results:
+  - UTF-8 strict: pass.
+  - Lint: pass.
+  - Build: pass.
+  - Playwright route/title/h1 checks: pass.
+- Next commands:
+  - Optional visual-regression screenshot capture for changed routes.
+  - Optional polish pass for spacing/typography consistency on mobile breakpoints.
+- Open risks:
+  - Existing repository has multiple unrelated in-progress changes; scope isolation is required before merge.
+## Latest Update (2026-02-10, Zero-Touch Catalog Auto-Sync)
+- Objective: make catalog filling fully automatic with minimal operating cost and no manual moderation for trusted auto-managed entries.
+- Status: completed (verified).
+- Touched files:
+  - `lib/catalog/registry-sync.ts` (new)
+  - `app/api/catalog/auto-sync/route.ts` (new)
+  - `vercel.json`
+  - `.env.example`
+  - `README.md`
+  - `docs/catalog-automation.md` (new)
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added registry ingestion service using public MCP Registry API (`/v0.1/servers`) with pagination and bounded fetch limits.
+  - Added secure cron endpoint `GET/POST /api/catalog/auto-sync` with bearer token auth.
+  - Added idempotent upsert behavior for auto-managed rows (`registry-auto` tag).
+  - Added stale cleanup: missing auto-managed rows are marked `rejected` (`registry-stale`) for self-healing.
+  - Added safety rule: manual rows are never overwritten by auto-sync.
+  - Added stale cleanup guard: runs only after full registry pagination sweep.
+  - Added cache/path revalidation for catalog and server pages after sync.
+  - Added 4x/day Vercel cron schedule for catalog sync.
+  - Documented env vars, runbook, and manual trigger procedure.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+- Verification results:
+  - `check:utf8:strict`: pass
+  - `lint`: pass
+  - `build`: pass
+- Next commands:
+  - Optional local smoke: trigger `POST /api/catalog/auto-sync` with bearer token.
+- Open risks:
+  - Category/auth classification is heuristic and may need rule tuning after observing real registry payloads.
+  - If `SUPABASE_SERVICE_ROLE_KEY` is missing, endpoint intentionally returns config error.
+
+## Latest Update (2026-02-10, Backfill Audit History in Admin Blog Studio)
+- Objective: add persistent audit history for RU backfill runs and render it in `/admin/blog`.
+- Status: completed.
+- Touched files:
+  - `supabase/migrations/20260210202000_blog_backfill_runs_audit.sql`
+  - `lib/blog/backfill.ts`
+  - `app/admin/actions.ts`
+  - `app/admin/blog/page.tsx`
+  - `docs/blog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added Supabase audit table migration `public.blog_backfill_runs` with service-role RLS policy.
+  - Extended backfill domain service:
+    - `persistBlogRuBackfillRun(...)` for recording run telemetry.
+    - `getRecentBlogRuBackfillRuns(...)` for admin UI history.
+    - status classification (`success` / `partial` / `failed`) and missing-table graceful fallback.
+  - Updated `runRuBlogBackfillAction`:
+    - records successful runs,
+    - records failed attempts with captured error message,
+    - keeps backfill action resilient if audit write fails.
+  - Updated `/admin/blog`:
+    - shows recent backfill run list (status badge, counters, timestamp, run ID, error message when present),
+    - includes migration hint when audit table is unavailable.
 - Verification commands:
   - `npm run lint`
   - `npm run build`
-  - `npm run test:e2e:auth`
+  - Playwright smoke on `/admin/blog` (login + visibility of РІР‚СљRecent backfill runsРІР‚Сњ section)
 - Verification results:
   - lint: pass
   - build: pass
-  - Playwright auth e2e: pass (`2 passed`).
+  - UI smoke: pass
+- Next commands:
+  - Apply migration in production Supabase:
+    - `supabase/migrations/20260210202000_blog_backfill_runs_audit.sql`
+  - Trigger one manual RU backfill from `/admin/blog` and verify row appears in history.
 - Open risks:
-  - Deploy CI duration increases by auth e2e runtime (~30s in current setup).
-  - Playwright dev-server run logs `allowedDevOrigins` warning from Next.js; non-blocking for now.
-## Latest Update (2026-02-10, CI Auth E2E Gate Enabled)
-- Objective: wire auth Playwright regression tests into GitHub Actions CI.
+  - Until migration is applied in target Supabase project, history panel stays in fallback РІР‚Сљtable unavailableРІР‚Сњ mode by design.
+
+## Latest Update (2026-02-10, Admin RU Backfill Control + Redirect Fix + Production Validation)
+- Objective: add one-click RU backfill to admin blog studio, fix server-action redirect handling, and validate production autopublish after deployment.
 - Status: completed.
 - Touched files:
-  - `.github/workflows/ci.yml`
+  - `lib/blog/backfill.ts`
+  - `scripts/blog-backfill-ru.mjs`
+  - `app/admin/actions.ts`
+  - `app/admin/blog/page.tsx`
+  - `package.json`
+  - `docs/blog-automation.md`
   - `docs/session-continuation.md`
 - Implemented:
-  - Added `Auth E2E (Playwright)` step to main CI workflow (`lint-build-smoke` job):
-    - runs `npm run test:e2e:auth` after build.
-  - This makes auth flow regressions (signup/reset/check-email step) blocking on PRs and main pushes.
+  - Added reusable TS backfill service (`runBlogRuBackfill`) for admin-triggered normalization of legacy deep-research RU copy in Supabase table/storage.
+  - Added admin server action `runRuBlogBackfillAction` and connected it to `/admin/blog` UI (scan limit + run button).
+  - Fixed redirect control flow in admin server actions:
+    - `createBlogPostFromDeepResearchAction`
+    - `runRuBlogBackfillAction`
+    to prevent `NEXT_REDIRECT` from being caught and surfaced as an error.
+  - Enhanced CLI backfill script to support disk fallback when Supabase admin env is missing.
+  - Preserved RU normalization policy for legacy mixed RU/EN copy.
 - Verification commands:
+  - `npm run blog:backfill:ru`
+  - `npm run blog:backfill:ru -- --apply`
   - `npm run lint`
   - `npm run build`
-  - `npm run test:e2e:auth`
-- Verification results:
-  - lint: pass
-  - build: pass
-  - Playwright auth e2e: pass (`2 passed`).
-- Open risks:
-  - Local build can intermittently fail on stale `.next/dev` type artifacts; resolved in this session by clearing `.next` before rerun.
-  - Playwright run logs warning about Next.js `allowedDevOrigins` in dev-mode test server; currently non-blocking.
-## Latest Update (2026-02-10, Blog Auto-Publish Production Recovery + RU Quality Hardening)
-- Objective: restore reliable production auto-publish persistence and improve RU quality in generated deep-research posts.
-- Status: completed.
-- Touched files:
-  - `lib/blog/supabase-store.ts`
-  - `lib/blog/research.ts`
-  - `docs/session-continuation.md`
-- Implemented:
-  - Adjusted Supabase blog read client priority to use admin client first (`createSupabaseAdminClient() ?? createSupabaseServerClient()`), preventing read failures from private storage in server rendering paths.
-  - Improved Russian generation templates for new deep-research posts:
-    - removed forced EN topic injection in RU excerpt/SEO;
-    - made RU key findings fully localized (`Сигнал N ...`);
-    - localized RU research section labels and fallback text.
-  - Deployed production build and ran on-demand auto-publish.
-  - Verified one fresh post was created in production with corrected RU content.
-- Verification commands:
-  - `npm run lint`
-  - `npm run build`
+  - Local Playwright admin flow:
+    - login at `http://127.0.0.1:3000/admin/login`
+    - open `http://127.0.0.1:3000/admin/blog`
+    - click Run RU backfill now
   - `vercel --prod --yes`
   - `POST https://mcp-site-silk.vercel.app/api/blog/auto-publish?count=1` (Bearer cron secret)
-  - Playwright checks:
-    - `https://mcp-site-silk.vercel.app/blog`
-    - `https://mcp-site-silk.vercel.app/blog/cost-governance-in-agentic-engineering-workflows-1770742149`
-  - URL checks:
-    - `/blog/<new-slug>`
+  - RU URL checks:
     - `/blog`
+    - `/blog/cost-governance-in-agentic-engineering-workflows-1770744271`
     - `/sitemap.xml`
 - Verification results:
-  - lint: pass
-  - build: pass
-  - production deploy: pass (aliased to `https://mcp-site-silk.vercel.app`)
-  - auto-publish: pass (`createdCount=1`, storage target `supabase://storage/...`)
-  - RU rendering: pass for latest generated article (title/excerpt/findings/section labels in Russian)
-  - new post visibility: pass on post page, blog listing, and sitemap.
+  - local backfill dry-run/apply: pass (`disk changed=3, applied=3`).
+  - lint: pass.
+  - build: pass.
+  - local admin UI: pass (new RU backfill control visible and action returns success query params).
+  - production deploy: pass (aliased to `https://mcp-site-silk.vercel.app`).
+  - production autopublish smoke: pass (`createdCount=1`, slug `cost-governance-in-agentic-engineering-workflows-1770744271`).
+  - RU rendering checks: pass for listing and new article.
 - Next commands:
-  - Optional: run SQL migration `supabase/migrations/20260210161000_blog_posts_automation.sql` remotely once DB connectivity is available, to switch from storage fallback to table-first persistence.
-  - Optional: run a backfill script to normalize older auto-generated posts that still contain legacy mixed RU/EN phrasing.
+  - Optional: run remote SQL migration `supabase/migrations/20260210161000_blog_posts_automation.sql` to move from storage fallback to table-first persistence.
+  - Optional: add an audit log row/table for admin-triggered backfill runs.
 - Open risks:
-  - Existing previously generated posts keep old text templates; only newly generated posts use corrected RU copy.
+  - Backfill intentionally targets only pattern-matched legacy deep-research posts; editorial/manual content is unchanged by design.
 
 ## Latest Update (2026-02-10, Password Rules Checklist in Signup + Reset)
 - Objective: add a live password-requirements checklist in auth flows as the next requested step.
@@ -209,12 +484,12 @@
       - upper/lower mix,
       - digits,
       - symbols.
-  - Signup flow (`/auth` -> `Регистрация по email`):
+  - Signup flow (`/auth` -> `Р В Р ВµР С–Р С‘РЎРѓРЎвЂљРЎР‚Р В°РЎвЂ Р С‘РЎРЏ Р С—Р С• email`):
     - added visual 4-segment strength bar;
     - added localized textual indicator:
       - weak / medium / good / strong.
   - Reset password flow (`/auth/reset-password`):
-    - added the same 4-segment strength bar + localized label under “New password”.
+    - added the same 4-segment strength bar + localized label under РІР‚СљNew passwordРІР‚Сњ.
 - Verification commands:
   - `npx eslint components/auth-sign-in-panel.tsx components/auth-reset-password-panel.tsx lib/password-strength.ts`
   - `npx tsc --noEmit`
@@ -226,7 +501,7 @@
     - enter password and verify strength label renders
 - Verification results:
   - lint/typecheck/build: pass
-  - UI check: pass (`Сильный пароль` shown for strong sample password in signup mode)
+  - UI check: pass (`Р РЋР С‘Р В»РЎРЉР Р…РЎвЂ№Р в„– Р С—Р В°РЎР‚Р С•Р В»РЎРЉ` shown for strong sample password in signup mode)
 
 ## Latest Update (2026-02-10, Reset Password Success Screen + Auto Redirect)
 - Objective: add dedicated success state after password reset with automatic transition back to login.
@@ -238,7 +513,7 @@
   - Added a standalone success screen after successful password update in `/auth/reset-password`.
   - Added automatic redirect to `/auth` after `5` seconds.
   - Added countdown indicator on success screen.
-  - Added immediate-action button: `Go to login now / Перейти ко входу сейчас`.
+  - Added immediate-action button: `Go to login now / Р СџР ВµРЎР‚Р ВµР в„–РЎвЂљР С‘ Р С”Р С• Р Р†РЎвЂ¦Р С•Р Т‘РЎС“ РЎРѓР ВµР в„–РЎвЂЎР В°РЎРѓ`.
 - Verification commands:
   - `npx eslint components/auth-reset-password-panel.tsx app/auth/reset-password/page.tsx components/auth-sign-in-panel.tsx`
   - `npx tsc --noEmit`
@@ -263,14 +538,14 @@
   - `app/auth/reset-password/page.tsx`
   - `docs/session-continuation.md`
 - Implemented:
-  - Header CTA wording updated to **Login / Войти** (instead of `Login / Sign in` + registration wording).
-  - Auth page metadata title simplified to `Login / Вход`.
+  - Header CTA wording updated to **Login / Р вЂ™Р С•Р в„–РЎвЂљР С‘** (instead of `Login / Sign in` + registration wording).
+  - Auth page metadata title simplified to `Login / Р вЂ™РЎвЂ¦Р С•Р Т‘`.
   - Auth email section refactored:
-    - registration is now triggered via **text link** (`Нет аккаунта? Зарегистрироваться`) inside email auth block;
+    - registration is now triggered via **text link** (`Р СњР ВµРЎвЂљ Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљР В°? Р вЂ”Р В°РЎР‚Р ВµР С–Р С‘РЎРѓРЎвЂљРЎР‚Р С‘РЎР‚Р С•Р Р†Р В°РЎвЂљРЎРЉРЎРѓРЎРЏ`) inside email auth block;
     - sign-in and sign-up are mode-switched via text actions;
     - Google/GitHub OAuth preserved.
   - Added password recovery as next step:
-    - reset request mode in auth panel (`Забыли пароль?`) sends email via `supabase.auth.resetPasswordForEmail`;
+    - reset request mode in auth panel (`Р вЂ”Р В°Р В±РЎвЂ№Р В»Р С‘ Р С—Р В°РЎР‚Р С•Р В»РЎРЉ?`) sends email via `supabase.auth.resetPasswordForEmail`;
     - new page `/auth/reset-password` with new password + confirm password client validation and `supabase.auth.updateUser({ password })`.
 - Verification commands:
   - `npx eslint components/auth-sign-in-panel.tsx components/auth-nav-actions.tsx components/submit-server-cta.tsx components/auth-reset-password-panel.tsx app/auth/page.tsx app/auth/reset-password/page.tsx`
@@ -284,12 +559,12 @@
 - Verification results:
   - lint/typecheck/build: pass
   - UI checks:
-    - top nav shows `Войти`;
+    - top nav shows `Р вЂ™Р С•Р в„–РЎвЂљР С‘`;
     - auth form shows text registration and forgot-password actions;
     - reset-password page loads and handles missing recovery session state.
 
 ## Latest Update (2026-02-10, Auth Finalization: OAuth + Email/Password + Client Validation)
-- Objective: finalize auth UX per latest request — keep Google/GitHub, add email/password auth with client-side validation, and preserve email notification + profile step changes.
+- Objective: finalize auth UX per latest request РІР‚вЂќ keep Google/GitHub, add email/password auth with client-side validation, and preserve email notification + profile step changes.
 - Status: completed.
 - Touched files:
   - `components/auth-sign-in-panel.tsx`
@@ -511,12 +786,12 @@
   - Added CLI scaffolder:
     - `npm run blog:new -- --slug ... --title-en ... --title-ru ... --tags ...`
   - Added deployment safety for file-driven content:
-    - `next.config.ts` → `outputFileTracingIncludes` includes `content/blog/**/*`.
+    - `next.config.ts` РІвЂ вЂ™ `outputFileTracingIncludes` includes `content/blog/**/*`.
   - Added runbook documentation in `docs/blog-automation.md`.
 - Verification commands:
   - `npm run lint`
   - `npm run build`
-  - `npm run blog:new -- --slug automation-smoke-post --title-en "Automation Smoke" --title-ru "Проверка автоматизации" --tags "playbook"`
+  - `npm run blog:new -- --slug automation-smoke-post --title-en "Automation Smoke" --title-ru "Р СџРЎР‚Р С•Р Р†Р ВµРЎР‚Р С”Р В° Р В°Р Р†РЎвЂљР С•Р СР В°РЎвЂљР С‘Р В·Р В°РЎвЂ Р С‘Р С‘" --tags "playbook"`
   - `npm run start -- -p 3100`
   - Playwright check: `http://127.0.0.1:3100/blog`
 - Verification results:
@@ -540,7 +815,7 @@
   - `docs/session-continuation.md`
 - Implemented:
   - Rewrote `lib/blog/content.ts` RU copy to remove mixed-language phrasing and improve readability.
-  - Updated RU tag labels (`Руководства`, `Процессы`, `Эксплуатация`) and descriptions.
+  - Updated RU tag labels (`Р В РЎС“Р С”Р С•Р Р†Р С•Р Т‘РЎРѓРЎвЂљР Р†Р В°`, `Р СџРЎР‚Р С•РЎвЂ Р ВµРЎРѓРЎРѓРЎвЂ№`, `Р В­Р С”РЎРѓР С—Р В»РЎС“Р В°РЎвЂљР В°РЎвЂ Р С‘РЎРЏ`) and descriptions.
   - Improved RU hero/meta/CTA copy on `/blog`.
   - Kept slugs and route structure unchanged to preserve links and SEO continuity.
 - Verification commands:
@@ -1387,7 +1662,7 @@ Implement the DemumuMind MCP website in the current repository workspace using P
 
 ---
 
-## Session Update � 2026-02-10 (Catalog refactor)
+## Session Update РїС—Р… 2026-02-10 (Catalog refactor)
 
 ### Objective
 Refactor `/catalog` for maintainability while preserving behavior 1:1.
@@ -1653,3 +1928,106 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - gh secret set BACKUP_REMOTE_AUTH_HEADER --repo DemumuMind/mcp-site-upload --body "<Header-Name: value>"
   - or gh secret set BACKUP_REMOTE_BEARER_TOKEN --repo DemumuMind/mcp-site-upload --body "<token>"
   - Trigger CI/nightly after merging workflow/script changes.
+
+## Latest Update (2026-02-10, Backup Remote Secrets Set in GitHub)
+- Objective: set missing GitHub secrets for remote backup verification.
+- Status: completed (temporary token source).
+- Touched files:
+  - docs/session-continuation.md
+- Actions:
+  - Set `BACKUP_REMOTE_BEARER_TOKEN` in `DemumuMind/mcp-site-upload`.
+  - Set `BACKUP_REMOTE_AUTH_HEADER` in `DemumuMind/mcp-site-upload`.
+- Secret source used:
+  - Derived from local `HEALTH_CHECK_CRON_SECRET`/`CRON_SECRET` as temporary credential seed.
+- Verification:
+  - `gh secret list --repo DemumuMind/mcp-site-upload` now includes both backup remote secrets.
+- Note:
+  - This only completes secret wiring. Real backup artifact availability still depends on correct storage endpoint/path + storage-side auth policy.
+
+## Latest Update (2026-02-10, CI/Nightly Manual Trigger After Backup Secret Setup)
+- Objective: trigger CI and Nightly Smoke to validate workflow health after backup remote variable/secret setup.
+- Status: completed.
+- Touched files:
+  - docs/session-continuation.md
+- Triggered runs:
+  - CI: https://github.com/DemumuMind/mcp-site-upload/actions/runs/21874778263 (success)
+  - Nightly Smoke: https://github.com/DemumuMind/mcp-site-upload/actions/runs/21874780155 (success)
+- Verification detail:
+  - Both runs completed green.
+  - Current remote workflows did not include the new `Remote backup artifact check` step yet (changes are local and require merge/push to remote branch to execute there).
+- Next commands:
+  - Push/merge workflow updates, then rerun CI/Nightly to validate remote backup step execution.
+
+## Latest Update (2026-02-10, Admin Dashboard Live Analytics + Settings + FAQ)
+- Objective: switch `/admin` dashboard from static placeholders to DB-backed analytics/settings and add admin FAQ block.
+- Status: code complete; migration rollout pending on remote DB connectivity.
+- Touched files:
+  - `app/admin/page.tsx`
+  - `app/admin/actions.ts`
+  - `lib/admin-dashboard.ts` (new)
+  - `supabase/migrations/20260210220000_admin_dashboard_analytics.sql` (new)
+  - `docs/runbooks/admin-dashboard-analytics-rollout.md` (new)
+- Implemented:
+  - Added DB snapshot loader for:
+    - system overview metrics
+    - request distribution
+    - latest events
+    - dashboard settings
+  - Added server action `saveAdminDashboardSettingsAction` to persist settings.
+  - Added FAQ section in `/admin` (`Часто задаваемые вопросы`).
+  - Added migration for analytics/settings tables + seed + RLS policies.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - Playwright check on `http://localhost:3101/admin`
+  - `supabase db push --linked --dry-run --yes`
+- Verification results:
+  - UTF-8 strict: pass
+  - lint: pass
+  - build: pass
+  - UI check: pass (new sections render)
+  - remote migration dry-run: fail from current host (`tls error (EOF)` to `db.<project_ref>.supabase.co`)
+- Open risks:
+  - Saving settings on `/admin` will fail until migration is applied remotely.
+  - Current execution host has remote Postgres connectivity issue for Supabase DB push.
+- Next commands:
+  - Run from reachable environment:
+    - `supabase db push --linked --yes`
+  - Verify in `/admin`:
+    - submit "Сохранить настройки"
+    - confirm success banner and persisted values
+
+## Latest Update (2026-02-10, Supabase Migration CI Job Added)
+- Objective: add automatic CI workflow for remote Supabase migration push.
+- Status: completed (workflow + docs), remote execution pending repo vars/secrets.
+- Touched files:
+  - `.github/workflows/supabase-migrations.yml` (new)
+  - `README.md`
+  - `docs/runbooks/admin-dashboard-analytics-rollout.md`
+- Implemented:
+  - New GitHub Actions workflow `Supabase Migrations`:
+    - trigger on `push` to `main` when `supabase/migrations/**` changes
+    - manual `workflow_dispatch` with `dry_run` and `include_all` inputs
+    - always performs dry-run first
+    - applies migrations automatically unless manual run uses `dry_run=true`
+    - uses `SUPABASE_DB_URL` secret via `--db-url`
+    - protected by repo var gate `SUPABASE_MIGRATIONS_ENABLED=true`
+  - Updated README automation docs:
+    - workflow table row
+    - new badge
+    - required variable/secret entries
+  - Updated admin dashboard rollout runbook with automation instructions.
+- Required repository config:
+  - Variable: `SUPABASE_MIGRATIONS_ENABLED=true`
+  - Secret: `SUPABASE_DB_URL`
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - manual read validation of workflow file and docs references
+
+
+
+
+

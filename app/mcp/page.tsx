@@ -4,24 +4,29 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("mcp"), locale);
 
   return {
-    title: tr(locale, "MCP Overview", "Обзор MCP"),
-    description: tr(
-      locale,
-      "Overview of DemumuMind MCP and how it helps teams.",
-      "Обзор DemumuMind MCP и того, как платформа помогает командам.",
-    ),
+    title: sectionCopy?.title ?? tr(locale, "MCP Overview", "Обзор MCP"),
+    description:
+      sectionCopy?.description ??
+      tr(
+        locale,
+        "Overview of DemumuMind MCP and how it helps teams.",
+        "Обзор DemumuMind MCP и того, как платформа помогает командам.",
+      ),
   };
 }
 
 export default async function MCPPage() {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("mcp"), locale);
 
   const highlights = [
     {
@@ -56,13 +61,21 @@ export default async function MCPPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
       <section className="space-y-3 rounded-2xl border border-white/10 bg-slate-900/55 p-6 sm:p-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-100">MCP</h1>
+        {sectionCopy?.eyebrow ? (
+          <p className="text-xs font-semibold tracking-[0.12em] text-cyan-200 uppercase">
+            {sectionCopy.eyebrow}
+          </p>
+        ) : null}
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-100">
+          {sectionCopy?.heroTitle ?? "MCP"}
+        </h1>
         <p className="max-w-3xl text-sm text-slate-300">
-          {tr(
-            locale,
-            "Discover verified and community MCP servers, inspect tool capabilities, and connect them to your AI workflows.",
-            "Находите верифицированные и community MCP-серверы, проверяйте возможности инструментов и подключайте их к AI-workflow.",
-          )}
+          {sectionCopy?.heroDescription ??
+            tr(
+              locale,
+              "Discover verified and community MCP servers, inspect tool capabilities, and connect them to your AI workflows.",
+              "Находите верифицированные и community MCP-серверы, проверяйте возможности инструментов и подключайте их к AI-workflow.",
+            )}
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild className="bg-blue-500 hover:bg-blue-400">

@@ -14,6 +14,7 @@ import {
   getBlogTagBySlug,
   getFeaturedPost,
 } from "@/lib/blog/service";
+import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -36,38 +37,46 @@ function normalizeTag(tag: string | undefined): string | null {
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("blog"), locale);
 
-  return {
-    title: tr(locale, "Blog", "Блог"),
-    description: tr(
+  const pageTitle = sectionCopy?.title ?? tr(locale, "Blog", "Блог");
+  const pageDescription =
+    sectionCopy?.description ??
+    tr(
       locale,
       "Articles on vibe coding, agentic coding, prompt engineering, and AI development best practices.",
-      "Статьи о практиках агентной разработки, интеграциях MCP и инженерных стандартах командной работы.",
-    ),
+      "Статьи о вайб-кодинге, агентной разработке, prompt engineering и лучших практиках AI-разработки.",
+    );
+
+  const heroTitle = sectionCopy?.heroTitle ?? tr(locale, "BridgeMind Blog", "Блог BridgeMind");
+  const heroDescription =
+    sectionCopy?.heroDescription ??
+    tr(
+      locale,
+      "Playbooks, architecture notes, and operational guides for agentic engineering teams.",
+      "Практические playbook-гайды, архитектурные заметки и операционные инструкции для агентных инженерных команд.",
+    );
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
     openGraph: {
-      title: tr(locale, "BridgeMind Blog", "Блог BridgeMind"),
-      description: tr(
-        locale,
-        "Playbooks, architecture notes, and operational guides for agentic engineering teams.",
-        "Практические руководства, архитектурные заметки и операционные материалы для инженерных команд.",
-      ),
+      title: heroTitle,
+      description: heroDescription,
       type: "website",
       url: "/blog",
     },
     twitter: {
       card: "summary_large_image",
-      title: tr(locale, "BridgeMind Blog", "Блог BridgeMind"),
-      description: tr(
-        locale,
-        "Playbooks, architecture notes, and operational guides for agentic engineering teams.",
-        "Практические руководства, архитектурные заметки и операционные материалы для инженерных команд.",
-      ),
+      title: heroTitle,
+      description: heroDescription,
     },
   };
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("blog"), locale);
   const { tag } = await searchParams;
   const normalizedTag = normalizeTag(typeof tag === "string" ? tag : undefined);
   const allPosts = await getAllBlogPosts();
@@ -101,7 +110,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_15%_5%,rgba(139,92,246,0.2),transparent_38%),radial-gradient(circle_at_82%_5%,rgba(56,189,248,0.14),transparent_38%)]" />
 
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
-        <BlogHero locale={locale} />
+        <BlogHero locale={locale} copy={sectionCopy} />
 
         <BlogFilterBar locale={locale} selectedTag={selectedTag?.slug ?? null} tags={tagsWithCounts} />
 
@@ -130,7 +139,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-2xl font-semibold tracking-tight text-slate-100 sm:text-3xl">
-              {tr(locale, "Latest from BridgeMind", "Последние материалы BridgeMind")}
+              {tr(locale, "Latest from BridgeMind", "Последнее от BridgeMind")}
             </h2>
           </div>
 
@@ -146,7 +155,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 {tr(
                   locale,
                   "No posts match this filter yet. Try another topic.",
-                  "Для этого фильтра пока нет материалов. Выберите другую тему.",
+                  "Пока нет статей под этот фильтр. Попробуйте другую тему.",
                 )}
               </CardContent>
             </Card>
@@ -158,14 +167,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             {tr(
               locale,
               "Want to suggest an article or benchmark scenario?",
-              "Хотите предложить тему статьи или сценарий для разбора?",
+              "Хотите предложить тему статьи или сценарий для бенчмарка?",
             )}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
             {tr(
               locale,
               "Send us your topic idea, production challenge, or model comparison request and we will include it in the editorial queue.",
-              "Отправьте идею темы, рабочий кейс или запрос на сравнение моделей — мы добавим это в редакционный план.",
+              "Отправьте идею темы, реальную продакшен-задачу или запрос на сравнение моделей — добавим в редакционный план.",
             )}
           </p>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
