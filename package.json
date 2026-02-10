@@ -17,7 +17,8 @@
     "smoke:check": "node scripts/smoke-check.mjs",
     "smoke:i18n": "node scripts/smoke-i18n.mjs",
     "ops:health-report": "node scripts/ops-health-report.mjs",
-    "ops:backup-verify": "node scripts/backup-verify.mjs"
+    "ops:backup-verify": "node scripts/backup-verify.mjs",
+    "ops:backup-verify-remote": "node scripts/backup-verify-remote.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

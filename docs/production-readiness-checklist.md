@@ -23,6 +23,7 @@
 
 ## Data Safety
 - [ ] Latest backup is within freshness window.
+- [ ] `npm run ops:backup-verify-remote` passes (real artifact reachable and fresh).
 - [ ] Monthly restore drill completed within policy window.
 - [ ] Backup manifest updated.
 

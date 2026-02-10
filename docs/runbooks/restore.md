@@ -16,8 +16,25 @@ Use `ops/backup-manifest.example.json` as reference. Required fields:
 ## Verification Commands
 - `npm run ops:backup-verify`
 - `npm run ops:backup-verify -- --json`
+- `npm run ops:backup-verify-remote`
+- `npm run ops:backup-verify-remote -- --json`
 - Override manifest path:
   - `npm run ops:backup-verify -- --manifest <path>`
+  - `npm run ops:backup-verify-remote -- --manifest <path>`
+- Override remote location:
+  - `npm run ops:backup-verify-remote -- --location <https://...|s3://bucket/key>`
+
+## Remote Artifact Verification (recommended)
+- Enable automatic checks in CI/nightly with:
+  - `BACKUP_REMOTE_CHECK_ENABLED=true` (repo variable)
+  - `BACKUP_REMOTE_CHECK_URL` (repo variable, optional if manifest location works from runner)
+- Optional auth secrets:
+  - `BACKUP_REMOTE_AUTH_HEADER` (format: `Header-Name: value`)
+  - `BACKUP_REMOTE_BEARER_TOKEN`
+- For S3 paths, set region when needed:
+  - `BACKUP_REMOTE_S3_REGION`
+- Preferred method:
+  - `BACKUP_REMOTE_CHECK_METHOD=auto|http|aws-cli` (default: `auto`)
 
 ## Monthly Restore Drill
 1. Pick latest backup and create isolated staging database.
