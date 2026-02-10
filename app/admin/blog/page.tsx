@@ -6,6 +6,7 @@ import {
   createBlogPostFromDeepResearchAction,
   logoutAdminAction,
 } from "@/app/admin/actions";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,7 +58,8 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
   const errorMessage = error ? tr(locale, formatError(error) ?? error, formatError(error) ?? error) : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+    <PageFrame variant="ops">
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-slate-100">
@@ -108,7 +110,7 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
         </div>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card className="border-white/10 bg-slate-900/70">
           <CardHeader>
             <CardTitle className="text-slate-100">
@@ -272,6 +274,7 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </PageFrame>
   );
 }
