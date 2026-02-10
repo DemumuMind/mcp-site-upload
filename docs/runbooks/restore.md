@@ -36,6 +36,16 @@ Use `ops/backup-manifest.example.json` as reference. Required fields:
 - Preferred method:
   - `BACKUP_REMOTE_CHECK_METHOD=auto|http|aws-cli` (default: `auto`)
 
+## Scheduled Backup Upload Workflow
+- Workflow: `.github/workflows/nightly-backup.yml`
+- Purpose: create daily `pg_dump` backup and upload:
+  - `backups/postgres/latest.sql.gz`
+  - `backups/postgres/<timestamp>.sql.gz`
+- Required repository secrets:
+  - `BACKUP_DATABASE_URL`
+  - `BACKUP_SUPABASE_URL`
+  - `BACKUP_SUPABASE_SERVICE_ROLE_KEY`
+
 ## Monthly Restore Drill
 1. Pick latest backup and create isolated staging database.
 2. Restore database dump.
