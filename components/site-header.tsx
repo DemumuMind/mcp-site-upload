@@ -18,8 +18,10 @@ import {
 import { AuthNavActions } from "@/components/auth-nav-actions";
 import { BrandLockup } from "@/components/brand-lockup";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { SiteNotificationCenter } from "@/components/site-notification-center";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Locale } from "@/lib/i18n";
+import type { SiteNotificationItem } from "@/lib/notifications/types";
 
 type NavLinkItem = {
   href: string;
@@ -42,9 +44,10 @@ const navLinkMap: readonly NavLinkItem[] = [
 
 type SiteHeaderProps = {
   locale: Locale;
+  notifications: SiteNotificationItem[];
 };
 
-export function SiteHeader({ locale }: SiteHeaderProps) {
+export function SiteHeader({ locale, notifications }: SiteHeaderProps) {
   const navLinks = navLinkMap.map((item) => ({
     href: item.href,
     label: item.label[locale],
@@ -112,6 +115,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
             {isMobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
             <span className="sr-only">{isMobileMenuOpen ? closeLabel : menuLabel}</span>
           </button>
+          <SiteNotificationCenter locale={locale} notifications={notifications} />
           <LanguageSwitcher />
           <ThemeToggle />
           <AuthNavActions locale={locale} />
