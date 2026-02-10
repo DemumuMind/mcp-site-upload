@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { Heart, Star } from "lucide-react";
+import { useMemo } from "react";
+import { GitCompareArrows, Heart, Star } from "lucide-react";
 
 import { useLocale } from "@/components/locale-provider";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,10 @@ type ServerCardProps = {
   mcpServer: McpServer;
   viewMode?: ServerCardViewMode;
   score?: number;
+  isSaved?: boolean;
+  isCompared?: boolean;
+  onToggleSaved?: (serverId: string) => void;
+  onToggleCompared?: (serverId: string) => void;
 };
 
 type LogoStyle = {
@@ -135,9 +139,16 @@ function getRatingValue(mcpServer: McpServer, score?: number): number {
   return Math.max(1, Math.min(5, Number(normalized.toFixed(1))));
 }
 
-export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardProps) {
+export function ServerCard({
+  mcpServer,
+  viewMode = "grid",
+  score,
+  isSaved = false,
+  isCompared = false,
+  onToggleSaved,
+  onToggleCompared,
+}: ServerCardProps) {
   const locale = useLocale();
-  const [saved, setSaved] = useState(false);
 
   const rating = useMemo(() => getRatingValue(mcpServer, score), [mcpServer, score]);
   const logoStyle = useMemo(() => resolveLogoStyle(mcpServer), [mcpServer]);
@@ -148,13 +159,13 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
   return (
     <Card
       className={cn(
-        "overflow-hidden border-slate-200 bg-white shadow-sm transition duration-200 hover:border-blue-300 hover:shadow-md",
+        "overflow-hidden border-white/10 bg-slate-900/75 shadow-[0_0_0_1px_rgba(148,163,184,0.08)] transition duration-200 hover:border-cyan-400/35",
         viewMode === "list" && "md:grid md:grid-cols-[250px_1fr]",
       )}
     >
       <div
         className={cn(
-          "relative overflow-hidden border-b border-slate-200 bg-gradient-to-br p-3",
+          "relative overflow-hidden border-b border-white/10 bg-gradient-to-br p-3",
           accentClassByLevel[mcpServer.verificationLevel],
           viewMode === "grid" ? "h-44" : "md:h-full md:border-r md:border-b-0",
         )}
@@ -175,11 +186,22 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
                 aria-label={tr(locale, "Save card", "Сохранить карточку")}
                 className={cn(
                   "inline-flex size-7 items-center justify-center rounded-md border border-slate-200/80 bg-white/90 text-slate-500 transition hover:text-rose-500",
-                  saved && "text-rose-500",
+                  isSaved && "text-rose-500",
                 )}
-                onClick={() => setSaved((isSaved) => !isSaved)}
+                onClick={() => onToggleSaved?.(mcpServer.id)}
               >
-                <Heart className={cn("size-3.5", saved && "fill-current")} />
+                <Heart className={cn("size-3.5", isSaved && "fill-current")} />
+              </button>
+              <button
+                type="button"
+                aria-label={tr(locale, "Add to compare", "Добавить в сравнение")}
+                className={cn(
+                  "inline-flex size-7 items-center justify-center rounded-md border border-slate-200/80 bg-white/90 text-slate-500 transition hover:text-blue-600",
+                  isCompared && "text-blue-600",
+                )}
+                onClick={() => onToggleCompared?.(mcpServer.id)}
+              >
+                <GitCompareArrows className={cn("size-3.5", isCompared && "stroke-[2.8]")} />
               </button>
             </div>
           </div>
@@ -199,15 +221,15 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
 
       <div className="flex flex-1 flex-col">
         <CardHeader className="space-y-2 pb-2">
-          <CardTitle className="text-lg leading-tight text-slate-900">
-            <Link className="transition hover:text-blue-600" href={`/server/${mcpServer.slug}`}>
+          <CardTitle className="text-lg leading-tight text-slate-100">
+            <Link className="transition hover:text-cyan-200" href={`/server/${mcpServer.slug}`}>
               {mcpServer.name}
             </Link>
           </CardTitle>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             {tr(locale, "by", "от")} {mcpServer.maintainer?.name ?? mcpServer.name}
           </p>
-          <p className="line-clamp-2 text-sm text-slate-600">{mcpServer.description}</p>
+          <p className="line-clamp-2 text-sm text-slate-300">{mcpServer.description}</p>
         </CardHeader>
 
         <CardContent className="space-y-3 pt-0">
@@ -215,34 +237,34 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
             {mcpServer.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500"
+                className="rounded-full border border-white/15 bg-slate-800/80 px-2 py-0.5 text-xs text-slate-300"
               >
                 {tag}
               </span>
             ))}
             {mcpServer.tags.length > 3 ? (
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500">
+              <span className="rounded-full border border-white/15 bg-slate-800/80 px-2 py-0.5 text-xs text-slate-300">
                 +{mcpServer.tags.length - 3}
               </span>
             ) : null}
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+            <div className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-200">
               <Star className="size-3.5 fill-current" />
               {rating.toFixed(1)}
             </div>
-            <span className="text-sm font-semibold text-blue-600">
+            <span className="text-sm font-semibold text-cyan-200">
               {tr(locale, accessLabel.en, accessLabel.ru)}
             </span>
           </div>
         </CardContent>
 
-        <CardFooter className="mt-auto border-t border-slate-200 bg-slate-50/80 p-3">
+        <CardFooter className="mt-auto border-t border-white/10 bg-slate-900/90 p-3">
           <Button
             asChild
             variant="outline"
-            className="w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+            className="w-full border-white/15 bg-slate-950/70 text-slate-100 hover:bg-slate-900"
           >
             <Link href={`/server/${mcpServer.slug}`}>
               {tr(locale, "View Details", "Подробнее")}

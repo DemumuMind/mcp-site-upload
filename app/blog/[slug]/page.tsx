@@ -5,6 +5,7 @@ import { ArrowLeft, CalendarDays, Clock3 } from "lucide-react";
 
 import { BlogArticleBody } from "@/components/blog/blog-article-body";
 import { BlogRelatedPosts } from "@/components/blog/blog-related-posts";
+import { PageFrame } from "@/components/page-templates";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,7 +117,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
   };
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="content">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#050d1b_0%,#060b16_45%,#040811_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_20%_0%,rgba(56,189,248,0.16),transparent_45%),radial-gradient(circle_at_85%_5%,rgba(139,92,246,0.18),transparent_45%)]" />
 
@@ -164,6 +165,6 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
 
         <BlogRelatedPosts posts={relatedPosts} locale={locale} />
       </div>
-    </div>
+    </PageFrame>
   );
 }

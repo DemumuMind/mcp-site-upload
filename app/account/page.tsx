@@ -14,6 +14,7 @@ import {
 
 import { AccountProfileForms } from "@/components/account-profile-forms";
 import { AccountSignOutButton } from "@/components/account-sign-out-button";
+import { PageFrame } from "@/components/page-templates";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,8 +206,9 @@ export default async function AccountPage() {
   const isEmailVerified = Boolean(userData.user.email_confirmed_at);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-      <section className="rounded-2xl border border-white/10 bg-slate-900/72 p-6">
+    <PageFrame variant="ops">
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+        <section className="rounded-2xl border border-white/10 bg-slate-900/72 p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             {avatarUrl ? (
@@ -442,6 +444,7 @@ export default async function AccountPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </PageFrame>
   );
 }

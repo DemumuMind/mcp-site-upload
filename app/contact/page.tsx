@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageFrame } from "@/components/page-templates";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -133,7 +134,7 @@ export default async function ContactPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="content">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#031022_0%,#050d1d_45%,#030915_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] bg-[radial-gradient(circle_at_20%_5%,rgba(56,189,248,0.22),transparent_40%),radial-gradient(circle_at_80%_5%,rgba(16,185,129,0.14),transparent_38%)]" />
 
@@ -252,6 +253,6 @@ export default async function ContactPage() {
           </Card>
         </section>
       </div>
-    </div>
+    </PageFrame>
   );
 }

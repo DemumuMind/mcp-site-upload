@@ -6,6 +6,7 @@ import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
 import { BlogFilterBar } from "@/components/blog/blog-filter-bar";
 import { BlogHero } from "@/components/blog/blog-hero";
 import { BlogPostCard } from "@/components/blog/blog-post-card";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -96,7 +97,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     .filter((tagItem) => tagItem.count > 0);
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="content">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#050d1b_0%,#060b16_45%,#040811_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_15%_5%,rgba(139,92,246,0.2),transparent_38%),radial-gradient(circle_at_82%_5%,rgba(56,189,248,0.14),transparent_38%)]" />
 
@@ -188,6 +189,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         </section>
       </div>
-    </div>
+    </PageFrame>
   );
 }
