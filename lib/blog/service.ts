@@ -1,7 +1,7 @@
 import { blogPosts as diskBlogPosts, blogTags as diskBlogTags } from "@/lib/blog/content";
 import { getBlogPostsFromSupabase } from "@/lib/blog/supabase-store";
 import type { BlogPost, BlogTag } from "@/lib/blog/types";
-import { normalizeBlogSlug, toTitleFromSlug } from "@/lib/blog/slug";
+import { normalizeBlogSeriesSlug, normalizeBlogSlug, toTitleFromSlug } from "@/lib/blog/slug";
 
 export const BLOG_POSTS_CACHE_TAG = "blog-posts";
 
@@ -18,15 +18,49 @@ function normalizeValue(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function toPostKey(slug: string): string {
+  const normalizedSlug = normalizeBlogSlug(slug);
+  const seriesSlug = normalizeBlogSeriesSlug(normalizedSlug);
+  return seriesSlug || normalizedSlug;
+}
+
+function toPostSortTimestamp(post: Pick<BlogPost, "publishedAt" | "updatedAt">): number {
+  const updatedAtTimestamp = post.updatedAt ? new Date(post.updatedAt).getTime() : Number.NaN;
+  if (Number.isFinite(updatedAtTimestamp)) {
+    return updatedAtTimestamp;
+  }
+
+  const publishedAtTimestamp = new Date(post.publishedAt).getTime();
+  if (Number.isFinite(publishedAtTimestamp)) {
+    return publishedAtTimestamp;
+  }
+
+  return 0;
+}
+
+function upsertByRecency(postMap: Map<string, BlogPost>, post: BlogPost): void {
+  const key = toPostKey(post.slug);
+  const existing = postMap.get(key);
+
+  if (!existing) {
+    postMap.set(key, post);
+    return;
+  }
+
+  if (toPostSortTimestamp(post) >= toPostSortTimestamp(existing)) {
+    postMap.set(key, post);
+  }
+}
+
 function mergePosts(diskPosts: BlogPost[], databasePosts: BlogPost[]): BlogPost[] {
   const postMap = new Map<string, BlogPost>();
 
   for (const post of diskPosts) {
-    postMap.set(normalizeBlogSlug(post.slug), post);
+    upsertByRecency(postMap, post);
   }
 
   for (const post of databasePosts) {
-    postMap.set(normalizeBlogSlug(post.slug), post);
+    upsertByRecency(postMap, post);
   }
 
   return [...postMap.values()].sort(sortByPublishedDesc);
@@ -105,7 +139,15 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   const normalizedSlug = normalizeValue(slug);
   const posts = await getAllBlogPosts();
   const match = posts.find((post) => normalizeValue(post.slug) === normalizedSlug);
-  return match ?? null;
+
+  if (match) {
+    return match;
+  }
+
+  const canonicalSlug = toPostKey(normalizedSlug);
+  const canonicalMatch = posts.find((post) => toPostKey(post.slug) === canonicalSlug);
+
+  return canonicalMatch ?? null;
 }
 
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {

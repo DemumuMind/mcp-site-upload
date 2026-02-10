@@ -2,6 +2,8 @@ function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
+const trailingTimestampSuffixPattern = /-\d{9,13}$/;
+
 export function normalizeBlogSlug(value: string): string {
   const normalized = normalizeWhitespace(value)
     .toLowerCase()
@@ -11,6 +13,11 @@ export function normalizeBlogSlug(value: string): string {
     .replace(/^-|-$/g, "");
 
   return normalized;
+}
+
+export function normalizeBlogSeriesSlug(value: string): string {
+  const normalized = normalizeBlogSlug(value);
+  return normalized.replace(trailingTimestampSuffixPattern, "");
 }
 
 export function toTitleFromSlug(slug: string): string {
