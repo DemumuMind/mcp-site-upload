@@ -1,0 +1,111 @@
+name: Nightly Backup
+
+on:
+  schedule:
+    - cron: "10 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BACKUP_BUCKET: blog-automation
+      BACKUP_OBJECT_PREFIX: backups/postgres
+
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Validate backup configuration
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_SUPABASE_URL: ${{ secrets.BACKUP_SUPABASE_URL }}
+          BACKUP_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BACKUP_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+
+          [ -n "$BACKUP_DATABASE_URL" ] || {
+            echo "Missing BACKUP_DATABASE_URL secret";
+            exit 1;
+          }
+          [ -n "$BACKUP_SUPABASE_URL" ] || {
+            echo "Missing BACKUP_SUPABASE_URL secret";
+            exit 1;
+          }
+          [ -n "$BACKUP_SUPABASE_SERVICE_ROLE_KEY" ] || {
+            echo "Missing BACKUP_SUPABASE_SERVICE_ROLE_KEY secret";
+            exit 1;
+          }
+
+      - name: Create compressed Postgres dump
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p backup-artifacts
+          timestamp="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
+          dump_file="backup-artifacts/postgres-${timestamp}.sql.gz"
+          latest_file="backup-artifacts/latest.sql.gz"
+
+          pg_dump "$BACKUP_DATABASE_URL" --clean --if-exists --no-owner --no-privileges \
+            | gzip -9 > "$dump_file"
+
+          cp "$dump_file" "$latest_file"
+          test -s "$latest_file"
+
+          echo "TIMESTAMP=$timestamp" >> "$GITHUB_ENV"
+          echo "DUMP_FILE=$dump_file" >> "$GITHUB_ENV"
+          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
+
+      - name: Upload backup to Supabase Storage
+        env:
+          BACKUP_SUPABASE_URL: ${{ secrets.BACKUP_SUPABASE_URL }}
+          BACKUP_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BACKUP_SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_BUCKET: ${{ env.BACKUP_BUCKET }}
+          BACKUP_OBJECT_PREFIX: ${{ env.BACKUP_OBJECT_PREFIX }}
+        run: |
+          set -euo pipefail
+
+          base_url="${BACKUP_SUPABASE_URL%/}"
+          auth_header="Authorization: Bearer ${BACKUP_SUPABASE_SERVICE_ROLE_KEY}"
+          apikey_header="apikey: ${BACKUP_SUPABASE_SERVICE_ROLE_KEY}"
+
+          curl -fsS -X POST "$base_url/storage/v1/object/${BACKUP_BUCKET}/${BACKUP_OBJECT_PREFIX}/latest.sql.gz" \
+            -H "$auth_header" \
+            -H "$apikey_header" \
+            -H "x-upsert: true" \
+            -H "Content-Type: application/gzip" \
+            --data-binary @"$LATEST_FILE"
+
+          curl -fsS -X POST "$base_url/storage/v1/object/${BACKUP_BUCKET}/${BACKUP_OBJECT_PREFIX}/${TIMESTAMP}.sql.gz" \
+            -H "$auth_header" \
+            -H "$apikey_header" \
+            -H "x-upsert: true" \
+            -H "Content-Type: application/gzip" \
+            --data-binary @"$DUMP_FILE"
+
+      - name: Verify uploaded latest backup artifact
+        env:
+          BACKUP_SUPABASE_URL: ${{ secrets.BACKUP_SUPABASE_URL }}
+          BACKUP_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BACKUP_SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_BUCKET: ${{ env.BACKUP_BUCKET }}
+          BACKUP_OBJECT_PREFIX: ${{ env.BACKUP_OBJECT_PREFIX }}
+        run: |
+          set -euo pipefail
+
+          object_url="${BACKUP_SUPABASE_URL%/}/storage/v1/object/${BACKUP_BUCKET}/${BACKUP_OBJECT_PREFIX}/latest.sql.gz"
+          status_code="$(curl -sS -o /dev/null -w "%{http_code}" -I "$object_url" \
+            -H "Authorization: Bearer ${BACKUP_SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "apikey: ${BACKUP_SUPABASE_SERVICE_ROLE_KEY}")"
+
+          [ "$status_code" = "200" ] || {
+            echo "Backup object HEAD request failed with status $status_code";
+            exit 1;
+          }

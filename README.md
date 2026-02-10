@@ -179,6 +179,7 @@ Workflow: `.github/workflows/deploy-smoke-check.yml`
 | `.github/workflows/security.yml` | Dependency review, npm audit, secret scan |
 | `.github/workflows/deploy.yml` | Deploy orchestration to Vercel + post-deploy smoke |
 | `.github/workflows/nightly-smoke.yml` | Scheduled smoke checks against configured environment |
+| `.github/workflows/nightly-backup.yml` | Scheduled Postgres dump upload to Supabase Storage (`backups/postgres/latest.sql.gz`) |
 | `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
 
 Repository variables controlling execution:
@@ -193,6 +194,11 @@ Repository variables controlling execution:
 Optional repository secrets for remote backup checks:
 - `BACKUP_REMOTE_AUTH_HEADER` (`Header-Name: value`)
 - `BACKUP_REMOTE_BEARER_TOKEN`
+
+Required repository secrets for `.github/workflows/nightly-backup.yml`:
+- `BACKUP_DATABASE_URL` (Postgres connection string for `pg_dump`)
+- `BACKUP_SUPABASE_URL` (Supabase project URL, e.g. `https://<project>.supabase.co`)
+- `BACKUP_SUPABASE_SERVICE_ROLE_KEY` (used to upload backup objects to Storage)
 
 ## Runbooks and Ops Docs
 
