@@ -43,6 +43,15 @@ The action runs deep research + verification, then persists to Supabase:
 
 If Supabase admin credentials are unavailable in local dev, it falls back to local JSON files.
 
+`/admin/blog` also includes:
+
+- **Run RU backfill now** control for one-time normalization of legacy deep-research auto-post RU copy (table + storage)
+- **Recent backfill runs** audit list (status, counters, timestamp, run ID, optional error)
+
+To enable the audit list, apply migration:
+
+- `supabase/migrations/20260210202000_blog_backfill_runs_audit.sql`
+
 ## Scheduled auto-publishing (4+ posts/day)
 
 - Endpoint: `GET/POST /api/blog/auto-publish`
@@ -88,3 +97,21 @@ curl -X POST "https://your-domain/api/blog/auto-publish?count=1" \
 
 - Disk JSON is validated by Zod on load.
 - Supabase blog rows are validated on read; invalid rows are skipped.
+
+## RU backfill for older auto-generated posts
+
+When templates are improved, you can normalize older auto-generated RU copy in Supabase:
+
+```bash
+# preview only
+npm run blog:backfill:ru
+
+# apply changes
+npm run blog:backfill:ru -- --apply
+```
+
+What it updates (legacy auto posts only):
+
+- RU excerpt and SEO description
+- RU findings phrasing (`Сигнал N ...`)
+- RU section headings / helper text in research blocks

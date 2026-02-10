@@ -5,6 +5,11 @@ import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createBlogPostFromResearch, parseTagList } from "@/lib/blog/automation";
+import {
+  persistBlogRuBackfillRun,
+  runBlogRuBackfill,
+  type BlogRuBackfillResult,
+} from "@/lib/blog/backfill";
 import { runDeepResearchWorkflow } from "@/lib/blog/research";
 import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
@@ -44,6 +49,25 @@ function getErrorMessage(error: unknown) {
   }
 
   return "Unexpected error";
+}
+
+function createEmptyBackfillResult(): BlogRuBackfillResult {
+  const emptyStats = {
+    scanned: 0,
+    legacy: 0,
+    changed: 0,
+    applied: 0,
+    errors: 0,
+    skipped: true,
+  };
+
+  return {
+    table: emptyStats,
+    storage: emptyStats,
+    changed: 0,
+    applied: 0,
+    errors: 0,
+  };
 }
 
 export async function loginAdminAction(formData: FormData) {
@@ -133,8 +157,11 @@ export async function createBlogPostFromDeepResearchAction(formData: FormData) {
     redirect("/admin/blog?error=missing_required_fields");
   }
 
+  let packet: Awaited<ReturnType<typeof runDeepResearchWorkflow>>;
+  let result: Awaited<ReturnType<typeof createBlogPostFromResearch>>;
+
   try {
-    const packet = await runDeepResearchWorkflow({
+    packet = await runDeepResearchWorkflow({
       topic,
       angle: angle || undefined,
       tags,
@@ -143,25 +170,84 @@ export async function createBlogPostFromDeepResearchAction(formData: FormData) {
       locale,
     });
 
-    const result = await createBlogPostFromResearch({
+    result = await createBlogPostFromResearch({
       packet,
       slug,
       titleEn,
       titleRu,
       tags,
     });
-
-    revalidatePath("/blog");
-    revalidatePath(`/blog/${result.slug}`);
-    revalidatePath("/sitemap.xml");
-    revalidatePath("/admin/blog");
-    updateTag(BLOG_POSTS_CACHE_TAG);
-
-    redirect(
-      `/admin/blog?success=created&slug=${encodeURIComponent(result.slug)}&research=${encodeURIComponent(packet.id)}&sources=${result.sourceCount}`,
-    );
   } catch (error) {
     const message = getErrorMessage(error);
     redirect(`/admin/blog?error=${encodeURIComponent(message)}`);
   }
+
+  revalidatePath("/blog");
+  revalidatePath(`/blog/${result.slug}`);
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/admin/blog");
+  updateTag(BLOG_POSTS_CACHE_TAG);
+
+  redirect(
+    `/admin/blog?success=created&slug=${encodeURIComponent(result.slug)}&research=${encodeURIComponent(packet.id)}&sources=${result.sourceCount}`,
+  );
+}
+
+export async function runRuBlogBackfillAction(formData: FormData) {
+  await assertAdminSession();
+
+  const limit = parseBoundedInt(formData.get("backfillLimit"), 500, 1, 5000);
+  let result: BlogRuBackfillResult;
+  let runId: string | undefined;
+
+  try {
+    result = await runBlogRuBackfill({
+      apply: true,
+      limit,
+    });
+
+    const persistResult = await persistBlogRuBackfillRun({
+      apply: true,
+      limit,
+      result,
+    });
+    runId = persistResult.runId;
+  } catch (error) {
+    const message = getErrorMessage(error);
+
+    try {
+      await persistBlogRuBackfillRun({
+        apply: true,
+        limit,
+        result: createEmptyBackfillResult(),
+        status: "failed",
+        errorMessage: message,
+      });
+    } catch {
+      // Ignore audit persistence failures to avoid blocking admin remediation actions.
+    }
+
+    redirect(`/admin/blog?error=${encodeURIComponent(`backfill_failed: ${message}`)}`);
+  }
+
+  revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/admin/blog");
+  updateTag(BLOG_POSTS_CACHE_TAG);
+
+  const params = new URLSearchParams({
+    success: "backfill",
+    backfillChanged: String(result.changed),
+    backfillApplied: String(result.applied),
+    backfillErrors: String(result.errors),
+    backfillTableChanged: String(result.table.changed),
+    backfillStorageChanged: String(result.storage.changed),
+    backfillLimit: String(limit),
+  });
+
+  if (runId) {
+    params.set("backfillRunId", runId);
+  }
+
+  redirect(`/admin/blog?${params.toString()}`);
 }
