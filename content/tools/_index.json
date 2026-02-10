@@ -1,0 +1,19 @@
+{
+  "section": "tools",
+  "locale": {
+    "en": {
+      "title": "Tools",
+      "description": "Token calculator, rules generator, and date/time localizer for MCP projects.",
+      "eyebrow": "Builder Utilities",
+      "heroTitle": "Utility Toolkit for MCP Teams",
+      "heroDescription": "Estimate prompt cost, generate delivery rules, and localize date-time formats for cross-regional operations."
+    },
+    "ru": {
+      "title": "Инструменты",
+      "description": "Калькулятор токенов, генератор правил и локализатор даты/времени для MCP-проектов.",
+      "eyebrow": "Инструменты разработчика",
+      "heroTitle": "Utility-набор для MCP-команд",
+      "heroDescription": "Оценивайте стоимость промптов, генерируйте правила доставки и локализуйте дату/время для кросс-региональной работы."
+    }
+  }
+}

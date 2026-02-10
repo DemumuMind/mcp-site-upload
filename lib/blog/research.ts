@@ -512,7 +512,8 @@ export function buildDraftPostFromResearch({
     (point) => `${point.title}. ${point.summary} Supporting sources: ${point.supportingSourceIds.join(", ")}.`,
   );
   const keyPointLinesRu = packet.keyPoints.map(
-    (point) => `${point.title}. ${point.summary} Подтверждающие источники: ${point.supportingSourceIds.join(", ")}.`,
+    (point, index) =>
+      `Сигнал ${index + 1}: подтверждён в независимых источниках (${point.supportingSourceIds.join(", ")}).`,
   );
 
   const sourceBullets = packet.sources.map(
@@ -561,14 +562,14 @@ export function buildDraftPostFromResearch({
       },
       ru: {
         title: titleRu,
-        excerpt: `Материал подготовлен на основе ${packet.sources.length} актуальных источников по теме: ${packet.topic}.`,
+        excerpt: `Материал подготовлен на основе ${packet.sources.length} актуальных источников с обязательной многоэтапной проверкой.`,
         seoTitle: titleRu,
-        seoDescription: `Статья на основе deep research по теме ${packet.topic} с многоэтапной проверкой источников.`,
+        seoDescription: "Статья на основе deep research с проверкой релевантности, свежести, разнообразия доменов и подтверждения сигналов.",
         contentBlocks: [
           {
             heading: "Область исследования",
             paragraphs: [
-              `Тема: ${packet.topic}. ${packet.angle ? `Фокус: ${packet.angle}.` : ""}`,
+              `Тема материала: ${titleRu}.`,
               `Источники отобраны за последние ${packet.recencyDays} дней и прошли многоэтапную верификацию.`,
             ],
           },

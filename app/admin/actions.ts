@@ -38,6 +38,10 @@ function parseBoundedInt(value: FormDataEntryValue | null, fallback: number, min
   return Math.max(min, Math.min(max, parsed));
 }
 
+function toCheckedBoolean(value: FormDataEntryValue | null): boolean {
+  return value === "on";
+}
+
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
     return error.message;
@@ -111,6 +115,57 @@ export async function moderateServerStatusAction(formData: FormData) {
   revalidatePath("/admin");
   updateTag(CATALOG_SERVERS_CACHE_TAG);
   redirect(`/admin?success=${nextStatus}`);
+}
+
+export async function saveAdminDashboardSettingsAction(formData: FormData) {
+  await assertAdminSession();
+
+  const statusUpdateIntervalSec = parseBoundedInt(
+    formData.get("statusUpdateIntervalSec"),
+    5,
+    1,
+    300,
+  );
+  const requestLimitPerMinute = parseBoundedInt(
+    formData.get("requestLimitPerMinute"),
+    1_000,
+    1,
+    100_000,
+  );
+  const notifyEmailOnErrors = toCheckedBoolean(formData.get("notifyEmailOnErrors"));
+  const notifyPushNotifications = toCheckedBoolean(formData.get("notifyPushNotifications"));
+  const notifyWebhookIntegrations = toCheckedBoolean(formData.get("notifyWebhookIntegrations"));
+
+  const adminClient = createSupabaseAdminClient();
+
+  if (!adminClient) {
+    redirect("/admin?error=supabase");
+  }
+
+  const { error } = await adminClient.from("admin_dashboard_settings").upsert(
+    {
+      id: 1,
+      status_update_interval_sec: statusUpdateIntervalSec,
+      request_limit_per_minute: requestLimitPerMinute,
+      notify_email_on_errors: notifyEmailOnErrors,
+      notify_push_notifications: notifyPushNotifications,
+      notify_webhook_integrations: notifyWebhookIntegrations,
+    },
+    { onConflict: "id" },
+  );
+
+  if (error) {
+    redirect(`/admin?error=${encodeURIComponent(error.message)}`);
+  }
+
+  await adminClient.from("admin_system_events").insert({
+    level: "info",
+    message_en: "Admin dashboard settings updated",
+    message_ru: "Настройки админ-панели обновлены",
+  });
+
+  revalidatePath("/admin");
+  redirect("/admin?success=settings");
 }
 
 export async function createBlogPostFromDeepResearchAction(formData: FormData) {

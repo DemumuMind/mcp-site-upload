@@ -1,0 +1,19 @@
+{
+  "section": "catalog",
+  "locale": {
+    "en": {
+      "title": "AI Tools Directory",
+      "description": "Discover and filter MCP tools, models, and services in one directory.",
+      "eyebrow": "Directory Control Center",
+      "heroTitle": "Find Trusted MCP Servers Faster",
+      "heroDescription": "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework."
+    },
+    "ru": {
+      "title": "Каталог AI-инструментов",
+      "description": "Открывайте и фильтруйте MCP-инструменты, модели и сервисы в одном каталоге.",
+      "eyebrow": "Центр управления каталогом",
+      "heroTitle": "Находите надёжные MCP-серверы быстрее",
+      "heroDescription": "Ищите по категории, модели аутентификации и capability-тегам. Сравнивайте варианты и переходите к интеграции с меньшими затратами."
+    }
+  }
+}

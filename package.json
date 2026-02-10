@@ -10,6 +10,7 @@
     "check:utf8:strict": "node scripts/check-utf8.mjs --strict-missing",
     "lint": "eslint .",
     "blog:new": "node scripts/blog-new-post.mjs",
+    "catalog:new": "node scripts/catalog-new-entry.mjs",
     "blog:backfill:ru": "node scripts/blog-backfill-ru.mjs",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "test:e2e": "playwright test",

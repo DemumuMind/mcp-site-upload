@@ -4,6 +4,7 @@
 [![Deploy](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/deploy.yml?branch=main&label=Deploy)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/deploy.yml)
 [![Security](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/security.yml?branch=main&label=Security)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/security.yml)
 [![Nightly Smoke](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/nightly-smoke.yml?branch=main&label=Nightly%20Smoke)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/nightly-smoke.yml)
+[![Supabase Migrations](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/supabase-migrations.yml?branch=main&label=Supabase%20Migrations)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/supabase-migrations.yml)
 
 Community-curated catalog of MCP (Model Context Protocol) servers with:
 - searchable public catalog
@@ -53,13 +54,23 @@ npm run dev
 | `SUPABASE_SERVICE_ROLE_KEY` | required for admin + health updates | server-side privileged Supabase access |
 | `ADMIN_ACCESS_TOKEN` | required for `/admin` | cookie-based admin auth token |
 | `HEALTH_CHECK_CRON_SECRET` | one of two required | bearer token for `/api/health-check` |
-| `CRON_SECRET` | one of two required | Vercel Cron-compatible alias |
+| `BLOG_AUTOPUBLISH_CRON_SECRET` | recommended | bearer token for `/api/blog/auto-publish` |
+| `CATALOG_AUTOSYNC_CRON_SECRET` | recommended | bearer token for `/api/catalog/auto-sync` |
+| `CRON_SECRET` | one of two required | shared Vercel Cron-compatible alias for all cron endpoints |
+| `EXA_API_KEY` | required for blog automation | deep research provider key for auto blog posts |
+| `CATALOG_AUTOSYNC_REGISTRY_URL` | optional | MCP Registry base URL override |
+| `CATALOG_AUTOSYNC_PAGE_LIMIT` | optional | page size per registry fetch (default `100`) |
+| `CATALOG_AUTOSYNC_MAX_PAGES` | optional | max pages per sync run (default `60`) |
+| `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` | optional | enable stale auto-row cleanup (default `true`) |
+| `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` | optional | filter obvious test/staging/template entries (default `true`) |
+| `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
+| `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to auto-reject noisy entries |
 
 Notes:
 - If Supabase env vars are missing, app falls back to local mock data for public catalog.
 - User auth callbacks use `/auth/callback`. Configure this URL in Supabase Auth provider settings for each environment.
 - `/submit-server` and `/account` are protected routes and require a valid user session.
-- For production cron auth, set either `HEALTH_CHECK_CRON_SECRET` or `CRON_SECRET` (can be same value).
+- For production cron auth, set either route-specific secrets (`HEALTH_CHECK_CRON_SECRET`, `BLOG_AUTOPUBLISH_CRON_SECRET`, `CATALOG_AUTOSYNC_CRON_SECRET`) or one shared `CRON_SECRET`.
 
 ## Database Migrations
 
@@ -93,6 +104,41 @@ Scheduler:
 
 Detailed operational notes: `docs/health-check-runbook.md`.
 
+## Catalog Auto-Sync
+
+Endpoint:
+- `GET/POST /api/catalog/auto-sync`
+
+Auth:
+- `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
+
+Manual trigger:
+
+```bash
+curl -X POST "http://localhost:3000/api/catalog/auto-sync?limit=100&pages=60&cleanupStale=true&qualityFilter=true" \
+  -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
+```
+
+Default Vercel cron schedule:
+- `01:45` UTC
+- `07:45` UTC
+- `13:45` UTC
+- `19:45` UTC
+
+Behavior:
+- pulls MCP servers from the public MCP Registry API
+- creates new `active` catalog entries automatically
+- applies denylist/allowlist moderation patterns (allowlist overrides denylist)
+- filters obvious low-quality records (test/demo/staging/template signals)
+- updates only previously auto-managed rows (`registry-auto` tag)
+- marks stale auto-managed rows as `rejected` when they disappear from registry
+- stale cleanup runs only after a full pagination sweep (safety guard)
+- leaves manually curated rows unchanged
+
+Moderation pattern syntax:
+- wildcard patterns (e.g. `ai-smithery-*-test*`)
+- regex patterns wrapped with slashes (e.g. `/^live-alpic-staging-/i`)
+
 ## Scripts
 
 ```bash
@@ -124,14 +170,17 @@ This means catalog cards remain usable even when upstream DB rows are incomplete
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ADMIN_ACCESS_TOKEN`
-   - `CRON_SECRET` (or `HEALTH_CHECK_CRON_SECRET`)
+   - `CRON_SECRET` (or route-specific cron secrets)
    - `NEXT_PUBLIC_SITE_URL` (your production domain)
+   - `EXA_API_KEY` (for blog auto-publish)
+   - optional: `CATALOG_AUTOSYNC_PAGE_LIMIT`, `CATALOG_AUTOSYNC_MAX_PAGES`, `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED`, `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS`, `CATALOG_AUTOSYNC_DENYLIST_PATTERNS`
 3. Confirm `vercel.json` cron is detected.
 4. Deploy and verify:
    - home page and server detail pages
    - `/sitemap.xml`
    - `/robots.txt`
    - `/api/health-check` (authorized manual call)
+   - `/api/catalog/auto-sync` (authorized manual call)
 
 ## Post-Deploy Smoke Check
 
@@ -179,8 +228,8 @@ Workflow: `.github/workflows/deploy-smoke-check.yml`
 | `.github/workflows/security.yml` | Dependency review, npm audit, secret scan |
 | `.github/workflows/deploy.yml` | Deploy orchestration to Vercel + post-deploy smoke |
 | `.github/workflows/nightly-smoke.yml` | Scheduled smoke checks against configured environment |
-| `.github/workflows/nightly-backup.yml` | Scheduled Postgres dump upload to Supabase Storage (`backups/postgres/latest.sql.gz`) |
 | `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
+| `.github/workflows/supabase-migrations.yml` | Auto/manual Supabase migration push to remote DB |
 
 Repository variables controlling execution:
 - `SMOKE_ENABLED=true` enables automatic smoke checks via `SMOKE_BASE_URL`.
@@ -190,15 +239,14 @@ Repository variables controlling execution:
 - `BACKUP_REMOTE_CHECK_URL` sets remote object URL (optional when manifest location is reachable from runner).
 - `BACKUP_REMOTE_CHECK_METHOD=auto|http|aws-cli` controls validation strategy (`auto` by default).
 - `BACKUP_REMOTE_S3_REGION` sets region for S3 probe fallback.
+- `SUPABASE_MIGRATIONS_ENABLED=true` enables remote migration workflow (`supabase-migrations.yml`).
 
 Optional repository secrets for remote backup checks:
 - `BACKUP_REMOTE_AUTH_HEADER` (`Header-Name: value`)
 - `BACKUP_REMOTE_BEARER_TOKEN`
 
-Required repository secrets for `.github/workflows/nightly-backup.yml`:
-- `BACKUP_DATABASE_URL` (Postgres connection string for `pg_dump`)
-- `BACKUP_SUPABASE_URL` (Supabase project URL, e.g. `https://<project>.supabase.co`)
-- `BACKUP_SUPABASE_SERVICE_ROLE_KEY` (used to upload backup objects to Storage)
+Required repository secret for Supabase migration workflow:
+- `SUPABASE_DB_URL` (remote Postgres connection string for `supabase db push --db-url ...`)
 
 ## Runbooks and Ops Docs
 
@@ -208,6 +256,8 @@ Required repository secrets for `.github/workflows/nightly-backup.yml`:
 - Incident runbook: `docs/runbooks/incident.md`
 - Restore runbook: `docs/runbooks/restore.md`
 - Security runbook: `docs/runbooks/security.md`
+- Catalog automation runbook: `docs/catalog-automation.md`
+- Admin dashboard analytics rollout: `docs/runbooks/admin-dashboard-analytics-rollout.md`
 - Backup manifest template: `ops/backup-manifest.example.json`
 - Runtime backup manifest path: `ops/backup-manifest.json` (gitignored)
 

@@ -19,6 +19,22 @@
     {
       "path": "/api/blog/auto-publish",
       "schedule": "15 18 * * *"
+    },
+    {
+      "path": "/api/catalog/auto-sync",
+      "schedule": "45 1 * * *"
+    },
+    {
+      "path": "/api/catalog/auto-sync",
+      "schedule": "45 7 * * *"
+    },
+    {
+      "path": "/api/catalog/auto-sync",
+      "schedule": "45 13 * * *"
+    },
+    {
+      "path": "/api/catalog/auto-sync",
+      "schedule": "45 19 * * *"
     }
   ]
 }

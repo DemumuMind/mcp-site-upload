@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Heart, Star } from "lucide-react";
 
 import { useLocale } from "@/components/locale-provider";
+import { ServerLogo } from "@/components/server-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,13 +19,6 @@ type ServerCardProps = {
   mcpServer: McpServer;
   viewMode?: ServerCardViewMode;
   score?: number;
-};
-
-type LogoStyle = {
-  symbol: string;
-  symbolClassName: string;
-  wordmark?: string;
-  wordmarkClassName?: string;
 };
 
 const verificationLabelByLevel: Record<VerificationLevel, { en: string; ru: string }> = {
@@ -44,75 +38,6 @@ const accentClassByLevel: Record<VerificationLevel, string> = {
   partner: "from-sky-50 via-blue-50 to-indigo-100",
   community: "from-emerald-50 via-cyan-50 to-sky-100",
 };
-
-const logoStyleBySlug: Record<string, LogoStyle> = {
-  linear: {
-    symbol: "◩",
-    symbolClassName: "text-slate-900",
-    wordmark: "Linear",
-    wordmarkClassName: "text-slate-900",
-  },
-  github: {
-    symbol: "◉",
-    symbolClassName: "text-slate-900",
-    wordmark: "GitHub",
-    wordmarkClassName: "text-slate-900",
-  },
-  figma: {
-    symbol: "⬣",
-    symbolClassName: "text-fuchsia-500",
-    wordmark: "Figma",
-    wordmarkClassName: "text-slate-900",
-  },
-  sentry: {
-    symbol: "⟟",
-    symbolClassName: "text-slate-900",
-    wordmark: "Sentry",
-    wordmarkClassName: "text-slate-900",
-  },
-  slack: {
-    symbol: "✶",
-    symbolClassName: "text-violet-500",
-    wordmark: "Slack",
-    wordmarkClassName: "text-slate-900",
-  },
-  postgres: {
-    symbol: "◍",
-    symbolClassName: "text-sky-600",
-    wordmark: "Postgres",
-    wordmarkClassName: "text-slate-900",
-  },
-};
-
-function getInitials(name: string): string {
-  const words = name
-    .split(/\s+/)
-    .map((word) => word.trim())
-    .filter(Boolean);
-
-  if (words.length === 0) {
-    return "MCP";
-  }
-
-  if (words.length === 1) {
-    return words[0].slice(0, 3).toUpperCase();
-  }
-
-  return `${words[0][0]}${words[1][0]}`.toUpperCase();
-}
-
-function resolveLogoStyle(mcpServer: McpServer): LogoStyle {
-  const predefined = logoStyleBySlug[mcpServer.slug];
-
-  if (predefined) {
-    return predefined;
-  }
-
-  return {
-    symbol: getInitials(mcpServer.name),
-    symbolClassName: "text-slate-900",
-  };
-}
 
 function getProductBadge(mcpServer: McpServer): { en: string; ru: string } {
   const loweredCategory = mcpServer.category.toLowerCase();
@@ -140,7 +65,6 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
   const [saved, setSaved] = useState(false);
 
   const rating = useMemo(() => getRatingValue(mcpServer, score), [mcpServer, score]);
-  const logoStyle = useMemo(() => resolveLogoStyle(mcpServer), [mcpServer]);
   const productBadge = useMemo(() => getProductBadge(mcpServer), [mcpServer]);
   const verificationLabel = verificationLabelByLevel[mcpServer.verificationLevel];
   const accessLabel = accessLabelByAuthType[mcpServer.authType];
@@ -185,14 +109,14 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
           </div>
 
           <div className="mt-auto flex flex-col items-center justify-center pb-2 text-center">
-            <p className={cn("text-5xl leading-none font-black tracking-tight", logoStyle.symbolClassName)}>
-              {logoStyle.symbol}
-            </p>
-            {logoStyle.wordmark ? (
-              <p className={cn("mt-2 text-sm font-bold tracking-tight", logoStyle.wordmarkClassName)}>
-                {logoStyle.wordmark}
-              </p>
-            ) : null}
+            <ServerLogo
+              mcpServer={mcpServer}
+              className="size-20"
+              imageClassName="h-full w-full object-contain p-2"
+              symbolClassName="text-4xl leading-none"
+              showWordmark
+              wordmarkClassName="text-slate-900"
+            />
           </div>
         </div>
       </div>

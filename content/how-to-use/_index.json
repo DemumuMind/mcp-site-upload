@@ -1,0 +1,19 @@
+{
+  "section": "how-to-use",
+  "locale": {
+    "en": {
+      "title": "Setup Guide",
+      "description": "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
+      "eyebrow": "Developer-First Onboarding",
+      "heroTitle": "Setup Guide",
+      "heroDescription": "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely."
+    },
+    "ru": {
+      "title": "Гайд по настройке",
+      "description": "Пошаговый гайд по подключению MCP-серверов и проверке вызовов инструментов.",
+      "eyebrow": "Developer-first онбординг",
+      "heroTitle": "Гайд по настройке",
+      "heroDescription": "Практический гайд по подключению MCP-серверов, проверке trust/auth-сигналов и безопасному выходу в production."
+    }
+  }
+}

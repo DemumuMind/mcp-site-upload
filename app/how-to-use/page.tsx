@@ -18,19 +18,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
+import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("how-to-use"), locale);
 
   return {
-    title: tr(locale, "Setup Guide", "Гайд по настройке"),
-    description: tr(
-      locale,
-      "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
-      "Пошаговый гайд по подключению MCP-серверов и проверке вызовов инструментов.",
-    ),
+    title: sectionCopy?.title ?? tr(locale, "Setup Guide", "Гайд по настройке"),
+    description:
+      sectionCopy?.description ??
+      tr(
+        locale,
+        "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
+        "Пошаговый гайд по подключению MCP-серверов и проверке вызовов инструментов.",
+      ),
   };
 }
 
@@ -241,6 +245,7 @@ const bestPractices = [
 
 export default async function HowToUsePage() {
   const locale = await getLocale();
+  const sectionCopy = getSectionLocaleCopy(getSectionIndex("how-to-use"), locale);
   const catalogSnapshot = await getCatalogSnapshot({ featuredLimit: 1 });
   const sampleServer = catalogSnapshot.sampleServer;
 
@@ -254,19 +259,21 @@ export default async function HowToUsePage() {
         <div className="space-y-5 rounded-3xl border border-cyan-400/25 bg-slate-950/72 p-6 sm:p-10">
           <Badge className="w-fit border-cyan-400/35 bg-cyan-500/10 text-cyan-200">
             <Sparkles className="size-3" />
-            {tr(locale, "Developer-First Onboarding", "Developer-first онбординг")}
+            {sectionCopy?.eyebrow ??
+              tr(locale, "Developer-First Onboarding", "Developer-first онбординг")}
           </Badge>
 
           <div className="space-y-3">
             <h1 className="text-4xl font-semibold tracking-tight text-slate-100 sm:text-6xl">
-              {tr(locale, "Setup Guide", "Гайд по настройке")}
+              {sectionCopy?.heroTitle ?? tr(locale, "Setup Guide", "Гайд по настройке")}
             </h1>
             <p className="max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">
-              {tr(
-                locale,
-                "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.",
-                "Практический гайд по подключению MCP-серверов, проверке trust/auth-сигналов и безопасному выходу в production.",
-              )}
+              {sectionCopy?.heroDescription ??
+                tr(
+                  locale,
+                  "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.",
+                  "Практический гайд по подключению MCP-серверов, проверке trust/auth-сигналов и безопасному выходу в production.",
+                )}
             </p>
           </div>
 
