@@ -1,12 +1,12 @@
 {
-  "slug": "cost-governance-in-agentic-engineering-workflows-1770736024",
+  "slug": "cost-governance-in-agentic-engineering-workflows",
   "tags": [
     "operations",
     "workflow",
     "quality"
   ],
-  "publishedAt": "2026-02-10T15:07:11.265Z",
-  "updatedAt": "2026-02-10T17:03:11.096Z",
+  "publishedAt": "2026-02-10T15:41:13.270Z",
+  "updatedAt": "2026-02-10T17:03:11.100Z",
   "readTimeMinutes": 3,
   "featured": false,
   "locale": {
@@ -26,11 +26,11 @@
         {
           "heading": "Verified findings",
           "paragraphs": [
-            "Signal 1: agentic. Repeated in 4 independent sources. Supporting sources: src-10, src-2, src-7, src-8.",
-            "Signal 2: governance. Repeated in 3 independent sources. Supporting sources: src-2, src-12, src-8.",
-            "Signal 3: model. Repeated in 2 independent sources. Supporting sources: src-10, src-6.",
-            "Signal 4: learn. Repeated in 2 independent sources. Supporting sources: src-10, src-12.",
-            "Signal 5: why. Repeated in 2 independent sources. Supporting sources: src-10, src-6."
+            "Signal 1: agentic. Repeated in 4 independent sources. Supporting sources: src-9, src-2, src-7, src-14.",
+            "Signal 2: governance. Repeated in 3 independent sources. Supporting sources: src-2, src-11, src-7.",
+            "Signal 3: model. Repeated in 2 independent sources. Supporting sources: src-9, src-6.",
+            "Signal 4: learn. Repeated in 2 independent sources. Supporting sources: src-9, src-11.",
+            "Signal 5: why. Repeated in 2 independent sources. Supporting sources: src-9, src-6."
           ]
         },
         {
@@ -41,10 +41,10 @@
           "bullets": [
             "Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... — https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)",
             "Governance lags agentic AI adoption in the UK, says Salesforce — https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)",
-            "The Business Value Of Agentic AI: Three Key Pillars For Scaling ... — https://www.forbes.com/councils/forbestechcouncil/2026/02/09/whats-the-business-value-of-agentic-ai-three-key-pillars-for-scaling-ai-agents/ (2026-02-09)",
             "AI Agent Governance Blueprint for Production Deployment — https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)",
             "Serving LLMs Without Breaking the Bank — https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)",
-            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)"
+            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)",
+            "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy — https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)"
           ]
         }
       ]
@@ -65,11 +65,11 @@
         {
           "heading": "Подтверждённые выводы",
           "paragraphs": [
-            "Сигнал 1: подтверждён в независимых источниках (src-10, src-2, src-7, src-8).",
-            "Сигнал 2: подтверждён в независимых источниках (src-2, src-12, src-8).",
-            "Сигнал 3: подтверждён в независимых источниках (src-10, src-6).",
-            "Сигнал 4: подтверждён в независимых источниках (src-10, src-12).",
-            "Сигнал 5: подтверждён в независимых источниках (src-10, src-6)."
+            "Сигнал 1: подтверждён в независимых источниках (src-9, src-2, src-7, src-14).",
+            "Сигнал 2: подтверждён в независимых источниках (src-2, src-11, src-7).",
+            "Сигнал 3: подтверждён в независимых источниках (src-9, src-6).",
+            "Сигнал 4: подтверждён в независимых источниках (src-9, src-11).",
+            "Сигнал 5: подтверждён в независимых источниках (src-9, src-6)."
           ]
         },
         {
@@ -80,26 +80,26 @@
           "bullets": [
             "Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... — https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)",
             "Governance lags agentic AI adoption in the UK, says Salesforce — https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)",
-            "The Business Value Of Agentic AI: Three Key Pillars For Scaling ... — https://www.forbes.com/councils/forbestechcouncil/2026/02/09/whats-the-business-value-of-agentic-ai-three-key-pillars-for-scaling-ai-agents/ (2026-02-09)",
             "AI Agent Governance Blueprint for Production Deployment — https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)",
             "Serving LLMs Without Breaking the Bank — https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)",
-            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)"
+            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)",
+            "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy — https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)"
           ]
         }
       ]
     }
   },
   "research": {
-    "packetId": "cost-governance-in-agentic-development-1770736031262",
+    "packetId": "cost-governance-in-agentic-development-1770738073268",
     "provider": "exa-search-deep",
-    "createdAt": "2026-02-10T15:07:11.262Z",
-    "verifiedAt": "2026-02-10T15:07:11.265Z",
+    "createdAt": "2026-02-10T15:41:13.268Z",
+    "verifiedAt": "2026-02-10T15:41:13.270Z",
     "sourceCount": 6,
     "verificationRounds": [
       {
         "round": "relevance",
         "passed": true,
-        "details": "Selected 6 essential sources (avg relevance 19.3)."
+        "details": "Selected 6 essential sources (avg relevance 19.2)."
       },
       {
         "round": "freshness",
