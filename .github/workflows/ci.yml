@@ -44,6 +44,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Auth E2E (Playwright)
+        run: npm run test:e2e:auth
+
+
       - name: Resolve smoke target
         id: smoke_target
         shell: bash

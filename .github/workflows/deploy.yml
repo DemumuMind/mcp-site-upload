@@ -66,6 +66,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Auth E2E (Playwright)
+        run: npm run test:e2e:auth
+
       - name: Resolve deployment mode
         id: deploy_mode
         shell: bash

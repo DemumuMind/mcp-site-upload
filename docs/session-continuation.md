@@ -1,4 +1,153 @@
-﻿## Latest Update (2026-02-10, RU/EN Localization Hardening + i18n Smoke Gate)
+﻿## Latest Update (2026-02-10, README Badges Expanded: Security + Nightly Smoke)
+- Objective: make pipeline monitoring more complete directly from README.
+- Status: completed.
+- Touched files:
+  - `README.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added two additional GitHub Actions status badges near the top of README:
+    - `Security` (`security.yml`)
+    - `Nightly Smoke` (`nightly-smoke.yml`)
+  - Existing badges for `CI + Auth E2E` and `Deploy` were preserved.
+- Verification commands:
+  - `npm run lint`
+- Verification results:
+  - lint: pass.
+- Open risks:
+  - Badge URLs depend on current repository slug `DemumuMind/mcp-site-upload`; if repo slug changes, links must be updated.
+## Latest Update (2026-02-10, README Badges for CI/Auth E2E + Deploy)
+- Objective: show visible pipeline status in README, including auth e2e gate coverage.
+- Status: completed.
+- Touched files:
+  - `README.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added GitHub Actions status badges at top of README:
+    - `CI + Auth E2E` badge (based on `ci.yml`, branch `main`)
+    - `Deploy` badge (based on `deploy.yml`, branch `main`)
+  - Badge links point to corresponding workflow run pages in GitHub Actions.
+- Verification commands:
+  - `npm run lint`
+- Verification results:
+  - lint: pass.
+- Open risks:
+  - Badges are tied to repository slug `DemumuMind/mcp-site-upload`; if repo is renamed or transferred, badge URLs must be updated.
+## Latest Update (2026-02-10, Deploy Workflow Auth E2E Gate Enabled)
+- Objective: prevent Vercel deployment when auth flow regressions appear.
+- Status: completed.
+- Touched files:
+  - `.github/workflows/deploy.yml`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added `Auth E2E (Playwright)` step to deploy workflow (`deploy` job), right after build:
+    - `npm run test:e2e:auth`
+  - Deploy pipeline now blocks before `vercel pull/build/deploy` if auth e2e fails.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `npm run test:e2e:auth`
+- Verification results:
+  - lint: pass
+  - build: pass
+  - Playwright auth e2e: pass (`2 passed`).
+- Open risks:
+  - Deploy CI duration increases by auth e2e runtime (~30s in current setup).
+  - Playwright dev-server run logs `allowedDevOrigins` warning from Next.js; non-blocking for now.
+## Latest Update (2026-02-10, CI Auth E2E Gate Enabled)
+- Objective: wire auth Playwright regression tests into GitHub Actions CI.
+- Status: completed.
+- Touched files:
+  - `.github/workflows/ci.yml`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added `Auth E2E (Playwright)` step to main CI workflow (`lint-build-smoke` job):
+    - runs `npm run test:e2e:auth` after build.
+  - This makes auth flow regressions (signup/reset/check-email step) blocking on PRs and main pushes.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `npm run test:e2e:auth`
+- Verification results:
+  - lint: pass
+  - build: pass
+  - Playwright auth e2e: pass (`2 passed`).
+- Open risks:
+  - Local build can intermittently fail on stale `.next/dev` type artifacts; resolved in this session by clearing `.next` before rerun.
+  - Playwright run logs warning about Next.js `allowedDevOrigins` in dev-mode test server; currently non-blocking.
+## Latest Update (2026-02-10, Blog Auto-Publish Production Recovery + RU Quality Hardening)
+- Objective: restore reliable production auto-publish persistence and improve RU quality in generated deep-research posts.
+- Status: completed.
+- Touched files:
+  - `lib/blog/supabase-store.ts`
+  - `lib/blog/research.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Adjusted Supabase blog read client priority to use admin client first (`createSupabaseAdminClient() ?? createSupabaseServerClient()`), preventing read failures from private storage in server rendering paths.
+  - Improved Russian generation templates for new deep-research posts:
+    - removed forced EN topic injection in RU excerpt/SEO;
+    - made RU key findings fully localized (`Сигнал N ...`);
+    - localized RU research section labels and fallback text.
+  - Deployed production build and ran on-demand auto-publish.
+  - Verified one fresh post was created in production with corrected RU content.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `vercel --prod --yes`
+  - `POST https://mcp-site-silk.vercel.app/api/blog/auto-publish?count=1` (Bearer cron secret)
+  - Playwright checks:
+    - `https://mcp-site-silk.vercel.app/blog`
+    - `https://mcp-site-silk.vercel.app/blog/cost-governance-in-agentic-engineering-workflows-1770742149`
+  - URL checks:
+    - `/blog/<new-slug>`
+    - `/blog`
+    - `/sitemap.xml`
+- Verification results:
+  - lint: pass
+  - build: pass
+  - production deploy: pass (aliased to `https://mcp-site-silk.vercel.app`)
+  - auto-publish: pass (`createdCount=1`, storage target `supabase://storage/...`)
+  - RU rendering: pass for latest generated article (title/excerpt/findings/section labels in Russian)
+  - new post visibility: pass on post page, blog listing, and sitemap.
+- Next commands:
+  - Optional: run SQL migration `supabase/migrations/20260210161000_blog_posts_automation.sql` remotely once DB connectivity is available, to switch from storage fallback to table-first persistence.
+  - Optional: run a backfill script to normalize older auto-generated posts that still contain legacy mixed RU/EN phrasing.
+- Open risks:
+  - Existing previously generated posts keep old text templates; only newly generated posts use corrected RU copy.
+
+## Latest Update (2026-02-10, Password Rules Checklist in Signup + Reset)
+- Objective: add a live password-requirements checklist in auth flows as the next requested step.
+- Status: completed.
+- Touched files:
+  - `lib/password-strength.ts`
+  - `components/auth-sign-in-panel.tsx`
+  - `components/auth-reset-password-panel.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added reusable password rule checks (`getPasswordRuleChecks`) and shared minimum length constant (`PASSWORD_MIN_LENGTH`).
+  - Updated signup form (`/auth`, sign-up mode):
+    - preserved 4-step strength meter;
+    - added localized checklist with per-rule live status:
+      - minimum length, lowercase, uppercase, digit, symbol.
+  - Updated reset-password form (`/auth/reset-password`):
+    - preserved 4-step strength meter;
+    - added the same localized live checklist under new password field.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - Playwright manual check:
+    - `http://127.0.0.1:3101/auth?next=%2Faccount`
+    - switch to sign-up mode
+    - confirm checklist appears and updates to checkmarks for strong password (`Aa1!aaaa`).
+- Verification results:
+  - lint: pass
+  - build: pass
+  - Playwright: pass (checklist visible and updates live in sign-up mode).
+- Next commands:
+  - Optional: add Playwright assertion test for checklist states as a regression guard.
+  - Optional: run end-to-end recovery-link flow from real reset email in staging to visually validate reset page checklist with active recovery session.
+- Open risks:
+  - Recovery page checklist is implemented and type/build-validated; full interactive token-based reset flow still depends on Supabase recovery email link in environment.
+## Latest Update (2026-02-10, RU/EN Localization Hardening + i18n Smoke Gate)
 - Objective: fix RU/EN localization defects across public pages (UI + metadata), and add an automated regression gate for localization.
 - Status: completed.
 - Touched files:
@@ -1372,3 +1521,135 @@ Implemented and validated locally (lint/build + Playwright manual checks on `/ca
 - Final sign-off:
   - All planned validation gates are green for this cycle.
   - No remaining release blockers from the validation checklist.
+
+
+## Latest Update (2026-02-10, Operator Backup Artifact Check)
+- Objective: verify real backup artifact existence in storage (not only manifest freshness).
+- Status: completed with failure.
+- Touched files:
+  - docs/session-continuation.md
+- Checks executed:
+  - Anonymous HEAD requests to manifest target using multiple S3 URL forms:
+    - https://demumumind-mcp-backups.s3.amazonaws.com/postgres/latest.sql.gz
+    - https://s3.amazonaws.com/demumumind-mcp-backups/postgres/latest.sql.gz
+    - https://s3.us-east-1.amazonaws.com/demumumind-mcp-backups/postgres/latest.sql.gz
+  - Bucket root HEAD checks for the same host forms.
+  - AWS credential availability checks (env + ~/.aws).
+- Results:
+  - All object HEAD checks returned HTTP 404.
+  - Bucket root HEAD checks also returned HTTP 404.
+  - No AWS credentials are configured in this environment (`AWS_*` env missing, `~/.aws` missing).
+- Conclusion:
+  - Runtime manifest freshness can be green, but artifact-level operator verification is currently failing.
+  - The configured backup location appears unreachable/non-existent from current environment, or requires a different authenticated/private endpoint not documented in repo config.
+- Next actions:
+  - Confirm real backup storage endpoint/path with infra owner.
+  - Add authenticated artifact check in backup pipeline (e.g., aws s3api head-object in CI/cron with dedicated credentials).
+  - Keep release sign-off contingent on successful artifact HEAD/list check, not only manifest timestamp.
+
+
+
+
+
+## Latest Update (2026-02-10, Remote Backup Artifact Verification Automation)
+- Objective: add real artifact-level backup verification and wire it into CI/nightly automation.
+- Status: completed.
+- Touched files:
+  - scripts/backup-verify-remote.mjs (new)
+  - package.json
+  - .github/workflows/ci.yml
+  - .github/workflows/nightly-smoke.yml
+  - .env.example
+  - README.md
+  - docs/runbooks/restore.md
+  - docs/production-readiness-checklist.md
+  - docs/session-continuation.md
+- Implemented:
+  - Added `npm run ops:backup-verify-remote` script.
+  - New verifier supports:
+    - `--location <https://...|s3://bucket/key>`
+    - `--manifest <path>`
+    - `--method auto|http|aws-cli`
+    - `--region <aws-region>`
+    - `--max-age-hours <n>`
+    - optional auth headers/tokens via env.
+  - Auto strategy:
+    - for `s3://...` tries AWS CLI `s3api head-object` first (when available)
+    - then HTTP HEAD candidates (virtual-host/path-style S3 URLs)
+    - validates artifact reachability + Last-Modified freshness.
+  - Wired optional remote backup checks into CI and Nightly Smoke workflows behind:
+    - repo var `BACKUP_REMOTE_CHECK_ENABLED=true`
+  - Added config documentation for remote backup checks in README/runbook/.env example.
+  - Added checklist requirement for remote artifact check in production readiness doc.
+- Verification commands:
+  - npm run lint
+  - npm run build
+  - npm run ops:backup-verify-remote
+  - npm run ops:backup-verify-remote -- --location https://www.rfc-editor.org/rfc/rfc9110.txt --max-age-hours 100000
+- Verification results:
+  - lint: pass
+  - build: pass
+  - remote backup check with current manifest location: fail (expected in this environment; object endpoint returns 404 and AWS CLI absent)
+  - remote backup check with known public test file + Last-Modified: pass
+- Open risks:
+  - Repo workflows will fail remote backup step when `BACKUP_REMOTE_CHECK_ENABLED=true` until real backup endpoint/auth are configured.
+  - Current local environment lacks AWS CLI and AWS credentials; S3 auth path cannot be validated here.
+- Next commands:
+  - Configure repo vars/secrets (`BACKUP_REMOTE_CHECK_URL`, optional auth secrets, method/region).
+  - Trigger CI/Nightly and confirm remote backup step turns green against real storage artifact.
+
+## Latest Update (2026-02-10, Auth + Build Gate Re-Verification After Lock Incident)
+- Objective: clear transient Next.js build lock risk and re-run full local auth validation gate.
+- Status: completed.
+- Touched files:
+  - docs/session-continuation.md
+- Executed commands:
+  - Process/lock cleanup:
+    - PowerShell scan/stop for Next.js-related 
+ode.exe processes
+    - lock check/removal for .next/lock
+  - Verification:
+    - 
+pm run check:utf8:strict
+    - 
+pm run lint
+    - 
+pm run build
+    - 
+pm run test:e2e:auth
+- Verification results:
+  - UTF-8 strict: pass
+  - lint: pass
+  - build: pass
+  - Playwright auth E2E: pass (2 passed)
+- Notes:
+  - Earlier lock error (.next/lock) was not reproducible after cleanup check (no active Next.js process and no lock file present).
+  - Non-blocking warnings persist in test run (NO_COLOR/FORCE_COLOR, Next.js llowedDevOrigins warning in dev-mode server).
+- Next commands:
+  - Optional: stage/commit current auth + CI workflow updates.
+  - Optional: tighten 
+ext.config with llowedDevOrigins if warning suppression is desired for dev-mode E2E.
+
+
+## Latest Update (2026-02-10, GitHub Remote Backup Check Variables Configured)
+- Objective: complete infra-side setup for remote backup artifact checks in CI/nightly.
+- Status: partially completed (variables configured, auth secrets still missing).
+- Touched files:
+  - docs/session-continuation.md
+- GitHub repo configured:
+  - BACKUP_REMOTE_CHECK_ENABLED=true
+  - BACKUP_REMOTE_CHECK_URL=s3://demumumind-mcp-backups/postgres/latest.sql.gz
+  - BACKUP_REMOTE_CHECK_METHOD=auto
+  - BACKUP_REMOTE_S3_REGION=us-east-1
+  - BACKUP_MAX_AGE_HOURS=26
+- Verification command:
+  - gh variable list --repo DemumuMind/mcp-site-upload
+- Result:
+  - all required backup-check variables are present in repository settings.
+- Remaining infra gap:
+  - BACKUP_REMOTE_AUTH_HEADER / BACKUP_REMOTE_BEARER_TOKEN are not available in current local environment and therefore were not set.
+  - Without valid storage auth and/or reachable public object path, remote backup check will fail when enabled on merged workflow code.
+- Next commands:
+  - gh secret set BACKUP_REMOTE_AUTH_HEADER --repo DemumuMind/mcp-site-upload --body "<Header-Name: value>"
+  - or gh secret set BACKUP_REMOTE_BEARER_TOKEN --repo DemumuMind/mcp-site-upload --body "<token>"
+  - Trigger CI/nightly after merging workflow/script changes.

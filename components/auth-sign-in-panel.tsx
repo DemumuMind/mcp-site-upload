@@ -10,6 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
+import {
+  buildAuthCallbackRedirect,
+  buildCheckEmailPath,
+  buildResetPasswordRedirect,
+  normalizeInternalPath,
+} from "@/lib/auth-redirects";
 import { tr } from "@/lib/i18n";
 import {
   getPasswordRuleChecks,
@@ -33,39 +39,6 @@ type EmailAuthValues = {
 type EmailAuthErrors = Partial<Record<keyof EmailAuthValues, string>>;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function normalizeNextPath(nextPath: string): string {
-  const candidate = nextPath.trim();
-
-  if (!candidate.startsWith("/")) {
-    return "/";
-  }
-
-  if (candidate.startsWith("//") || candidate.startsWith("/\\")) {
-    return "/";
-  }
-
-  if (/[\u0000-\u001F\u007F]/.test(candidate)) {
-    return "/";
-  }
-
-  try {
-    const parsed = new URL(candidate, "http://localhost");
-
-    if (parsed.origin !== "http://localhost") {
-      return "/";
-    }
-
-    const normalizedPath = `${parsed.pathname}${parsed.search}${parsed.hash}`;
-    if (!normalizedPath.startsWith("/") || normalizedPath.startsWith("//")) {
-      return "/";
-    }
-
-    return normalizedPath;
-  } catch {
-    return "/";
-  }
-}
 
 function getAuthErrorMessage(locale: "en" | "ru", errorCode?: string): string | null {
   if (!errorCode) {
@@ -232,7 +205,7 @@ function getPasswordChecklistItems(locale: "en" | "ru", password: string) {
 
 export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
   const locale = useLocale();
-  const safeNextPath = useMemo(() => normalizeNextPath(nextPath), [nextPath]);
+  const safeNextPath = useMemo(() => normalizeInternalPath(nextPath), [nextPath]);
   const callbackErrorMessage = useMemo(
     () => getAuthErrorMessage(locale, errorCode),
     [errorCode, locale],
@@ -269,7 +242,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
       return undefined;
     }
 
-    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNextPath)}`;
+    return buildAuthCallbackRedirect(window.location.origin, safeNextPath);
   }
 
   function getResetRedirectTo(): string | undefined {
@@ -277,7 +250,15 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
       return undefined;
     }
 
-    return `${window.location.origin}/auth/reset-password`;
+    return buildResetPasswordRedirect(window.location.origin);
+  }
+
+  function getCheckEmailPath(flow: "signup" | "reset", email: string): string {
+    return buildCheckEmailPath({
+      flow,
+      email,
+      nextPath: safeNextPath,
+    });
   }
 
   function updateEmailField(field: keyof EmailAuthValues, value: string) {
@@ -415,14 +396,10 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         return;
       }
 
-      setEmailMessage(
-        tr(
-          locale,
-          "Confirmation email sent. Please verify your inbox to complete sign-up.",
-          "Письмо для подтверждения отправлено. Проверьте почту, чтобы завершить регистрацию.",
-        ),
-      );
       toast.success(tr(locale, "Confirmation email sent.", "Письмо подтверждения отправлено."));
+      if (typeof window !== "undefined") {
+        window.location.assign(getCheckEmailPath("signup", normalizedValues.email));
+      }
       return;
     }
 
@@ -437,14 +414,10 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
       return;
     }
 
-    setEmailMessage(
-      tr(
-        locale,
-        "Password reset email sent. Open the link from your email to set a new password.",
-        "Письмо для сброса отправлено. Откройте ссылку из почты, чтобы задать новый пароль.",
-      ),
-    );
     toast.success(tr(locale, "Reset email sent.", "Письмо для сброса отправлено."));
+    if (typeof window !== "undefined") {
+      window.location.assign(getCheckEmailPath("reset", normalizedValues.email));
+    }
   }
 
   async function signOut() {

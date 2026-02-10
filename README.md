@@ -1,5 +1,10 @@
 # DemumuMind MCP
 
+[![CI + Auth E2E](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/ci.yml?branch=main&label=CI%20%2B%20Auth%20E2E)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/deploy.yml?branch=main&label=Deploy)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/deploy.yml)
+[![Security](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/security.yml?branch=main&label=Security)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/security.yml)
+[![Nightly Smoke](https://img.shields.io/github/actions/workflow/status/DemumuMind/mcp-site-upload/nightly-smoke.yml?branch=main&label=Nightly%20Smoke)](https://github.com/DemumuMind/mcp-site-upload/actions/workflows/nightly-smoke.yml)
+
 Community-curated catalog of MCP (Model Context Protocol) servers with:
 - searchable public catalog
 - server submission + admin moderation flow
@@ -98,6 +103,7 @@ npm run start
 npm run smoke:check -- https://your-domain
 npm run ops:health-report -- --base-url https://your-domain
 npm run ops:backup-verify
+npm run ops:backup-verify-remote
 ```
 
 ## Catalog Data Defaults
@@ -179,6 +185,14 @@ Repository variables controlling execution:
 - `SMOKE_ENABLED=true` enables automatic smoke checks via `SMOKE_BASE_URL`.
 - `SMOKE_ALLOW_PROTECTED=true` allows smoke checks to accept `401` for protected preview URLs.
 - `VERCEL_DEPLOY_ENABLED=true` enables actual deploy steps in `deploy.yml`.
+- `BACKUP_REMOTE_CHECK_ENABLED=true` enables remote backup artifact validation in `ci.yml` and `nightly-smoke.yml`.
+- `BACKUP_REMOTE_CHECK_URL` sets remote object URL (optional when manifest location is reachable from runner).
+- `BACKUP_REMOTE_CHECK_METHOD=auto|http|aws-cli` controls validation strategy (`auto` by default).
+- `BACKUP_REMOTE_S3_REGION` sets region for S3 probe fallback.
+
+Optional repository secrets for remote backup checks:
+- `BACKUP_REMOTE_AUTH_HEADER` (`Header-Name: value`)
+- `BACKUP_REMOTE_BEARER_TOKEN`
 
 ## Runbooks and Ops Docs
 
