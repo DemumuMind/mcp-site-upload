@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   dependency-review:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && vars.DEPENDENCY_REVIEW_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
