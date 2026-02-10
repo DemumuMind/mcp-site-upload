@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { FileText } from "lucide-react";
 
 import { logoutAdminAction, moderateServerStatusAction } from "@/app/admin/actions";
 import { Badge } from "@/components/ui/badge";
@@ -32,14 +34,14 @@ function getFeedbackMessage({
   if (success === "active") {
     return {
       tone: "success" as const,
-      text: tr(locale, "Server approved and moved to active.", "Сервер одобрен и переведен в активный статус."),
+      text: tr(locale, "Server approved and moved to active.", "Сервер одобрен и переведён в активный статус."),
     };
   }
 
   if (success === "rejected") {
     return {
       tone: "success" as const,
-      text: tr(locale, "Server rejected successfully.", "Сервер успешно отклонен."),
+      text: tr(locale, "Server rejected successfully.", "Сервер успешно отклонён."),
     };
   }
 
@@ -76,15 +78,28 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </p>
         </div>
 
-        <form action={logoutAdminAction}>
+        <div className="flex flex-wrap items-center gap-2">
           <Button
-            type="submit"
+            asChild
             variant="outline"
             className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
           >
-            {tr(locale, "Logout", "Выйти")}
+            <Link href="/admin/blog">
+              <FileText className="size-4" />
+              {tr(locale, "Blog studio", "Студия блога")}
+            </Link>
           </Button>
-        </form>
+
+          <form action={logoutAdminAction}>
+            <Button
+              type="submit"
+              variant="outline"
+              className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
+            >
+              {tr(locale, "Logout", "Выйти")}
+            </Button>
+          </form>
+        </div>
       </div>
 
       {feedback ? (

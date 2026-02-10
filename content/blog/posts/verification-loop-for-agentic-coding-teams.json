@@ -1,0 +1,63 @@
+{
+  "slug": "verification-loop-for-agentic-coding-teams",
+  "tags": [
+    "workflow",
+    "quality"
+  ],
+  "publishedAt": "2025-10-22T10:00:00.000Z",
+  "readTimeMinutes": 8,
+  "locale": {
+    "en": {
+      "title": "Verification Loop for Agentic Coding Teams",
+      "excerpt": "How Plan → Check → Plan → Final Check reduces regressions when multiple agents collaborate on delivery.",
+      "seoTitle": "Verification Loop for Agentic Coding Teams",
+      "seoDescription": "Operational verification loop for teams using AI agents in production software delivery.",
+      "contentBlocks": [
+        {
+          "heading": "Planning is necessary but insufficient",
+          "paragraphs": [
+            "Multi-agent delivery fails when the plan is not continuously validated against implementation reality.",
+            "A formal verification loop keeps architecture, code, and quality gates synchronized."
+          ]
+        },
+        {
+          "heading": "Use explicit checkpoints",
+          "paragraphs": [
+            "Between planning iterations, run targeted checks that either confirm assumptions or force immediate correction."
+          ],
+          "bullets": [
+            "Design consistency check",
+            "Lint/build baseline check",
+            "User-path smoke check"
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "Цикл проверки для команд с AI-агентами",
+      "excerpt": "Как цикл «План → Проверка → План → Финальная проверка» снижает регрессии при совместной работе нескольких агентов.",
+      "seoTitle": "Цикл проверки для команд с AI-агентами",
+      "seoDescription": "Операционный цикл верификации для команд, которые используют AI-агентов в реальной разработке.",
+      "contentBlocks": [
+        {
+          "heading": "Планирование важно, но его недостаточно",
+          "paragraphs": [
+            "Мультиагентная разработка начинает сбоить, если план не сверяется с фактической реализацией.",
+            "Формальный цикл проверки удерживает архитектуру, код и контрольные точки качества в одном контуре."
+          ]
+        },
+        {
+          "heading": "Используйте явные промежуточные проверки",
+          "paragraphs": [
+            "Между итерациями планирования запускайте точечные проверки, которые либо подтверждают гипотезы, либо сразу требуют корректировки курса."
+          ],
+          "bullets": [
+            "Проверка согласованности дизайна",
+            "Проверка базовых lint/build-гейтов",
+            "Проверка ключевого пользовательского сценария"
+          ]
+        }
+      ]
+    }
+  }
+}

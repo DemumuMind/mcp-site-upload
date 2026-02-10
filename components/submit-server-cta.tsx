@@ -16,7 +16,7 @@ export function SubmitServerCta() {
   const href = user ? "/submit-server" : authRedirectHref;
   const label = user
     ? tr(locale, "Submit Server", "Отправить сервер")
-    : tr(locale, "Login / Sign in", "Войти / Регистрация");
+    : tr(locale, "Login", "Войти");
 
   return (
     <Button

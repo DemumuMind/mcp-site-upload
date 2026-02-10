@@ -1,0 +1,151 @@
+{
+  "id": "cost-governance-in-agentic-development-1770738073268",
+  "topic": "Cost governance in agentic development",
+  "angle": "How teams manage model spend without reducing delivery speed",
+  "tags": [
+    "operations",
+    "workflow",
+    "quality"
+  ],
+  "createdAt": "2026-02-10T15:41:13.268Z",
+  "recencyDays": 14,
+  "maxSources": 6,
+  "query": "Cost governance in agentic development: How teams manage model spend without reducing delivery speed. Latest updates and verified sources",
+  "additionalQueries": [
+    "Cost governance in agentic development 2026 latest news",
+    "Cost governance in agentic development expert analysis 2026",
+    "Cost governance in agentic development How teams manage model spend without reducing delivery speed evidence-based"
+  ],
+  "provider": "exa-search-deep",
+  "providerRequestId": "f7fe7d53887a4b285f3c5241982b4c9e",
+  "sources": [
+    {
+      "id": "src-9",
+      "title": "Agentic Development Lifecycle (ADLC): A New Model for AI Systems ...",
+      "url": "https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained",
+      "domain": "epam.com",
+      "publishedDate": "2026-02-05T15:41:10.193Z",
+      "snippet": "Learn why SDLC falls short and how the Agentic Development Lifecycle (ADLC) helps teams design, test, deploy, and govern AI agents in production.",
+      "relevanceScore": 23
+    },
+    {
+      "id": "src-2",
+      "title": "Governance lags agentic AI adoption in the UK, says Salesforce",
+      "url": "https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce",
+      "domain": "computerweekly.com",
+      "publishedDate": "2026-02-05T15:41:10.113Z",
+      "author": "By:  James Kofalt",
+      "snippet": "Governance lags agentic AI adoption in the UK, says Salesforce | Computer Weekly **[![]] [![ComputerWeekly]![ComputerWeekly]] [![TechTarget]] **Search the TechTarget Network** * [Home] * [Artificial intelligence, automation and robotics] ![] kirill\\_makarov - stock.adobe.com [News] # Governance lags agentic AI adopt...",
+      "relevanceScore": 19
+    },
+    {
+      "id": "src-11",
+      "title": "AI Agent Governance Blueprint for Production Deployment",
+      "url": "https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production",
+      "domain": "codebridge.tech",
+      "publishedDate": "2026-02-09T15:41:09.957Z",
+      "snippet": "Learn how AI agent governance is changing, how it impacts leaders, and what mature teams already do to deploy AI agents safely in production with ...",
+      "relevanceScore": 19
+    },
+    {
+      "id": "src-6",
+      "title": "Serving LLMs Without Breaking the Bank",
+      "url": "https://www.corvex.ai/blog/llm-inference-cost",
+      "domain": "corvex.ai",
+      "publishedDate": "2026-02-05T00:00:00.000Z",
+      "snippet": "Corvex | Serving LLMs Without Breaking the Bank [![]] # Serving LLMs Without Breaking the Bank ![cost effective llm] [ ![] ![cost effective llm]] ![] Corvex in June 13th, 2025 [ Read in** ] ## Why Does LLM Inference Get Expensive So Quickly? A 70B-parameter model needs roughly 80 GB of HBM just to sit idle; every se...",
+      "relevanceScore": 18
+    },
+    {
+      "id": "src-7",
+      "title": "Getting AI Governance Right Without Slowing Everything Down",
+      "url": "https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down",
+      "domain": "databricks.com",
+      "publishedDate": "2026-01-30T00:00:00.000Z",
+      "snippet": "Getting AI Governance Right Without Slowing Everything Down | Databricks Blog [Skip to main content] # Getting AI Governance Right Without Slowing Everything Down ## David Meyer, SVP Product, shares how leading enterprises balance speed, control, and trust as agentic AI scales ![Getting AI Governance Right Without S...",
+      "relevanceScore": 18
+    },
+    {
+      "id": "src-14",
+      "title": "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy",
+      "url": "https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/",
+      "domain": "forrester.com",
+      "publishedDate": "2026-01-28T00:00:00.000Z",
+      "author": "Emily Pfeiffer",
+      "snippet": "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy [Skip to content] [![Forrester Logo]] [Forrester Cart] Show Menu [&lt; Blogs] [Home] &gt;[Featured Blogs] &gt; Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy # Manage The Emerging Cost...",
+      "relevanceScore": 18
+    }
+  ],
+  "verificationChecks": [
+    {
+      "round": "relevance",
+      "passed": true,
+      "details": "Selected 6 essential sources (avg relevance 19.2)."
+    },
+    {
+      "round": "freshness",
+      "passed": true,
+      "details": "All selected sources are within the last 14 days."
+    },
+    {
+      "round": "diversity",
+      "passed": true,
+      "details": "Domain diversity passed (6 unique domains)."
+    },
+    {
+      "round": "corroboration",
+      "passed": true,
+      "details": "Corroboration passed with 5 repeated signals."
+    }
+  ],
+  "keyPoints": [
+    {
+      "title": "Signal 1: agentic",
+      "summary": "Repeated in 4 independent sources.",
+      "supportingSourceIds": [
+        "src-9",
+        "src-2",
+        "src-7",
+        "src-14"
+      ]
+    },
+    {
+      "title": "Signal 2: governance",
+      "summary": "Repeated in 3 independent sources.",
+      "supportingSourceIds": [
+        "src-2",
+        "src-11",
+        "src-7"
+      ]
+    },
+    {
+      "title": "Signal 3: model",
+      "summary": "Repeated in 2 independent sources.",
+      "supportingSourceIds": [
+        "src-9",
+        "src-6"
+      ]
+    },
+    {
+      "title": "Signal 4: learn",
+      "summary": "Repeated in 2 independent sources.",
+      "supportingSourceIds": [
+        "src-9",
+        "src-11"
+      ]
+    },
+    {
+      "title": "Signal 5: why",
+      "summary": "Repeated in 2 independent sources.",
+      "supportingSourceIds": [
+        "src-9",
+        "src-6"
+      ]
+    }
+  ],
+  "notes": [
+    "Only fresh sources from the configured recency window are allowed.",
+    "Only high-relevance sources are selected after scoring and domain balancing.",
+    "Multi-round verification (relevance, freshness, diversity, corroboration) is mandatory."
+  ]
+}

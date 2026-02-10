@@ -61,6 +61,17 @@ export const CATALOG_LANGUAGE_OPTIONS = [
   "Scala",
 ] as const;
 
+export const CATALOG_VISIBLE_TAG_LIMIT = 24;
+
+const TAG_DOT_CLASSES = [
+  "bg-sky-400",
+  "bg-emerald-400",
+  "bg-violet-400",
+  "bg-fuchsia-400",
+  "bg-amber-400",
+  "bg-rose-400",
+] as const;
+
 const SERVER_LANGUAGE_BY_SLUG: Record<string, string> = {
   linear: "TypeScript",
   "google-drive": "Python",
@@ -83,6 +94,16 @@ const SERVER_LANGUAGE_BY_SLUG: Record<string, string> = {
   figma: "TypeScript",
   sentry: "Python",
 };
+
+export function getTagDotClass(tag: string): string {
+  let hash = 0;
+
+  for (let index = 0; index < tag.length; index += 1) {
+    hash = (hash + tag.charCodeAt(index) * 17) % 10_000;
+  }
+
+  return TAG_DOT_CLASSES[hash % TAG_DOT_CLASSES.length];
+}
 
 export function inferServerLanguage(mcpServer: McpServer): string {
   return SERVER_LANGUAGE_BY_SLUG[mcpServer.slug] || "Other";

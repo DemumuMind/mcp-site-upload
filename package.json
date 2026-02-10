@@ -6,9 +6,13 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
+    "check:utf8": "node scripts/check-utf8.mjs",
+    "check:utf8:strict": "node scripts/check-utf8.mjs --strict-missing",
     "lint": "eslint .",
+    "blog:new": "node scripts/blog-new-post.mjs",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "smoke:check": "node scripts/smoke-check.mjs",
+    "smoke:i18n": "node scripts/smoke-i18n.mjs",
     "ops:health-report": "node scripts/ops-health-report.mjs",
     "ops:backup-verify": "node scripts/backup-verify.mjs"
   },

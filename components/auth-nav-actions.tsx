@@ -42,7 +42,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={authRedirectHref}>
           <span className="sm:hidden">{tr(locale, "Login", "Войти")}</span>
-          <span className="hidden sm:inline">{tr(locale, "Login / Sign in", "Войти / Регистрация")}</span>
+          <span className="hidden sm:inline">{tr(locale, "Login", "Войти")}</span>
         </Link>
       </Button>
     );
@@ -53,7 +53,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={authRedirectHref}>
           <span className="sm:hidden">{tr(locale, "Login", "Войти")}</span>
-          <span className="hidden sm:inline">{tr(locale, "Login / Sign in", "Войти / Регистрация")}</span>
+          <span className="hidden sm:inline">{tr(locale, "Login", "Войти")}</span>
         </Link>
       </Button>
     );

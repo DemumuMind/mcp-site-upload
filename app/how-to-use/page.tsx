@@ -17,14 +17,22 @@ import { HowToConnectSection } from "@/components/how-to-connect-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getActiveServers } from "@/lib/servers";
 
-export const metadata: Metadata = {
-  title: "Setup Guide",
-  description: "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "Setup Guide", "Гайд по настройке"),
+    description: tr(
+      locale,
+      "Step-by-step setup guide for connecting MCP servers and validating tool calls.",
+      "Пошаговый гайд по подключению MCP-серверов и проверке вызовов инструментов.",
+    ),
+  };
+}
 
 const setupSteps = [
   {
@@ -233,8 +241,8 @@ const bestPractices = [
 
 export default async function HowToUsePage() {
   const locale = await getLocale();
-  const activeServers = await getActiveServers();
-  const sampleServer = activeServers[0];
+  const catalogSnapshot = await getCatalogSnapshot({ featuredLimit: 1 });
+  const sampleServer = catalogSnapshot.sampleServer;
 
   return (
     <div className="relative overflow-hidden border-t border-white/10">

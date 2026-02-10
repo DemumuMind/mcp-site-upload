@@ -3,6 +3,22 @@
     {
       "path": "/api/health-check",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/blog/auto-publish",
+      "schedule": "15 0 * * *"
+    },
+    {
+      "path": "/api/blog/auto-publish",
+      "schedule": "15 6 * * *"
+    },
+    {
+      "path": "/api/blog/auto-publish",
+      "schedule": "15 12 * * *"
+    },
+    {
+      "path": "/api/blog/auto-publish",
+      "schedule": "15 18 * * *"
     }
   ]
 }

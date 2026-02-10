@@ -43,6 +43,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: UTF-8 check
+        run: npm run check:utf8:strict
+
       - name: NPM audit (production deps)
         run: npm audit --omit=dev --audit-level=high
 

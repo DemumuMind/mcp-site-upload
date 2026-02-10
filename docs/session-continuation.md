@@ -1,4 +1,442 @@
+﻿## Latest Update (2026-02-10, RU/EN Localization Hardening + i18n Smoke Gate)
+- Objective: fix RU/EN localization defects across public pages (UI + metadata), and add an automated regression gate for localization.
+- Status: completed.
+- Touched files:
+  - `app/about/page.tsx`
+  - `app/categories/page.tsx`
+  - `app/catalog/page.tsx`
+  - `app/how-to-use/page.tsx`
+  - `app/mcp/page.tsx`
+  - `app/pricing/page.tsx`
+  - `app/tools/page.tsx`
+  - `app/privacy/page.tsx`
+  - `app/terms/page.tsx`
+  - `app/contact/page.tsx`
+  - `app/discord/page.tsx`
+  - `app/sitemap/page.tsx`
+  - `scripts/smoke-i18n.mjs`
+  - `package.json`
+  - `components/blog/blog-featured-post.tsx`
+  - `components/blog/blog-post-card.tsx`
+  - `lib/blog/automation.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Converted public static metadata to locale-aware `generateMetadata()` with `getLocale()` + `tr(...)`.
+  - Fully localized previously EN-only pages: contact, discord, sitemap (headings, body copy, CTA labels, metadata).
+  - Added Playwright-based i18n smoke script: `scripts/smoke-i18n.mjs`.
+  - Added npm command: `npm run smoke:i18n`.
+  - Resolved unrelated existing build blockers discovered during verification:
+    - duplicate `postPath` declaration in `lib/blog/automation.ts`;
+    - invalid `coverImage` property access in `lib/blog/automation.ts`;
+    - async tag lookup usage in blog cards (`components/blog/blog-featured-post.tsx`, `components/blog/blog-post-card.tsx`).
+- Verification commands:
+  - `npm run check:utf8`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3100`
+  - `npm run smoke:i18n -- http://localhost:3100`
+- Verification results:
+  - UTF-8 check: pass.
+  - Lint: pass.
+  - Build: pass.
+  - i18n smoke (EN+RU title/h1 checks on key public pages): pass.
+- Next commands:
+  - Optional full deploy smoke: `npm run smoke:check -- <deploy-url>`.
+  - Optional i18n smoke against deployed env: `npm run smoke:i18n -- <deploy-url>`.
+- Open risks:
+  - Repository currently contains many unrelated in-progress modifications; commit/merge should isolate this localization scope.
+## Latest Update (2026-02-10, Reset Password Success Screen + Auto Redirect)
+- Objective: add dedicated success state after password reset with automatic transition back to login.
+- Status: completed.
+- Touched files:
+  - `components/auth-reset-password-panel.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added a standalone success screen after successful password update in `/auth/reset-password`.
+  - Added automatic redirect to `/auth` after `5` seconds.
+  - Added countdown indicator on success screen.
+  - Added immediate-action button: `Go to login now / Перейти ко входу сейчас`.
+- Verification commands:
+  - `npx eslint components/auth-reset-password-panel.tsx app/auth/reset-password/page.tsx components/auth-sign-in-panel.tsx`
+  - `npx tsc --noEmit`
+  - `npm run lint`
+  - `npm run build`
+  - Playwright:
+    - `http://localhost:3000/auth?next=%2Faccount` (auth modes/links)
+    - `http://localhost:3000/auth/reset-password` (recovery page + missing-session fallback)
+- Verification results:
+  - lint/typecheck/build: pass
+  - UI checks: pass (reset-password route available; fallback and auth entry flow validated)
+
+## Latest Update (2026-02-10, Login Label + Text Registration Flow + Password Recovery Step)
+- Objective: apply UX request for auth entrypoint wording and move registration trigger to text inside auth form; implement next auth step (password recovery flow).
+- Status: completed.
+- Touched files:
+  - `components/auth-nav-actions.tsx`
+  - `components/submit-server-cta.tsx`
+  - `app/auth/page.tsx`
+  - `components/auth-sign-in-panel.tsx`
+  - `components/auth-reset-password-panel.tsx`
+  - `app/auth/reset-password/page.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Header CTA wording updated to **Login / Войти** (instead of `Login / Sign in` + registration wording).
+  - Auth page metadata title simplified to `Login / Вход`.
+  - Auth email section refactored:
+    - registration is now triggered via **text link** (`Нет аккаунта? Зарегистрироваться`) inside email auth block;
+    - sign-in and sign-up are mode-switched via text actions;
+    - Google/GitHub OAuth preserved.
+  - Added password recovery as next step:
+    - reset request mode in auth panel (`Забыли пароль?`) sends email via `supabase.auth.resetPasswordForEmail`;
+    - new page `/auth/reset-password` with new password + confirm password client validation and `supabase.auth.updateUser({ password })`.
+- Verification commands:
+  - `npx eslint components/auth-sign-in-panel.tsx components/auth-nav-actions.tsx components/submit-server-cta.tsx components/auth-reset-password-panel.tsx app/auth/page.tsx app/auth/reset-password/page.tsx`
+  - `npx tsc --noEmit`
+  - `npm run lint`
+  - `npm run build`
+  - Playwright checks:
+    - `http://localhost:3000/` (header CTA label)
+    - `http://localhost:3000/auth?next=%2Faccount` (registration as text + OAuth presence + forgot password trigger)
+    - `http://localhost:3000/auth/reset-password` (recovery route availability)
+- Verification results:
+  - lint/typecheck/build: pass
+  - UI checks:
+    - top nav shows `Войти`;
+    - auth form shows text registration and forgot-password actions;
+    - reset-password page loads and handles missing recovery session state.
+
+## Latest Update (2026-02-10, Auth Finalization: OAuth + Email/Password + Client Validation)
+- Objective: finalize auth UX per latest request — keep Google/GitHub, add email/password auth with client-side validation, and preserve email notification + profile step changes.
+- Status: completed.
+- Touched files:
+  - `components/auth-sign-in-panel.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Restored social OAuth providers in auth UI:
+    - Google
+    - GitHub
+  - Replaced magic-link-only email block with full email/password auth flow:
+    - mode switch: `Sign in` / `Sign up`
+    - sign in via `supabase.auth.signInWithPassword`
+    - sign up via `supabase.auth.signUp` with `emailRedirectTo`
+  - Added client-side validation for:
+    - email format
+    - minimum password length (8)
+    - confirm password required (sign-up mode)
+    - password/confirm mismatch
+  - Added user-facing success flow for sign-up confirmation email and direct redirect on successful session auth.
+- Verification commands:
+  - `npx eslint components/auth-sign-in-panel.tsx app/actions.ts lib/email/notifications.ts app/account/page.tsx app/account/actions.ts components/account-profile-forms.tsx lib/account-profile-schema.ts`
+  - `npx tsc --noEmit`
+  - `npm run lint`
+  - `npm run build`
+  - Playwright checks on `http://localhost:3000/auth?next=%2Faccount` and `http://localhost:3000/account`
+- Verification results:
+  - lint/typecheck/build: pass
+  - UI validation:
+    - Google and GitHub buttons visible
+    - Email/password block visible with `Sign in`/`Sign up`
+    - Client validation errors shown for short password and password mismatch
+    - `/account` correctly redirects to auth when unauthenticated
+
+## Latest Update (2026-02-10, Supabase-backed Blog Automation for Production)
+- Objective: remove read-only filesystem blocker and make scheduled blog auto-publishing work in production.
+- Status: completed (implementation + migration + local verification).
+- Touched files:
+  - `supabase/migrations/20260210161000_blog_posts_automation.sql`
+  - `lib/blog/supabase-store.ts`
+  - `lib/blog/service.ts`
+  - `lib/blog/automation.ts`
+  - `app/blog/page.tsx`
+  - `app/blog/[slug]/page.tsx`
+  - `app/sitemap.xml/route.ts`
+  - `app/api/blog/auto-publish/route.ts`
+  - `app/admin/actions.ts`
+  - `docs/blog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added `public.blog_posts` table migration with RLS/public read and service-role write policies.
+  - Added Supabase blog store adapter (`lib/blog/supabase-store.ts`) for reading/persisting blog posts.
+  - Refactored blog service to merge disk posts + Supabase posts with cache tag `blog-posts`.
+  - Updated blog listing/article pages and sitemap to use async blog service API.
+  - Updated automation write path:
+    - production-first save to Supabase;
+    - local/dev fallback to JSON files;
+    - explicit production guard if Supabase admin config is missing.
+  - Updated cron/admin invalidation to refresh `blog-posts` cache tag.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3203`
+  - `Invoke-RestMethod -Method Post "http://127.0.0.1:3203/api/blog/auto-publish?count=1" -Headers @{ Authorization = "Bearer <secret>" }`
+- Open risks:
+  - Supabase migration must be applied in target environments before automation can persist posts.
+  - Existing mojibake RU strings in legacy generated posts remain content-level debt and should be cleaned separately.
+
+## Latest Update (2026-02-10, Production Secret Setup + Immediate Blog Post Publish)
+- Objective: configure production auto-publish secret and publish one blog post immediately.
+- Status: completed with production FS limitation noted.
+- Touched files:
+  - `content/blog/posts/cost-governance-in-agentic-engineering-workflows-1770738067.json`
+  - `content/blog/research/cost-governance-in-agentic-development-1770738073268.json`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added/updated Vercel Production env vars:
+    - `BLOG_AUTOPUBLISH_CRON_SECRET`
+    - `EXA_API_KEY`
+  - Redeployed production and verified alias:
+    - `https://mcp-site-silk.vercel.app`
+  - Triggered production auto-publish endpoint with bearer auth; auth succeeded but write failed due runtime read-only filesystem (`EROFS`).
+  - Generated one post locally via auto-publish route and redeployed, resulting in immediate production availability of:
+    - `/blog/cost-governance-in-agentic-engineering-workflows-1770738067`
+- Verification commands:
+  - `vercel env ls production`
+  - `vercel --prod --yes`
+  - `Invoke-RestMethod -Method Post https://mcp-site-silk.vercel.app/api/blog/auto-publish?count=1 ...`
+  - `Invoke-WebRequest https://mcp-site-silk.vercel.app/blog/cost-governance-in-agentic-engineering-workflows-1770738067`
+- Open risks:
+  - Scheduled production auto-publish remains blocked by write-to-repo filesystem approach (`/var/task/content/...` is read-only in serverless runtime). Durable storage or Git-based publish flow is required for true autonomous posting in production.
+
+## Latest Update (2026-02-10, Auto-Publish Schedule 4x/Day + Build Recovery)
+- Objective: finalize automated blog cadence (4+ posts/day capability) and restore green build after recent automation changes.
+- Status: completed.
+- Touched files:
+  - `vercel.json`
+  - `app/account/page.tsx`
+  - `components/account-profile-forms.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Confirmed 4 cron triggers/day for `/api/blog/auto-publish` at `00:15`, `06:15`, `12:15`, `18:15` UTC.
+  - Preserved per-run scaling via `BLOG_AUTOPUBLISH_POSTS_PER_RUN` (default `1` = 4/day; raise to `2`+ for 8+/day).
+  - Fixed build blocker in account profile data initialization by adding `avatarUrl` to `AccountProfileInput`.
+  - Repaired invalid UTF-8 bytes in `components/account-profile-forms.tsx` to unblock Turbopack parsing.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `node -e "const fs=require('fs'); const v=JSON.parse(fs.readFileSync('vercel.json','utf8')); const jobs=v.crons.filter(c=>c.path==='/api/blog/auto-publish'); console.log(jobs.length, jobs.map(j=>j.schedule))"`
+- Verification results:
+  - Lint: pass.
+  - Build: pass.
+  - Cron config: 4 jobs for `/api/blog/auto-publish`.
+
+## Latest Update (2026-02-10, Auth OAuth Restore + Email Notifications + Avatar Step)
+- Objective: restore Google/GitHub auth, add email notification sending, and implement next profile step (avatar support).
+- Status: completed.
+- Touched files:
+  - `components/auth-sign-in-panel.tsx`
+  - `app/actions.ts`
+  - `lib/email/notifications.ts`
+  - `.env.example`
+  - `lib/account-profile-schema.ts`
+  - `app/account/actions.ts`
+  - `components/account-profile-forms.tsx`
+  - `app/account/page.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Restored OAuth sign-in buttons for Google and GitHub on `/auth` while keeping email/password auth.
+  - Added transactional email notification system via Resend:
+    - sends submission confirmation to user email;
+    - optionally sends admin copy to `EMAIL_ADMIN_TO`.
+  - Added new env config for email notifications (`EMAIL_NOTIFICATIONS_ENABLED`, `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_ADMIN_TO`).
+  - Implemented next profile step: avatar URL support in profile schema/forms, user metadata update, and avatar rendering on `/account` header.
+- Verification commands:
+  - `npx eslint components/auth-sign-in-panel.tsx app/actions.ts lib/email/notifications.ts app/account/page.tsx app/account/actions.ts components/account-profile-forms.tsx lib/account-profile-schema.ts`
+  - `npx tsc --noEmit`
+  - `npm run build`
+  - `npm run lint`
+- Open risks:
+  - Email delivery depends on valid Resend credentials and domain configuration.
+  - OAuth providers require correct Supabase provider setup and redirect URLs in project settings.
+
+## Latest Update (2026-02-10, Full Account Profile Page)
+- Objective: turn `/account` into a full profile cabinet with editable user data, security controls, and richer submission analytics.
+- Status: completed.
+- Touched files:
+  - `app/account/page.tsx`
+  - `app/account/actions.ts`
+  - `components/account-profile-forms.tsx`
+  - `lib/account-profile-schema.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Rebuilt `/account` layout with profile header, account stats, detailed account overview, and improved submissions list.
+  - Added profile editing form (name, username, website, bio) with client+server validation.
+  - Added password update form with confirmation and validation.
+  - Added new account server actions:
+    - `updateAccountProfileAction`
+    - `updateAccountPasswordAction`
+  - Added shared Zod schemas for account/profile/password validation in `lib/account-profile-schema.ts`.
+- Verification commands:
+  - `npx eslint app/account/page.tsx components/account-profile-forms.tsx app/account/actions.ts lib/account-profile-schema.ts`
+  - `npx tsc --noEmit`
+  - `npm run build`
+- Open risks:
+  - Password update behavior can depend on Supabase project security settings (e.g., re-auth requirements).
+  - Public server links in submissions are shown only for non-pending/non-rejected statuses.
+
+## Latest Update (2026-02-10, Scheduled Blog Auto-Publishing 4x/Day)
+- Objective: add scheduled automation for 4+ blog posts per day with mandatory deep research and multi-round verification.
+- Implemented:
+  - Added scheduled publisher core:
+    - `lib/blog/auto-publish.ts`
+    - rotates through high-priority MCP/agentic topics
+    - for each run executes deep research + verification + post creation.
+  - Added cron API route:
+    - `app/api/blog/auto-publish/route.ts`
+    - bearer-token protected (`BLOG_AUTOPUBLISH_CRON_SECRET` or `CRON_SECRET`)
+    - supports per-run post count and runtime tuning via env.
+  - Added Vercel schedule (UTC):
+    - `00:15`, `06:15`, `12:15`, `18:15` via `vercel.json`.
+    - default 1 post per run => 4 posts/day.
+  - Added env documentation:
+    - `.env.example` includes `EXA_API_KEY`, `BLOG_AUTOPUBLISH_*` variables.
+  - Updated runbook:
+    - `docs/blog-automation.md` includes scheduled flow and manual trigger example.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - local API auth checks with `npm run start -- -p 3200` and `Invoke-WebRequest` against `/api/blog/auto-publish`.
+- Open risks:
+  - File-based post writing requires writable runtime filesystem; for strict serverless read-only environments use CI commit flow or external storage for generated drafts.
 # Session Continuation
+
+## Latest Update (2026-02-10, Full Blog Automation via File-Driven Content)
+- Objective: fully automate blog content lifecycle so new posts can be added without editing TypeScript source.
+- Status: completed.
+- Touched files:
+  - `lib/blog/content.ts`
+  - `content/blog/tags.json`
+  - `content/blog/posts/*.json` (initial migration for all existing posts)
+  - `scripts/blog-new-post.mjs`
+  - `package.json`
+  - `next.config.ts`
+  - `docs/blog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Migrated blog source-of-truth from hardcoded TS arrays to `content/blog` JSON files.
+  - Added schema validation (Zod) and fail-fast loading in `lib/blog/content.ts`.
+  - Added automatic read-time fallback estimation when `readTimeMinutes` is not provided.
+  - Added automatic fallback tag generation for missing tag definitions.
+  - Added CLI scaffolder:
+    - `npm run blog:new -- --slug ... --title-en ... --title-ru ... --tags ...`
+  - Added deployment safety for file-driven content:
+    - `next.config.ts` → `outputFileTracingIncludes` includes `content/blog/**/*`.
+  - Added runbook documentation in `docs/blog-automation.md`.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `npm run blog:new -- --slug automation-smoke-post --title-en "Automation Smoke" --title-ru "Проверка автоматизации" --tags "playbook"`
+  - `npm run start -- -p 3100`
+  - Playwright check: `http://127.0.0.1:3100/blog`
+- Verification results:
+  - lint/build: pass
+  - blog scaffolder: pass (smoke post created successfully; removed after test)
+  - `/blog` renders correctly from JSON-based content source
+- Next commands:
+  - Add editorial QA checklist (content lint rules) before merge.
+  - Optional: add CI job to validate `content/blog/**/*` schema without full build.
+- Open risks:
+  - Invalid JSON/content schema will fail build (intentional fail-fast behavior).
+  - Very large content volumes may require pagination/index optimization in the next iteration.
+
+## Latest Update (2026-02-10, Blog RU Localization Polish)
+- Objective: fix mixed EN/RU strings on Blog page and improve Russian localization quality.
+- Status: completed.
+- Touched files:
+  - `lib/blog/content.ts`
+  - `components/blog/blog-hero.tsx`
+  - `app/blog/page.tsx`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Rewrote `lib/blog/content.ts` RU copy to remove mixed-language phrasing and improve readability.
+  - Updated RU tag labels (`Руководства`, `Процессы`, `Эксплуатация`) and descriptions.
+  - Improved RU hero/meta/CTA copy on `/blog`.
+  - Kept slugs and route structure unchanged to preserve links and SEO continuity.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - `npm run start -- -p 3100`
+  - Playwright check: `http://127.0.0.1:3100/blog`
+- Verification results:
+  - lint/build: pass
+  - Blog UI in RU now shows localized badges/labels/CTA without mixed EN phrases in the refactored blog sections.
+- Next commands:
+  - Optional: perform copy review for other pages (`/about`, `/tools`) to align tone and localization depth.
+- Open risks:
+  - Some global site areas (outside blog scope) still intentionally include English product/tech terms.
+
+## Latest Update (2026-02-10, Blog Refactor: Typed Content + /blog/[slug] + SEO)
+- Objective: implement Blog refactor plan with architecture-first structure and verification loop.
+- Status: completed.
+- Touched files:
+  - `app/blog/page.tsx`
+  - `app/blog/[slug]/page.tsx`
+  - `components/blog/blog-hero.tsx`
+  - `components/blog/blog-filter-bar.tsx`
+  - `components/blog/blog-featured-post.tsx`
+  - `components/blog/blog-post-card.tsx`
+  - `components/blog/blog-article-body.tsx`
+  - `components/blog/blog-related-posts.tsx`
+  - `lib/blog/types.ts`
+  - `lib/blog/content.ts`
+  - `lib/blog/service.ts`
+  - `app/sitemap.xml/route.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Replaced static `app/blog/page.tsx` with typed, locale-aware listing page supporting topic filters (`?tag=`).
+  - Added dynamic article route `app/blog/[slug]/page.tsx` with `generateStaticParams`, localized metadata, and JSON-LD `BlogPosting`.
+  - Introduced dedicated Blog component layer under `components/blog/*` (hero, filter bar, featured card, post card, article body, related posts).
+  - Introduced typed blog data/service layer under `lib/blog/*` with reusable API:
+    - `getAllBlogPosts`, `getBlogPostBySlug`, `getBlogPostsByTag`, `getRelatedBlogPosts`, `getFeaturedPost`, `getAllBlogSlugs`.
+  - Extended `sitemap.xml` route with dynamic `/blog/[slug]` entries.
+- Verification commands:
+  - `npm run lint`
+  - `npm run build`
+  - Playwright smoke:
+    - open `/blog`
+    - apply filter `/blog?tag=architecture`
+    - open article `/blog/mcp-overview-choosing-the-right-integration-surface`
+    - open invalid slug `/blog/non-existent-slug`
+  - `Invoke-WebRequest -Uri http://127.0.0.1:3000/sitemap.xml -UseBasicParsing`
+- Verification results:
+  - lint: pass
+  - build: pass
+  - smoke: listing/filter/article/invalid-slug paths load correctly
+  - sitemap: contains `/blog/[slug]` entries
+- Next commands:
+  - Optional: add pagination/search for blog listing if content volume grows.
+  - Optional: migrate `lib/blog/content.ts` to CMS/Supabase source when editorial workflow requires non-code publishing.
+- Open risks:
+  - Current content source is code-local; non-technical editorial updates still require code changes.
+  - `notFound` fallback relies on global app behavior; custom blog-specific `not-found.tsx` can improve UX.
+
+## Latest Update (2026-02-10, Cross-Platform MCP Config Stabilization for CMD + WSL)
+- Objective: make MCP servers load reliably in both Windows CMD and WSL sessions without path/command startup errors.
+- Status: completed.
+- Touched files:
+  - `/mnt/c/Users/Romanchello/.codex/config.toml`
+  - `/mnt/c/Users/Romanchello/.codex/config.toml.bak-2026-02-10` (backup)
+  - `docs/session-continuation.md`
+- Implemented:
+  - Replaced Windows-only `npx.cmd` launcher entries with cross-platform `npx` for stdio MCP servers.
+  - Removed Windows-absolute profile paths (`C:/Users/...`) and switched to relative `model_instructions_file` references so config resolves under both environments.
+  - Removed hardcoded Windows-only Playwright output directory argument.
+  - Set filesystem MCP path argument to `.` to avoid cross-platform absolute path resolution failures.
+- Verification commands:
+  - `HOME=/mnt/c/Users/Romanchello codex mcp list`
+  - `HOME=/mnt/c/Users/Romanchello codex mcp get filesystem`
+  - `HOME=/mnt/c/Users/Romanchello codex mcp get playwright`
+  - `npx -y @modelcontextprotocol/server-filesystem .`
+  - `npx -y chrome-devtools-mcp@latest`
+  - `npx -y @playwright/mcp@latest --headless --isolated --save-trace`
+- Verification results:
+  - `codex mcp list` loads successfully with all configured MCPs enabled.
+  - stdio MCP server commands start/exit cleanly (no startup path/command errors).
+- Next commands:
+  - Restart Codex CLI/IDE extension session to reload updated MCP config.
+  - Run `codex mcp list` once in your normal shell to confirm active config source.
+- Open risks:
+  - `filesystem` MCP is now scoped to current working directory (`.`). If wider access is needed, adjust this path per environment.
+  - Remote MCP endpoints (`exa`, `openaiDeveloperDocs`) may still require network/auth context depending on client/runtime policy.
 
 ## Latest Update (2026-02-10, Nightly Smoke 500 Resolved via Production Redeploy)
 - Objective: resolve `Nightly Smoke` failure on authorized `/api/health-check` probe (`500`) after switching to production alias target.
@@ -755,3 +1193,114 @@ Implement the DemumuMind MCP website in the current repository workspace using P
 
 
 
+---
+
+## Session Update � 2026-02-10 (Catalog refactor)
+
+### Objective
+Refactor `/catalog` for maintainability while preserving behavior 1:1.
+
+### Status
+Implemented and validated locally (lint/build + Playwright manual checks on `/catalog` and `/categories`).
+
+### Touched Files
+- `components/catalog-section.tsx`
+- `components/catalog-filter-bar.tsx`
+- `components/catalog-taxonomy-panel.tsx`
+- `hooks/use-catalog-state.ts` (new)
+- `lib/catalog/types.ts` (new)
+- `lib/catalog/filtering.ts` (new)
+- `lib/catalog/sorting.ts` (new)
+- `lib/catalog/facets.ts` (new)
+- `lib/catalog-taxonomy.ts`
+
+### Next Commands
+- `npm run lint`
+- `npm run build`
+- `npm run dev`
+
+### Verification Commands
+- `npm run lint`
+- `npm run build`
+
+### Open Risks
+- Existing repository has unrelated in-progress changes in multiple files; avoid broad staging/commits.
+- Behavior parity is validated manually; no dedicated automated unit test suite exists yet for catalog filtering/sorting.
+## Latest Update (2026-02-10, Full Validation Run Execution)
+- Objective: execute the approved full pre-release validation plan end-to-end (local, CI/CD, security, smoke, ops).
+- Status: completed with blockers detected.
+- Touched files:
+  - docs/session-continuation.md
+- Executed commands:
+  - codex-health
+  - codex --version
+  - codex mcp list
+  - tmux -V
+  - npm ci
+  - npm run lint
+  - npm run build
+  - npx next dev -p 3105 + npm run smoke:check -- http://localhost:3105
+  - npm run ops:health-report -- --base-url http://localhost:3105
+  - npm audit --omit=dev --audit-level=high
+  - gh run list ... (CI/Security/Deploy/Nightly statuses)
+  - npm run smoke:check -- https://mcp-site-silk.vercel.app
+  - npm run ops:health-report -- --base-url https://mcp-site-silk.vercel.app
+  - npm run ops:backup-verify
+  - Playwright route checks for key pages (local + production alias)
+- Verification results:
+  - Preflight environment: pass (codex-health, MCP set, tmux)
+  - Install/lint: pass
+  - Build: FAIL (app/admin/actions.ts, revalidateTag called with 1 arg; current signature requires 2)
+  - Local smoke: pass (including authorized health check JSON summary)
+  - Local ops health report: pass (4/4)
+  - Security audit: pass (0 vulnerabilities)
+  - GitHub latest workflows: CI/Security/Deploy/Nightly Smoke all success
+  - Production alias smoke (https://mcp-site-silk.vercel.app): pass (authorized health probe included)
+  - Production ops health report: pass (4/4 baseline checks)
+  - Backup verification: FAIL (backup freshness 42.99h > max 26h)
+  - Playwright route matrix:
+    - Local key routes: pass
+    - Production key routes: pass except tested blog slug /blog/mcp-overview-choosing-the-right-integration-surface returned 404 in production (local route exists and returns 200)
+- Open risks / blockers:
+  - Release gate blocked by local build type error in app/admin/actions.ts.
+  - Release gate blocked by stale backup manifest freshness (ops/backup-manifest.json).
+  - Content drift between local and production blog detail routes (slug availability mismatch).
+- Next commands:
+  - Fix build blocker, then rerun: npm run lint && npm run build
+  - Refresh backup evidence/manifest, then rerun: npm run ops:backup-verify
+  - Re-run full smoke + Playwright matrix after fixes.
+
+## Latest Update (2026-02-10, Blocker #1 Resolved + Revalidation)
+- Objective: resolve build blocker and rerun validation gates.
+- Status: blocker #1 resolved; backup freshness blocker remains.
+- Touched files:
+  - docs/session-continuation.md
+- What changed:
+  - Re-ran build path from clean process state; current code in app/admin/actions.ts with updateTag(...) compiles successfully.
+  - Confirmed local and production smoke/health checks again.
+  - Re-ran Playwright route matrix for local and production key pages.
+- Verification commands:
+  - npm run lint
+  - npm run build
+  - npx next dev -p 3105
+  - npm run smoke:check -- http://localhost:3105
+  - npm run ops:health-report -- --base-url http://localhost:3105
+  - npm run smoke:check -- https://mcp-site-silk.vercel.app
+  - npm run ops:health-report -- --base-url https://mcp-site-silk.vercel.app
+  - npm audit --omit=dev --audit-level=high
+  - npm run ops:backup-verify
+- Verification results:
+  - lint: pass
+  - build: pass
+  - local smoke: pass
+  - local ops health report: pass (4/4)
+  - production smoke: pass
+  - production ops health report: pass (4/4)
+  - security audit: pass (0 vulnerabilities)
+  - backup verify: FAIL (backup freshness age=43.47h > 26h)
+  - Playwright routes: pass for local and production key routes including blog detail slug
+- Remaining blocker:
+  - Backup freshness policy violation in ops/backup-manifest.json.
+- Next commands:
+  - Refresh backup artifact + manifest timestamp, then rerun: npm run ops:backup-verify
+  - After backup gate is green, final release sign-off.

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getActiveServers } from "@/lib/servers";
+import { getAllBlogPosts } from "@/lib/blog/service";
+import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 
 type StaticSitemapRoute = {
   path: string;
@@ -58,7 +59,9 @@ function serializeUrl(entry: SitemapEntry) {
 export async function GET() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const nowIso = new Date().toISOString();
-  const activeServers = await getActiveServers();
+  const catalogSnapshot = await getCatalogSnapshot();
+  const activeServers = catalogSnapshot.servers;
+  const blogPosts = await getAllBlogPosts();
 
   const staticEntries: SitemapEntry[] = staticRoutes.map((route) => ({
     url: new URL(route.path, siteUrl).toString(),
@@ -74,10 +77,17 @@ export async function GET() {
     priority: 0.8,
   }));
 
+  const blogEntries: SitemapEntry[] = blogPosts.map((post) => ({
+    url: new URL(`/blog/${post.slug}`, siteUrl).toString(),
+    lastModified: new Date(post.updatedAt ?? post.publishedAt).toISOString(),
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
   const payload = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...[...staticEntries, ...serverEntries].map(serializeUrl),
+    ...[...staticEntries, ...serverEntries, ...blogEntries].map(serializeUrl),
     "</urlset>",
   ].join("");
 

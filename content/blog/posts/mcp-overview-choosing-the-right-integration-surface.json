@@ -1,0 +1,65 @@
+{
+  "slug": "mcp-overview-choosing-the-right-integration-surface",
+  "tags": [
+    "architecture",
+    "playbook"
+  ],
+  "publishedAt": "2025-12-12T10:00:00.000Z",
+  "readTimeMinutes": 5,
+  "locale": {
+    "en": {
+      "title": "MCP Overview: Choosing the Right Integration Surface",
+      "excerpt": "How to evaluate server fit by auth requirements, operational ownership, and long-term maintainability.",
+      "seoTitle": "MCP Overview: Choosing the Right Integration Surface",
+      "seoDescription": "Evaluate MCP server fit with architecture-first criteria: ownership, auth model, and lifecycle costs.",
+      "contentBlocks": [
+        {
+          "heading": "Integration surface is a long-term decision",
+          "paragraphs": [
+            "Choosing a server only by feature list causes hidden costs later in maintenance and incident response.",
+            "The better decision model starts with lifecycle ownership, compliance limits, and error visibility."
+          ]
+        },
+        {
+          "heading": "Score candidates with architectural criteria",
+          "paragraphs": [
+            "Use a weighted matrix instead of subjective selection.",
+            "Even lightweight scoring reveals which option is operationally safe and which is only fast in demos."
+          ],
+          "bullets": [
+            "Authentication and secret boundaries",
+            "Rate-limit behavior and retries",
+            "Operational ownership and on-call model"
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "MCP: как выбрать правильный контур интеграции",
+      "excerpt": "Как оценивать серверы по требованиям к доступу, операционной ответственности и долгосрочной поддержке.",
+      "seoTitle": "MCP: как выбрать правильный контур интеграции",
+      "seoDescription": "Архитектурный подход к выбору MCP-сервера: ответственность, модель доступа и стоимость сопровождения.",
+      "contentBlocks": [
+        {
+          "heading": "Контур интеграции — это долгосрочное решение",
+          "paragraphs": [
+            "Выбор сервера только по списку функций обычно приводит к скрытым затратам на поддержку и обработку инцидентов.",
+            "Надёжная модель выбора начинается с понимания жизненного цикла, требований соответствия и прозрачности ошибок."
+          ]
+        },
+        {
+          "heading": "Оценивайте кандидатов по архитектурным критериям",
+          "paragraphs": [
+            "Используйте взвешенную матрицу вместо субъективного выбора.",
+            "Даже простая модель оценки быстро показывает, что подходит для продакшена, а что работает только на демонстрациях."
+          ],
+          "bullets": [
+            "Границы авторизации и хранения секретов",
+            "Поведение при ограничениях по запросам и повторных попытках",
+            "Владелец эксплуатации и модель дежурств"
+          ]
+        }
+      ]
+    }
+  }
+}

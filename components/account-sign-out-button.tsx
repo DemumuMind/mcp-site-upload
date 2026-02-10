@@ -20,7 +20,7 @@ export function AccountSignOutButton({ locale }: AccountSignOutButtonProps) {
         tr(
           locale,
           "Auth client is not configured.",
-          "Auth client is not configured.",
+          "Клиент авторизации не настроен.",
         ),
       );
       return;
@@ -33,7 +33,7 @@ export function AccountSignOutButton({ locale }: AccountSignOutButtonProps) {
       return;
     }
 
-    toast.success(tr(locale, "Signed out", "Signed out"));
+    toast.success(tr(locale, "Signed out", "Вы вышли из аккаунта"));
     window.location.assign("/auth");
   }
 
@@ -47,7 +47,7 @@ export function AccountSignOutButton({ locale }: AccountSignOutButtonProps) {
       className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]"
     >
       <LogOut className="size-4" />
-      {tr(locale, "Sign out", "Sign out")}
+      {tr(locale, "Sign out", "Выйти")}
     </Button>
   );
 }

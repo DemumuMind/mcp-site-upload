@@ -9,10 +9,18 @@ import {
   privacySections,
 } from "@/lib/legal-content";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "Privacy policy for DemumuMind MCP.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "Privacy Policy", "Политика конфиденциальности"),
+    description: tr(
+      locale,
+      "Privacy policy for DemumuMind MCP.",
+      "Политика конфиденциальности DemumuMind MCP.",
+    ),
+  };
+}
 
 export default async function PrivacyPage() {
   const locale = await getLocale();

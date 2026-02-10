@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: UTF-8 check
+        run: npm run check:utf8:strict
+
       - name: Lint
         run: npm run lint
 

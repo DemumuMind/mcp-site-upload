@@ -7,10 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "Pricing",
-  description: "Pricing details for DemumuMind MCP.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "Pricing", "Цены"),
+    description: tr(
+      locale,
+      "Pricing details for DemumuMind MCP.",
+      "Тарифы и текущий план для DemumuMind MCP.",
+    ),
+  };
+}
 
 export default async function PricingPage() {
   const locale = await getLocale();

@@ -26,9 +26,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SubmissionAccessPanel } from "@/components/submission-access-panel";
+import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { tr, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getActiveServers } from "@/lib/servers";
 import type { AuthType } from "@/lib/types";
 
 const authTypeLabelByLocale: Record<Locale, Record<AuthType, string>> = {
@@ -295,14 +295,12 @@ const boardRowStyles = [
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const activeServers = await getActiveServers();
+  const catalogSnapshot = await getCatalogSnapshot({ featuredLimit: 4 });
+  const activeServers = catalogSnapshot.servers;
   const authTypeLabel = authTypeLabelByLocale[locale];
-  const featuredServers = activeServers.slice(0, 4);
-  const totalTools = activeServers.reduce(
-    (total, mcpServer) => total + mcpServer.tools.length,
-    0,
-  );
-  const totalCategories = new Set(activeServers.map((mcpServer) => mcpServer.category)).size;
+  const featuredServers = catalogSnapshot.featuredServers;
+  const totalTools = catalogSnapshot.totalTools;
+  const totalCategories = catalogSnapshot.totalCategories;
   const connectionsCount = Math.max(2, Math.min(4, featuredServers.length));
   const firstServer = featuredServers[0];
 

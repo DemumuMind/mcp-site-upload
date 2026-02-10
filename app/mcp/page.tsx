@@ -7,10 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "MCP Overview",
-  description: "Overview of DemumuMind MCP and how it helps teams.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "MCP Overview", "Обзор MCP"),
+    description: tr(
+      locale,
+      "Overview of DemumuMind MCP and how it helps teams.",
+      "Обзор DemumuMind MCP и того, как платформа помогает командам.",
+    ),
+  };
+}
 
 export default async function MCPPage() {
   const locale = await getLocale();

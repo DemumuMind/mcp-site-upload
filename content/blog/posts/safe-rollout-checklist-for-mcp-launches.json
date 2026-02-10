@@ -1,0 +1,66 @@
+{
+  "slug": "safe-rollout-checklist-for-mcp-launches",
+  "tags": [
+    "operations",
+    "quality",
+    "playbook"
+  ],
+  "publishedAt": "2025-09-30T10:00:00.000Z",
+  "readTimeMinutes": 6,
+  "locale": {
+    "en": {
+      "title": "Safe Rollout Checklist for MCP Launches",
+      "excerpt": "A concise checklist to reduce avoidable incidents during first production launches.",
+      "seoTitle": "Safe Rollout Checklist for MCP Launches",
+      "seoDescription": "Use this rollout checklist to launch MCP integrations safely and reduce production incidents.",
+      "contentBlocks": [
+        {
+          "heading": "Runbook first, then release",
+          "paragraphs": [
+            "The first launch should always include a clear runbook with rollback thresholds and owner contacts.",
+            "A checklist does not slow delivery, it protects delivery velocity over time."
+          ]
+        },
+        {
+          "heading": "Minimum launch checklist",
+          "paragraphs": [
+            "If one item is missing, the release is not ready."
+          ],
+          "bullets": [
+            "Health metrics and alerts configured",
+            "Error triage path documented",
+            "Fallback behavior validated in staging",
+            "On-call handoff completed"
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "Чеклист безопасного запуска MCP-интеграций",
+      "excerpt": "Короткий список проверок, который снижает число предотвратимых инцидентов при первом запуске в продакшене.",
+      "seoTitle": "Чеклист безопасного запуска MCP-интеграций",
+      "seoDescription": "Используйте этот чеклист, чтобы безопасно запускать MCP-интеграции и снижать риск инцидентов.",
+      "contentBlocks": [
+        {
+          "heading": "Сначала регламент, потом релиз",
+          "paragraphs": [
+            "Первый запуск должен сопровождаться чётким регламентом с порогами отката и контактами ответственных.",
+            "Чеклист не замедляет поставку, а защищает её стабильность на дистанции."
+          ]
+        },
+        {
+          "heading": "Минимальный список перед запуском",
+          "paragraphs": [
+            "Если хотя бы один пункт не выполнен, релиз не готов."
+          ],
+          "bullets": [
+            "Настроены метрики состояния и оповещения",
+            "Описан путь разбора ошибок",
+            "Резервный сценарий проверен на стенде",
+            "Передача дежурства завершена"
+          ]
+        }
+      ]
+    }
+  }
+}

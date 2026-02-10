@@ -1,0 +1,82 @@
+{
+  "slug": "mcp-setup-playbook-production-teams",
+  "tags": [
+    "playbook",
+    "operations",
+    "workflow"
+  ],
+  "publishedAt": "2026-01-18T10:00:00.000Z",
+  "updatedAt": "2026-01-20T10:00:00.000Z",
+  "readTimeMinutes": 6,
+  "featured": true,
+  "locale": {
+    "en": {
+      "title": "MCP Setup Playbook for Production Teams",
+      "excerpt": "A practical rollout sequence to move from MCP discovery to controlled deployment without integration dead-ends.",
+      "seoTitle": "MCP Setup Playbook for Production Teams",
+      "seoDescription": "Production-ready MCP setup sequence: discovery, constraints, rollout gates, and post-launch checks.",
+      "contentBlocks": [
+        {
+          "heading": "Start with capability and ownership mapping",
+          "paragraphs": [
+            "Every MCP rollout starts with a simple map: what capability is needed, which server provides it, and who owns runtime support.",
+            "Without clear ownership, rollout speed looks high in week one and collapses during incident response."
+          ]
+        },
+        {
+          "heading": "Define hard rollout gates before coding",
+          "paragraphs": [
+            "Treat integration as an operational change, not only as implementation work.",
+            "Set mandatory gates for auth readiness, error budget, fallback behavior, and observability before shipping to production."
+          ],
+          "bullets": [
+            "Auth and secret handling reviewed",
+            "Telemetry for success/failure paths enabled",
+            "Rollback path documented and tested"
+          ]
+        },
+        {
+          "heading": "Run staged verification",
+          "paragraphs": [
+            "Move from local checks to staging smoke and then production canary. Keep each stage small and measurable.",
+            "A fast feedback loop with explicit pass/fail criteria prevents risky all-in deployments."
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "Пошаговый запуск MCP для продуктовых команд",
+      "excerpt": "Практическая последовательность: от первичной оценки до контролируемого внедрения без интеграционных тупиков.",
+      "seoTitle": "Пошаговый запуск MCP для продуктовых команд",
+      "seoDescription": "Готовая схема запуска MCP: первичная оценка, ограничения, контрольные точки внедрения и послерелизные проверки.",
+      "contentBlocks": [
+        {
+          "heading": "Начните с карты возможностей и ответственности",
+          "paragraphs": [
+            "Каждый запуск MCP стоит начинать с простой карты: какая возможность нужна, какой сервер её обеспечивает и кто отвечает за поддержку в рабочей среде.",
+            "Без явного владельца скорость на старте кажется высокой, но резко падает при первом инциденте."
+          ]
+        },
+        {
+          "heading": "Зафиксируйте контрольные точки до начала разработки",
+          "paragraphs": [
+            "Интеграцию важно воспринимать как операционное изменение, а не только как задачу по написанию кода.",
+            "До релиза зафиксируйте обязательные проверки по авторизации, наблюдаемости, отказоустойчивости и плану отката."
+          ],
+          "bullets": [
+            "Проверены доступы и работа с секретами",
+            "Включены метрики успешных и ошибочных сценариев",
+            "План отката оформлен и протестирован"
+          ]
+        },
+        {
+          "heading": "Проводите поэтапную верификацию",
+          "paragraphs": [
+            "Двигайтесь от локальных проверок к проверке на стенде и затем к ограниченному запуску в продакшене.",
+            "Короткий цикл обратной связи с чёткими критериями прохождения снижает риск релиза без контроля."
+          ]
+        }
+      ]
+    }
+  }
+}

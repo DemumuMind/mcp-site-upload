@@ -1,0 +1,121 @@
+{
+  "slug": "cost-governance-in-agentic-engineering-workflows-1770738067",
+  "tags": [
+    "operations",
+    "workflow",
+    "quality"
+  ],
+  "publishedAt": "2026-02-10T15:41:13.270Z",
+  "updatedAt": "2026-02-10T15:41:13.270Z",
+  "readTimeMinutes": 3,
+  "featured": false,
+  "locale": {
+    "en": {
+      "title": "Cost Governance in Agentic Engineering Workflows",
+      "excerpt": "Research-backed article based on 6 recent sources about Cost governance in agentic development.",
+      "seoTitle": "Cost Governance in Agentic Engineering Workflows",
+      "seoDescription": "Deep research-based article on Cost governance in agentic development with verified, recent web sources.",
+      "contentBlocks": [
+        {
+          "heading": "Research scope",
+          "paragraphs": [
+            "Topic: Cost governance in agentic development. Angle: How teams manage model spend without reducing delivery speed.",
+            "Sources were selected from the last 14 days and validated through multi-round checks."
+          ]
+        },
+        {
+          "heading": "Verified findings",
+          "paragraphs": [
+            "Signal 1: agentic. Repeated in 4 independent sources. Supporting sources: src-9, src-2, src-7, src-14.",
+            "Signal 2: governance. Repeated in 3 independent sources. Supporting sources: src-2, src-11, src-7.",
+            "Signal 3: model. Repeated in 2 independent sources. Supporting sources: src-9, src-6.",
+            "Signal 4: learn. Repeated in 2 independent sources. Supporting sources: src-9, src-11.",
+            "Signal 5: why. Repeated in 2 independent sources. Supporting sources: src-9, src-6."
+          ]
+        },
+        {
+          "heading": "Curated fresh sources",
+          "paragraphs": [
+            "Only recent and high-relevance sources are included below."
+          ],
+          "bullets": [
+            "Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... — https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)",
+            "Governance lags agentic AI adoption in the UK, says Salesforce — https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)",
+            "AI Agent Governance Blueprint for Production Deployment — https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)",
+            "Serving LLMs Without Breaking the Bank — https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)",
+            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)",
+            "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy — https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)"
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "Управление затратами в agentic-инженерных workflow",
+      "excerpt": "Материал подготовлен на основе 6 актуальных источников по теме: Cost governance in agentic development.",
+      "seoTitle": "Управление затратами в agentic-инженерных workflow",
+      "seoDescription": "Статья на основе deep research по теме Cost governance in agentic development с многоэтапной проверкой источников.",
+      "contentBlocks": [
+        {
+          "heading": "Область исследования",
+          "paragraphs": [
+            "Тема: Cost governance in agentic development. Фокус: How teams manage model spend without reducing delivery speed.",
+            "Источники отобраны за последние 14 дней и прошли многоэтапную верификацию."
+          ]
+        },
+        {
+          "heading": "Подтверждённые выводы",
+          "paragraphs": [
+            "Signal 1: agentic. Repeated in 4 independent sources. Подтверждающие источники: src-9, src-2, src-7, src-14.",
+            "Signal 2: governance. Repeated in 3 independent sources. Подтверждающие источники: src-2, src-11, src-7.",
+            "Signal 3: model. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-6.",
+            "Signal 4: learn. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-11.",
+            "Signal 5: why. Repeated in 2 independent sources. Подтверждающие источники: src-9, src-6."
+          ]
+        },
+        {
+          "heading": "Актуальные источники",
+          "paragraphs": [
+            "Ниже приведены только свежие и релевантные источники."
+          ],
+          "bullets": [
+            "Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... — https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)",
+            "Governance lags agentic AI adoption in the UK, says Salesforce — https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)",
+            "AI Agent Governance Blueprint for Production Deployment — https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)",
+            "Serving LLMs Without Breaking the Bank — https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)",
+            "Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)",
+            "Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy — https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)"
+          ]
+        }
+      ]
+    }
+  },
+  "research": {
+    "packetId": "cost-governance-in-agentic-development-1770738073268",
+    "provider": "exa-search-deep",
+    "createdAt": "2026-02-10T15:41:13.268Z",
+    "verifiedAt": "2026-02-10T15:41:13.270Z",
+    "sourceCount": 6,
+    "verificationRounds": [
+      {
+        "round": "relevance",
+        "passed": true,
+        "details": "Selected 6 essential sources (avg relevance 19.2)."
+      },
+      {
+        "round": "freshness",
+        "passed": true,
+        "details": "All selected sources are within the last 14 days."
+      },
+      {
+        "round": "diversity",
+        "passed": true,
+        "details": "Domain diversity passed (6 unique domains)."
+      },
+      {
+        "round": "corroboration",
+        "passed": true,
+        "details": "Corroboration passed with 5 repeated signals."
+      }
+    ]
+  }
+}

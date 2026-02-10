@@ -1,5 +1,6 @@
 "use server";
 
+import { sendSubmissionReceivedEmail } from "@/lib/email/notifications";
 import { getSupabaseServerUser } from "@/lib/supabase/auth-server";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -41,7 +42,7 @@ export async function submitServerAction(
   if (!parsedSubmission.success) {
     const fieldErrors = Object.fromEntries(
       Object.entries(parsedSubmission.error.flatten().fieldErrors).map(
-        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Некорректное значение")],
+        ([field, errors]) => [field, errors?.[0] ?? tr(locale, "Invalid value", "Неверное значение")],
       ),
     );
 
@@ -50,7 +51,7 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Validation failed. Please check highlighted fields.",
-        "Проверка данных не пройдена. Исправьте поля с ошибками.",
+        "Ошибка валидации. Проверьте поля с ошибками.",
       ),
       fieldErrors: fieldErrors as Partial<Record<keyof SubmissionInput, string>>,
     };
@@ -65,7 +66,7 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Auth is not configured. Set Supabase environment variables before submitting.",
-        "Авторизация не настроена. Укажите переменные окружения Supabase перед отправкой.",
+        "Авторизация не настроена. Проверьте переменные окружения Supabase перед отправкой.",
       ),
     };
   }
@@ -76,14 +77,16 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Login / Sign in is required before submitting a server.",
-        "Перед отправкой сервера необходимо войти в аккаунт.",
+        "Перед отправкой сервера нужно войти в аккаунт.",
       ),
     };
   }
 
+  const serverSlug = toSlug(data.name);
+
   const { error } = await supabaseClient.from("servers").insert({
     name: data.name,
-    slug: toSlug(data.name),
+    slug: serverSlug,
     description: data.description,
     server_url: data.serverUrl,
     category: data.category,
@@ -106,7 +109,7 @@ export async function submitServerAction(
         message: tr(
           locale,
           "A server with a similar name already exists. Please use a more specific name.",
-          "Сервер с похожим названием уже существует. Укажите более уникальное название.",
+          "Сервер с похожим названием уже существует. Используйте более уникальное имя.",
         ),
       };
     }
@@ -116,9 +119,24 @@ export async function submitServerAction(
       message: tr(
         locale,
         "Submission failed. Please try again later.",
-        "Не удалось отправить сервер. Попробуйте ещё раз позже.",
+        "Не удалось отправить заявку. Попробуйте позже.",
       ),
     };
+  }
+
+  const recipientEmail = user.email || data.maintainerEmail;
+
+  const emailResult = await sendSubmissionReceivedEmail({
+    locale,
+    recipientEmail,
+    serverName: data.name,
+    serverSlug,
+    category: data.category,
+    authType: data.authType,
+  });
+
+  if (!emailResult.sent && !emailResult.skipped) {
+    console.error("[submitServerAction] Failed to send submission email:", emailResult.reason);
   }
 
   return {
@@ -126,7 +144,7 @@ export async function submitServerAction(
     message: tr(
       locale,
       "Server submitted successfully. Status: pending moderation.",
-      "Сервер успешно отправлен. Статус: ожидает модерацию.",
+      "Сервер успешно отправлен. Статус: ожидает модерации.",
     ),
   };
 }

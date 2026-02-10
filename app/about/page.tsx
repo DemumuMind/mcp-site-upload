@@ -22,10 +22,18 @@ import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: "Developer-first overview of DemumuMind MCP and how we build with MCP in production.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "About", "О нас"),
+    description: tr(
+      locale,
+      "Developer-first overview of DemumuMind MCP and how we build with MCP in production.",
+      "Обзор DemumuMind MCP для разработчиков: как мы внедряем MCP в продакшене.",
+    ),
+  };
+}
 
 const revealDelayClasses = ["about-delay-0", "about-delay-1", "about-delay-2", "about-delay-3"] as const;
 

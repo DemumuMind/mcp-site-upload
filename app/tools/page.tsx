@@ -4,10 +4,18 @@ import { ToolsSection } from "@/components/tools-section";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: "Tools",
-  description: "Token calculator, rules generator, and date/time localizer for MCP projects.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "Tools", "Инструменты"),
+    description: tr(
+      locale,
+      "Token calculator, rules generator, and date/time localizer for MCP projects.",
+      "Калькулятор токенов, генератор правил и локализатор даты/времени для MCP-проектов.",
+    ),
+  };
+}
 
 export default async function ToolsPage() {
   const locale = await getLocale();

@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
 
 import { CatalogSection } from "@/components/catalog-section";
+import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getActiveServers } from "@/lib/servers";
 
-export const metadata: Metadata = {
-  title: "AI Tools Directory",
-  description: "Discover and filter MCP tools, models, and services in one directory.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "AI Tools Directory", "Каталог AI-инструментов"),
+    description: tr(
+      locale,
+      "Discover and filter MCP tools, models, and services in one directory.",
+      "Находите и фильтруйте MCP-инструменты, модели и сервисы в едином каталоге.",
+    ),
+  };
+}
 
 export default async function CatalogPage() {
   const locale = await getLocale();
-  const activeServers = await getActiveServers();
+  const catalogSnapshot = await getCatalogSnapshot();
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
@@ -31,12 +39,12 @@ export default async function CatalogPage() {
           <p className="text-xs text-slate-500">
             {tr(
               locale,
-              `${activeServers.length} tools available in the catalog.`,
-              `В каталоге доступно ${activeServers.length} инструментов.`,
+              `${catalogSnapshot.totalServers} tools available in the catalog.`,
+              `В каталоге доступно ${catalogSnapshot.totalServers} инструментов.`,
             )}
           </p>
         </div>
-        <CatalogSection initialServers={activeServers} />
+        <CatalogSection initialServers={catalogSnapshot.servers} />
       </div>
     </div>
   );

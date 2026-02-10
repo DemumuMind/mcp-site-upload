@@ -1,0 +1,65 @@
+{
+  "slug": "catalog-patterns-from-discovery-to-reuse",
+  "tags": [
+    "workflow",
+    "operations"
+  ],
+  "publishedAt": "2025-11-27T10:00:00.000Z",
+  "readTimeMinutes": 7,
+  "locale": {
+    "en": {
+      "title": "Catalog Patterns: From Discovery to Reuse",
+      "excerpt": "Workflow patterns that help teams reuse integration knowledge and avoid duplicated setup effort.",
+      "seoTitle": "Catalog Patterns: From Discovery to Reuse",
+      "seoDescription": "Turn integration discoveries into reusable catalog knowledge with practical workflow patterns.",
+      "contentBlocks": [
+        {
+          "heading": "Capture the context, not only the link",
+          "paragraphs": [
+            "A useful catalog entry includes setup constraints, auth mode, known limits, and support status.",
+            "Context-rich entries reduce repeated discovery work across squads."
+          ]
+        },
+        {
+          "heading": "Standardize the handoff format",
+          "paragraphs": [
+            "Define a compact template for discovery notes and rollout readiness.",
+            "This makes handoff predictable and keeps implementation teams aligned with product intent."
+          ],
+          "bullets": [
+            "What was tested and by whom",
+            "Known failure modes",
+            "Fallback and rollback notes"
+          ]
+        }
+      ]
+    },
+    "ru": {
+      "title": "Каталожные паттерны: от оценки к повторному использованию",
+      "excerpt": "Практики, которые помогают переиспользовать интеграционные знания и не дублировать работу по настройке.",
+      "seoTitle": "Каталожные паттерны: от оценки к повторному использованию",
+      "seoDescription": "Как превращать результаты оценки интеграций в переиспользуемые знания каталога.",
+      "contentBlocks": [
+        {
+          "heading": "Фиксируйте не только ссылку, но и контекст",
+          "paragraphs": [
+            "Полезная запись в каталоге содержит ограничения настройки, модель доступа, известные лимиты и состояние поддержки.",
+            "Контекстные записи снижают повторные исследования между командами."
+          ]
+        },
+        {
+          "heading": "Стандартизируйте формат передачи",
+          "paragraphs": [
+            "Используйте компактный шаблон для заметок по оценке и готовности к внедрению.",
+            "Это делает передачу контекста предсказуемой и синхронизирует команды с продуктовой целью."
+          ],
+          "bullets": [
+            "Что проверили и кто проверял",
+            "Известные сценарии отказа",
+            "Примечания по резервным сценариям и откату"
+          ]
+        }
+      ]
+    }
+  }
+}

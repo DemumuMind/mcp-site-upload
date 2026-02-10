@@ -13,6 +13,8 @@
 - `npm run dev` — start local dev server on port `3000`.
 - `npm run build` — create production build (required before merge).
 - `npm run start` — run the production build locally.
+- `npm run check:utf8` — verify tracked text files are valid UTF-8.
+- `npm run check:utf8:strict` — UTF-8 check + fail if any git-tracked file is missing.
 - `npm run lint` — run ESLint across the repo.
 - `npm run smoke:check -- <url>` — run deployment smoke checks.
 - `npm run ops:health-report -- --base-url <url>` — generate health summary.
@@ -28,8 +30,9 @@
 
 ## Testing Guidelines
 - There is no dedicated unit test suite yet; quality gate is:
-  1) `npm run lint`
-  2) `npm run build`
+  1) `npm run check:utf8`
+  2) `npm run lint`
+  3) `npm run build`
 - For release validation, run smoke checks against the target environment.
 - For UI-heavy changes, include manual browser verification (mobile + desktop) and capture screenshots when relevant.
 

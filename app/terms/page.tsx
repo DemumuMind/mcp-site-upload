@@ -9,10 +9,18 @@ import {
   termsSections,
 } from "@/lib/legal-content";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "Terms of service and acceptable use policy for DemumuMind MCP.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  return {
+    title: tr(locale, "Terms of Service", "Пользовательское соглашение"),
+    description: tr(
+      locale,
+      "Terms of service and acceptable use policy for DemumuMind MCP.",
+      "Пользовательское соглашение и правила допустимого использования DemumuMind MCP.",
+    ),
+  };
+}
 
 export default async function TermsPage() {
   const locale = await getLocale();
