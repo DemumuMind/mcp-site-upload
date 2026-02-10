@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageFrame } from "@/components/page-templates";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { cn } from "@/lib/utils";
@@ -229,7 +230,7 @@ export default async function AboutPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="marketing" className="relative">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02070f_0%,#030b16_45%,#050814_100%)]" />
       <div className="about-hero-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[760px] bg-[radial-gradient(circle_at_18%_8%,rgba(56,189,248,0.26),transparent_44%),radial-gradient(circle_at_82%_3%,rgba(14,165,233,0.18),transparent_40%)]" />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(56,189,248,0.06)_1px,transparent_1px),linear-gradient(rgba(56,189,248,0.05)_1px,transparent_1px)] bg-[size:44px_44px] opacity-35" />
@@ -587,6 +588,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-    </div>
+    </PageFrame>
   );
 }

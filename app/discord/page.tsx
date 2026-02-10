@@ -5,6 +5,7 @@ import { type LucideIcon, ArrowRight, Bot, MessageCircleMore, ShieldCheck, Users
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageFrame } from "@/components/page-templates";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -82,7 +83,7 @@ export default async function DiscordPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <PageFrame variant="content">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0a1020_0%,#070b17_50%,#050811_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_17%_7%,rgba(99,102,241,0.24),transparent_42%),radial-gradient(circle_at_84%_4%,rgba(168,85,247,0.2),transparent_38%)]" />
 
@@ -190,6 +191,6 @@ export default async function DiscordPage() {
           </Card>
         </section>
       </div>
-    </div>
+    </PageFrame>
   );
 }
