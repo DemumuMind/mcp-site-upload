@@ -1,4 +1,39 @@
-﻿## Latest Update (2026-02-10, Real Catalog Entries + Section Index Extended)
+﻿## Latest Update (2026-02-12, /how-to-use Redesign + Scenario UX + Event Tracking)
+- Objective: implement deep redesign for `/how-to-use` with role-based onboarding, stronger catalog conversion path, and consent-aware analytics events.
+- Status: completed (pending verification commands listed below).
+- Touched files:
+  - `app/how-to-use/page.tsx`
+  - `components/how-to-connect-section.tsx`
+  - `components/how-to-use/how-to-use-page-content.tsx` (new)
+  - `components/how-to-use/persona-selector.tsx` (new)
+  - `components/how-to-use/scenario-steps.tsx` (new)
+  - `components/how-to-use/client-reference.tsx` (new)
+  - `components/how-to-use/cta-rail.tsx` (new)
+  - `lib/content/how-to-use.ts` (new)
+  - `lib/analytics/track-consented.ts` (new)
+  - `content/how-to-use/_index.json`
+  - `content/how-to-use/paths.json` (new)
+  - `tests/how-to-use.spec.ts` (new)
+  - `docs/content-infrastructure.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Rebuilt `/how-to-use` into role-based flow (`quick_start` / `production_ready`) with reduced duplication and stronger CTA funnel.
+  - Added structured content source `content/how-to-use/paths.json` with EN/RU parity and a typed loader (`lib/content/how-to-use.ts`).
+  - Added client reference switcher, scenario-specific steps, trust/troubleshooting blocks, and a final CTA rail.
+  - Added consent-aware analytics helper and instrumented events:
+    - `how_to_use_persona_selected`
+    - `how_to_use_cta_clicked`
+    - `how_to_use_client_reference_opened`
+    - `how_to_use_config_copied`
+    - `how_to_use_scroll_depth`
+  - Extended `HowToConnectSection` with optional `onConfigCopied` callback for instrumentation.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - `npx playwright test tests/how-to-use.spec.ts`
+
+## Latest Update (2026-02-10, Real Catalog Entries + Section Index Extended)
 - Objective: continue previous content-infrastructure work by (1) adding real disk catalog entries and (2) extending section-index metadata wiring beyond blog/catalog.
 - Status: completed (pending/after verification commands below).
 - Touched files:
@@ -2026,6 +2061,7 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - `npm run lint`
   - `npm run build`
   - manual read validation of workflow file and docs references
+
 
 
 

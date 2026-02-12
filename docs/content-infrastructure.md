@@ -15,6 +15,7 @@ Used by page metadata and heroes.
 - `content/tools/_index.json`
 - `content/mcp/_index.json`
 - `content/how-to-use/_index.json`
+- `content/how-to-use/paths.json` (structured setup scenarios, client reference, trust checks, troubleshooting, CTA rail)
 
 Schema is handled by `lib/content/section-index.ts`:
 
@@ -74,3 +75,16 @@ Current real infrastructure entries included in this repo:
 - `content/catalog/entries/playwright-browser-automation.json`
 - `content/catalog/entries/chrome-devtools-inspector.json`
 - `content/catalog/entries/local-filesystem-ops.json`
+
+## 4) How-to-use content (structured page copy)
+
+`/how-to-use` now consumes a structured content file:
+
+- `content/how-to-use/paths.json`
+- loader: `lib/content/how-to-use.ts`
+
+This enables:
+
+- role-based setup paths (`quick_start`, `production_ready`)
+- client setup reference without duplicated page blocks
+- centralized trust/troubleshooting/CTA copy in EN + RU

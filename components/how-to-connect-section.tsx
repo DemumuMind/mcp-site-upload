@@ -12,6 +12,7 @@ import { tr } from "@/lib/i18n";
 type HowToConnectSectionProps = {
   serverName: string;
   serverUrl: string;
+  onConfigCopied?: () => void;
 };
 
 function toConfigKey(serverName: string): string {
@@ -26,6 +27,7 @@ function toConfigKey(serverName: string): string {
 export function HowToConnectSection({
   serverName,
   serverUrl,
+  onConfigCopied,
 }: HowToConnectSectionProps) {
   const locale = useLocale();
 
@@ -49,6 +51,7 @@ export function HowToConnectSection({
   async function handleCopyConfig() {
     try {
       await navigator.clipboard.writeText(configSnippet);
+      onConfigCopied?.();
       toast.success(
         tr(locale, "Config snippet copied to clipboard.", "Конфиг скопирован в буфер обмена."),
       );
