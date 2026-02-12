@@ -25,7 +25,7 @@ const checks = [
       en: "About",
     },
     h1: {
-      en: "Agentic Engineering Organization",
+      en: "We build production MCP workflows",
     },
   },
   {
@@ -43,7 +43,7 @@ const checks = [
       en: "AI Tools Directory",
     },
     h1: {
-      en: "AI Tools Directory",
+      en: "Find Trusted MCP Servers Faster",
     },
   },
   {
@@ -52,7 +52,7 @@ const checks = [
       en: "Tools",
     },
     h1: {
-      en: "Tools",
+      en: "Utility Toolkit for MCP Teams",
     },
   },
   {
@@ -61,7 +61,7 @@ const checks = [
       en: "Pricing",
     },
     h1: {
-      en: "Pricing",
+      en: "Two simple plans",
     },
   },
   {
@@ -70,7 +70,7 @@ const checks = [
       en: "Contact",
     },
     h1: {
-      en: "Contact BridgeMind",
+      en: "Need help shipping MCP workflows?",
     },
   },
   {
@@ -88,7 +88,7 @@ const checks = [
       en: "Sitemap",
     },
     h1: {
-      en: "BridgeMind Sitemap",
+      en: "DemumuMind Sitemap",
     },
   },
   {
