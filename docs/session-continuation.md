@@ -1,4 +1,21 @@
-﻿## Latest Update (2026-02-12, E2E + Build Stability Hotfixes)
+﻿## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
+- Objective: finalize “Почини” follow-up by ensuring lint/build are stable after security hardening pass.
+- Status: completed.
+- Touched files:
+  - `eslint.config.mjs`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added ESLint ignore for generated Playwright artifact directory: `.next-playwright-howto/**`.
+  - Re-validated the full local quality/build gate.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npx tsc --noEmit` -> pass
+- Open risks:
+  - Repo still contains many unrelated in-progress changes; keep commit scope isolated.
+
+## Latest Update (2026-02-12, E2E + Build Stability Hotfixes)
 - Objective: fix all issues found in bug sweep (`build` env/PWD instability, Playwright webServer lock issue, and rollout-track test instability).
 - Status: completed.
 - Touched files:
