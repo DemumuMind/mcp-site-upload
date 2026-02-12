@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { SearchX } from "lucide-react";
+import { FilterX, SearchX, X } from "lucide-react";
 
 import { CatalogFilterBar } from "@/components/catalog-filter-bar";
 import { CatalogTaxonomyPanel } from "@/components/catalog-taxonomy-panel";
@@ -41,6 +41,12 @@ type CatalogQueryState = {
   sortField: CatalogSortField;
   sortDirection: CatalogSortDirection;
   viewMode: CatalogViewMode;
+};
+
+type ActiveFilterChip = {
+  key: string;
+  label: string;
+  onRemove: () => void;
 };
 
 const catalogPageSize = 12;
@@ -184,6 +190,9 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
     viewMode: initialViewMode,
   });
 
+  const [searchInputValue, setSearchInputValue] = useState(initialSearchQuery);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
   const authTypeOptions = useMemo<AuthTypeOption[]>(
     () => [
       {
@@ -205,6 +214,11 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
     [authTypeCounts.api_key, authTypeCounts.none, authTypeCounts.oauth, locale],
   );
 
+  const authTypeLabelByValue = useMemo(
+    () => new Map(authTypeOptions.map((option) => [option.value, option.label])),
+    [authTypeOptions],
+  );
+
   const totalPages = Math.max(1, Math.ceil(filteredServers.length / catalogPageSize));
   const activePage = Math.min(currentPage, totalPages);
   const paginatedServers = useMemo(() => {
@@ -218,10 +232,84 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
   );
   const firstVisibleIndex = filteredServers.length === 0 ? 0 : (activePage - 1) * catalogPageSize + 1;
   const lastVisibleIndex = Math.min(activePage * catalogPageSize, filteredServers.length);
+  const activeFilterCount =
+    selectedCategories.length + selectedAuthTypes.length + selectedTags.length;
 
-  function replaceCatalogUrl(nextState: Partial<CatalogQueryState>) {
-    const mergedState: CatalogQueryState = {
-      page: currentPage,
+  const replaceCatalogUrl = useCallback(
+    (nextState: Partial<CatalogQueryState>) => {
+      const mergedState: CatalogQueryState = {
+        page: currentPage,
+        searchQuery,
+        selectedCategories,
+        selectedAuthTypes,
+        selectedTags,
+        sortField,
+        sortDirection,
+        viewMode,
+        ...nextState,
+      };
+
+      const normalizedSearchQuery = mergedState.searchQuery.trim();
+      const normalizedCategories = toSortedUniqueCatalogList(mergedState.selectedCategories);
+      const normalizedAuthTypes = toSortedUniqueAuthTypes(mergedState.selectedAuthTypes);
+      const normalizedTags = toSortedUniqueCatalogList(mergedState.selectedTags);
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("page");
+      params.delete("q");
+      params.delete("cat");
+      params.delete("auth");
+      params.delete("tag");
+      params.delete("sort");
+      params.delete("order");
+      params.delete("view");
+
+      if (mergedState.page > 1) {
+        params.set("page", String(mergedState.page));
+      }
+
+      if (normalizedSearchQuery.length > 0) {
+        params.set("q", normalizedSearchQuery);
+      }
+
+      normalizedCategories.forEach((category) => {
+        params.append("cat", category);
+      });
+
+      normalizedAuthTypes.forEach((authType) => {
+        params.append("auth", authType);
+      });
+
+      normalizedTags.forEach((tag) => {
+        params.append("tag", tag);
+      });
+
+      if (mergedState.sortField !== defaultSortField) {
+        params.set("sort", mergedState.sortField);
+      }
+
+      if (mergedState.sortDirection !== defaultSortDirection) {
+        params.set("order", mergedState.sortDirection);
+      }
+
+      if (mergedState.viewMode !== defaultViewMode) {
+        params.set("view", mergedState.viewMode);
+      }
+
+      const query = params.toString();
+      const currentQuery = searchParams.toString();
+
+      if (query === currentQuery) {
+        return;
+      }
+
+      router.replace(query.length > 0 ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [
+      currentPage,
+      pathname,
+      router,
+      searchParams,
       searchQuery,
       selectedCategories,
       selectedAuthTypes,
@@ -229,72 +317,20 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       sortField,
       sortDirection,
       viewMode,
-      ...nextState,
-    };
+    ],
+  );
 
-    const normalizedSearchQuery = mergedState.searchQuery.trim();
-    const normalizedCategories = toSortedUniqueCatalogList(mergedState.selectedCategories);
-    const normalizedAuthTypes = toSortedUniqueAuthTypes(mergedState.selectedAuthTypes);
-    const normalizedTags = toSortedUniqueCatalogList(mergedState.selectedTags);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("page");
-    params.delete("q");
-    params.delete("cat");
-    params.delete("auth");
-    params.delete("tag");
-    params.delete("sort");
-    params.delete("order");
-    params.delete("view");
-
-    if (mergedState.page > 1) {
-      params.set("page", String(mergedState.page));
-    }
-
-    if (normalizedSearchQuery.length > 0) {
-      params.set("q", normalizedSearchQuery);
-    }
-
-    normalizedCategories.forEach((category) => {
-      params.append("cat", category);
+  function clearSearchQuery() {
+    setSearchInputValue("");
+    setSearchQuery("");
+    replaceCatalogUrl({
+      page: 1,
+      searchQuery: "",
     });
-
-    normalizedAuthTypes.forEach((authType) => {
-      params.append("auth", authType);
-    });
-
-    normalizedTags.forEach((tag) => {
-      params.append("tag", tag);
-    });
-
-    if (mergedState.sortField !== defaultSortField) {
-      params.set("sort", mergedState.sortField);
-    }
-
-    if (mergedState.sortDirection !== defaultSortDirection) {
-      params.set("order", mergedState.sortDirection);
-    }
-
-    if (mergedState.viewMode !== defaultViewMode) {
-      params.set("view", mergedState.viewMode);
-    }
-
-    const query = params.toString();
-    const currentQuery = searchParams.toString();
-
-    if (query === currentQuery) {
-      return;
-    }
-
-    router.replace(query.length > 0 ? `${pathname}?${query}` : pathname, { scroll: false });
   }
 
   function handleSearchQueryChange(value: string) {
-    setSearchQuery(value);
-    replaceCatalogUrl({
-      page: 1,
-      searchQuery: value,
-    });
+    setSearchInputValue(value);
   }
 
   function handleSortFieldChange(value: CatalogSortField) {
@@ -357,6 +393,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
   }
 
   function handleClearAllFilters() {
+    setSearchInputValue("");
     clearAllFilters();
     replaceCatalogUrl({
       page: 1,
@@ -370,25 +407,142 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
   function setCatalogPage(pageNumber: number) {
     const normalizedPage = Math.min(Math.max(pageNumber, 1), totalPages);
 
-    if (normalizedPage === currentPage) {
+    if (normalizedPage === activePage) {
       return;
     }
 
     replaceCatalogUrl({ page: normalizedPage });
   }
 
+  const activeFilterChips: ActiveFilterChip[] = [];
+
+  if (searchQuery.trim().length > 0) {
+    activeFilterChips.push({
+      key: "search-query",
+      label: tr(locale, `Search: ${searchQuery}`, `Поиск: ${searchQuery}`),
+      onRemove: clearSearchQuery,
+    });
+  }
+
+  selectedCategories.forEach((category) => {
+    activeFilterChips.push({
+      key: `category-${category}`,
+      label: category,
+      onRemove: () => handleToggleCategory(category),
+    });
+  });
+
+  selectedAuthTypes.forEach((authType) => {
+    const authLabel = authTypeLabelByValue.get(authType) ?? authType;
+
+    activeFilterChips.push({
+      key: `auth-${authType}`,
+      label: `${tr(locale, "Pricing", "Стоимость")}: ${authLabel}`,
+      onRemove: () => handleToggleAuthType(authType),
+    });
+  });
+
+  selectedTags.forEach((tag) => {
+    activeFilterChips.push({
+      key: `tag-${tag}`,
+      label: `#${tag}`,
+      onRemove: () => handleToggleTag(tag),
+    });
+  });
+
+  useEffect(() => {
+    setSearchInputValue(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (searchInputValue === searchQuery) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSearchQuery(searchInputValue);
+      replaceCatalogUrl({
+        page: 1,
+        searchQuery: searchInputValue,
+      });
+    }, 260);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [replaceCatalogUrl, searchInputValue, searchQuery, setSearchQuery]);
+
+  useEffect(() => {
+    if (currentPage === activePage) {
+      return;
+    }
+
+    replaceCatalogUrl({ page: activePage });
+  }, [activePage, currentPage, replaceCatalogUrl]);
+
+  useEffect(() => {
+    if (!isMobileFiltersOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileFiltersOpen]);
+
   return (
     <div className="space-y-4">
-      <CatalogFilterBar
-        searchQuery={searchQuery}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        viewMode={viewMode}
-        onSearchQueryChange={handleSearchQueryChange}
-        onSortFieldChange={handleSortFieldChange}
-        onSortDirectionChange={handleSortDirectionChange}
-        onViewModeChange={handleViewModeChange}
-      />
+      <div className="sticky top-14 z-30 rounded-2xl border border-white/15 bg-slate-950/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
+        <CatalogFilterBar
+          searchQuery={searchInputValue}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          viewMode={viewMode}
+          activeFilterCount={activeFilterCount}
+          isMobileFiltersOpen={isMobileFiltersOpen}
+          onSearchQueryChange={handleSearchQueryChange}
+          onSortFieldChange={handleSortFieldChange}
+          onSortDirectionChange={handleSortDirectionChange}
+          onViewModeChange={handleViewModeChange}
+          onToggleMobileFilters={() => setIsMobileFiltersOpen((current) => !current)}
+        />
+      </div>
+
+      {activeFilterChips.length > 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[11px] font-semibold tracking-[0.08em] text-slate-500 uppercase">
+              {tr(locale, "Active filters", "Активные фильтры")}
+            </p>
+
+            {activeFilterChips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={chip.onRemove}
+                className="inline-flex max-w-full items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              >
+                <span className="max-w-[170px] truncate">{chip.label}</span>
+                <X className="size-3" />
+              </button>
+            ))}
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              onClick={handleClearAllFilters}
+              className="sm:ml-auto"
+            >
+              <FilterX className="size-3.5" />
+              {tr(locale, "Clear all", "Сбросить все")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="space-y-1 text-sm text-slate-500">
         <p>
@@ -409,9 +563,39 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         ) : null}
       </div>
 
+      {isMobileFiltersOpen ? (
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-slate-950/65 backdrop-blur-[1.5px] lg:hidden"
+            onClick={() => setIsMobileFiltersOpen(false)}
+            aria-label={tr(locale, "Close filters", "Закрыть фильтры")}
+          />
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm p-3 lg:hidden">
+            <CatalogTaxonomyPanel
+              mode="filters"
+              panelId="catalog-mobile-filters"
+              className="h-full overflow-y-auto"
+              categoryEntries={categoryEntries}
+              selectedCategories={selectedCategories}
+              authTypeOptions={authTypeOptions}
+              selectedAuthTypes={selectedAuthTypes}
+              tagEntries={tagEntries}
+              selectedTags={selectedTags}
+              onToggleCategory={handleToggleCategory}
+              onToggleAuthType={handleToggleAuthType}
+              onToggleTag={handleToggleTag}
+              onClearAll={handleClearAllFilters}
+              onRequestClose={() => setIsMobileFiltersOpen(false)}
+            />
+          </div>
+        </>
+      ) : null}
+
       <div className="grid gap-5 lg:grid-cols-[240px_1fr]">
         <CatalogTaxonomyPanel
           mode="filters"
+          className="hidden lg:block"
           categoryEntries={categoryEntries}
           selectedCategories={selectedCategories}
           authTypeOptions={authTypeOptions}

@@ -1,5 +1,8 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import { X } from "lucide-react";
+
 import { useLocale } from "@/components/locale-provider";
 import {
   CATALOG_CATEGORY_OPTIONS,
@@ -45,7 +48,11 @@ function TaxonomyList({
   );
 }
 
-type CatalogTaxonomyPanelOverviewProps = {
+type CatalogTaxonomyPanelBaseProps = {
+  className?: string;
+};
+
+type CatalogTaxonomyPanelOverviewProps = CatalogTaxonomyPanelBaseProps & {
   mode?: "overview";
   locale: Locale;
   categoryEntries?: Array<[string, number]>;
@@ -58,8 +65,9 @@ type CatalogAuthTypeOption = {
   count: number;
 };
 
-type CatalogTaxonomyPanelFilterProps = {
+type CatalogTaxonomyPanelFilterProps = CatalogTaxonomyPanelBaseProps & {
   mode: "filters";
+  panelId?: string;
   categoryEntries: Array<[string, number]>;
   selectedCategories: string[];
   authTypeOptions: CatalogAuthTypeOption[];
@@ -70,6 +78,7 @@ type CatalogTaxonomyPanelFilterProps = {
   onToggleAuthType: (authType: AuthType) => void;
   onToggleTag: (tag: string) => void;
   onClearAll: () => void;
+  onRequestClose?: () => void;
 };
 
 type CatalogTaxonomyPanelProps =
@@ -95,19 +104,51 @@ function toTaxonomyEntries(
 
 export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
   const localeFromContext = useLocale();
+  const [showAllTags, setShowAllTags] = useState(false);
+
+  const visibleTagEntries = useMemo(() => {
+    if (!isFilterMode(props)) {
+      return [] as Array<[string, number]>;
+    }
+
+    return showAllTags ? props.tagEntries : props.tagEntries.slice(0, CATALOG_VISIBLE_TAG_LIMIT);
+  }, [props, showAllTags]);
 
   if (isFilterMode(props)) {
+    const hasAdditionalTags = props.tagEntries.length > CATALOG_VISIBLE_TAG_LIMIT;
+    const hiddenTagsCount = Math.max(0, props.tagEntries.length - CATALOG_VISIBLE_TAG_LIMIT);
+
     return (
-      <aside className="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-24">
-        <div className="flex items-center justify-between px-4 py-4">
+      <aside
+        id={props.panelId}
+        className={cn(
+          "h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-24",
+          props.className,
+        )}
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-900">{tr(localeFromContext, "Filters", "Фильтры")}</h2>
-          <button
-            type="button"
-            className="text-xs font-medium text-slate-500 transition hover:text-slate-900"
-            onClick={props.onClearAll}
-          >
-            {tr(localeFromContext, "Clear All", "Сбросить")}
-          </button>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              className="text-xs font-medium text-slate-500 transition hover:text-slate-900"
+              onClick={props.onClearAll}
+            >
+              {tr(localeFromContext, "Clear all", "Сбросить")}
+            </button>
+
+            {props.onRequestClose ? (
+              <button
+                type="button"
+                className="inline-flex size-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                onClick={props.onRequestClose}
+                aria-label={tr(localeFromContext, "Close filters", "Закрыть фильтры")}
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="border-t border-slate-200 px-4 py-4">
@@ -165,7 +206,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
             {tr(localeFromContext, "Tags", "Теги")}
           </h3>
           <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
-            {props.tagEntries.slice(0, CATALOG_VISIBLE_TAG_LIMIT).map(([tag, count]) => (
+            {visibleTagEntries.map(([tag, count]) => (
               <label
                 key={tag}
                 className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-slate-50"
@@ -184,6 +225,19 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
               </label>
             ))}
           </div>
+
+          {hasAdditionalTags ? (
+            <button
+              type="button"
+              className="mt-3 text-xs font-medium text-blue-600 transition hover:text-blue-700"
+              onClick={() => setShowAllTags((current) => !current)}
+            >
+              {showAllTags
+                ? tr(localeFromContext, "Show fewer tags", "Скрыть лишние теги")
+                : tr(localeFromContext, "Show more tags", "Показать больше тегов")}
+              {!showAllTags ? ` (${hiddenTagsCount})` : ""}
+            </button>
+          ) : null}
         </div>
       </aside>
     );
@@ -194,7 +248,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
   const languageEntries = toTaxonomyEntries(props.languageEntries, CATALOG_LANGUAGE_OPTIONS);
 
   return (
-    <section className="space-y-3">
+    <section className={cn("space-y-3", props.className)}>
       <h2 className="text-xl font-semibold text-slate-100">{tr(locale, "Filters", "Фильтры")}</h2>
       <div className="grid gap-4">
         <TaxonomyList

@@ -32,8 +32,9 @@ export default async function CatalogPage() {
 
   return (
     <PageFrame variant="directory">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 sm:px-6 sm:py-12">
         <PageHero
+          className="space-y-4 p-5 sm:p-7"
           badgeTone="cyan"
           eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Центр управления каталогом")}
           title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Находите надёжные MCP-серверы быстрее")}
@@ -47,13 +48,13 @@ export default async function CatalogPage() {
           }
           actions={
             <>
-              <Button asChild className="h-11 rounded-xl bg-blue-500 px-6 text-white hover:bg-blue-400">
+              <Button asChild className="h-10 rounded-xl bg-blue-500 px-5 text-white hover:bg-blue-400">
                 <Link href="/submit-server">{tr(locale, "Submit server", "Добавить сервер")}</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="h-11 rounded-xl border-white/20 bg-slate-950/70 text-slate-100 hover:bg-slate-900"
+                className="h-10 rounded-xl border-white/20 bg-slate-950/70 text-slate-100 hover:bg-slate-900"
               >
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Открыть гайд")}</Link>
               </Button>

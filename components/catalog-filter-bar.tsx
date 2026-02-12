@@ -1,6 +1,6 @@
 "use client";
 
-import { Grid2X2, List, Search } from "lucide-react";
+import { Grid2X2, List, Search, SlidersHorizontal } from "lucide-react";
 
 import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,13 @@ type CatalogFilterBarProps = {
   sortField: CatalogSortField;
   sortDirection: CatalogSortDirection;
   viewMode: CatalogViewMode;
+  activeFilterCount: number;
+  isMobileFiltersOpen: boolean;
   onSearchQueryChange: (value: string) => void;
   onSortFieldChange: (value: CatalogSortField) => void;
   onSortDirectionChange: (value: CatalogSortDirection) => void;
   onViewModeChange: (value: CatalogViewMode) => void;
+  onToggleMobileFilters: () => void;
 };
 
 export function CatalogFilterBar({
@@ -36,10 +39,13 @@ export function CatalogFilterBar({
   sortField,
   sortDirection,
   viewMode,
+  activeFilterCount,
+  isMobileFiltersOpen,
   onSearchQueryChange,
   onSortFieldChange,
   onSortDirectionChange,
   onViewModeChange,
+  onToggleMobileFilters,
 }: CatalogFilterBarProps) {
   const locale = useLocale();
 
@@ -83,37 +89,58 @@ export function CatalogFilterBar({
         </SelectContent>
       </Select>
 
-      <div className="flex items-center justify-end gap-1 rounded-lg border border-slate-300 bg-white p-1">
+      <div className="flex items-center justify-end gap-2">
         <Button
           type="button"
-          size="icon-sm"
-          variant={viewMode === "grid" ? "default" : "ghost"}
-          className={cn(
-            "transition",
-            viewMode === "grid"
-              ? "bg-blue-600 text-white hover:bg-blue-500"
-              : "text-slate-500 hover:text-slate-800",
-          )}
-          onClick={() => onViewModeChange("grid")}
-          aria-label={tr(locale, "Grid view", "Вид сеткой")}
+          size="sm"
+          variant="outline"
+          className="h-10 border-slate-300 bg-white text-slate-700 hover:bg-slate-100 lg:hidden"
+          onClick={onToggleMobileFilters}
+          aria-label={tr(locale, "Open filters", "Открыть фильтры")}
+          aria-expanded={isMobileFiltersOpen}
+          aria-controls="catalog-mobile-filters"
         >
-          <Grid2X2 className="size-4" />
+          <SlidersHorizontal className="size-4" />
+          {tr(locale, "Filters", "Фильтры")}
+          {activeFilterCount > 0 ? (
+            <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[11px] font-semibold text-white">
+              {activeFilterCount}
+            </span>
+          ) : null}
         </Button>
-        <Button
-          type="button"
-          size="icon-sm"
-          variant={viewMode === "list" ? "default" : "ghost"}
-          className={cn(
-            "transition",
-            viewMode === "list"
-              ? "bg-blue-600 text-white hover:bg-blue-500"
-              : "text-slate-500 hover:text-slate-800",
-          )}
-          onClick={() => onViewModeChange("list")}
-          aria-label={tr(locale, "List view", "Вид списком")}
-        >
-          <List className="size-4" />
-        </Button>
+
+        <div className="flex items-center gap-1 rounded-lg border border-slate-300 bg-white p-1">
+          <Button
+            type="button"
+            size="icon-sm"
+            variant={viewMode === "grid" ? "default" : "ghost"}
+            className={cn(
+              "transition",
+              viewMode === "grid"
+                ? "bg-blue-600 text-white hover:bg-blue-500"
+                : "text-slate-500 hover:text-slate-800",
+            )}
+            onClick={() => onViewModeChange("grid")}
+            aria-label={tr(locale, "Grid view", "Вид сеткой")}
+          >
+            <Grid2X2 className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant={viewMode === "list" ? "default" : "ghost"}
+            className={cn(
+              "transition",
+              viewMode === "list"
+                ? "bg-blue-600 text-white hover:bg-blue-500"
+                : "text-slate-500 hover:text-slate-800",
+            )}
+            onClick={() => onViewModeChange("list")}
+            aria-label={tr(locale, "List view", "Вид списком")}
+          >
+            <List className="size-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
