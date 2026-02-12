@@ -7,6 +7,7 @@ import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
+import { getHeaderNotifications } from "@/lib/notifications/service";
 import { COOKIE_CONSENT_COOKIE_KEY, parseCookieConsent } from "@/lib/cookie-consent";
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
@@ -76,6 +77,7 @@ export default async function RootLayout({
   const initialConsent = parseCookieConsent(
     cookieStore.get(COOKIE_CONSENT_COOKIE_KEY)?.value,
   );
+  const notifications = await getHeaderNotifications(locale);
 
   return (
     <html lang={locale} className="dark" data-scroll-behavior="smooth">
@@ -85,7 +87,7 @@ export default async function RootLayout({
         <LocaleProvider locale={locale}>
           <div className="relative flex min-h-screen flex-col">
             <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(56,189,248,0.15),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.12),transparent_40%),linear-gradient(180deg,#f8fafc_0%,#eff6ff_40%,#e2e8f0_100%)] dark:bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.22),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(56,189,248,0.16),transparent_35%),linear-gradient(180deg,#020617_0%,#020617_45%,#0b1020_100%)]" />
-            <SiteHeader locale={locale} />
+            <SiteHeader locale={locale} notifications={notifications} />
             <main className="flex-1">{children}</main>
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} />
