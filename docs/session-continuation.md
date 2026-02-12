@@ -1,4 +1,29 @@
-﻿## Latest Update (2026-02-12, /how-to-use Redesign + Scenario UX + Event Tracking)
+﻿## Latest Update (2026-02-12, Tools Rules Generator v2 + Brand Mascot)
+- Objective: ship enhanced Rules Generator (skill-aware + multi-format), add brand anime mascot card on `/tools`, and complete the requested next step (commit).
+- Status: completed (feature + tests + commit).
+- Commit: `84724a9` (`feat(tools): add skill-aware rules generator and mascot card`)
+- Touched files:
+  - `app/tools/page.tsx`
+  - `components/tools-section.tsx`
+  - `components/brand-mascot-card.tsx` (new)
+  - `lib/tools/rules-generator.ts` (new)
+  - `lib/tools/skill-profiles.ts` (new)
+  - `public/mascot/demumumind-anime-mascot.svg` (new)
+  - `tests/tools-rules-generator.spec.ts` (new)
+  - `content/tools/_index.json`
+  - `docs/session-continuation.md`
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> fail (unrelated workspace issue: unresolved `@/app/admin/actions` import in admin pages)
+  - `$env:PLAYWRIGHT_BASE_URL='http://localhost:3000'; npx playwright test tests/tools-rules-generator.spec.ts` -> pass (2/2)
+- Next commands:
+  - Push commit if needed: `git push`
+  - Resolve unrelated admin module state before release gate: `npm run build`
+- Open risks:
+  - Repository currently contains many unrelated in-progress admin/catalog changes; keep merge scope isolated.
+
+## Latest Update (2026-02-12, /how-to-use Redesign + Scenario UX + Event Tracking)
 - Objective: implement deep redesign for `/how-to-use` with role-based onboarding, stronger catalog conversion path, and consent-aware analytics events.
 - Status: completed (pending verification commands listed below).
 - Touched files:
