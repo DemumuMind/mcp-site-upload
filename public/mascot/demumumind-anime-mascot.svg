@@ -1,0 +1,70 @@
+<svg width="720" height="720" viewBox="0 0 720 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="96" y1="72" x2="624" y2="648" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A1B3D" />
+      <stop offset="1" stop-color="#0A0F24" />
+    </linearGradient>
+    <linearGradient id="hairGradient" x1="223" y1="142" x2="493" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EA5FF" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="eyeGradient" x1="305" y1="312" x2="415" y2="312" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9" />
+      <stop offset="1" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="hoodieGradient" x1="230" y1="424" x2="486" y2="616" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0E2A57" />
+      <stop offset="1" stop-color="#0B1731" />
+    </linearGradient>
+    <radialGradient id="ringGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 358) rotate(90) scale(262)">
+      <stop stop-color="#22D3EE" stop-opacity="0.22" />
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0" />
+    </radialGradient>
+    <filter id="softGlow" x="112" y="96" width="496" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="18" result="effect1_foregroundBlur"/>
+    </filter>
+  </defs>
+
+  <rect x="24" y="24" width="672" height="672" rx="36" fill="url(#bgGradient)" />
+  <circle cx="360" cy="356" r="262" fill="url(#ringGlow)" />
+
+  <g filter="url(#softGlow)">
+    <circle cx="360" cy="352" r="188" stroke="#22D3EE" stroke-opacity="0.3" stroke-width="8" />
+  </g>
+
+  <g>
+    <path d="M262 270C271 211 311 166 361 166C414 166 451 207 458 270L466 336H253L262 270Z" fill="url(#hairGradient)" />
+    <path d="M250 307C250 246 299 199 360 199C421 199 470 246 470 307V361C470 422 421 471 360 471C299 471 250 422 250 361V307Z" fill="#FFD9C9" />
+
+    <path d="M293 315C293 288 314 267 341 267C368 267 389 288 389 315V323C389 350 368 371 341 371C314 371 293 350 293 323V315Z" fill="url(#eyeGradient)" />
+    <path d="M331 281C342 281 351 290 351 301V327C351 338 342 347 331 347C320 347 311 338 311 327V301C311 290 320 281 331 281Z" fill="#0A1027" />
+    <circle cx="324" cy="295" r="5" fill="#E0FAFF" />
+
+    <path d="M392 315C392 288 413 267 440 267C467 267 488 288 488 315V323C488 350 467 371 440 371C413 371 392 350 392 323V315Z" fill="url(#eyeGradient)" />
+    <path d="M430 281C441 281 450 290 450 301V327C450 338 441 347 430 347C419 347 410 338 410 327V301C410 290 419 281 430 281Z" fill="#0A1027" />
+    <circle cx="423" cy="295" r="5" fill="#E0FAFF" />
+
+    <path d="M339 401C347 410 358 414 370 414C382 414 392 410 401 401" stroke="#F472B6" stroke-width="7" stroke-linecap="round" />
+
+    <path d="M250 305L250 286C250 225 299 178 360 178C421 178 470 225 470 286V305C470 293 460 284 448 284C436 284 426 293 426 305V312C426 323 417 332 406 332C395 332 386 323 386 312V307C386 275 360 249 328 249H319C282 249 252 279 250 316V305Z" fill="#0A1838" fill-opacity="0.75" />
+    <path d="M292 245C306 199 339 171 360 171C382 171 415 199 429 245" stroke="#9FC9FF" stroke-opacity="0.35" stroke-width="7" stroke-linecap="round" />
+
+    <path d="M274 507C288 469 323 444 362 444C401 444 435 469 449 507L476 584H247L274 507Z" fill="url(#hoodieGradient)" />
+    <path d="M300 503C313 479 336 466 362 466C387 466 411 479 424 503" stroke="#5EA5FF" stroke-width="6" stroke-linecap="round" />
+    <path d="M336 503L348 546" stroke="#A5F3FC" stroke-opacity="0.85" stroke-width="5" stroke-linecap="round" />
+    <path d="M388 503L376 546" stroke="#A5F3FC" stroke-opacity="0.85" stroke-width="5" stroke-linecap="round" />
+
+    <circle cx="266" cy="565" r="22" fill="#132B57" />
+    <circle cx="454" cy="565" r="22" fill="#132B57" />
+  </g>
+
+  <g>
+    <rect x="132" y="125" width="88" height="40" rx="12" fill="#10234A" stroke="#2DD4BF" stroke-opacity="0.5" />
+    <text x="176" y="150" text-anchor="middle" fill="#7CE6FF" font-size="18" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="700">MCP</text>
+
+    <rect x="500" y="538" width="124" height="42" rx="13" fill="#10234A" stroke="#60A5FA" stroke-opacity="0.55" />
+    <text x="562" y="565" text-anchor="middle" fill="#C4E7FF" font-size="18" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="700">Demumu</text>
+  </g>
+</svg>
