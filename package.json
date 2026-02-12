@@ -6,7 +6,7 @@
     "predev": "node scripts/patch-contentlayer-win-warning.mjs",
     "dev": "next dev --webpack -p 3000",
     "prebuild": "node scripts/patch-contentlayer-win-warning.mjs",
-    "build": "contentlayer2 build && next build --webpack",
+    "build": "node scripts/run-build.mjs",
     "start": "next start",
     "content:build": "contentlayer2 build",
     "check:utf8": "node scripts/check-utf8.mjs",

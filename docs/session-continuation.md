@@ -1,4 +1,60 @@
-﻿## Latest Update (2026-02-12, EN-only cleanup follow-up: admin naming)
+﻿## Latest Update (2026-02-12, E2E + Build Stability Hotfixes)
+- Objective: fix all issues found in bug sweep (`build` env/PWD instability, Playwright webServer lock issue, and rollout-track test instability).
+- Status: completed.
+- Touched files:
+  - `package.json`
+  - `scripts/run-build.mjs` (new)
+  - `playwright.config.ts`
+  - `tests/how-to-use.spec.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Replaced direct `contentlayer2 build && next build --webpack` with `node scripts/run-build.mjs`.
+  - Added `scripts/run-build.mjs` to normalize `PWD`/`INIT_CWD` and run Contentlayer + Next build deterministically on Windows/MSYS env.
+  - Switched Playwright local webServer from `next dev` to `npm run build && npm run start -- -p 3101` to remove `.next/dev/lock` failures and dev-mode flakiness.
+  - Updated `tests/how-to-use.spec.ts` with a guarded re-click + explicit "Governed rollout phases" assertion for more stable interaction checks.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass (without manual `$env:PWD` override)
+  - `npm run test:e2e -- tests/how-to-use.spec.ts` -> pass (1/1)
+- Open risks:
+  - E2E now prioritizes production-like stability over dev-mode speed; first run is slower because it performs build + start.
+
+## Latest Update (2026-02-12, /how-to-use Full Rebuild v2: Ops Rollout Guide)
+- Objective: fully rebuild `/how-to-use` from scratch for team/DevOps audience with stronger conversion to `/catalog`.
+- Status: completed (implementation + verification).
+- Touched files:
+  - `app/how-to-use/page.tsx`
+  - `components/how-to-use/how-to-use-page-content.tsx`
+  - `components/how-to-use/persona-selector.tsx`
+  - `components/how-to-use/scenario-steps.tsx`
+  - `components/how-to-use/client-reference.tsx`
+  - `components/how-to-use/execution-runbook.tsx` (new)
+  - `lib/content/how-to-use.ts`
+  - `content/how-to-use/_index.json`
+  - `content/how-to-use/paths.json`
+  - `tests/how-to-use.spec.ts`
+  - `docs/content-infrastructure.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Replaced old role-based setup copy with operations-first rollout architecture (pilot vs governed tracks).
+  - Added deterministic execution runbook block with command/verification pairs and config snippet CTA path.
+  - Reworked client reference into an operational client matrix (setup path, validation command, operating notes).
+  - Replaced trust/troubleshooting framing with risk gates + failure playbooks.
+  - Updated structured content schema/loader (`content/how-to-use/paths.json` + `lib/content/how-to-use.ts`) to match new IA.
+  - Updated EN section metadata and Playwright coverage for new headings/interaction contract.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `$env:NEXT_DIST_DIR='.next-build-howto'; npm run build` -> pass (used isolated dist dir due existing `.next` lock)
+  - `$env:PLAYWRIGHT_BASE_URL='http://localhost:3000'; npx playwright test tests/how-to-use.spec.ts` -> pass (1/1)
+- Next commands:
+  - Optional visual QA screenshots for `/how-to-use` (desktop/mobile).
+  - Stage only the files listed above before commit because repo has unrelated active changes.
+- Open risks:
+  - Local environment may keep `.next` lock when another Next process is active; use isolated `NEXT_DIST_DIR` for verification runs.
+  - Existing repository contains many unrelated changes; commit scope must stay isolated.
+## Latest Update (2026-02-12, EN-only cleanup follow-up: admin naming)
 - Objective: remove legacy legacy-locale admin event naming and keep EN-only wording.
 - Status: completed.
 - Touched files: app/admin/actions.ts; app/admin/page.tsx; lib/admin-dashboard.ts; supabase/migrations/20260210220000_admin_dashboard_analytics.sql; supabase/migrations/20260212213000_admin_events_message_secondary.sql; docs/session-continuation.md.
@@ -2341,6 +2397,7 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
 - Notes:
   - The admin rollout objective is complete (DB schema + role seed done remotely).
   - Current lint/build failures are outside admin scope and come from existing catalog file corruption in the working tree.
+
 
 
 

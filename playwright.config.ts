@@ -18,9 +18,9 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "npx next dev --webpack -p 3101",
+        command: "npm run build && npm run start -- -p 3101",
         url: baseURL,
-        reuseExistingServer: false,
-        timeout: 180_000,
+        reuseExistingServer: true,
+        timeout: 300_000,
       },
 });
