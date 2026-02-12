@@ -1,7 +1,11 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import { withContentlayer } from "next-contentlayer2";
+
+const distDir = process.env.NEXT_DIST_DIR?.trim();
 
 const nextConfig: NextConfig = {
+  ...(distDir ? { distDir } : {}),
   outputFileTracingRoot: path.join(__dirname),
   outputFileTracingIncludes: {
     "/*": ["./content/blog/**/*"],
@@ -22,4 +26,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withContentlayer(nextConfig);

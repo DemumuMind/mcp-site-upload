@@ -2,56 +2,46 @@
   {
     "slug": "playbook",
     "label": {
-      "en": "Playbook",
-      "ru": "Руководства"
+      "en": "Playbook"
     },
     "description": {
-      "en": "Step-by-step execution patterns for MCP and agentic workflows.",
-      "ru": "Пошаговые сценарии внедрения MCP и агентных процессов."
+      "en": "Step-by-step execution patterns for MCP and agentic workflows."
     }
   },
   {
     "slug": "architecture",
     "label": {
-      "en": "Architecture",
-      "ru": "Архитектура"
+      "en": "Architecture"
     },
     "description": {
-      "en": "Design decisions, boundaries, and system-level tradeoffs.",
-      "ru": "Архитектурные решения, границы системы и ключевые компромиссы."
+      "en": "Design decisions, boundaries, and system-level tradeoffs."
     }
   },
   {
     "slug": "workflow",
     "label": {
-      "en": "Workflow",
-      "ru": "Процессы"
+      "en": "Workflow"
     },
     "description": {
-      "en": "Operational flow for planning, validation, and release.",
-      "ru": "Операционный цикл планирования, проверки и релиза."
+      "en": "Operational flow for planning, validation, and release."
     }
   },
   {
     "slug": "operations",
     "label": {
-      "en": "Operations",
-      "ru": "Эксплуатация"
+      "en": "Operations"
     },
     "description": {
-      "en": "Production reliability, rollout controls, and maintenance.",
-      "ru": "Надёжность в продакшене, контроль запуска и сопровождение."
+      "en": "Production reliability, rollout controls, and maintenance."
     }
   },
   {
     "slug": "quality",
     "label": {
-      "en": "Quality",
-      "ru": "Качество"
+      "en": "Quality"
     },
     "description": {
-      "en": "Verification layers and quality gates for delivery teams.",
-      "ru": "Слои верификации и контрольные точки качества для команд разработки."
+      "en": "Verification layers and quality gates for delivery teams."
     }
   }
 ]

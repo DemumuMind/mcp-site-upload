@@ -7,13 +7,6 @@
       "eyebrow": "Resources",
       "heroTitle": "BridgeMind Blog",
       "heroDescription": "Editorial notes, benchmarks, and implementation playbooks for teams shipping agentic coding workflows."
-    },
-    "ru": {
-      "title": "Блог",
-      "description": "Статьи о вайб-кодинге, агентной разработке, prompt engineering и лучших практиках AI-разработки.",
-      "eyebrow": "Ресурсы",
-      "heroTitle": "Блог BridgeMind",
-      "heroDescription": "Редакционные заметки, бенчмарки и практические playbook-гайды для команд, которые внедряют агентные инженерные процессы."
     }
   }
 }
