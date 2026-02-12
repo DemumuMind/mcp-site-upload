@@ -17,7 +17,7 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 
 - [Home](${absoluteUrl("/", siteUrl)}): Discover vibe coding and join the agentic coding revolution
 - [About BridgeMind](${absoluteUrl("/about", siteUrl)}): Our mission, vision, and approach to vibe coding and agentic coding
-- [Pricing](${absoluteUrl("/pricing", siteUrl)}): Membership plans and platform access
+- [Free & Open](${absoluteUrl("/pricing", siteUrl)}): Free access today with a transparent roadmap for future Pro capabilities
 
 ## Resources
 

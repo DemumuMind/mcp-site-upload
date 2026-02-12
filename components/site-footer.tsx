@@ -102,7 +102,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           </p>
           <p>
             <Link href="/pricing" className={footerLinkClass}>
-              {tr(locale, "Pricing", "Цены")}
+              {tr(locale, "Free & Open", "Бесплатно и Open")}
             </Link>
           </p>
           <p>

@@ -37,7 +37,7 @@ const navLinkMap: readonly NavLinkItem[] = [
   { href: "/tools", label: { en: "Tools", ru: "Инструменты" }, icon: Wrench },
   { href: "/mcp", label: { en: "MCP", ru: "MCP" }, icon: Cpu },
   { href: "/blog", label: { en: "Blog", ru: "Блог" }, icon: Newspaper },
-  { href: "/pricing", label: { en: "Pricing", ru: "Цены" }, icon: Wallet },
+  { href: "/pricing", label: { en: "Free & Open", ru: "Бесплатно и Open" }, icon: Wallet },
 ];
 
 type SiteHeaderProps = {

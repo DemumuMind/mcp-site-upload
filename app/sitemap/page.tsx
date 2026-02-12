@@ -54,12 +54,12 @@ const sections: readonly SiteMapSection[] = [
       {
         href: "/pricing",
         title: {
-          en: "Pricing",
-          ru: "Цены",
+          en: "Free & Open",
+          ru: "Бесплатно и Open",
         },
         description: {
-          en: "Current plans and platform access details.",
-          ru: "Текущие планы и условия доступа к платформе.",
+          en: "Free access today with a transparent roadmap for future Pro capabilities.",
+          ru: "Бесплатный доступ сегодня с прозрачным roadmap будущих Pro-возможностей.",
         },
       },
     ],
