@@ -77,18 +77,18 @@ create table if not exists public.admin_system_events (
   occurred_at timestamptz not null default now(),
   level text not null default 'info' check (level in ('info', 'success', 'warning', 'error')),
   message_en text not null,
-  message_ru text not null
+  message_secondary text not null
 );
 
 create index if not exists admin_system_events_occurred_at_idx
   on public.admin_system_events(occurred_at desc);
 
-insert into public.admin_system_events (occurred_at, level, message_en, message_ru)
+insert into public.admin_system_events (occurred_at, level, message_en, message_secondary)
 values
-  (now() - interval '5 minutes', 'success', 'gateway-02 latency returned to baseline', 'gateway-02: задержка вернулась в норму'),
-  (now() - interval '18 minutes', 'warning', 'Webhook delivery retried for 4 endpoints', 'Повторная доставка webhook для 4 endpoint'),
-  (now() - interval '32 minutes', 'error', 'Rate limit reached on gateway-04', 'Достигнут лимит запросов на gateway-04'),
-  (now() - interval '47 minutes', 'success', 'Health check passed for all active servers', 'Health-check пройден для всех активных серверов');
+  (now() - interval '5 minutes', 'success', 'gateway-02 latency returned to baseline', 'gateway-02 latency returned to baseline'),
+  (now() - interval '18 minutes', 'warning', 'Webhook delivery retried for 4 endpoints', 'Webhook delivery retried for 4 endpoints'),
+  (now() - interval '32 minutes', 'error', 'Rate limit reached on gateway-04', 'Rate limit reached on gateway-04'),
+  (now() - interval '47 minutes', 'success', 'Health check passed for all active servers', 'Health check passed for all active servers');
 
 alter table public.admin_dashboard_settings enable row level security;
 alter table public.admin_dashboard_metrics enable row level security;

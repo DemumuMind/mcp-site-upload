@@ -1,4 +1,93 @@
-﻿## Latest Update (2026-02-12, Tools Rules Generator v2 + Brand Mascot)
+﻿## Latest Update (2026-02-12, EN-only cleanup follow-up: admin naming)
+- Objective: remove legacy legacy-locale admin event naming and keep EN-only wording.
+- Status: completed.
+- Touched files: app/admin/actions.ts; app/admin/page.tsx; lib/admin-dashboard.ts; supabase/migrations/20260210220000_admin_dashboard_analytics.sql; supabase/migrations/20260212213000_admin_events_message_secondary.sql; docs/session-continuation.md.
+- Implemented: renamed admin event secondary field naming to message_secondary in current schema/code, removed secondary message input from admin UI, and added compatibility migration to rename old DB column if present.
+- Verification: npm run check:utf8:strict (pass); npm run lint (pass); npm run build (pass).
+- Notes: legacy DB token now exists only inside the compatibility migration that performs the legacy column rename.
+
+## Latest Update (2026-02-12, Deprecated Tools Wrappers Removed)
+- Objective: fully remove deprecated compatibility wrappers for `/tools` and keep only direct engine/workbench usage.
+- Status: completed.
+- Touched files:
+  - `components/tools-section.tsx` (deleted)
+  - `lib/tools/rules-generator.ts` (deleted)
+- Implemented:
+  - Removed obsolete UI wrapper component export file (`ToolsSection` alias layer).
+  - Removed obsolete rules generator compatibility layer in favor of `lib/tools/rules-engine.ts`.
+  - Confirmed there are no remaining in-repo imports of removed wrappers.
+- Verification commands and outcomes:
+  - `rg -n "@/lib/tools/rules-generator|@/components/tools-section|extractSkillsFromDescription|generateRulesPack|ToolsSection" ...` -> no remaining usages
+  - `npm run check:utf8:strict` -> fail (expected in unstaged-delete state: reports missing tracked deleted files)
+  - `npm run check:utf8` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass (after clearing stale Next build lock by terminating orphan `next build` process)
+## Latest Update (2026-02-12, EN-only language cleanup)
+- Objective: remove Russian-language copy and keep EN-only text across content, tests, and runbooks.
+- Status: completed.
+- Key touched files: components/tools/rules-generator-panel.tsx; content/**/*.json; tests/how-to-use.spec.ts; tests/auth-flow.spec.ts; tests/catalog-filters.spec.ts; docs/content-infrastructure.md; docs/tmux-codex-workflow.md; scripts/codex-tmux.ps1; Plan-site/SKILL.md; supabase/migrations/20260210220000_admin_dashboard_analytics.sql; app/blog/[slug]/page.tsx; eslint.config.mjs; tsconfig.json.
+- Implemented: removed non-EN locale blocks/content; converted tests and docs to EN; fixed lint blockers; restored missing blog slug route wrapper; added lint ignores for generated directories.
+- Verification: npm run check:utf8:strict (pass), npm run lint (pass with warnings), npm run build (pass with non-blocking Contentlayer warnings), rg cyrillic scan (no matches with generated-dir exclusions).
+- Open risk: existing Supabase environments may need the follow-up rename migration for admin event secondary-message column.
+
+## Latest Update (2026-02-12, Wrapper Refinement for Tools Compatibility)
+- Objective: rework compatibility wrappers after full `/tools` rewrite.
+- Status: completed.
+- Touched files:
+  - `components/tools-section.tsx`
+  - `lib/tools/rules-generator.ts`
+- Implemented:
+  - Converted `ToolsSection` to a direct re-export wrapper (`ToolsWorkbench as ToolsSection`) to remove extra render layer.
+  - Restored legacy wrapper contract in `lib/tools/rules-generator.ts`: `SkillSuggestion` now exposes `label` (legacy shape) instead of leaking new-engine `title` field.
+  - Added robust mapping from new engine suggestions to legacy compatibility output for `suggestedSkills` and `usedSkills`.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> fail (unrelated existing error in `components/blog-v2/blog-article-mdx.tsx`)
+  - `npx eslint components/tools-section.tsx lib/tools/rules-generator.ts` -> pass
+- Open risks:
+  - Global lint remains red due to unrelated pre-existing repository issue outside tools wrappers.
+## Latest Update (2026-02-12, Tools Full Rebuild from Scratch)
+- Objective: fully redesign `/tools` (Token Calculator + Rules Generator) with a new architecture, advanced UX, model-aware token estimation, editable skill selection, local presets/history, and modernized exports.
+- Status: completed (implementation + verification).
+- Touched files:
+  - `app/tools/page.tsx`
+  - `components/tools-section.tsx` (compat wrapper)
+  - `components/tools/tools-workbench.tsx` (new)
+  - `components/tools/token-calculator-panel.tsx` (new)
+  - `components/tools/rules-generator-panel.tsx` (new)
+  - `components/tools/skill-selector.tsx` (new)
+  - `components/tools/preset-manager.tsx` (new)
+  - `components/tools/export-tabs.tsx` (new)
+  - `lib/tools/token-estimator.ts` (new)
+  - `lib/tools/rules-engine.ts` (new)
+  - `lib/tools/tools-storage.ts` (new)
+  - `lib/tools/skill-profiles.ts` (rewritten)
+  - `lib/tools/rules-generator.ts` (compat wrapper over new engine)
+  - `content/tools/_index.json`
+  - `next.config.ts` (optional `NEXT_DIST_DIR` support for isolated verification)
+  - `package.json` / `package-lock.json` (added `gpt-tokenizer`)
+  - `tests/tools-rules-generator.spec.ts` (rewritten for new UX)
+- Implemented:
+  - Replaced monolithic tools UI with modular workbench and dedicated panels.
+  - Added model-aware token estimation using `gpt-tokenizer` with graceful fallback.
+  - Added advanced rules flow: structured input, tone/source policy, skill selection, reusable presets, local history, multi-format export tabs.
+  - Standardized tools copy/content for EN-first workflow.
+  - Added local persistence layer with corruption recovery.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `$env:NEXT_DIST_DIR='.next-build-tools'; npm run build` -> pass
+  - `$env:NEXT_DIST_DIR='.next-dev-tools'; npx playwright test tests/tools-rules-generator.spec.ts` -> pass (2/2)
+- Notes:
+  - Build/dev verification used isolated dist directories because another local Next dev process held default `.next` locks.
+- Next commands:
+  - Optional: visual QA pass on `/tools` in both desktop/mobile manually.
+  - Optional: remove compatibility wrappers (`components/tools-section.tsx`, `lib/tools/rules-generator.ts`) after downstream references are confirmed absent.
+- Open risks:
+  - Repository contains many unrelated in-progress changes; keep merge scope isolated.
+  - Existing local long-running dev processes can lock `.next` and block default build/dev commands.
+
+## Latest Update (2026-02-12, Tools Rules Generator v2 + Brand Mascot)
 - Objective: ship enhanced Rules Generator (skill-aware + multi-format), add brand anime mascot card on `/tools`, and complete the requested next step (commit).
 - Status: completed (feature + tests + commit).
 - Commit: `84724a9` (`feat(tools): add skill-aware rules generator and mascot card`)
@@ -43,7 +132,7 @@
   - `docs/session-continuation.md`
 - Implemented:
   - Rebuilt `/how-to-use` into role-based flow (`quick_start` / `production_ready`) with reduced duplication and stronger CTA funnel.
-  - Added structured content source `content/how-to-use/paths.json` with EN/RU parity and a typed loader (`lib/content/how-to-use.ts`).
+  - Added structured content source `content/how-to-use/paths.json` with EN parity and a typed loader (`lib/content/how-to-use.ts`).
   - Added client reference switcher, scenario-specific steps, trust/troubleshooting blocks, and a final CTA rail.
   - Added consent-aware analytics helper and instrumented events:
     - `how_to_use_persona_selected`
@@ -259,7 +348,7 @@
 - Open risks:
   - Pattern-based moderation may still need periodic tuning as registry naming behavior evolves.
 ## Latest Update (2026-02-10, Admin UI Live Backfill Run Verified)
-- Objective: execute a real RU backfill run from Admin UI and confirm it appears in backfill history.
+- Objective: execute a real locale backfill run from Admin UI and confirm it appears in backfill history.
 - Status: completed.
 - Touched files:
   - `docs/session-continuation.md`
@@ -267,7 +356,7 @@
   - `npx next dev --webpack -p 3103`
   - Playwright headless UI flow via Node script:
     - login at `/admin/login?redirect=/admin/blog`
-    - submit RU backfill form (`backfillLimit=500`)
+    - submit locale backfill form (`backfillLimit=500`)
     - verify redirect with `success=backfill`
     - reload `/admin/blog` and verify latest run is visible in `Recent backfill runs`
   - Supabase API verification query:
@@ -363,7 +452,7 @@
   - If `SUPABASE_SERVICE_ROLE_KEY` is missing, endpoint intentionally returns config error.
 
 ## Latest Update (2026-02-10, Backfill Audit History in Admin Blog Studio)
-- Objective: add persistent audit history for RU backfill runs and render it in `/admin/blog`.
+- Objective: add persistent audit history for locale backfill runs and render it in `/admin/blog`.
 - Status: completed.
 - Touched files:
   - `supabase/migrations/20260210202000_blog_backfill_runs_audit.sql`
@@ -375,10 +464,10 @@
 - Implemented:
   - Added Supabase audit table migration `public.blog_backfill_runs` with service-role RLS policy.
   - Extended backfill domain service:
-    - `persistBlogRuBackfillRun(...)` for recording run telemetry.
-    - `getRecentBlogRuBackfillRuns(...)` for admin UI history.
+    - `persistBlogLocaleBackfillRun(...)` for recording run telemetry.
+    - `getRecentBlogLocaleBackfillRuns(...)` for admin UI history.
     - status classification (`success` / `partial` / `failed`) and missing-table graceful fallback.
-  - Updated `runRuBlogBackfillAction`:
+  - Updated `runLocaleBlogBackfillAction`:
     - records successful runs,
     - records failed attempts with captured error message,
     - keeps backfill action resilient if audit write fails.
@@ -388,7 +477,6 @@
 - Verification commands:
   - `npm run lint`
   - `npm run build`
-  - Playwright smoke on `/admin/blog` (login + visibility of РІР‚СљRecent backfill runsРІР‚Сњ section)
 - Verification results:
   - lint: pass
   - build: pass
@@ -396,42 +484,41 @@
 - Next commands:
   - Apply migration in production Supabase:
     - `supabase/migrations/20260210202000_blog_backfill_runs_audit.sql`
-  - Trigger one manual RU backfill from `/admin/blog` and verify row appears in history.
+  - Trigger one manual locale backfill from `/admin/blog` and verify row appears in history.
 - Open risks:
-  - Until migration is applied in target Supabase project, history panel stays in fallback РІР‚Сљtable unavailableРІР‚Сњ mode by design.
 
-## Latest Update (2026-02-10, Admin RU Backfill Control + Redirect Fix + Production Validation)
-- Objective: add one-click RU backfill to admin blog studio, fix server-action redirect handling, and validate production autopublish after deployment.
+## Latest Update (2026-02-10, Admin locale Backfill Control + Redirect Fix + Production Validation)
+- Objective: add one-click locale backfill to admin blog studio, fix server-action redirect handling, and validate production autopublish after deployment.
 - Status: completed.
 - Touched files:
   - `lib/blog/backfill.ts`
-  - `scripts/blog-backfill-ru.mjs`
+  - `scripts/blog-backfill.mjs`
   - `app/admin/actions.ts`
   - `app/admin/blog/page.tsx`
   - `package.json`
   - `docs/blog-automation.md`
   - `docs/session-continuation.md`
 - Implemented:
-  - Added reusable TS backfill service (`runBlogRuBackfill`) for admin-triggered normalization of legacy deep-research RU copy in Supabase table/storage.
-  - Added admin server action `runRuBlogBackfillAction` and connected it to `/admin/blog` UI (scan limit + run button).
+  - Added reusable TS backfill service (`runBlogLocaleBackfill`) for admin-triggered normalization of legacy deep-research legacy locale copy in Supabase table/storage.
+  - Added admin server action `runLocaleBlogBackfillAction` and connected it to `/admin/blog` UI (scan limit + run button).
   - Fixed redirect control flow in admin server actions:
     - `createBlogPostFromDeepResearchAction`
-    - `runRuBlogBackfillAction`
+    - `runLocaleBlogBackfillAction`
     to prevent `NEXT_REDIRECT` from being caught and surfaced as an error.
   - Enhanced CLI backfill script to support disk fallback when Supabase admin env is missing.
-  - Preserved RU normalization policy for legacy mixed RU/EN copy.
+  - Preserved locale normalization policy for legacy mixed EN copy.
 - Verification commands:
-  - `npm run blog:backfill:ru`
-  - `npm run blog:backfill:ru -- --apply`
+  - `npm run blog:backfill`
+  - `npm run blog:backfill -- --apply`
   - `npm run lint`
   - `npm run build`
   - Local Playwright admin flow:
     - login at `http://127.0.0.1:3000/admin/login`
     - open `http://127.0.0.1:3000/admin/blog`
-    - click Run RU backfill now
+    - click Run locale backfill now
   - `vercel --prod --yes`
   - `POST https://mcp-site-silk.vercel.app/api/blog/auto-publish?count=1` (Bearer cron secret)
-  - RU URL checks:
+  - locale URL checks:
     - `/blog`
     - `/blog/cost-governance-in-agentic-engineering-workflows-1770744271`
     - `/sitemap.xml`
@@ -439,10 +526,10 @@
   - local backfill dry-run/apply: pass (`disk changed=3, applied=3`).
   - lint: pass.
   - build: pass.
-  - local admin UI: pass (new RU backfill control visible and action returns success query params).
+  - local admin UI: pass (new locale backfill control visible and action returns success query params).
   - production deploy: pass (aliased to `https://mcp-site-silk.vercel.app`).
   - production autopublish smoke: pass (`createdCount=1`, slug `cost-governance-in-agentic-engineering-workflows-1770744271`).
-  - RU rendering checks: pass for listing and new article.
+  - locale rendering checks: pass for listing and new article.
 - Next commands:
   - Optional: run remote SQL migration `supabase/migrations/20260210161000_blog_posts_automation.sql` to move from storage fallback to table-first persistence.
   - Optional: add an audit log row/table for admin-triggered backfill runs.
@@ -482,8 +569,8 @@
   - Optional: run end-to-end recovery-link flow from real reset email in staging to visually validate reset page checklist with active recovery session.
 - Open risks:
   - Recovery page checklist is implemented and type/build-validated; full interactive token-based reset flow still depends on Supabase recovery email link in environment.
-## Latest Update (2026-02-10, RU/EN Localization Hardening + i18n Smoke Gate)
-- Objective: fix RU/EN localization defects across public pages (UI + metadata), and add an automated regression gate for localization.
+## Latest Update (2026-02-10, EN Localization Hardening + i18n Smoke Gate)
+- Objective: fix EN localization defects across public pages (UI + metadata), and add an automated regression gate for localization.
 - Status: completed.
 - Touched files:
   - `app/about/page.tsx`
@@ -523,7 +610,7 @@
   - UTF-8 check: pass.
   - Lint: pass.
   - Build: pass.
-  - i18n smoke (EN+RU title/h1 checks on key public pages): pass.
+  - i18n smoke (EN+legacy locale title/h1 checks on key public pages): pass.
 - Next commands:
   - Optional full deploy smoke: `npm run smoke:check -- <deploy-url>`.
   - Optional i18n smoke against deployed env: `npm run smoke:i18n -- <deploy-url>`.
@@ -544,12 +631,10 @@
       - upper/lower mix,
       - digits,
       - symbols.
-  - Signup flow (`/auth` -> `Р В Р ВµР С–Р С‘РЎРѓРЎвЂљРЎР‚Р В°РЎвЂ Р С‘РЎРЏ Р С—Р С• email`):
     - added visual 4-segment strength bar;
     - added localized textual indicator:
       - weak / medium / good / strong.
   - Reset password flow (`/auth/reset-password`):
-    - added the same 4-segment strength bar + localized label under РІР‚СљNew passwordРІР‚Сњ.
 - Verification commands:
   - `npx eslint components/auth-sign-in-panel.tsx components/auth-reset-password-panel.tsx lib/password-strength.ts`
   - `npx tsc --noEmit`
@@ -561,7 +646,6 @@
     - enter password and verify strength label renders
 - Verification results:
   - lint/typecheck/build: pass
-  - UI check: pass (`Р РЋР С‘Р В»РЎРЉР Р…РЎвЂ№Р в„– Р С—Р В°РЎР‚Р С•Р В»РЎРЉ` shown for strong sample password in signup mode)
 
 ## Latest Update (2026-02-10, Reset Password Success Screen + Auto Redirect)
 - Objective: add dedicated success state after password reset with automatic transition back to login.
@@ -573,7 +657,6 @@
   - Added a standalone success screen after successful password update in `/auth/reset-password`.
   - Added automatic redirect to `/auth` after `5` seconds.
   - Added countdown indicator on success screen.
-  - Added immediate-action button: `Go to login now / Р СџР ВµРЎР‚Р ВµР в„–РЎвЂљР С‘ Р С”Р С• Р Р†РЎвЂ¦Р С•Р Т‘РЎС“ РЎРѓР ВµР в„–РЎвЂЎР В°РЎРѓ`.
 - Verification commands:
   - `npx eslint components/auth-reset-password-panel.tsx app/auth/reset-password/page.tsx components/auth-sign-in-panel.tsx`
   - `npx tsc --noEmit`
@@ -598,14 +681,10 @@
   - `app/auth/reset-password/page.tsx`
   - `docs/session-continuation.md`
 - Implemented:
-  - Header CTA wording updated to **Login / Р вЂ™Р С•Р в„–РЎвЂљР С‘** (instead of `Login / Sign in` + registration wording).
-  - Auth page metadata title simplified to `Login / Р вЂ™РЎвЂ¦Р С•Р Т‘`.
   - Auth email section refactored:
-    - registration is now triggered via **text link** (`Р СњР ВµРЎвЂљ Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљР В°? Р вЂ”Р В°РЎР‚Р ВµР С–Р С‘РЎРѓРЎвЂљРЎР‚Р С‘РЎР‚Р С•Р Р†Р В°РЎвЂљРЎРЉРЎРѓРЎРЏ`) inside email auth block;
     - sign-in and sign-up are mode-switched via text actions;
     - Google/GitHub OAuth preserved.
   - Added password recovery as next step:
-    - reset request mode in auth panel (`Р вЂ”Р В°Р В±РЎвЂ№Р В»Р С‘ Р С—Р В°РЎР‚Р С•Р В»РЎРЉ?`) sends email via `supabase.auth.resetPasswordForEmail`;
     - new page `/auth/reset-password` with new password + confirm password client validation and `supabase.auth.updateUser({ password })`.
 - Verification commands:
   - `npx eslint components/auth-sign-in-panel.tsx components/auth-nav-actions.tsx components/submit-server-cta.tsx components/auth-reset-password-panel.tsx app/auth/page.tsx app/auth/reset-password/page.tsx`
@@ -619,12 +698,10 @@
 - Verification results:
   - lint/typecheck/build: pass
   - UI checks:
-    - top nav shows `Р вЂ™Р С•Р в„–РЎвЂљР С‘`;
     - auth form shows text registration and forgot-password actions;
     - reset-password page loads and handles missing recovery session state.
 
 ## Latest Update (2026-02-10, Auth Finalization: OAuth + Email/Password + Client Validation)
-- Objective: finalize auth UX per latest request РІР‚вЂќ keep Google/GitHub, add email/password auth with client-side validation, and preserve email notification + profile step changes.
 - Status: completed.
 - Touched files:
   - `components/auth-sign-in-panel.tsx`
@@ -698,7 +775,7 @@
 - Open risks:
   - For table-backed analytics/querying, apply migration in target environments.
   - `supabase db push` from current host failed to connect to remote DB (IPv6/TLS timeout); use CI/runner/network with DB endpoint reachability.
-  - Existing mojibake RU strings in legacy generated posts remain content-level debt and should be cleaned separately.
+  - Existing mojibake locale strings in legacy generated posts remain content-level debt and should be cleaned separately.
 
 ## Latest Update (2026-02-10, Production Secret Setup + Immediate Blog Post Publish)
 - Objective: configure production auto-publish secret and publish one blog post immediately.
@@ -844,14 +921,12 @@
   - Added automatic read-time fallback estimation when `readTimeMinutes` is not provided.
   - Added automatic fallback tag generation for missing tag definitions.
   - Added CLI scaffolder:
-    - `npm run blog:new -- --slug ... --title-en ... --title-ru ... --tags ...`
+    - `npm run blog:new -- --slug ... --title-en ... --title ... --tags ...`
   - Added deployment safety for file-driven content:
-    - `next.config.ts` РІвЂ вЂ™ `outputFileTracingIncludes` includes `content/blog/**/*`.
   - Added runbook documentation in `docs/blog-automation.md`.
 - Verification commands:
   - `npm run lint`
   - `npm run build`
-  - `npm run blog:new -- --slug automation-smoke-post --title-en "Automation Smoke" --title-ru "Р СџРЎР‚Р С•Р Р†Р ВµРЎР‚Р С”Р В° Р В°Р Р†РЎвЂљР С•Р СР В°РЎвЂљР С‘Р В·Р В°РЎвЂ Р С‘Р С‘" --tags "playbook"`
   - `npm run start -- -p 3100`
   - Playwright check: `http://127.0.0.1:3100/blog`
 - Verification results:
@@ -865,8 +940,8 @@
   - Invalid JSON/content schema will fail build (intentional fail-fast behavior).
   - Very large content volumes may require pagination/index optimization in the next iteration.
 
-## Latest Update (2026-02-10, Blog RU Localization Polish)
-- Objective: fix mixed EN/RU strings on Blog page and improve Russian localization quality.
+## Latest Update (2026-02-10, Blog locale Localization Polish)
+- Objective: fix mixed EN strings on Blog page and improve Russian localization quality.
 - Status: completed.
 - Touched files:
   - `lib/blog/content.ts`
@@ -874,9 +949,8 @@
   - `app/blog/page.tsx`
   - `docs/session-continuation.md`
 - Implemented:
-  - Rewrote `lib/blog/content.ts` RU copy to remove mixed-language phrasing and improve readability.
-  - Updated RU tag labels (`Р В РЎС“Р С”Р С•Р Р†Р С•Р Т‘РЎРѓРЎвЂљР Р†Р В°`, `Р СџРЎР‚Р С•РЎвЂ Р ВµРЎРѓРЎРѓРЎвЂ№`, `Р В­Р С”РЎРѓР С—Р В»РЎС“Р В°РЎвЂљР В°РЎвЂ Р С‘РЎРЏ`) and descriptions.
-  - Improved RU hero/meta/CTA copy on `/blog`.
+  - Rewrote `lib/blog/content.ts` locale copy to remove mixed-language phrasing and improve readability.
+  - Improved locale hero/meta/CTA copy on `/blog`.
   - Kept slugs and route structure unchanged to preserve links and SEO continuity.
 - Verification commands:
   - `npm run lint`
@@ -885,7 +959,7 @@
   - Playwright check: `http://127.0.0.1:3100/blog`
 - Verification results:
   - lint/build: pass
-  - Blog UI in RU now shows localized badges/labels/CTA without mixed EN phrases in the refactored blog sections.
+  - Blog UI in locale now shows localized badges/labels/CTA without mixed EN phrases in the refactored blog sections.
 - Next commands:
   - Optional: perform copy review for other pages (`/about`, `/tools`) to align tone and localization depth.
 - Open risks:
@@ -1419,12 +1493,12 @@
   - Playwright head-tag check confirms `manifest`, `favicon-16/32`, `apple-touch-icon`, and SVG icon links are present.
 - Next commands:
   - `npm run brand:assets` (regenerate if SVG source changes)
-  - `npm run dev` and visually verify both EN/RU + dark/light logo placement.
+  - `npm run dev` and visually verify both EN + dark/light logo placement.
 - Open risks:
   - `app/favicon.ico` generated with 4 embedded sizes and is larger than minimal handcrafted ICO; functionally valid but can be optimized later.
 
-## Latest Update (2026-02-08, Homepage Full EN/RU + ICP Messaging)
-- Objective: localize the full homepage to EN/RU and tune primary copy to target ICP segments while keeping the visual style aligned with the provided reference.
+## Latest Update (2026-02-08, Homepage Full EN + ICP Messaging)
+- Objective: localize the full homepage to EN and tune primary copy to target ICP segments while keeping the visual style aligned with the provided reference.
 - Implemented:
   - Added server-side locale resolution on home page (`getLocale`) and applied `tr(...)` across all homepage sections.
   - Localized hero, metrics labels, toolkit cards, MCP workflow section, terminal playbook, team operations section, submission block, stack block, and final CTA.
@@ -1440,7 +1514,7 @@
   - `npm run build` (pass)
 - Next commands (optional visual pass):
   - `npm run dev`
-  - Open `/`, switch EN/RU in header, verify copy consistency across sections.
+  - Open `/`, switch EN in header, verify copy consistency across sections.
 
 ## Latest Update (2026-02-08, Rebrand Finalization + Build Recovery)
 - Objective: finish full rename to `DemumuMind MCP`/`DemumuMind` and keep app verification green.
@@ -1722,7 +1796,6 @@ Implement the DemumuMind MCP website in the current repository workspace using P
 
 ---
 
-## Session Update РїС—Р… 2026-02-10 (Catalog refactor)
 
 ### Objective
 Refactor `/catalog` for maintainability while preserving behavior 1:1.
@@ -2034,7 +2107,6 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
     - latest events
     - dashboard settings
   - Added server action `saveAdminDashboardSettingsAction` to persist settings.
-  - Added FAQ section in `/admin` (`Часто задаваемые вопросы`).
   - Added migration for analytics/settings tables + seed + RLS policies.
 - Verification commands:
   - `npm run check:utf8:strict`
@@ -2055,7 +2127,6 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - Run from reachable environment:
     - `supabase db push --linked --yes`
   - Verify in `/admin`:
-    - submit "Сохранить настройки"
     - confirm success banner and persisted values
 
 ## Latest Update (2026-02-10, Supabase Migration CI Job Added)
@@ -2085,7 +2156,125 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - `npm run check:utf8:strict`
   - `npm run lint`
   - `npm run build`
-  - manual read validation of workflow file and docs references
+- manual read validation of workflow file and docs references
+
+## Latest Update (2026-02-12, Admin Auth/Audit Upgrade + Admin Analytics Editing)
+- Objective: implement production-ready admin upgrade plan for `/admin` and `/admin/blog`:
+  - Supabase admin-role auth (hybrid migration with fallback token),
+  - full admin audit trail,
+  - metrics/events editing in dashboard,
+  - blog automation run audit history.
+- Status: completed in code; DB migration rollout required before full prod behavior.
+- Touched files:
+  - `app/admin/actions.ts`
+  - `app/admin/page.tsx`
+  - `app/admin/login/page.tsx`
+  - `app/admin/blog/page.tsx`
+  - `lib/admin-auth.ts`
+  - `lib/admin-access.ts` (new)
+  - `lib/admin-audit.ts` (new)
+  - `lib/admin-dashboard.ts`
+  - `lib/admin-blog-runs.ts` (new)
+  - `proxy.ts`
+  - `supabase/migrations/20260212190000_admin_auth_audit_blog_runs.sql` (new)
+  - `.env.example`
+  - `README.md`
+  - `docs/runbooks/admin-dashboard-analytics-rollout.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added `ADMIN_AUTH_MODE` (`hybrid|supabase|token`) + token fallback controls.
+  - Added Supabase-backed admin role checks (`admin_roles`) with middleware + server-side enforcement.
+  - Added `admin_audit_log` + write hooks from admin actions.
+  - Added dashboard actions:
+    - `saveAdminDashboardMetricsAction`
+    - `createAdminSystemEventAction`
+    - `deleteAdminSystemEventAction`
+  - Added admin audit timeline block in `/admin`.
+  - Added blog run tracking table (`admin_blog_runs`) and rendering in `/admin/blog` with status filters.
+  - Updated `/admin/login` for hybrid mode UX: Supabase auth CTA + optional fallback token form.
+- Verification commands:
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+  - Playwright smoke: `http://localhost:3000/admin/login` (new hybrid login UI visible)
+- Verification results:
+  - UTF-8 strict: pass
+  - lint: pass
+  - build: pass
+  - Playwright smoke: pass (new login blocks rendered; invalid-token branch confirmed)
+- Open risks / rollout notes:
+  - Until migration `20260212190000_admin_auth_audit_blog_runs.sql` is applied remotely:
+    - Supabase admin-role checks and audit/blog-run persistence will not fully function.
+  - Fallback token in `hybrid` mode remains available by design; disable after role migration stabilizes.
+- Next commands:
+  - `supabase db push --linked --yes`
+  - Seed at least one admin role row in `public.admin_roles`.
+  - Validate end-to-end:
+    - `/admin/login` Supabase flow
+    - `/admin` metrics/events edit + audit entries
+    - `/admin/blog` run history status transitions
+
+## Latest Update (2026-02-12, Admin Role Seed Script + Rollout Checklist)
+- Objective: provide safe SQL seed and staged rollout checklist for enabling first admin accounts.
+- Status: completed.
+- Touched files:
+  - `docs/runbooks/admin-role-seed-rollout.md` (new)
+  - `README.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added copy-paste SQL seed block for `public.admin_roles` by user email lookup from `auth.users`.
+  - Added verification SQL, staging/prod rollout phases (A/B/C), and rollback steps.
+  - Linked new runbook from README.
+- Verification commands:
+  - `npm run check:utf8:strict`
+
+## Latest Update (2026-02-12, Ready SQL Blocks for Staging/Prod Admin Seed)
+- Objective: provide immediate copy-paste SQL blocks for staging and production admin role seeding.
+- Status: completed.
+- Touched files:
+  - `docs/runbooks/sql/admin-role-seed-staging-prod.sql` (new)
+  - `docs/runbooks/admin-role-seed-rollout.md`
+  - `README.md`
+- Implemented:
+  - Added separate SQL script with:
+    - staging block (super_admin + admin by email),
+    - production block (super_admin + admin by email),
+    - verification queries for each environment.
+  - Linked the script from runbooks and README.
+- Verification commands:
+  - `npm run check:utf8:strict`
+
+
+
+
+## Latest Update (2026-02-12, Remote Admin Migration + Super Admin Seed Executed)
+- Objective: execute rollout directly (remote migration push + first super_admin seed) without manual DB dashboard steps.
+- Status: completed for linked project `nbjegiocsvmtgnfbbxyd`.
+- Touched files:
+  - `docs/session-continuation.md`
+- Executed commands:
+  - `supabase migration list --linked`
+  - `supabase db push --linked --yes`
+  - one-off Node seed script (service-role based) to upsert `public.admin_roles` for `dezveer2@gmail.com`
+  - `supabase migration list --linked` (post-check)
+  - `npm run check:utf8:strict`
+  - `npm run lint`
+  - `npm run build`
+- Verification results:
+  - Remote migration push: pass (applied `20260210161000`, `20260210220000`, `20260212190000`)
+  - Migration parity (local vs remote): pass
+  - Admin role seed: pass (`dezveer2@gmail.com` -> `super_admin`)
+  - UTF-8 strict: pass
+  - lint: fail (unrelated pre-existing binary/corrupted files: `components/catalog-section.tsx`, `components/catalog-taxonomy-panel.tsx`)
+  - build: fail for same unrelated corrupted files (unexpected `�` characters)
+- Notes:
+  - The admin rollout objective is complete (DB schema + role seed done remotely).
+  - Current lint/build failures are outside admin scope and come from existing catalog file corruption in the working tree.
+
+
+
+
+
 
 
 
