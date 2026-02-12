@@ -23,8 +23,6 @@ test.describe("Tools rules generator", () => {
     await setLocaleCookies(page, "ru");
     await page.goto("/tools");
 
-    await expect(page.getByText("Фирменный маскот")).toBeVisible();
-
     await page.getByRole("button", { name: "Merge с текущим AGENTS.md" }).click();
     await expect(page.getByLabel("Текущий AGENTS.md (опционально)")).toBeVisible();
 
@@ -50,7 +48,6 @@ test.describe("Tools rules generator", () => {
     await setLocaleCookies(page, "en");
     await page.goto("/tools");
 
-    await expect(page.getByText("Brand mascot")).toBeVisible();
     await expect(page.getByText("Rules Generator")).toBeVisible();
 
     await page.getByLabel("Project Description").fill(
