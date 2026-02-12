@@ -1,49 +1,42 @@
 # Codex + tmux continuation workflow
 
-Этот workflow делает `docs/session-continuation.md` практической «оперативной памятью» для новых сессий Codex через tmux.
+This workflow uses `docs/session-continuation.md` as the source of truth for handing context to new Codex sessions started in tmux.
 
-## Что это дает
+## Why this exists
 
-- Одна постоянная tmux-сессия для репозитория.
-- Быстрый ре-старт Codex в фоне и возврат в контекст.
-- Автопередача последнего handoff-блока из `docs/session-continuation.md` при старте (режим `continuation`).
+- Keep one persistent tmux session per repository.
+- Resume Codex quickly without losing recent context.
+- Keep a compact handoff block in `docs/session-continuation.md` (latest section at the top).
 
-## Команды (PowerShell / CMD)
+## Commands (PowerShell / CMD)
 
-Из корня репозитория:
-
-- Старт и attach:
+- Start session and attach:
   - `scripts\codex-tmux.cmd -Action start`
-- Только attach к уже запущенной сессии:
+- Attach to an existing session:
   - `scripts\codex-tmux.cmd -Action attach`
-- Статус:
+- Show status:
   - `scripts\codex-tmux.cmd -Action status`
-- Остановить сессию:
+- Kill session:
   - `scripts\codex-tmux.cmd -Action kill`
 
-## Режимы старта
+## Startup modes
 
-По умолчанию: `-StartupMode continuation`.
+Use `-StartupMode`:
 
-- `continuation` — читает последний блок из `docs/session-continuation.md` и передает его как стартовый prompt.
-- `resume-last` — запускает `codex resume --last --cd <repo>`.
-- `plain` — обычный `codex --cd <repo>` без стартового контекста.
+- `continuation` -> reads the latest section from `docs/session-continuation.md` and sends it as startup prompt.
+- `resume-last` -> runs `codex resume --last --cd <repo>`.
+- `plain` -> runs `codex --cd <repo>`.
 
-Примеры:
+Examples:
 
 - `scripts\codex-tmux.cmd -Action start -StartupMode continuation`
 - `scripts\codex-tmux.cmd -Action start -StartupMode resume-last`
 - `scripts\codex-tmux.cmd -Action start -StartupMode plain`
 
-## Полезные флаги
+## Useful flags
 
-- `-NoAttach` — оставить tmux-сессию в фоне (не подключаться сразу).
-- `-SkipCodexStart` — создать tmux-сессию без автозапуска Codex.
-- `-SessionName <name>` — задать имя tmux-сессии вручную.
-- `-RepoPath <path>` — запустить для другого репозитория.
-- `-ContinuationFile <path>` — использовать другой handoff-файл.
-
-## Важное уточнение про память
-
-`docs/session-continuation.md` не является «системной памятью Codex».  
-Это файловый источник контекста в репозитории. Скрипт просто автоматизирует его подхват на старте.
+- `-NoAttach` -> leave session running in background.
+- `-SkipCodexStart` -> create tmux session without launching Codex.
+- `-SessionName <name>` -> custom tmux session name.
+- `-RepoPath <path>` -> repository root.
+- `-ContinuationFile <path>` -> custom handoff file path.

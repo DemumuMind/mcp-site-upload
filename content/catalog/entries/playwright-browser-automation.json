@@ -5,7 +5,11 @@
   "serverUrl": "playwright-mcp --headless --isolated",
   "category": "Testing",
   "authType": "none",
-  "tags": ["browser", "automation", "e2e"],
+  "tags": [
+    "browser",
+    "automation",
+    "e2e"
+  ],
   "repoUrl": "https://playwright.dev",
   "maintainer": {
     "name": "Microsoft Playwright"

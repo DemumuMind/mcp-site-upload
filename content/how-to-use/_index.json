@@ -7,13 +7,6 @@
       "eyebrow": "Developer-First Onboarding",
       "heroTitle": "Setup Guide",
       "heroDescription": "Choose a setup path, connect MCP servers safely, and move to production with measurable confidence."
-    },
-    "ru": {
-      "title": "Гайд по настройке",
-      "description": "Ролевой гайд по подключению MCP-серверов и проверке вызовов инструментов.",
-      "eyebrow": "Developer-first онбординг",
-      "heroTitle": "Гайд по настройке",
-      "heroDescription": "Выберите сценарий настройки, безопасно подключите MCP-серверы и переходите в production с измеримой уверенностью."
     }
   }
 }

@@ -1,4 +1,4 @@
-param(
+﻿param(
   [ValidateSet("start", "attach", "status", "kill")]
   [string]$Action = "start",
   [string]$SessionName,
@@ -181,15 +181,15 @@ if (-not $SkipCodexStart) {
       }
       else {
         $promptText = @"
-Продолжи работу в этом репозитории.
+Continue work in this repository.
 
-Обязательные шаги:
-1) Сначала открой и прочитай docs/session-continuation.md целиком.
-2) Затем используй блок ниже как быстрый handoff-контекст:
+Required steps:
+1) First, open and read docs/session-continuation.md fully.
+2) Then use the handoff block below as quick context:
 
 $latestSection
 
-В первом ответе кратко зафиксируй: цель, текущий статус, следующие команды проверки.
+In your first response, briefly confirm: objective, current status, and next verification commands.
 "@
 
         $promptFileName = "codex-startup-$SessionName-$(Get-Date -Format 'yyyyMMddHHmmss').txt"
@@ -216,3 +216,4 @@ if ($NoAttach) {
 else {
   & tmux attach-session -t $SessionName
 }
+

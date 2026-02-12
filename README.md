@@ -52,7 +52,10 @@ npm run dev
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes (for DB mode) | Supabase anon key |
 | `NEXT_PUBLIC_SITE_URL` | recommended | Canonical URL for metadata/sitemap |
 | `SUPABASE_SERVICE_ROLE_KEY` | required for admin + health updates | server-side privileged Supabase access |
-| `ADMIN_ACCESS_TOKEN` | required for `/admin` | cookie-based admin auth token |
+| `ADMIN_AUTH_MODE` | optional | admin auth mode: `hybrid` (default), `supabase`, or `token` |
+| `ADMIN_FALLBACK_TOKEN_ENABLED` | optional | enable/disable token fallback in `hybrid` mode (default `true`) |
+| `ADMIN_ACCESS_TOKEN` | required for token fallback | cookie-based admin auth token (`token` mode or hybrid fallback) |
+| `ADMIN_TOKEN_ACTOR_LABEL` | optional | human-readable actor label for fallback-token audit records |
 | `HEALTH_CHECK_CRON_SECRET` | one of two required | bearer token for `/api/health-check` |
 | `BLOG_AUTOPUBLISH_CRON_SECRET` | recommended | bearer token for `/api/blog/auto-publish` |
 | `CATALOG_AUTOSYNC_CRON_SECRET` | recommended | bearer token for `/api/catalog/auto-sync` |
@@ -81,6 +84,8 @@ Current key migrations:
 - `20260208074000_server_health_checks.sql` - health status fields
 - `20260208080000_seed_top_mcp_servers.sql` - cold-start seed dataset (idempotent upsert by slug)
 - `20260208194500_user_owned_submissions.sql` - user-owned submissions (`owner_user_id`) + stricter auth submit/read policies
+- `20260210220000_admin_dashboard_analytics.sql` - admin dashboard analytics/settings tables
+- `20260212190000_admin_auth_audit_blog_runs.sql` - admin roles, audit log, blog automation run history
 
 Apply migrations via Supabase CLI in your environment.
 
@@ -258,6 +263,8 @@ Required repository secret for Supabase migration workflow:
 - Security runbook: `docs/runbooks/security.md`
 - Catalog automation runbook: `docs/catalog-automation.md`
 - Admin dashboard analytics rollout: `docs/runbooks/admin-dashboard-analytics-rollout.md`
+- Admin role seed + rollout: `docs/runbooks/admin-role-seed-rollout.md`
+- Admin role seed SQL (staging/prod): `docs/runbooks/sql/admin-role-seed-staging-prod.sql`
 - Backup manifest template: `ops/backup-manifest.example.json`
 - Runtime backup manifest path: `ops/backup-manifest.json` (gitignored)
 

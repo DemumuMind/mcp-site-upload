@@ -3,17 +3,10 @@
   "locale": {
     "en": {
       "title": "Tools",
-      "description": "Token calculator and rules generator for MCP projects.",
+      "description": "Token estimation and rules generation for MCP-focused engineering teams.",
       "eyebrow": "Builder Utilities",
       "heroTitle": "Utility Toolkit for MCP Teams",
-      "heroDescription": "Estimate prompt tokens and generate starter project rules."
-    },
-    "ru": {
-      "title": "Инструменты",
-      "description": "Калькулятор токенов и генератор правил для MCP-проектов.",
-      "eyebrow": "Инструменты разработчика",
-      "heroTitle": "Utility-набор для MCP-команд",
-      "heroDescription": "Оценивайте токены в промптах и генерируйте стартовые правила проекта."
+      "heroDescription": "Estimate prompt token usage and generate production-ready rule packs with reusable presets."
     }
   }
 }

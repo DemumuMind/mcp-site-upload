@@ -87,6 +87,77 @@
   - Repository contains many unrelated in-progress changes; keep merge scope isolated.
   - Existing local long-running dev processes can lock `.next` and block default build/dev commands.
 
+## Latest Update (2026-02-12, Blog v2 Vertical Rebuild: MDX + Contentlayer + Admin Pipeline)
+- Objective: implement full Blog v2 vertical from scratch per approved plan (new UI, MDX-first content model, admin-only AI pipeline, feature-flag rollout path, engagement analytics).
+- Status: completed (build + lint + UTF-8 + targeted Playwright checks passed).
+- Touched files (primary):
+  - Routing / pages:
+    - `app/blog/page.tsx`
+    - `app/blog/legacy-page.tsx` (new)
+    - `app/blog/[slug]/page.tsx`
+    - `app/blog/[slug]/legacy-page.tsx` (new)
+    - `app/sitemap.xml/route.ts`
+  - Blog v2 UI:
+    - `components/blog-v2/blog-list-page.tsx` (new)
+    - `components/blog-v2/blog-article-page.tsx` (new)
+    - `components/blog-v2/blog-featured-card.tsx` (new)
+    - `components/blog-v2/blog-article-card.tsx` (new)
+    - `components/blog-v2/blog-topic-filter.tsx` (new)
+    - `components/blog-v2/blog-reading-progress.tsx` (new)
+    - `components/blog-v2/blog-engagement-tracker.tsx` (new)
+    - `components/blog-v2/blog-tracked-link.tsx` (new)
+    - `components/blog-v2/blog-article-mdx.tsx` (new)
+  - Blog v2 data/content:
+    - `contentlayer.config.ts` (new)
+    - `content/blog/authors/bridgemind-editorial.json` (new)
+    - `content/blog/taxonomy/topics.json` (new)
+    - `content/blog/posts/*.mdx` (6 new files)
+    - `scripts/blog-migrate-json-to-mdx.mjs` (new)
+  - Blog v2 domain/pipeline:
+    - `lib/blog-v2/types.ts` (new)
+    - `lib/blog-v2/flags.ts` (new)
+    - `lib/blog-v2/contentlayer.ts` (new)
+    - `lib/blog-v2/mdx-components.tsx` (new)
+    - `lib/blog-v2/analytics.ts` (new)
+    - `lib/blog-v2/pipeline/types.ts` (new)
+    - `lib/blog-v2/pipeline/draft.ts` (new)
+  - Admin/API:
+    - `app/admin/actions.ts` (switched blog generation flow to Blog v2 draft+publish)
+    - `app/admin/blog/page.tsx` (copy + form cleanup/fix)
+    - `app/api/admin/blog-v2/generate/route.ts` (new)
+    - `app/api/admin/blog-v2/preview/route.ts` (new)
+    - `app/api/admin/blog-v2/publish/route.ts` (new)
+    - `app/api/blog/auto-publish/route.ts` (v1 blocked when `BLOG_V2_ENABLED=true`)
+  - Tooling/config/tests:
+    - `package.json` (contentlayer build + migration script)
+    - `next.config.ts` (withContentlayer2)
+    - `tsconfig.json` (generated contentlayer paths/include)
+    - `playwright.config.ts` (explicit `next dev --webpack`, no server reuse)
+    - `tests/blog-v2.spec.ts` (new)
+- Implemented:
+  - New Blog v2 UX in Editorial + Tech Noir direction for both list and article pages.
+  - Feature-flag routing path (`BLOG_V2_ENABLED`) with legacy fallback files preserved.
+  - MDX-first content model via Contentlayer2; migrated existing JSON posts into MDX equivalents.
+  - New admin-only API pipeline for draft generation/preview/publish.
+  - Existing `/admin/blog` form now executes Blog v2 pipeline (deep research -> MDX draft -> publish).
+  - Consent-gated engagement analytics for read progress, completion, related clicks, and CTA clicks.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass (Contentlayer Windows warning only)
+  - `npx playwright test tests/blog-v2.spec.ts` -> pass (3/3)
+- Next commands:
+  - Optional: set `BLOG_V2_ENABLED=false` for legacy fallback validation.
+  - Optional: exercise new admin endpoints manually:
+    - `POST /api/admin/blog-v2/generate`
+    - `POST /api/admin/blog-v2/preview`
+    - `POST /api/admin/blog-v2/publish`
+  - Optional: add `allowedDevOrigins` to `next.config.ts` to silence cross-origin dev warning in Playwright runs.
+- Open risks:
+  - Contentlayer on Windows emits non-fatal compatibility warning.
+  - Legacy JSON posts still exist in `content/blog/posts/*.json`; cleanup/deprecation should be done in a dedicated follow-up.
+  - Repo contains many unrelated in-progress diffs; isolate commit scope carefully before merge.
+
 ## Latest Update (2026-02-12, Tools Rules Generator v2 + Brand Mascot)
 - Objective: ship enhanced Rules Generator (skill-aware + multi-format), add brand anime mascot card on `/tools`, and complete the requested next step (commit).
 - Status: completed (feature + tests + commit).

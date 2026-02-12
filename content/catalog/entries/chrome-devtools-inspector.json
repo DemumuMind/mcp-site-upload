@@ -5,7 +5,11 @@
   "serverUrl": "chrome-devtools-mcp",
   "category": "Developer Tools",
   "authType": "none",
-  "tags": ["browser", "debugging", "performance"],
+  "tags": [
+    "browser",
+    "debugging",
+    "performance"
+  ],
   "repoUrl": "https://developer.chrome.com/docs/devtools",
   "maintainer": {
     "name": "Google Chrome"

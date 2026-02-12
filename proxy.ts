@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { ADMIN_SESSION_COOKIE, isAdminSessionCookieValue } from "@/lib/admin-auth";
+import {
+  ADMIN_SESSION_COOKIE,
+  getAdminRoleForUser,
+  isAdminSessionCookieValue,
+  isSupabaseAdminAuthEnabled,
+  isTokenAdminAuthEnabled,
+} from "@/lib/admin-auth";
+import { normalizeInternalPath } from "@/lib/auth-redirects";
 import { createSupabaseProxyAuthClient } from "@/lib/supabase/proxy-auth";
 
 const protectedUserPathnames = ["/submit-server", "/account"] as const;
@@ -19,6 +26,17 @@ function getAuthRedirectUrl(request: NextRequest): URL {
   return redirectUrl;
 }
 
+function getAdminLoginRedirectUrl(
+  request: NextRequest,
+  errorCode: "session" | "forbidden" | "config",
+): URL {
+  const redirectUrl = new URL("/admin/login", request.url);
+  const nextPath = normalizeInternalPath(`${request.nextUrl.pathname}${request.nextUrl.search}`);
+  redirectUrl.searchParams.set("redirect", nextPath);
+  redirectUrl.searchParams.set("error", errorCode);
+  return redirectUrl;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -27,15 +45,39 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    const tokenEnabled = isTokenAdminAuthEnabled();
+    const supabaseEnabled = isSupabaseAdminAuthEnabled();
     const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
 
-    if (!isAdminSessionCookieValue(sessionCookie)) {
-      const loginUrl = new URL("/admin/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+    if (tokenEnabled && isAdminSessionCookieValue(sessionCookie)) {
+      return NextResponse.next();
     }
 
-    return NextResponse.next();
+    if (supabaseEnabled) {
+      const proxyClient = createSupabaseProxyAuthClient(request);
+
+      if (!proxyClient) {
+        if (!tokenEnabled) {
+          return NextResponse.redirect(getAdminLoginRedirectUrl(request, "config"));
+        }
+
+        return NextResponse.redirect(getAdminLoginRedirectUrl(request, "session"));
+      }
+
+      const { data, error } = await proxyClient.supabaseClient.auth.getUser();
+
+      if (!error && data.user) {
+        const role = await getAdminRoleForUser(proxyClient.supabaseClient, data.user.id);
+
+        if (role) {
+          return proxyClient.getResponse();
+        }
+
+        return NextResponse.redirect(getAdminLoginRedirectUrl(request, "forbidden"));
+      }
+    }
+
+    return NextResponse.redirect(getAdminLoginRedirectUrl(request, "session"));
   }
 
   if (!isProtectedUserPath(pathname)) {

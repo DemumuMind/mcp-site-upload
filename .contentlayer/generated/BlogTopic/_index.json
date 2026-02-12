@@ -1,0 +1,55 @@
+[
+  {
+    "topics": [
+      {
+        "name": "Playbook",
+        "slug": "playbook",
+        "description": "Step-by-step execution patterns for production teams.",
+        "colorToken": "violet",
+        "type": "BlogTopicItem",
+        "_raw": {}
+      },
+      {
+        "name": "Architecture",
+        "slug": "architecture",
+        "description": "System boundaries, integration surfaces, and design tradeoffs.",
+        "colorToken": "cyan",
+        "type": "BlogTopicItem",
+        "_raw": {}
+      },
+      {
+        "name": "Workflow",
+        "slug": "workflow",
+        "description": "Planning and delivery workflows for agentic engineering.",
+        "colorToken": "emerald",
+        "type": "BlogTopicItem",
+        "_raw": {}
+      },
+      {
+        "name": "Operations",
+        "slug": "operations",
+        "description": "Reliability, rollout control, and operational readiness.",
+        "colorToken": "blue",
+        "type": "BlogTopicItem",
+        "_raw": {}
+      },
+      {
+        "name": "Quality",
+        "slug": "quality",
+        "description": "Verification loops, release gates, and confidence systems.",
+        "colorToken": "amber",
+        "type": "BlogTopicItem",
+        "_raw": {}
+      }
+    ],
+    "_id": "blog/taxonomy/topics.json",
+    "_raw": {
+      "sourceFilePath": "blog/taxonomy/topics.json",
+      "sourceFileName": "topics.json",
+      "sourceFileDir": "blog/taxonomy",
+      "contentType": "data",
+      "flattenedPath": "blog/taxonomy/topics"
+    },
+    "type": "BlogTopic"
+  }
+]

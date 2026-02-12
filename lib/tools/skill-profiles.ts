@@ -1,22 +1,17 @@
 import type { Locale } from "@/lib/i18n";
 
-type LocalizedText = {
-  en: string;
-  ru: string;
-};
-
-type LocalizedRuleSet = {
-  en: string[];
-  ru: string[];
+export type RulesByFormat = {
+  agents: string[];
+  cursor: string[];
+  copilot: string[];
 };
 
 export type SkillProfile = {
   id: string;
-  title: LocalizedText;
+  title: string;
+  summary: string;
   keywords: string[];
-  agentsRules: LocalizedRuleSet;
-  cursorRules: LocalizedRuleSet;
-  copilotRules: LocalizedRuleSet;
+  rules: RulesByFormat;
 };
 
 export const DEFAULT_SKILL_IDS = [
@@ -29,395 +24,215 @@ export const DEFAULT_SKILL_IDS = [
 export const SKILL_PROFILES: SkillProfile[] = [
   {
     id: "nextjs-app-router",
-    title: {
-      en: "Next.js App Router",
-      ru: "Next.js App Router",
-    },
-    keywords: [
-      "next.js",
-      "nextjs",
-      "app router",
-      "server component",
-      "route handler",
-      "rsc",
-      "next",
-      "next app",
-    ],
-    agentsRules: {
-      en: [
+    title: "Next.js App Router",
+    summary: "Use App Router conventions and keep server/client boundaries explicit.",
+    keywords: ["next.js", "nextjs", "app router", "server component", "route handler", "rsc"],
+    rules: {
+      agents: [
         "Prefer Server Components by default and isolate client-only logic.",
-        "Follow App Router conventions (page.tsx/layout.tsx/route.ts).",
+        "Keep route changes scoped to the affected segment in app/.",
       ],
-      ru: [
-        "Используйте Server Components по умолчанию, клиентскую логику изолируйте.",
-        "Соблюдайте конвенции App Router (page.tsx/layout.tsx/route.ts).",
+      cursor: [
+        "Follow page.tsx/layout.tsx/route.ts conventions consistently.",
+        "Avoid moving data fetching to client components without explicit need.",
       ],
-    },
-    cursorRules: {
-      en: [
-        "Keep route-level changes localized to the relevant app segment.",
-        "Do not move data fetching to client components without explicit need.",
-      ],
-      ru: [
-        "Локализуйте изменения на уровне нужного сегмента app/.",
-        "Не переносите data fetching в клиент без явной необходимости.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Generate code that respects server/client boundaries.",
-        "Prefer route handlers in app/api for backend actions.",
-      ],
-      ru: [
-        "Генерируйте код с учетом границ server/client.",
-        "Для backend-действий предпочитайте route handlers в app/api.",
+      copilot: [
+        "Generate backend actions as route handlers under app/api when applicable.",
+        "Preserve cache and rendering assumptions when editing routes.",
       ],
     },
   },
   {
     id: "typescript-pro",
-    title: {
-      en: "TypeScript Pro",
-      ru: "TypeScript Pro",
-    },
-    keywords: [
-      "typescript",
-      "ts",
-      "type",
-      "interface",
-      "generics",
-      "strict",
-      "typing",
-    ],
-    agentsRules: {
-      en: [
-        "Keep types explicit at module boundaries and avoid loose any.",
-        "Model nullable/optional states directly in types.",
+    title: "TypeScript Pro",
+    summary: "Prioritize explicit types, stable contracts, and safe refactors.",
+    keywords: ["typescript", "type", "interface", "generic", "strict", "typing", "ts"],
+    rules: {
+      agents: [
+        "Keep public module boundaries strongly typed and avoid loose any.",
+        "Model nullable and optional states explicitly in interfaces.",
       ],
-      ru: [
-        "Делайте типы явными на границах модулей и избегайте any.",
-        "Явно моделируйте nullable/optional состояния в типах.",
+      cursor: [
+        "Prefer composable utility types over oversized unions.",
+        "Keep function signatures backward-compatible unless explicitly changed.",
       ],
-    },
-    cursorRules: {
-      en: [
-        "Prefer small, composable utility types over large unions.",
-        "Keep function signatures stable and backward compatible.",
-      ],
-      ru: [
-        "Предпочитайте небольшие композиционные utility-типы.",
-        "Сохраняйте стабильные и обратно-совместимые сигнатуры функций.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Always infer and validate return types for helpers.",
-        "Use descriptive names for domain types.",
-      ],
-      ru: [
-        "Всегда выводите и проверяйте return types helper-функций.",
-        "Используйте понятные названия доменных типов.",
-      ],
-    },
-  },
-  {
-    id: "playwright-skill",
-    title: {
-      en: "Playwright Skill",
-      ru: "Playwright Skill",
-    },
-    keywords: [
-      "playwright",
-      "e2e",
-      "ui test",
-      "browser automation",
-      "visual",
-      "ux",
-      "regression",
-    ],
-    agentsRules: {
-      en: [
-        "Add Playwright coverage for user-visible behavior changes.",
-        "Validate desktop and mobile critical flows when touching UI.",
-      ],
-      ru: [
-        "Добавляйте Playwright-проверки для изменений пользовательского поведения.",
-        "Проверяйте критичные UI-флоу на desktop и mobile.",
-      ],
-    },
-    cursorRules: {
-      en: [
-        "Prefer semantic locators (role/label/text) over brittle selectors.",
-        "Include locale-aware assertions if UI is bilingual.",
-      ],
-      ru: [
-        "Используйте семантические локаторы (role/label/text), а не хрупкие селекторы.",
-        "Добавляйте locale-aware проверки для двуязычного интерфейса.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Generate deterministic E2E checks with clear expected outcomes.",
-        "Set consent/locale cookies in tests when needed.",
-      ],
-      ru: [
-        "Генерируйте детерминированные E2E-проверки с явными ожидаемыми результатами.",
-        "В тестах задавайте cookies locale/consent, когда это нужно.",
+      copilot: [
+        "Infer and validate return types for helpers.",
+        "Use descriptive names for domain types and DTOs.",
       ],
     },
   },
   {
     id: "lint-and-validate",
-    title: {
-      en: "Lint and Validate",
-      ru: "Lint and Validate",
-    },
-    keywords: [
-      "lint",
-      "validation",
-      "format",
-      "quality gate",
-      "ci",
-      "checks",
-    ],
-    agentsRules: {
-      en: [
-        "Run repository quality gates before completion claims.",
-        "Treat lint/build failures as blockers, not optional warnings.",
+    title: "Lint and Validate",
+    summary: "Run repository quality gates before claiming completion.",
+    keywords: ["lint", "validation", "quality", "check", "ci", "build", "format"],
+    rules: {
+      agents: [
+        "Run project quality gates before completion claims.",
+        "Treat lint/build errors as blockers, not optional warnings.",
       ],
-      ru: [
-        "Перед завершением запускайте quality gate репозитория.",
-        "Считайте lint/build ошибки блокирующими, а не опциональными.",
-      ],
-    },
-    cursorRules: {
-      en: [
-        "Use project scripts instead of ad-hoc commands when possible.",
+      cursor: [
+        "Use repository scripts rather than ad-hoc shell commands where possible.",
         "Report executed commands and concise outcomes.",
       ],
-      ru: [
-        "Используйте проектные scripts вместо ad-hoc команд.",
-        "Фиксируйте выполненные команды и краткий результат.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Keep changes lint-compatible and convention-aligned.",
-        "Avoid introducing new dependencies for small fixes.",
-      ],
-      ru: [
-        "Сохраняйте совместимость с lint и текущими конвенциями.",
-        "Не добавляйте новые зависимости для мелких правок.",
+      copilot: [
+        "Keep generated code lint-compatible and convention-aligned.",
+        "Avoid introducing dependencies for tiny fixes.",
       ],
     },
   },
   {
     id: "verification-before-completion",
-    title: {
-      en: "Verification Before Completion",
-      ru: "Verification Before Completion",
-    },
-    keywords: [
-      "verification",
-      "final check",
-      "acceptance",
-      "done",
-      "ship",
-      "release",
-    ],
-    agentsRules: {
-      en: [
-        "Never claim 'done' without evidence from executed checks.",
-        "Map acceptance criteria to specific verification evidence.",
+    title: "Verification Before Completion",
+    summary: "Evidence-first delivery with explicit pass/fail command output.",
+    keywords: ["verification", "done", "acceptance", "release", "ship", "final check"],
+    rules: {
+      agents: [
+        "Never claim done without evidence from executed checks.",
+        "Map acceptance criteria to concrete verification output.",
       ],
-      ru: [
-        "Не заявляйте о завершении без доказательств из выполненных проверок.",
-        "Связывайте acceptance criteria с конкретной верификацией.",
-      ],
-    },
-    cursorRules: {
-      en: [
-        "Summarize pass/fail per command before handoff.",
+      cursor: [
+        "Summarize pass/fail status for each command before handoff.",
         "Call out residual risks explicitly.",
       ],
-      ru: [
-        "Перед handoff указывайте pass/fail по каждой команде.",
-        "Явно фиксируйте остаточные риски.",
+      copilot: [
+        "Include command evidence in delivery notes.",
+        "Do not claim completion when checks are missing.",
       ],
     },
-    copilotRules: {
-      en: [
-        "Generate delivery notes with command evidence.",
-        "Avoid completion claims when tests/checks are missing.",
+  },
+  {
+    id: "playwright-skill",
+    title: "Playwright Skill",
+    summary: "Validate UI behavior through deterministic browser flows.",
+    keywords: ["playwright", "e2e", "browser", "ui test", "regression", "visual"],
+    rules: {
+      agents: [
+        "Add Playwright coverage for user-visible behavior changes.",
+        "Validate critical flows on both desktop and mobile breakpoints.",
       ],
-      ru: [
-        "Генерируйте delivery notes с доказательствами по командам.",
-        "Избегайте финальных claim без тестов/проверок.",
+      cursor: [
+        "Prefer semantic locators (role/label/text) over brittle selectors.",
+        "Use deterministic assertions with explicit expected states.",
+      ],
+      copilot: [
+        "Generate E2E checks for primary user paths after UI changes.",
+        "Prepare predictable test data/state before assertions.",
       ],
     },
   },
   {
     id: "security-review",
-    title: {
-      en: "Security Review",
-      ru: "Security Review",
-    },
-    keywords: [
-      "auth",
-      "token",
-      "security",
-      "permission",
-      "role",
-      "secret",
-      "compliance",
-    ],
-    agentsRules: {
-      en: [
-        "Do not expose secrets or sensitive identifiers in logs/output.",
-        "Validate access boundaries for auth-protected actions.",
+    title: "Security Review",
+    summary: "Enforce secure defaults and avoid sensitive data exposure.",
+    keywords: ["security", "auth", "token", "secret", "permission", "compliance"],
+    rules: {
+      agents: [
+        "Never expose secrets, credentials, or private tokens in logs/output.",
+        "Validate access boundaries for auth-protected flows.",
       ],
-      ru: [
-        "Не раскрывайте секреты и чувствительные идентификаторы в логах/выводе.",
-        "Проверяйте границы доступа для auth-защищенных действий.",
+      cursor: [
+        "Default to least privilege when introducing new capabilities.",
+        "Flag any change touching auth, billing, or personal data.",
       ],
-    },
-    cursorRules: {
-      en: [
-        "Prefer least-privilege defaults for new capabilities.",
-        "Flag any change affecting auth, payment, or personal data.",
-      ],
-      ru: [
-        "Для новых возможностей используйте принципы least-privilege.",
-        "Отмечайте изменения в auth, payment и персональных данных.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Generate secure defaults and explicit input validation.",
-        "Never suggest committing credentials or private tokens.",
-      ],
-      ru: [
-        "Генерируйте безопасные значения по умолчанию и явную валидацию.",
-        "Никогда не предлагайте коммитить credentials или приватные токены.",
+      copilot: [
+        "Generate explicit input validation and safe defaults.",
+        "Avoid suggesting insecure shortcuts in auth-sensitive code paths.",
       ],
     },
   },
   {
     id: "supabase-postgres-best-practices",
-    title: {
-      en: "Supabase Postgres Best Practices",
-      ru: "Supabase Postgres Best Practices",
-    },
-    keywords: [
-      "supabase",
-      "postgres",
-      "sql",
-      "migration",
-      "schema",
-      "query",
-      "database",
-    ],
-    agentsRules: {
-      en: [
-        "Treat schema changes as high-risk and document rollback paths.",
-        "Prefer indexed query patterns and avoid broad table scans.",
+    title: "Supabase Postgres Best Practices",
+    summary: "Treat schema and query behavior as high-risk and reversible.",
+    keywords: ["supabase", "postgres", "sql", "migration", "schema", "database", "query"],
+    rules: {
+      agents: [
+        "Keep schema-affecting changes small and rollback-friendly.",
+        "Prefer indexed query patterns and avoid broad scans.",
       ],
-      ru: [
-        "Рассматривайте изменения схемы как high-risk и документируйте rollback.",
-        "Предпочитайте индексируемые запросы и избегайте широких table scans.",
+      cursor: [
+        "Document migration intent and rollback path.",
+        "Validate data integrity assumptions before rollout.",
       ],
-    },
-    cursorRules: {
-      en: [
-        "Keep migrations small, ordered, and reversible.",
-        "Validate data integrity assumptions before deployment.",
-      ],
-      ru: [
-        "Делайте миграции маленькими, упорядоченными и обратимыми.",
-        "Проверяйте гипотезы по целостности данных до деплоя.",
-      ],
-    },
-    copilotRules: {
-      en: [
-        "Generate SQL with explicit constraints and index awareness.",
-        "Avoid destructive migration commands without rollback guidance.",
-      ],
-      ru: [
-        "Генерируйте SQL с явными constraints и учетом индексов.",
-        "Избегайте разрушительных миграций без rollback-пути.",
+      copilot: [
+        "Generate SQL with explicit constraints and indexes when relevant.",
+        "Avoid destructive migration steps without rollback guidance.",
       ],
     },
   },
   {
     id: "ui-skills",
-    title: {
-      en: "UI Skills",
-      ru: "UI Skills",
-    },
-    keywords: [
-      "ui",
-      "ux",
-      "component",
-      "responsive",
-      "design",
-      "tailwind",
-      "accessibility",
-      "interface",
-    ],
-    agentsRules: {
-      en: [
-        "Keep visual hierarchy clear and preserve readability in dark mode.",
+    title: "UI Skills",
+    summary: "Maintain clear visual hierarchy, accessibility, and reusable UI patterns.",
+    keywords: ["ui", "ux", "design", "responsive", "component", "tailwind", "accessibility"],
+    rules: {
+      agents: [
+        "Keep visual hierarchy clear and content readability high.",
         "Use accessible labels and keyboard-friendly controls.",
       ],
-      ru: [
-        "Сохраняйте четкую визуальную иерархию и читабельность в dark mode.",
-        "Используйте доступные labels и keyboard-friendly элементы.",
+      cursor: [
+        "Follow existing design tokens and spacing patterns.",
+        "Validate updated layouts on mobile and desktop breakpoints.",
+      ],
+      copilot: [
+        "Generate semantic markup and explicit labels for form controls.",
+        "Prefer reusable UI blocks over one-off markup.",
       ],
     },
-    cursorRules: {
-      en: [
-        "Follow existing design tokens and component patterns.",
-        "Validate mobile and desktop breakpoints for updated layouts.",
+  },
+  {
+    id: "accessibility-compliance-accessibility-audit",
+    title: "Accessibility Audit",
+    summary: "Apply WCAG-minded interaction and semantic correctness.",
+    keywords: ["accessibility", "wcag", "screen reader", "aria", "keyboard", "contrast"],
+    rules: {
+      agents: [
+        "Ensure all interactive controls have accessible names.",
+        "Preserve keyboard reachability and visible focus states.",
       ],
-      ru: [
-        "Следуйте существующим design tokens и паттернам компонентов.",
-        "Проверяйте mobile/desktop breakpoints для обновленных layout.",
+      cursor: [
+        "Use semantic HTML before adding ARIA attributes.",
+        "Avoid color-only status indicators; include text cues.",
       ],
-    },
-    copilotRules: {
-      en: [
-        "Generate semantic markup with explicit labels.",
-        "Favor small reusable UI blocks over one-off markup.",
-      ],
-      ru: [
-        "Генерируйте семантическую разметку с явными labels.",
-        "Предпочитайте небольшие переиспользуемые UI-блоки.",
+      copilot: [
+        "Generate labels, descriptions, and helper text tied via IDs.",
+        "Validate component semantics for forms, tabs, and lists.",
       ],
     },
   },
 ];
 
-export function localizeText(locale: Locale, text: LocalizedText): string {
-  return locale === "ru" ? text.ru : text.en;
-}
+const SKILL_PROFILE_BY_ID = new Map(SKILL_PROFILES.map((profile) => [profile.id, profile]));
 
-export function localizeRules(locale: Locale, rules: LocalizedRuleSet): string[] {
-  return locale === "ru" ? rules.ru : rules.en;
+export function listSkillProfiles(): SkillProfile[] {
+  return [...SKILL_PROFILES];
 }
 
 export function getSkillProfileById(id: string): SkillProfile | undefined {
-  return SKILL_PROFILES.find((profile) => profile.id === id);
+  return SKILL_PROFILE_BY_ID.get(id);
 }
 
 export function getSkillProfilesByIds(ids: string[]): SkillProfile[] {
-  const unique = new Set(ids);
-  const ordered: SkillProfile[] = [];
+  const uniqueIds = new Set(ids);
+  const orderedProfiles: SkillProfile[] = [];
 
   for (const profile of SKILL_PROFILES) {
-    if (unique.has(profile.id)) {
-      ordered.push(profile);
+    if (uniqueIds.has(profile.id)) {
+      orderedProfiles.push(profile);
     }
   }
 
-  return ordered;
+  return orderedProfiles;
+}
+
+export function localizeText(locale: Locale, text: string): string {
+  void locale;
+  return text;
+}
+
+export function localizeRules(locale: Locale, rules: string[]): string[] {
+  void locale;
+  return rules;
 }

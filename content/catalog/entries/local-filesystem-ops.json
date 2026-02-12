@@ -5,7 +5,11 @@
   "serverUrl": "mcp-server-filesystem .",
   "category": "Developer Tools",
   "authType": "none",
-  "tags": ["filesystem", "local", "automation"],
+  "tags": [
+    "filesystem",
+    "local",
+    "automation"
+  ],
   "repoUrl": "https://modelcontextprotocol.io",
   "maintainer": {
     "name": "Model Context Protocol"

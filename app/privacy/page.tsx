@@ -1,81 +1,52 @@
 import type { Metadata } from "next";
-
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import {
-  getLegalLastUpdatedValue,
-  legalEmail,
-  legalGmailComposeUrl,
-  privacySections,
-} from "@/lib/legal-content";
-
+import { getLegalLastUpdatedValue, legalEmail, legalGmailComposeUrl, privacySections, } from "@/lib/legal-content";
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-
-  return {
-    title: tr(locale, "Privacy Policy", "Политика конфиденциальности"),
-    description: tr(
-      locale,
-      "Privacy policy for DemumuMind MCP.",
-      "Политика конфиденциальности DemumuMind MCP.",
-    ),
-  };
+    const locale = await getLocale();
+    return {
+        title: tr(locale, "Privacy Policy", "Privacy Policy"),
+        description: tr(locale, "Privacy policy for DemumuMind MCP.", "Privacy policy for DemumuMind MCP."),
+    };
 }
-
 export default async function PrivacyPage() {
-  const locale = await getLocale();
-
-  return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-12 sm:px-6">
+    const locale = await getLocale();
+    return (<div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-12 sm:px-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold text-slate-100">
-          {tr(locale, "Privacy Policy", "Политика конфиденциальности")}
+        <h1 className="text-3xl font-semibold text-violet-50">
+          {tr(locale, "Privacy Policy", "Privacy Policy")}
         </h1>
-        <p className="text-sm text-slate-400">
-          {tr(locale, "Last updated:", "Последнее обновление:")} {getLegalLastUpdatedValue(locale)}
+        <p className="text-sm text-violet-300">
+          {tr(locale, "Last updated:", "Last updated:")} {getLegalLastUpdatedValue(locale)}
         </p>
       </header>
 
-      {privacySections.map((section) => (
-        <section key={section.id} className="space-y-3 border-t border-white/10 pt-5">
-          <h2 className="text-2xl font-semibold text-slate-100">
-            {tr(locale, section.title.en, section.title.ru)}
+      {privacySections.map((section) => (<section key={section.id} className="space-y-3 border-t border-white/10 pt-5">
+          <h2 className="text-2xl font-semibold text-violet-50">
+            {tr(locale, section.title.en, section.title.en)}
           </h2>
 
-          {section.paragraph ? (
-            <p className="text-base leading-8 text-slate-300">
-              {tr(locale, section.paragraph.en, section.paragraph.ru)}
-            </p>
-          ) : null}
+          {section.paragraph ? (<p className="text-base leading-8 text-violet-200">
+              {tr(locale, section.paragraph.en, section.paragraph.en)}
+            </p>) : null}
 
-          {section.bullets ? (
-            <ul className="space-y-3 pl-5 text-base leading-8 text-slate-300">
-              {section.bullets.map((bullet) => (
-                <li key={bullet.en} className="list-disc marker:text-sky-400">
-                  {tr(locale, bullet.en, bullet.ru)}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      ))}
+          {section.bullets ? (<ul className="space-y-3 pl-5 text-base leading-8 text-violet-200">
+              {section.bullets.map((bullet) => (<li key={bullet.en} className="list-disc marker:text-sky-400">
+                  {tr(locale, bullet.en, bullet.en)}
+                </li>))}
+            </ul>) : null}
+        </section>))}
 
       <section className="space-y-3 border-t border-white/10 pt-5">
-        <h2 className="text-2xl font-semibold text-slate-100">
-          {tr(locale, "9. Contact", "9. Контакты")}
+        <h2 className="text-2xl font-semibold text-violet-50">
+          {tr(locale, "9. Contact", "9. Contact")}
         </h2>
-        <p className="text-base leading-8 text-slate-300">
+        <p className="text-base leading-8 text-violet-200">
           {tr(locale, "Email:", "Email:")}{" "}
-          <a
-            href={legalGmailComposeUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sky-300 underline underline-offset-2 transition hover:text-sky-200"
-          >
+          <a href={legalGmailComposeUrl} target="_blank" rel="noreferrer" className="text-sky-300 underline underline-offset-2 transition hover:text-sky-200">
             {legalEmail}
           </a>
         </p>
       </section>
-    </div>
-  );
+    </div>);
 }

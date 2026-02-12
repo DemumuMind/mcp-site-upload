@@ -1,66 +1,68 @@
-﻿---
+---
 name: Plan-site
 description: Use when planning or refactoring this site/repository. Enforces the Plan -> Check -> Plan -> Final verification loop with explicit hypothesis, architecture, and risk control.
 metadata:
   category: discipline
-  triggers: plan-site, план, рефакторинг, каталог, hypothesis, architecture, plan-check-plan, финальная проверка
+  triggers: plan-site, plan, refactor, catalog, hypothesis, architecture, plan-check-plan, final verification
 ---
 
 # Plan-site
 
-Дисциплина для всех задач по сайту: сначала качественный план, потом проверка фактов, затем уточнённый план и только после этого финальная проверка.
+Discipline for all repository work: plan first, verify facts second, refine plan third, and only then claim completion.
 
-## Когда использовать
+## When to use
 
-- Нужно спланировать рефакторинг (особенно страницы **Каталог**).
-- Нужна явная гипотеза и архитектура до реализации.
-- Нужно исключить «кодинг на догадках».
-- Нужен воспроизводимый формат: **Plan > Check > Plan > Final verification**.
+- You need to plan/refactor (especially around the Catalog page).
+- You need explicit hypothesis and architecture before implementation.
+- You want to avoid guesswork-driven coding.
+- You need a repeatable format: **Plan > Check > Plan > Final verification**.
 
-## Обязательный цикл (без исключений)
+## Mandatory loop
 
 1. **Plan v1**
-2. **Check v1** (проверка фактов в коде/данных/окружении)
+2. **Check v1** (fact-check against code/data/environment)
 3. **Plan v2** (decision-complete)
-4. **Final verification** (перед заявлением «готово»)
+4. **Final verification** (before claiming done)
 
-Если хотя бы один шаг пропущен — задача не считается завершённой.
+If any step is skipped, the task is not complete.
 
-## Что обязательно включать в Plan v1
+## Plan v1 must include
 
-1. **Hypothesis** — почему предложенное решение должно сработать.
-2. **Success Criteria** — измеримые критерии успеха.
-3. **Scope In/Out** — что делаем и что сознательно не делаем.
-4. **Architecture** — какие слои/модули/контракты меняются.
-5. **Implementation Steps** — пошаговый порядок работ.
-6. **Test Scenarios** — функциональные и регрессионные сценарии.
-7. **Risks + Mitigation** — ключевые риски и меры.
-8. **Rollback** — как безопасно откатить изменения.
+1. **Hypothesis** — why the approach should work.
+2. **Success Criteria** — measurable outcomes.
+3. **Scope In/Out** — what is included/excluded.
+4. **Architecture** — layers/modules/contracts affected.
+5. **Implementation Steps** — ordered execution steps.
+6. **Test Scenarios** — functional and regression checks.
+7. **Risks + Mitigation** — key risks and controls.
+8. **Rollback** — safe rollback path.
 
-## Check v1: проверка фактов до реализации
+## Check v1 guidance
 
-Проверяй факты, а не предположения:
+Verify facts, not assumptions:
 
-- где реальные точки изменения в коде;
-- есть ли уже готовые компоненты/утилиты для переиспользования;
-- какие публичные интерфейсы (routes/API/types) затрагиваются;
-- где возможны побочные эффекты (кэш, invalidation, auth, SEO, i18n, a11y);
-- какие проверки обязательны для этой задачи.
+- exact files/functions to edit;
+- existing components/utilities to reuse;
+- impacted interfaces (routes/API/types);
+- side effects (cache, invalidation, auth, SEO, i18n, a11y);
+- required verification commands.
 
-Если найдено расхождение — обязательно обновить **Plan v2**.
+If findings differ from assumptions, update **Plan v2**.
 
-## Plan v2 должен быть decision-complete
+## Plan v2 must be decision-complete
 
-Исполнитель после чтения Plan v2 не должен принимать новые архитектурные решения. В плане должны быть:
+After reading Plan v2, the implementer should not need to make new architectural decisions.
 
-- точные файлы/модули для изменений;
-- изменения интерфейсов/типов/контрактов (если есть);
-- точные acceptance criteria;
-- список проверок и ожидаемых результатов.
+Include:
 
-## Multi-side thinking (обдумать с нескольких сторон)
+- exact files/modules;
+- interface/type/contract changes (if any);
+- concrete acceptance criteria;
+- verification checklist with expected outcomes.
 
-Перед финализацией плана пройти минимум по 8 осям:
+## Multi-side thinking
+
+Before finalizing the plan, review at least these axes:
 
 1. Product / User Value
 2. Architecture
@@ -71,31 +73,31 @@ metadata:
 7. Operations / Observability
 8. Delivery Risk / Rollout / Rollback
 
-## Final verification (обязательно перед «готово»)
+## Final verification (required)
 
-Минимальный gate:
+Minimum gate:
 
 1. `npm run check:utf8:strict`
 2. `npm run lint`
 3. `npm run build`
-4. Для UI-изменений: проверка в браузере (Playwright/DevTools) ключевых сценариев
+4. Browser/UI checks with Playwright/DevTools (for UI changes)
 
-Отчёт должен содержать:
+Report must include:
 
-- выполненные команды;
-- фактический результат каждой команды;
-- что не прошло (если есть) и почему;
-- остаточные риски.
+- executed commands;
+- actual outcomes;
+- any failures and reason;
+- residual risks.
 
-## Anti-patterns (запрещено)
+## Anti-patterns
 
-- Начинать реализацию без сформулированной гипотезы и критериев успеха.
-- Говорить «готово» без верификации командами.
-- Дублировать логику вместо переиспользования.
-- Игнорировать кэш/инвалидацию/маршрутизацию после рефакторинга.
-- Подменять проверенные факты предположениями.
+- Implementing before clear hypothesis/success criteria.
+- Claiming done without evidence.
+- Duplicating logic instead of reusing.
+- Ignoring cache/invalidation/routing impact after refactor.
+- Treating assumptions as facts.
 
-## Быстрый шаблон
+## Quick template
 
 ```md
 ### Hypothesis
@@ -119,7 +121,7 @@ metadata:
 - [ ] npm run check:utf8:strict
 - [ ] npm run lint
 - [ ] npm run build
-- [ ] Browser/UI checks (если применимо)
+- [ ] Browser/UI checks (if applicable)
 
 ### Risks / Rollback
 - Risk: ...
@@ -127,6 +129,6 @@ metadata:
 - Rollback: ...
 ```
 
-## Обязательная фраза в начале работы
+## Required opening sentence
 
-`Использую skill Plan-site: работаем по циклу Plan > Check > Plan > Final verification.`
+`Using Plan-site skill: Plan > Check > Plan > Final verification.`

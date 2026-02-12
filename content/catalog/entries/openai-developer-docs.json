@@ -5,7 +5,11 @@
   "serverUrl": "https://developers.openai.com/mcp",
   "category": "Developer Tools",
   "authType": "none",
-  "tags": ["official", "docs", "api"],
+  "tags": [
+    "official",
+    "docs",
+    "api"
+  ],
   "repoUrl": "https://platform.openai.com/docs",
   "maintainer": {
     "name": "OpenAI"

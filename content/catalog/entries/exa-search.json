@@ -5,7 +5,11 @@
   "serverUrl": "https://mcp.exa.ai/mcp",
   "category": "Search",
   "authType": "api_key",
-  "tags": ["search", "research", "semantic"],
+  "tags": [
+    "search",
+    "research",
+    "semantic"
+  ],
   "repoUrl": "https://exa.ai",
   "maintainer": {
     "name": "Exa"

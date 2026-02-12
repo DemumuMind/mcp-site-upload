@@ -1,50 +1,13 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-
+import { useEffect } from "react";
+import { MoonStar } from "lucide-react";
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") {
-      return true;
-    }
-
-    const savedTheme = window.localStorage.getItem("demumumind-theme");
-    return savedTheme !== "light";
-  });
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    window.localStorage.setItem("demumumind-theme", isDark ? "dark" : "light");
-  }, [isDark]);
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      setHydrated(true);
-    });
-  }, []);
-
-  function toggleTheme() {
-    setIsDark((current) => !current);
-  }
-
-  const uiIsDark = hydrated ? isDark : true;
-  const themeToggleLabel = uiIsDark ? "Switch to light theme" : "Switch to dark theme";
-
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon"
-      onClick={toggleTheme}
-      className="h-11 w-11 rounded-full border-white/15 bg-slate-900/70 text-slate-300 hover:bg-slate-900 hover:text-white sm:h-9 sm:w-9"
-      aria-label={themeToggleLabel}
-    >
-      {uiIsDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-      <span className="sr-only">{themeToggleLabel}</span>
-    </Button>
-  );
+    useEffect(() => {
+        document.documentElement.classList.add("dark");
+        window.localStorage.setItem("demumumind-theme", "dark");
+    }, []);
+    return (<span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-indigo-900/70 text-violet-100 shadow-[0_0_0_1px_rgba(124,142,255,0.22),0_0_24px_rgba(83,92,255,0.2)] sm:h-9 sm:w-9" aria-label="Dark cosmic theme enabled" title="Dark cosmic theme">
+      <MoonStar className="size-4"/>
+      <span className="sr-only">Dark cosmic theme enabled</span>
+    </span>);
 }

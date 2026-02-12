@@ -54,11 +54,9 @@ async function ensureTagCoverage(tagsFilePath, tagSlugs) {
       slug: tagSlug,
       label: {
         en: toTitleCase(tagSlug),
-        ru: toTitleCase(tagSlug),
       },
       description: {
         en: "Automatically generated tag from blog content.",
-        ru: "Тег автоматически создан на основе контента блога.",
       },
     });
     existing.add(normalized);
@@ -70,12 +68,11 @@ async function ensureTagCoverage(tagsFilePath, tagSlugs) {
 async function main() {
   const inputSlug = readArg("--slug");
   const titleEn = readArg("--title-en") || "New Blog Post";
-  const titleRu = readArg("--title-ru") || "Новая статья блога";
   const tagsInput = readArg("--tags") || "playbook";
 
   if (!inputSlug) {
     console.error(
-      "Usage: npm run blog:new -- --slug <slug> [--title-en \"...\"] [--title-ru \"...\"] [--tags \"playbook,workflow\"]",
+      "Usage: npm run blog:new -- --slug <slug> [--title-en \"...\"] [--tags \"playbook,workflow\"]",
     );
     process.exit(1);
   }
@@ -127,19 +124,6 @@ async function main() {
             heading: "First section heading",
             paragraphs: ["Write your first paragraph in English."],
             bullets: ["Optional bullet point"],
-          },
-        ],
-      },
-      ru: {
-        title: titleRu,
-        excerpt: "Добавьте короткое русское описание для карточки.",
-        seoTitle: titleRu,
-        seoDescription: "Добавьте SEO-описание на русском.",
-        contentBlocks: [
-          {
-            heading: "Первый заголовок",
-            paragraphs: ["Напишите первый абзац на русском."],
-            bullets: ["Необязательный пункт списка"],
           },
         ],
       },

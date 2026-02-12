@@ -1,0 +1,34 @@
+{
+  "slug": "mcp-setup-playbook-production-teams",
+  "title": "MCP Setup Playbook for Production Teams",
+  "excerpt": "A practical rollout sequence to move from MCP discovery to controlled deployment without integration dead-ends.",
+  "seoTitle": "MCP Setup Playbook for Production Teams",
+  "seoDescription": "Production-ready MCP setup sequence: discovery, constraints, rollout gates, and post-launch checks.",
+  "publishedAt": "2026-01-18T10:00:00.000Z",
+  "updatedAt": "2026-01-20T10:00:00.000Z",
+  "authorId": "bridgemind-editorial",
+  "tags": [
+    "playbook",
+    "operations",
+    "workflow"
+  ],
+  "featured": true,
+  "draft": false,
+  "readingTime": 6,
+  "body": {
+    "raw": "## Start with capability and ownership mapping\n\nEvery MCP rollout starts with a simple map: what capability is needed, which server provides it, and who owns runtime support.\n\nWithout clear ownership, rollout speed looks high in week one and collapses during incident response.\n\n## Define hard rollout gates before coding\n\nTreat integration as an operational change, not only as implementation work.\n\nSet mandatory gates for auth readiness, error budget, fallback behavior, and observability before shipping to production.\n\n- Auth and secret handling reviewed\n- Telemetry for success/failure paths enabled\n- Rollback path documented and tested\n\n## Run staged verification\n\nMove from local checks to staging smoke and then production canary. Keep each stage small and measurable.\n\nA fast feedback loop with explicit pass/fail criteria prevents risky all-in deployments.\n",
+    "code": "var Component=(()=>{var h=Object.create;var i=Object.defineProperty;var u=Object.getOwnPropertyDescriptor;var m=Object.getOwnPropertyNames;var g=Object.getPrototypeOf,f=Object.prototype.hasOwnProperty;var b=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports),y=(t,e)=>{for(var o in e)i(t,o,{get:e[o],enumerable:!0})},l=(t,e,o,a)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let r of m(e))!f.call(t,r)&&r!==o&&i(t,r,{get:()=>e[r],enumerable:!(a=u(e,r))||a.enumerable});return t};var w=(t,e,o)=>(o=t!=null?h(g(t)):{},l(e||!t||!t.__esModule?i(o,\"default\",{value:t,enumerable:!0}):o,t)),k=t=>l(i({},\"__esModule\",{value:!0}),t);var d=b((M,s)=>{s.exports=_jsx_runtime});var x={};y(x,{default:()=>p,frontmatter:()=>v});var n=w(d()),v={slug:\"mcp-setup-playbook-production-teams\",title:\"MCP Setup Playbook for Production Teams\",excerpt:\"A practical rollout sequence to move from MCP discovery to controlled deployment without integration dead-ends.\",seoTitle:\"MCP Setup Playbook for Production Teams\",seoDescription:\"Production-ready MCP setup sequence: discovery, constraints, rollout gates, and post-launch checks.\",publishedAt:\"2026-01-18T10:00:00.000Z\",updatedAt:\"2026-01-20T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"playbook\",\"operations\",\"workflow\"],featured:!0,readingTime:6};function c(t){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...t.components};return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(e.h2,{children:\"Start with capability and ownership mapping\"}),`\n`,(0,n.jsx)(e.p,{children:\"Every MCP rollout starts with a simple map: what capability is needed, which server provides it, and who owns runtime support.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Without clear ownership, rollout speed looks high in week one and collapses during incident response.\"}),`\n`,(0,n.jsx)(e.h2,{children:\"Define hard rollout gates before coding\"}),`\n`,(0,n.jsx)(e.p,{children:\"Treat integration as an operational change, not only as implementation work.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Set mandatory gates for auth readiness, error budget, fallback behavior, and observability before shipping to production.\"}),`\n`,(0,n.jsxs)(e.ul,{children:[`\n`,(0,n.jsx)(e.li,{children:\"Auth and secret handling reviewed\"}),`\n`,(0,n.jsx)(e.li,{children:\"Telemetry for success/failure paths enabled\"}),`\n`,(0,n.jsx)(e.li,{children:\"Rollback path documented and tested\"}),`\n`]}),`\n`,(0,n.jsx)(e.h2,{children:\"Run staged verification\"}),`\n`,(0,n.jsx)(e.p,{children:\"Move from local checks to staging smoke and then production canary. Keep each stage small and measurable.\"}),`\n`,(0,n.jsx)(e.p,{children:\"A fast feedback loop with explicit pass/fail criteria prevents risky all-in deployments.\"})]})}function p(t={}){let{wrapper:e}=t.components||{};return e?(0,n.jsx)(e,{...t,children:(0,n.jsx)(c,{...t})}):c(t)}return k(x);})();\n;return Component;"
+  },
+  "_id": "blog/posts/mcp-setup-playbook-production-teams.mdx",
+  "_raw": {
+    "sourceFilePath": "blog/posts/mcp-setup-playbook-production-teams.mdx",
+    "sourceFileName": "mcp-setup-playbook-production-teams.mdx",
+    "sourceFileDir": "blog/posts",
+    "contentType": "mdx",
+    "flattenedPath": "blog/posts/mcp-setup-playbook-production-teams"
+  },
+  "type": "BlogPost",
+  "slugNormalized": "mcp-setup-playbook-production-teams",
+  "url": "/blog/mcp-setup-playbook-production-teams",
+  "readingTimeMinutes": 6
+}

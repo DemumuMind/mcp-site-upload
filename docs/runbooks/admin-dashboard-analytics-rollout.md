@@ -3,12 +3,16 @@
 ## Scope
 Apply and verify admin dashboard migration:
 - `supabase/migrations/20260210220000_admin_dashboard_analytics.sql`
+- `supabase/migrations/20260212190000_admin_auth_audit_blog_runs.sql`
 
 This migration creates persistent tables for:
 - system overview metrics
 - request distribution analytics
 - latest events feed
 - admin settings storage
+- admin roles and role-based access helpers
+- admin audit trail
+- admin blog automation run history
 
 ## Prerequisites
 - Supabase CLI installed (`supabase --version`)
@@ -65,5 +69,8 @@ Behavior:
    select * from public.admin_dashboard_metrics;
    select * from public.admin_server_request_distribution order by request_count desc;
    select * from public.admin_system_events order by occurred_at desc limit 10;
+   select * from public.admin_roles;
+   select * from public.admin_audit_log order by occurred_at desc limit 20;
+   select * from public.admin_blog_runs order by created_at desc limit 20;
    ```
 

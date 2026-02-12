@@ -7,13 +7,6 @@
       "eyebrow": "MCP Foundation",
       "heroTitle": "One Operating Layer for MCP Delivery",
       "heroDescription": "Discover verified and community MCP servers, inspect tool capabilities, and connect them to your AI workflows."
-    },
-    "ru": {
-      "title": "Обзор MCP",
-      "description": "Обзор DemumuMind MCP и того, как платформа помогает командам.",
-      "eyebrow": "Основа MCP",
-      "heroTitle": "Единый операционный слой для MCP-доставки",
-      "heroDescription": "Находите верифицированные и community MCP-серверы, проверяйте возможности инструментов и подключайте их к AI-workflow."
     }
   }
 }

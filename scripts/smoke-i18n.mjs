@@ -14,121 +14,99 @@ const checks = [
     route: "/",
     title: {
       en: "DemumuMind MCP",
-      ru: "DemumuMind MCP",
     },
     h1: {
       en: "Ship MCP Integrations",
-      ru: "Запускайте MCP-интеграции",
     },
   },
   {
     route: "/about",
     title: {
       en: "About",
-      ru: "О нас",
     },
     h1: {
       en: "Agentic Engineering Organization",
-      ru: "агенто-ориентированная инженерная организация",
     },
   },
   {
     route: "/categories",
     title: {
       en: "Categories",
-      ru: "Категории",
     },
     h1: {
       en: "Categories",
-      ru: "Категории",
     },
   },
   {
     route: "/catalog",
     title: {
       en: "AI Tools Directory",
-      ru: "Каталог AI-инструментов",
     },
     h1: {
       en: "AI Tools Directory",
-      ru: "Каталог AI-инструментов",
     },
   },
   {
     route: "/tools",
     title: {
       en: "Tools",
-      ru: "Инструменты",
     },
     h1: {
       en: "Tools",
-      ru: "Инструменты",
     },
   },
   {
     route: "/pricing",
     title: {
       en: "Pricing",
-      ru: "Цены",
     },
     h1: {
       en: "Pricing",
-      ru: "Цены",
     },
   },
   {
     route: "/contact",
     title: {
       en: "Contact",
-      ru: "Контакты",
     },
     h1: {
       en: "Contact BridgeMind",
-      ru: "Связаться с BridgeMind",
     },
   },
   {
     route: "/discord",
     title: {
       en: "Discord Community",
-      ru: "Discord-сообщество",
     },
     h1: {
       en: "BridgeMind Discord",
-      ru: "BridgeMind в Discord",
     },
   },
   {
     route: "/sitemap",
     title: {
       en: "Sitemap",
-      ru: "Карта сайта",
     },
     h1: {
       en: "BridgeMind Sitemap",
-      ru: "Карта сайта BridgeMind",
     },
   },
   {
     route: "/privacy",
     title: {
       en: "Privacy Policy",
-      ru: "Политика конфиденциальности",
     },
     h1: {
       en: "Privacy Policy",
-      ru: "Политика конфиденциальности",
     },
   },
   {
     route: "/terms",
     title: {
       en: "Terms of Service",
-      ru: "Пользовательское соглашение",
     },
     h1: {
       en: "Terms of Service",
-      ru: "Пользовательское соглашение",
     },
   },
 ];
@@ -209,7 +187,6 @@ async function main() {
 
   try {
     await runLocaleChecks(browser, "en");
-    await runLocaleChecks(browser, "ru");
   } finally {
     await browser.close();
   }

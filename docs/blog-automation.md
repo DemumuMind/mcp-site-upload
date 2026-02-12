@@ -31,7 +31,7 @@ Open `/admin/blog` and submit:
 - topic
 - optional angle
 - slug
-- EN/RU titles
+- EN title
 - tags
 - recency window in days
 - max curated sources

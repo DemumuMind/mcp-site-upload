@@ -6,9 +6,8 @@ type AutoPublishTopic = {
   topic: string;
   angle?: string;
   titleEn: string;
-  titleRu: string;
   tags: string[];
-  locale?: "en" | "ru";
+  locale?: "en";
 };
 
 const autoPublishTopics: readonly AutoPublishTopic[] = [
@@ -16,84 +15,72 @@ const autoPublishTopics: readonly AutoPublishTopic[] = [
     topic: "MCP production incident triage",
     angle: "How teams reduce MTTR with deterministic runbooks and agent guardrails",
     titleEn: "MCP Incident Triage Playbook for Production Teams",
-    titleRu: "Плейбук инцидент-триажа MCP для продакшен-команд",
     tags: ["operations", "playbook", "quality"],
   },
   {
     topic: "Agentic coding verification loops",
     angle: "Plan-Check-Plan-Final Check and release confidence",
     titleEn: "Verification Loops for Agentic Engineering Delivery",
-    titleRu: "Циклы верификации для поставки agentic-разработки",
     tags: ["workflow", "quality", "playbook"],
   },
   {
     topic: "MCP authentication hardening",
     angle: "Token rotation, auth boundaries, and least-privilege rollout",
     titleEn: "Hardening MCP Authentication in Real Deployments",
-    titleRu: "Укрепление аутентификации MCP в реальных внедрениях",
     tags: ["operations", "architecture", "quality"],
   },
   {
     topic: "MCP observability stack",
     angle: "Metrics, traces, logs, and release gates for agent workflows",
     titleEn: "Observability Patterns for MCP Workflows",
-    titleRu: "Паттерны наблюдаемости для MCP-workflow",
     tags: ["operations", "architecture", "workflow"],
   },
   {
     topic: "MCP server selection framework",
     angle: "How teams compare reliability, integration cost, and blast radius",
     titleEn: "How to Select MCP Servers with Production Constraints",
-    titleRu: "Как выбирать MCP-серверы с учётом продакшен-ограничений",
     tags: ["architecture", "playbook", "workflow"],
   },
   {
     topic: "Prompt operations for engineering teams",
     angle: "Versioning prompts, regression checks, and rollout safety",
     titleEn: "PromptOps for Engineering Teams: From Draft to Controlled Rollout",
-    titleRu: "PromptOps для инженерных команд: от черновика к контролируемому релизу",
     tags: ["workflow", "operations", "quality"],
   },
   {
     topic: "MCP integration anti-patterns",
     angle: "Common failure modes and how to avoid integration dead ends",
     titleEn: "MCP Integration Anti-Patterns and Recovery Strategies",
-    titleRu: "Антипаттерны интеграции MCP и стратегии восстановления",
     tags: ["architecture", "operations", "quality"],
   },
   {
     topic: "Agent reliability benchmarks",
     angle: "Metrics that matter for enterprise-ready coding agents",
     titleEn: "Reliability Benchmarks for Enterprise Coding Agents",
-    titleRu: "Бенчмарки надёжности для enterprise coding agents",
     tags: ["quality", "operations", "workflow"],
   },
   {
     topic: "MCP change management",
     angle: "Safe migration strategy when replacing integration surfaces",
     titleEn: "MCP Change Management: Safe Migrations and Rollbacks",
-    titleRu: "Управление изменениями MCP: безопасные миграции и откаты",
     tags: ["playbook", "operations", "architecture"],
   },
   {
     topic: "Security review for MCP workflows",
     angle: "Threat modeling and practical controls for high-risk automations",
     titleEn: "Security Review Checklist for MCP Workflow Automation",
-    titleRu: "Чеклист security review для автоматизации MCP-workflow",
     tags: ["quality", "operations", "playbook"],
   },
   {
     topic: "Cost governance in agentic development",
     angle: "How teams manage model spend without reducing delivery speed",
     titleEn: "Cost Governance in Agentic Engineering Workflows",
-    titleRu: "Управление затратами в agentic-инженерных workflow",
     tags: ["operations", "workflow", "quality"],
   },
   {
     topic: "MCP platform architecture scaling",
     angle: "Boundaries, shared modules, and reliability patterns at scale",
     titleEn: "Scaling MCP Platform Architecture Without Losing Control",
-    titleRu: "Масштабирование MCP-платформы без потери контроля",
     tags: ["architecture", "operations", "workflow"],
   },
 ];
@@ -130,7 +117,7 @@ type AutoPublishBatchOptions = {
 function getUtcDayOfYear(date: Date): number {
   const start = Date.UTC(date.getUTCFullYear(), 0, 0);
   const current = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-  return Math.floor((current - start) / 86_400_000);
+  return Math.floor((current - start) / 86400000);
 }
 
 function getSixHourSlotIndex(date: Date): number {
@@ -146,7 +133,7 @@ function selectTopic(date: Date, offset: number): AutoPublishTopic {
 
 function buildUniqueSlug(base: string, date: Date, offset: number): string {
   const safeBase = normalizeBlogSlug(base).slice(0, 56).replace(/-+$/, "") || "auto-blog-post";
-  const unixSeconds = Math.floor((date.getTime() + offset * 1_000) / 1_000);
+  const unixSeconds = Math.floor((date.getTime() + offset * 1000) / 1000);
   return `${safeBase}-${unixSeconds}`;
 }
 
@@ -154,13 +141,10 @@ function toErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-
   return "Unexpected auto-publish error";
 }
 
-export async function runAutoPublishBatch(
-  options: AutoPublishBatchOptions,
-): Promise<AutoPublishBatchResult> {
+export async function runAutoPublishBatch(options: AutoPublishBatchOptions): Promise<AutoPublishBatchResult> {
   const now = options.now ?? new Date();
   const requestedCount = Math.max(1, Math.min(options.count, 8));
   const recencyDays = Math.max(1, Math.min(options.recencyDays, 90));
@@ -187,7 +171,6 @@ export async function runAutoPublishBatch(
         packet,
         slug,
         titleEn: topic.titleEn,
-        titleRu: topic.titleRu,
         tags: topic.tags,
       });
 

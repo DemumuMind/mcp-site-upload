@@ -1,0 +1,315 @@
+{
+  "cacheItemsMap": {
+    "blog/posts/catalog-patterns-from-discovery-to-reuse.mdx": {
+      "document": {
+        "slug": "catalog-patterns-from-discovery-to-reuse",
+        "title": "Catalog Patterns: From Discovery to Reuse",
+        "excerpt": "Workflow patterns that help teams reuse integration knowledge and avoid duplicated setup effort.",
+        "seoTitle": "Catalog Patterns: From Discovery to Reuse",
+        "seoDescription": "Turn integration discoveries into reusable catalog knowledge with practical workflow patterns.",
+        "publishedAt": "2025-11-27T10:00:00.000Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "workflow",
+          "operations"
+        ],
+        "featured": false,
+        "draft": false,
+        "readingTime": 7,
+        "body": {
+          "raw": "## Capture the context, not only the link\n\nA useful catalog entry includes setup constraints, auth mode, known limits, and support status.\n\nContext-rich entries reduce repeated discovery work across squads.\n\n## Standardize the handoff format\n\nDefine a compact template for discovery notes and rollout readiness.\n\nThis makes handoff predictable and keeps implementation teams aligned with product intent.\n\n- What was tested and by whom\n- Known failure modes\n- Fallback and rollback notes\n",
+          "code": "var Component=(()=>{var h=Object.create;var a=Object.defineProperty;var p=Object.getOwnPropertyDescriptor;var m=Object.getOwnPropertyNames;var f=Object.getPrototypeOf,g=Object.prototype.hasOwnProperty;var w=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports),k=(t,e)=>{for(var o in e)a(t,o,{get:e[o],enumerable:!0})},s=(t,e,o,i)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let r of m(e))!g.call(t,r)&&r!==o&&a(t,r,{get:()=>e[r],enumerable:!(i=p(e,r))||i.enumerable});return t};var x=(t,e,o)=>(o=t!=null?h(f(t)):{},s(e||!t||!t.__esModule?a(o,\"default\",{value:t,enumerable:!0}):o,t)),y=t=>s(a({},\"__esModule\",{value:!0}),t);var d=w((C,l)=>{l.exports=_jsx_runtime});var v={};k(v,{default:()=>u,frontmatter:()=>b});var n=x(d()),b={slug:\"catalog-patterns-from-discovery-to-reuse\",title:\"Catalog Patterns: From Discovery to Reuse\",excerpt:\"Workflow patterns that help teams reuse integration knowledge and avoid duplicated setup effort.\",seoTitle:\"Catalog Patterns: From Discovery to Reuse\",seoDescription:\"Turn integration discoveries into reusable catalog knowledge with practical workflow patterns.\",publishedAt:\"2025-11-27T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"workflow\",\"operations\"],featured:!1,readingTime:7};function c(t){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...t.components};return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(e.h2,{children:\"Capture the context, not only the link\"}),`\n`,(0,n.jsx)(e.p,{children:\"A useful catalog entry includes setup constraints, auth mode, known limits, and support status.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Context-rich entries reduce repeated discovery work across squads.\"}),`\n`,(0,n.jsx)(e.h2,{children:\"Standardize the handoff format\"}),`\n`,(0,n.jsx)(e.p,{children:\"Define a compact template for discovery notes and rollout readiness.\"}),`\n`,(0,n.jsx)(e.p,{children:\"This makes handoff predictable and keeps implementation teams aligned with product intent.\"}),`\n`,(0,n.jsxs)(e.ul,{children:[`\n`,(0,n.jsx)(e.li,{children:\"What was tested and by whom\"}),`\n`,(0,n.jsx)(e.li,{children:\"Known failure modes\"}),`\n`,(0,n.jsx)(e.li,{children:\"Fallback and rollback notes\"}),`\n`]})]})}function u(t={}){let{wrapper:e}=t.components||{};return e?(0,n.jsx)(e,{...t,children:(0,n.jsx)(c,{...t})}):c(t)}return y(v);})();\n;return Component;"
+        },
+        "_id": "blog/posts/catalog-patterns-from-discovery-to-reuse.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/catalog-patterns-from-discovery-to-reuse.mdx",
+          "sourceFileName": "catalog-patterns-from-discovery-to-reuse.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/catalog-patterns-from-discovery-to-reuse"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "catalog-patterns-from-discovery-to-reuse",
+        "url": "/blog/catalog-patterns-from-discovery-to-reuse",
+        "readingTimeMinutes": 7
+      },
+      "documentHash": "1770916604017",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/posts/cost-governance-in-agentic-engineering-workflows.mdx": {
+      "document": {
+        "slug": "cost-governance-in-agentic-engineering-workflows",
+        "title": "Cost Governance in Agentic Engineering Workflows",
+        "excerpt": "Research-backed article based on 6 recent sources about Cost governance in agentic development.",
+        "seoTitle": "Cost Governance in Agentic Engineering Workflows",
+        "seoDescription": "Deep research-based article on Cost governance in agentic development with verified, recent web sources.",
+        "publishedAt": "2026-02-10T15:41:13.270Z",
+        "updatedAt": "2026-02-10T17:03:11.100Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "operations",
+          "workflow",
+          "quality"
+        ],
+        "featured": false,
+        "draft": false,
+        "readingTime": 3,
+        "researchPacketId": "cost-governance-in-agentic-development-1770738073268",
+        "researchProvider": "exa-search-deep",
+        "researchSourceCount": 6,
+        "body": {
+          "raw": "## Research scope\n\nTopic: Cost governance in agentic development. Angle: How teams manage model spend without reducing delivery speed.\n\nSources were selected from the last 14 days and validated through multi-round checks.\n\n## Verified findings\n\nSignal 1: agentic. Repeated in 4 independent sources. Supporting sources: src-9, src-2, src-7, src-14.\n\nSignal 2: governance. Repeated in 3 independent sources. Supporting sources: src-2, src-11, src-7.\n\nSignal 3: model. Repeated in 2 independent sources. Supporting sources: src-9, src-6.\n\nSignal 4: learn. Repeated in 2 independent sources. Supporting sources: src-9, src-11.\n\nSignal 5: why. Repeated in 2 independent sources. Supporting sources: src-9, src-6.\n\n## Curated fresh sources\n\nOnly recent and high-relevance sources are included below.\n\n- Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... — https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)\n- Governance lags agentic AI adoption in the UK, says Salesforce — https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)\n- AI Agent Governance Blueprint for Production Deployment — https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)\n- Serving LLMs Without Breaking the Bank — https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)\n- Getting AI Governance Right Without Slowing Everything Down — https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)\n- Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy — https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)\n",
+          "code": "var Component=(()=>{var p=Object.create;var o=Object.defineProperty;var h=Object.getOwnPropertyDescriptor;var u=Object.getOwnPropertyNames;var m=Object.getPrototypeOf,w=Object.prototype.hasOwnProperty;var f=(r,e)=>()=>(e||r((e={exports:{}}).exports,e),e.exports),v=(r,e)=>{for(var t in e)o(r,t,{get:e[t],enumerable:!0})},s=(r,e,t,c)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let i of u(e))!w.call(r,i)&&i!==t&&o(r,i,{get:()=>e[i],enumerable:!(c=h(e,i))||c.enumerable});return r};var y=(r,e,t)=>(t=r!=null?p(m(r)):{},s(e||!r||!r.__esModule?o(t,\"default\",{value:r,enumerable:!0}):t,r)),S=r=>s(o({},\"__esModule\",{value:!0}),r);var l=f((x,a)=>{a.exports=_jsx_runtime});var A={};v(A,{default:()=>g,frontmatter:()=>b});var n=y(l()),b={slug:\"cost-governance-in-agentic-engineering-workflows\",title:\"Cost Governance in Agentic Engineering Workflows\",excerpt:\"Research-backed article based on 6 recent sources about Cost governance in agentic development.\",seoTitle:\"Cost Governance in Agentic Engineering Workflows\",seoDescription:\"Deep research-based article on Cost governance in agentic development with verified, recent web sources.\",publishedAt:\"2026-02-10T15:41:13.270Z\",updatedAt:\"2026-02-10T17:03:11.100Z\",authorId:\"bridgemind-editorial\",tags:[\"operations\",\"workflow\",\"quality\"],featured:!1,readingTime:3,researchPacketId:\"cost-governance-in-agentic-development-1770738073268\",researchProvider:\"exa-search-deep\",researchSourceCount:6};function d(r){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...r.components};return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(e.h2,{children:\"Research scope\"}),`\n`,(0,n.jsx)(e.p,{children:\"Topic: Cost governance in agentic development. Angle: How teams manage model spend without reducing delivery speed.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Sources were selected from the last 14 days and validated through multi-round checks.\"}),`\n`,(0,n.jsx)(e.h2,{children:\"Verified findings\"}),`\n`,(0,n.jsx)(e.p,{children:\"Signal 1: agentic. Repeated in 4 independent sources. Supporting sources: src-9, src-2, src-7, src-14.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Signal 2: governance. Repeated in 3 independent sources. Supporting sources: src-2, src-11, src-7.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Signal 3: model. Repeated in 2 independent sources. Supporting sources: src-9, src-6.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Signal 4: learn. Repeated in 2 independent sources. Supporting sources: src-9, src-11.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Signal 5: why. Repeated in 2 independent sources. Supporting sources: src-9, src-6.\"}),`\n`,(0,n.jsx)(e.h2,{children:\"Curated fresh sources\"}),`\n`,(0,n.jsx)(e.p,{children:\"Only recent and high-relevance sources are included below.\"}),`\n`,(0,n.jsxs)(e.ul,{children:[`\n`,(0,n.jsx)(e.li,{children:\"Agentic Development Lifecycle (ADLC): A New Model for AI Systems ... \\u2014 https://www.epam.com/insights/ai/blogs/agentic-development-lifecycle-explained (2026-02-05)\"}),`\n`,(0,n.jsx)(e.li,{children:\"Governance lags agentic AI adoption in the UK, says Salesforce \\u2014 https://www.computerweekly.com/news/366638841/Governance-lags-agentic-AI-adoption-in-the-UK-says-Salesforce (2026-02-05)\"}),`\n`,(0,n.jsx)(e.li,{children:\"AI Agent Governance Blueprint for Production Deployment \\u2014 https://www.codebridge.tech/articles/from-answers-to-actions-a-practical-governance-blueprint-for-deploying-ai-agents-in-production (2026-02-09)\"}),`\n`,(0,n.jsx)(e.li,{children:\"Serving LLMs Without Breaking the Bank \\u2014 https://www.corvex.ai/blog/llm-inference-cost (2026-02-05)\"}),`\n`,(0,n.jsx)(e.li,{children:\"Getting AI Governance Right Without Slowing Everything Down \\u2014 https://www.databricks.com/blog/getting-ai-governance-right-without-slowing-everything-down (2026-01-30)\"}),`\n`,(0,n.jsx)(e.li,{children:\"Manage The Emerging Costs Of Agentic Commerce By Taking A Cue From Drop-Shipping Strategy \\u2014 https://www.forrester.com/blogs/manage-the-emerging-costs-of-agentic-commerce-by-taking-a-cue-from-drop-shipping-strategy/ (2026-01-28)\"}),`\n`]})]})}function g(r={}){let{wrapper:e}=r.components||{};return e?(0,n.jsx)(e,{...r,children:(0,n.jsx)(d,{...r})}):d(r)}return S(A);})();\n;return Component;"
+        },
+        "_id": "blog/posts/cost-governance-in-agentic-engineering-workflows.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/cost-governance-in-agentic-engineering-workflows.mdx",
+          "sourceFileName": "cost-governance-in-agentic-engineering-workflows.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/cost-governance-in-agentic-engineering-workflows"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "cost-governance-in-agentic-engineering-workflows",
+        "url": "/blog/cost-governance-in-agentic-engineering-workflows",
+        "readingTimeMinutes": 3
+      },
+      "documentHash": "1770916604027",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/posts/mcp-overview-choosing-the-right-integration-surface.mdx": {
+      "document": {
+        "slug": "mcp-overview-choosing-the-right-integration-surface",
+        "title": "MCP Overview: Choosing the Right Integration Surface",
+        "excerpt": "How to evaluate server fit by auth requirements, operational ownership, and long-term maintainability.",
+        "seoTitle": "MCP Overview: Choosing the Right Integration Surface",
+        "seoDescription": "Evaluate MCP server fit with architecture-first criteria: ownership, auth model, and lifecycle costs.",
+        "publishedAt": "2025-12-12T10:00:00.000Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "architecture",
+          "playbook"
+        ],
+        "featured": false,
+        "draft": false,
+        "readingTime": 5,
+        "body": {
+          "raw": "## Integration surface is a long-term decision\n\nChoosing a server only by feature list causes hidden costs later in maintenance and incident response.\n\nThe better decision model starts with lifecycle ownership, compliance limits, and error visibility.\n\n## Score candidates with architectural criteria\n\nUse a weighted matrix instead of subjective selection.\n\nEven lightweight scoring reveals which option is operationally safe and which is only fast in demos.\n\n- Authentication and secret boundaries\n- Rate-limit behavior and retries\n- Operational ownership and on-call model\n",
+          "code": "var Component=(()=>{var u=Object.create;var a=Object.defineProperty;var m=Object.getOwnPropertyDescriptor;var p=Object.getOwnPropertyNames;var g=Object.getPrototypeOf,f=Object.prototype.hasOwnProperty;var v=(i,e)=>()=>(e||i((e={exports:{}}).exports,e),e.exports),w=(i,e)=>{for(var n in e)a(i,n,{get:e[n],enumerable:!0})},s=(i,e,n,o)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let r of p(e))!f.call(i,r)&&r!==n&&a(i,r,{get:()=>e[r],enumerable:!(o=m(e,r))||o.enumerable});return i};var b=(i,e,n)=>(n=i!=null?u(g(i)):{},s(e||!i||!i.__esModule?a(n,\"default\",{value:i,enumerable:!0}):n,i)),x=i=>s(a({},\"__esModule\",{value:!0}),i);var l=v((j,c)=>{c.exports=_jsx_runtime});var C={};w(C,{default:()=>d,frontmatter:()=>y});var t=b(l()),y={slug:\"mcp-overview-choosing-the-right-integration-surface\",title:\"MCP Overview: Choosing the Right Integration Surface\",excerpt:\"How to evaluate server fit by auth requirements, operational ownership, and long-term maintainability.\",seoTitle:\"MCP Overview: Choosing the Right Integration Surface\",seoDescription:\"Evaluate MCP server fit with architecture-first criteria: ownership, auth model, and lifecycle costs.\",publishedAt:\"2025-12-12T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"architecture\",\"playbook\"],featured:!1,readingTime:5};function h(i){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...i.components};return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(e.h2,{children:\"Integration surface is a long-term decision\"}),`\n`,(0,t.jsx)(e.p,{children:\"Choosing a server only by feature list causes hidden costs later in maintenance and incident response.\"}),`\n`,(0,t.jsx)(e.p,{children:\"The better decision model starts with lifecycle ownership, compliance limits, and error visibility.\"}),`\n`,(0,t.jsx)(e.h2,{children:\"Score candidates with architectural criteria\"}),`\n`,(0,t.jsx)(e.p,{children:\"Use a weighted matrix instead of subjective selection.\"}),`\n`,(0,t.jsx)(e.p,{children:\"Even lightweight scoring reveals which option is operationally safe and which is only fast in demos.\"}),`\n`,(0,t.jsxs)(e.ul,{children:[`\n`,(0,t.jsx)(e.li,{children:\"Authentication and secret boundaries\"}),`\n`,(0,t.jsx)(e.li,{children:\"Rate-limit behavior and retries\"}),`\n`,(0,t.jsx)(e.li,{children:\"Operational ownership and on-call model\"}),`\n`]})]})}function d(i={}){let{wrapper:e}=i.components||{};return e?(0,t.jsx)(e,{...i,children:(0,t.jsx)(h,{...i})}):h(i)}return x(C);})();\n;return Component;"
+        },
+        "_id": "blog/posts/mcp-overview-choosing-the-right-integration-surface.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/mcp-overview-choosing-the-right-integration-surface.mdx",
+          "sourceFileName": "mcp-overview-choosing-the-right-integration-surface.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/mcp-overview-choosing-the-right-integration-surface"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "mcp-overview-choosing-the-right-integration-surface",
+        "url": "/blog/mcp-overview-choosing-the-right-integration-surface",
+        "readingTimeMinutes": 5
+      },
+      "documentHash": "1770916604030",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/posts/mcp-setup-playbook-production-teams.mdx": {
+      "document": {
+        "slug": "mcp-setup-playbook-production-teams",
+        "title": "MCP Setup Playbook for Production Teams",
+        "excerpt": "A practical rollout sequence to move from MCP discovery to controlled deployment without integration dead-ends.",
+        "seoTitle": "MCP Setup Playbook for Production Teams",
+        "seoDescription": "Production-ready MCP setup sequence: discovery, constraints, rollout gates, and post-launch checks.",
+        "publishedAt": "2026-01-18T10:00:00.000Z",
+        "updatedAt": "2026-01-20T10:00:00.000Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "playbook",
+          "operations",
+          "workflow"
+        ],
+        "featured": true,
+        "draft": false,
+        "readingTime": 6,
+        "body": {
+          "raw": "## Start with capability and ownership mapping\n\nEvery MCP rollout starts with a simple map: what capability is needed, which server provides it, and who owns runtime support.\n\nWithout clear ownership, rollout speed looks high in week one and collapses during incident response.\n\n## Define hard rollout gates before coding\n\nTreat integration as an operational change, not only as implementation work.\n\nSet mandatory gates for auth readiness, error budget, fallback behavior, and observability before shipping to production.\n\n- Auth and secret handling reviewed\n- Telemetry for success/failure paths enabled\n- Rollback path documented and tested\n\n## Run staged verification\n\nMove from local checks to staging smoke and then production canary. Keep each stage small and measurable.\n\nA fast feedback loop with explicit pass/fail criteria prevents risky all-in deployments.\n",
+          "code": "var Component=(()=>{var h=Object.create;var i=Object.defineProperty;var u=Object.getOwnPropertyDescriptor;var m=Object.getOwnPropertyNames;var g=Object.getPrototypeOf,f=Object.prototype.hasOwnProperty;var b=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports),y=(t,e)=>{for(var o in e)i(t,o,{get:e[o],enumerable:!0})},l=(t,e,o,a)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let r of m(e))!f.call(t,r)&&r!==o&&i(t,r,{get:()=>e[r],enumerable:!(a=u(e,r))||a.enumerable});return t};var w=(t,e,o)=>(o=t!=null?h(g(t)):{},l(e||!t||!t.__esModule?i(o,\"default\",{value:t,enumerable:!0}):o,t)),k=t=>l(i({},\"__esModule\",{value:!0}),t);var d=b((M,s)=>{s.exports=_jsx_runtime});var x={};y(x,{default:()=>p,frontmatter:()=>v});var n=w(d()),v={slug:\"mcp-setup-playbook-production-teams\",title:\"MCP Setup Playbook for Production Teams\",excerpt:\"A practical rollout sequence to move from MCP discovery to controlled deployment without integration dead-ends.\",seoTitle:\"MCP Setup Playbook for Production Teams\",seoDescription:\"Production-ready MCP setup sequence: discovery, constraints, rollout gates, and post-launch checks.\",publishedAt:\"2026-01-18T10:00:00.000Z\",updatedAt:\"2026-01-20T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"playbook\",\"operations\",\"workflow\"],featured:!0,readingTime:6};function c(t){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...t.components};return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(e.h2,{children:\"Start with capability and ownership mapping\"}),`\n`,(0,n.jsx)(e.p,{children:\"Every MCP rollout starts with a simple map: what capability is needed, which server provides it, and who owns runtime support.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Without clear ownership, rollout speed looks high in week one and collapses during incident response.\"}),`\n`,(0,n.jsx)(e.h2,{children:\"Define hard rollout gates before coding\"}),`\n`,(0,n.jsx)(e.p,{children:\"Treat integration as an operational change, not only as implementation work.\"}),`\n`,(0,n.jsx)(e.p,{children:\"Set mandatory gates for auth readiness, error budget, fallback behavior, and observability before shipping to production.\"}),`\n`,(0,n.jsxs)(e.ul,{children:[`\n`,(0,n.jsx)(e.li,{children:\"Auth and secret handling reviewed\"}),`\n`,(0,n.jsx)(e.li,{children:\"Telemetry for success/failure paths enabled\"}),`\n`,(0,n.jsx)(e.li,{children:\"Rollback path documented and tested\"}),`\n`]}),`\n`,(0,n.jsx)(e.h2,{children:\"Run staged verification\"}),`\n`,(0,n.jsx)(e.p,{children:\"Move from local checks to staging smoke and then production canary. Keep each stage small and measurable.\"}),`\n`,(0,n.jsx)(e.p,{children:\"A fast feedback loop with explicit pass/fail criteria prevents risky all-in deployments.\"})]})}function p(t={}){let{wrapper:e}=t.components||{};return e?(0,n.jsx)(e,{...t,children:(0,n.jsx)(c,{...t})}):c(t)}return k(x);})();\n;return Component;"
+        },
+        "_id": "blog/posts/mcp-setup-playbook-production-teams.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/mcp-setup-playbook-production-teams.mdx",
+          "sourceFileName": "mcp-setup-playbook-production-teams.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/mcp-setup-playbook-production-teams"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "mcp-setup-playbook-production-teams",
+        "url": "/blog/mcp-setup-playbook-production-teams",
+        "readingTimeMinutes": 6
+      },
+      "documentHash": "1770916604033",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/posts/safe-rollout-checklist-for-mcp-launches.mdx": {
+      "document": {
+        "slug": "safe-rollout-checklist-for-mcp-launches",
+        "title": "Safe Rollout Checklist for MCP Launches",
+        "excerpt": "A concise checklist to reduce avoidable incidents during first production launches.",
+        "seoTitle": "Safe Rollout Checklist for MCP Launches",
+        "seoDescription": "Use this rollout checklist to launch MCP integrations safely and reduce production incidents.",
+        "publishedAt": "2025-09-30T10:00:00.000Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "operations",
+          "quality",
+          "playbook"
+        ],
+        "featured": false,
+        "draft": false,
+        "readingTime": 6,
+        "body": {
+          "raw": "## Runbook first, then release\n\nThe first launch should always include a clear runbook with rollback thresholds and owner contacts.\n\nA checklist does not slow delivery, it protects delivery velocity over time.\n\n## Minimum launch checklist\n\nIf one item is missing, the release is not ready.\n\n- Health metrics and alerts configured\n- Error triage path documented\n- Fallback behavior validated in staging\n- On-call handoff completed\n",
+          "code": "var Component=(()=>{var u=Object.create;var o=Object.defineProperty;var f=Object.getOwnPropertyDescriptor;var m=Object.getOwnPropertyNames;var p=Object.getPrototypeOf,g=Object.prototype.hasOwnProperty;var k=(n,e)=>()=>(e||n((e={exports:{}}).exports,e),e.exports),x=(n,e)=>{for(var i in e)o(n,i,{get:e[i],enumerable:!0})},c=(n,e,i,r)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let l of m(e))!g.call(n,l)&&l!==i&&o(n,l,{get:()=>e[l],enumerable:!(r=f(e,l))||r.enumerable});return n};var b=(n,e,i)=>(i=n!=null?u(p(n)):{},c(e||!n||!n.__esModule?o(i,\"default\",{value:n,enumerable:!0}):i,n)),y=n=>c(o({},\"__esModule\",{value:!0}),n);var a=k((_,s)=>{s.exports=_jsx_runtime});var C={};x(C,{default:()=>h,frontmatter:()=>v});var t=b(a()),v={slug:\"safe-rollout-checklist-for-mcp-launches\",title:\"Safe Rollout Checklist for MCP Launches\",excerpt:\"A concise checklist to reduce avoidable incidents during first production launches.\",seoTitle:\"Safe Rollout Checklist for MCP Launches\",seoDescription:\"Use this rollout checklist to launch MCP integrations safely and reduce production incidents.\",publishedAt:\"2025-09-30T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"operations\",\"quality\",\"playbook\"],featured:!1,readingTime:6};function d(n){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...n.components};return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(e.h2,{children:\"Runbook first, then release\"}),`\n`,(0,t.jsx)(e.p,{children:\"The first launch should always include a clear runbook with rollback thresholds and owner contacts.\"}),`\n`,(0,t.jsx)(e.p,{children:\"A checklist does not slow delivery, it protects delivery velocity over time.\"}),`\n`,(0,t.jsx)(e.h2,{children:\"Minimum launch checklist\"}),`\n`,(0,t.jsx)(e.p,{children:\"If one item is missing, the release is not ready.\"}),`\n`,(0,t.jsxs)(e.ul,{children:[`\n`,(0,t.jsx)(e.li,{children:\"Health metrics and alerts configured\"}),`\n`,(0,t.jsx)(e.li,{children:\"Error triage path documented\"}),`\n`,(0,t.jsx)(e.li,{children:\"Fallback behavior validated in staging\"}),`\n`,(0,t.jsx)(e.li,{children:\"On-call handoff completed\"}),`\n`]})]})}function h(n={}){let{wrapper:e}=n.components||{};return e?(0,t.jsx)(e,{...n,children:(0,t.jsx)(d,{...n})}):d(n)}return y(C);})();\n;return Component;"
+        },
+        "_id": "blog/posts/safe-rollout-checklist-for-mcp-launches.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/safe-rollout-checklist-for-mcp-launches.mdx",
+          "sourceFileName": "safe-rollout-checklist-for-mcp-launches.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/safe-rollout-checklist-for-mcp-launches"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "safe-rollout-checklist-for-mcp-launches",
+        "url": "/blog/safe-rollout-checklist-for-mcp-launches",
+        "readingTimeMinutes": 6
+      },
+      "documentHash": "1770916604035",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/posts/verification-loop-for-agentic-coding-teams.mdx": {
+      "document": {
+        "slug": "verification-loop-for-agentic-coding-teams",
+        "title": "Verification Loop for Agentic Coding Teams",
+        "excerpt": "How Plan → Check → Plan → Final Check reduces regressions when multiple agents collaborate on delivery.",
+        "seoTitle": "Verification Loop for Agentic Coding Teams",
+        "seoDescription": "Operational verification loop for teams using AI agents in production software delivery.",
+        "publishedAt": "2025-10-22T10:00:00.000Z",
+        "authorId": "bridgemind-editorial",
+        "tags": [
+          "workflow",
+          "quality"
+        ],
+        "featured": false,
+        "draft": false,
+        "readingTime": 8,
+        "body": {
+          "raw": "## Planning is necessary but insufficient\n\nMulti-agent delivery fails when the plan is not continuously validated against implementation reality.\n\nA formal verification loop keeps architecture, code, and quality gates synchronized.\n\n## Use explicit checkpoints\n\nBetween planning iterations, run targeted checks that either confirm assumptions or force immediate correction.\n\n- Design consistency check\n- Lint/build baseline check\n- User-path smoke check\n",
+          "code": "var Component=(()=>{var u=Object.create;var r=Object.defineProperty;var p=Object.getOwnPropertyDescriptor;var f=Object.getOwnPropertyNames;var m=Object.getPrototypeOf,g=Object.prototype.hasOwnProperty;var x=(n,e)=>()=>(e||n((e={exports:{}}).exports,e),e.exports),y=(n,e)=>{for(var t in e)r(n,t,{get:e[t],enumerable:!0})},c=(n,e,t,a)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let o of f(e))!g.call(n,o)&&o!==t&&r(n,o,{get:()=>e[o],enumerable:!(a=p(e,o))||a.enumerable});return n};var k=(n,e,t)=>(t=n!=null?u(m(n)):{},c(e||!n||!n.__esModule?r(t,\"default\",{value:n,enumerable:!0}):t,n)),w=n=>c(r({},\"__esModule\",{value:!0}),n);var l=x((C,s)=>{s.exports=_jsx_runtime});var _={};y(_,{default:()=>h,frontmatter:()=>v});var i=k(l()),v={slug:\"verification-loop-for-agentic-coding-teams\",title:\"Verification Loop for Agentic Coding Teams\",excerpt:\"How Plan \\u2192 Check \\u2192 Plan \\u2192 Final Check reduces regressions when multiple agents collaborate on delivery.\",seoTitle:\"Verification Loop for Agentic Coding Teams\",seoDescription:\"Operational verification loop for teams using AI agents in production software delivery.\",publishedAt:\"2025-10-22T10:00:00.000Z\",authorId:\"bridgemind-editorial\",tags:[\"workflow\",\"quality\"],featured:!1,readingTime:8};function d(n){let e={h2:\"h2\",li:\"li\",p:\"p\",ul:\"ul\",...n.components};return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(e.h2,{children:\"Planning is necessary but insufficient\"}),`\n`,(0,i.jsx)(e.p,{children:\"Multi-agent delivery fails when the plan is not continuously validated against implementation reality.\"}),`\n`,(0,i.jsx)(e.p,{children:\"A formal verification loop keeps architecture, code, and quality gates synchronized.\"}),`\n`,(0,i.jsx)(e.h2,{children:\"Use explicit checkpoints\"}),`\n`,(0,i.jsx)(e.p,{children:\"Between planning iterations, run targeted checks that either confirm assumptions or force immediate correction.\"}),`\n`,(0,i.jsxs)(e.ul,{children:[`\n`,(0,i.jsx)(e.li,{children:\"Design consistency check\"}),`\n`,(0,i.jsx)(e.li,{children:\"Lint/build baseline check\"}),`\n`,(0,i.jsx)(e.li,{children:\"User-path smoke check\"}),`\n`]})]})}function h(n={}){let{wrapper:e}=n.components||{};return e?(0,i.jsx)(e,{...n,children:(0,i.jsx)(d,{...n})}):d(n)}return w(_);})();\n;return Component;"
+        },
+        "_id": "blog/posts/verification-loop-for-agentic-coding-teams.mdx",
+        "_raw": {
+          "sourceFilePath": "blog/posts/verification-loop-for-agentic-coding-teams.mdx",
+          "sourceFileName": "verification-loop-for-agentic-coding-teams.mdx",
+          "sourceFileDir": "blog/posts",
+          "contentType": "mdx",
+          "flattenedPath": "blog/posts/verification-loop-for-agentic-coding-teams"
+        },
+        "type": "BlogPost",
+        "slugNormalized": "verification-loop-for-agentic-coding-teams",
+        "url": "/blog/verification-loop-for-agentic-coding-teams",
+        "readingTimeMinutes": 8
+      },
+      "documentHash": "1770916604038",
+      "hasWarnings": false,
+      "documentTypeName": "BlogPost"
+    },
+    "blog/authors/bridgemind-editorial.json": {
+      "document": {
+        "id": "bridgemind-editorial",
+        "name": "BridgeMind Editorial Team",
+        "role": "Research & Implementation Desk",
+        "bio": "We publish practical playbooks, architecture decisions, and delivery patterns for teams shipping MCP and agentic systems in production.",
+        "avatar": "/demumumind-mark.svg",
+        "xUrl": "https://x.com",
+        "linkedinUrl": "https://www.linkedin.com",
+        "_id": "blog/authors/bridgemind-editorial.json",
+        "_raw": {
+          "sourceFilePath": "blog/authors/bridgemind-editorial.json",
+          "sourceFileName": "bridgemind-editorial.json",
+          "sourceFileDir": "blog/authors",
+          "contentType": "data",
+          "flattenedPath": "blog/authors/bridgemind-editorial"
+        },
+        "type": "BlogAuthor"
+      },
+      "documentHash": "1770916565623",
+      "hasWarnings": false,
+      "documentTypeName": "BlogAuthor"
+    },
+    "blog/taxonomy/topics.json": {
+      "document": {
+        "topics": [
+          {
+            "name": "Playbook",
+            "slug": "playbook",
+            "description": "Step-by-step execution patterns for production teams.",
+            "colorToken": "violet",
+            "type": "BlogTopicItem",
+            "_raw": {}
+          },
+          {
+            "name": "Architecture",
+            "slug": "architecture",
+            "description": "System boundaries, integration surfaces, and design tradeoffs.",
+            "colorToken": "cyan",
+            "type": "BlogTopicItem",
+            "_raw": {}
+          },
+          {
+            "name": "Workflow",
+            "slug": "workflow",
+            "description": "Planning and delivery workflows for agentic engineering.",
+            "colorToken": "emerald",
+            "type": "BlogTopicItem",
+            "_raw": {}
+          },
+          {
+            "name": "Operations",
+            "slug": "operations",
+            "description": "Reliability, rollout control, and operational readiness.",
+            "colorToken": "blue",
+            "type": "BlogTopicItem",
+            "_raw": {}
+          },
+          {
+            "name": "Quality",
+            "slug": "quality",
+            "description": "Verification loops, release gates, and confidence systems.",
+            "colorToken": "amber",
+            "type": "BlogTopicItem",
+            "_raw": {}
+          }
+        ],
+        "_id": "blog/taxonomy/topics.json",
+        "_raw": {
+          "sourceFilePath": "blog/taxonomy/topics.json",
+          "sourceFileName": "topics.json",
+          "sourceFileDir": "blog/taxonomy",
+          "contentType": "data",
+          "flattenedPath": "blog/taxonomy/topics"
+        },
+        "type": "BlogTopic"
+      },
+      "documentHash": "1770916572676",
+      "hasWarnings": false,
+      "documentTypeName": "BlogTopic"
+    }
+  }
+}

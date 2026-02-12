@@ -1,98 +1,79 @@
 {
   "heroActions": {
     "primaryLabel": {
-      "en": "Open Catalog",
-      "ru": "Открыть каталог"
+      "en": "Open Catalog"
     },
     "secondaryLabel": {
-      "en": "Jump to setup paths",
-      "ru": "Перейти к сценариям настройки"
+      "en": "Jump to setup paths"
     }
   },
   "scenarioSection": {
     "title": {
-      "en": "Choose your setup path",
-      "ru": "Выберите сценарий настройки"
+      "en": "Choose your setup path"
     },
     "description": {
-      "en": "Use a role-based flow: quick onboarding for first launch or production-ready hardening for team rollout.",
-      "ru": "Используйте ролевой сценарий: быстрый онбординг для первого запуска или production-ready сценарий для командного внедрения."
+      "en": "Use a role-based flow: quick onboarding for first launch or production-ready hardening for team rollout."
     }
   },
   "scenarios": [
     {
       "id": "quick_start",
       "badge": {
-        "en": "Quick path",
-        "ru": "Быстрый путь"
+        "en": "Quick path"
       },
       "title": {
-        "en": "First successful tool call",
-        "ru": "Первый успешный вызов инструмента"
+        "en": "First successful tool call"
       },
       "description": {
-        "en": "For newcomers: connect one server quickly, validate basic response quality, then continue in catalog.",
-        "ru": "Для новичков: быстро подключите один сервер, проверьте базовое качество ответа и продолжайте в каталоге."
+        "en": "For newcomers: connect one server quickly, validate basic response quality, then continue in catalog."
       },
       "stepsTitle": {
-        "en": "Quick start sequence",
-        "ru": "Последовательность быстрого старта"
+        "en": "Quick start sequence"
       },
       "steps": [
         {
           "title": {
-            "en": "Select one server for current task",
-            "ru": "Выберите один сервер под текущую задачу"
+            "en": "Select one server for current task"
           },
           "description": {
-            "en": "In the catalog, focus on category, auth type, and verification level instead of trying many servers at once.",
-            "ru": "В каталоге ориентируйтесь на категорию, тип auth и уровень верификации, а не на множество серверов сразу."
+            "en": "In the catalog, focus on category, auth type, and verification level instead of trying many servers at once."
           }
         },
         {
           "title": {
-            "en": "Paste MCP config into your client",
-            "ru": "Вставьте MCP-конфиг в клиент"
+            "en": "Paste MCP config into your client"
           },
           "description": {
-            "en": "Use local settings, keep credentials outside repository, and restart the client session.",
-            "ru": "Используйте локальные настройки, храните credentials вне репозитория и перезапустите сессию клиента."
+            "en": "Use local settings, keep credentials outside repository, and restart the client session."
           }
         },
         {
           "title": {
-            "en": "Run a single read-only smoke call",
-            "ru": "Запустите один read-only smoke-вызов"
+            "en": "Run a single read-only smoke call"
           },
           "description": {
-            "en": "Confirm response shape and latency are stable before adding more tools or servers.",
-            "ru": "Убедитесь, что структура ответа и задержка стабильны, прежде чем добавлять новые инструменты или серверы."
+            "en": "Confirm response shape and latency are stable before adding more tools or servers."
           }
         }
       ],
       "checklistTitle": {
-        "en": "Done when",
-        "ru": "Готово, когда"
+        "en": "Done when"
       },
       "checklistItems": [
         {
-          "en": "Client restarted after config update",
-          "ru": "Клиент перезапущен после обновления конфига"
+          "en": "Client restarted after config update"
         },
         {
-          "en": "You received one successful deterministic response",
-          "ru": "Вы получили один успешный детерминированный ответ"
+          "en": "You received one successful deterministic response"
         },
         {
-          "en": "No credentials were committed to git",
-          "ru": "Credentials не попали в git"
+          "en": "No credentials were committed to git"
         }
       ],
       "primaryCta": {
         "id": "scenario_catalog",
         "label": {
-          "en": "Choose a server in catalog",
-          "ru": "Выбрать сервер в каталоге"
+          "en": "Choose a server in catalog"
         },
         "href": "/catalog"
       }
@@ -100,76 +81,61 @@
     {
       "id": "production_ready",
       "badge": {
-        "en": "Production path",
-        "ru": "Production-путь"
+        "en": "Production path"
       },
       "title": {
-        "en": "Hardened rollout for teams",
-        "ru": "Усиленный запуск для команд"
+        "en": "Hardened rollout for teams"
       },
       "description": {
-        "en": "For experienced users: validate trust signals, isolate secrets, and prepare repeatable operations.",
-        "ru": "Для опытных пользователей: проверьте сигналы доверия, изолируйте секреты и подготовьте повторяемые операционные шаги."
+        "en": "For experienced users: validate trust signals, isolate secrets, and prepare repeatable operations."
       },
       "stepsTitle": {
-        "en": "Production-ready sequence",
-        "ru": "Последовательность production-ready"
+        "en": "Production-ready sequence"
       },
       "steps": [
         {
           "title": {
-            "en": "Validate trust, ownership, and auth",
-            "ru": "Проверьте trust, ownership и auth"
+            "en": "Validate trust, ownership, and auth"
           },
           "description": {
-            "en": "Review maintainer data, verification status, and required auth scopes before granting team access.",
-            "ru": "Проверьте данные мейнтейнера, статус верификации и требуемые auth scope до выдачи доступа команде."
+            "en": "Review maintainer data, verification status, and required auth scopes before granting team access."
           }
         },
         {
           "title": {
-            "en": "Separate local, staging, and production configs",
-            "ru": "Разделите local, staging и production конфиги"
+            "en": "Separate local, staging, and production configs"
           },
           "description": {
-            "en": "Use environment variables and rotation policy for tokens and keys.",
-            "ru": "Используйте переменные окружения и политику ротации токенов и ключей."
+            "en": "Use environment variables and rotation policy for tokens and keys."
           }
         },
         {
           "title": {
-            "en": "Run deterministic health/list/read checks",
-            "ru": "Запустите детерминированные health/list/read проверки"
+            "en": "Run deterministic health/list/read checks"
           },
           "description": {
-            "en": "Repeat calls and verify stable payloads and acceptable latency before rollout.",
-            "ru": "Повторите вызовы и проверьте стабильность payload и приемлемую задержку до запуска."
+            "en": "Repeat calls and verify stable payloads and acceptable latency before rollout."
           }
         }
       ],
       "checklistTitle": {
-        "en": "Production checklist",
-        "ru": "Production-чеклист"
+        "en": "Production checklist"
       },
       "checklistItems": [
         {
-          "en": "Auth scope and token rotation policy are documented",
-          "ru": "Документированы auth scope и политика ротации токенов"
+          "en": "Auth scope and token rotation policy are documented"
         },
         {
-          "en": "Runbook includes rollback steps",
-          "ru": "Runbook содержит шаги отката"
+          "en": "Runbook includes rollback steps"
         },
         {
-          "en": "Smoke test outputs are stable across reruns",
-          "ru": "Результаты smoke-тестов стабильны при повторных запусках"
+          "en": "Smoke test outputs are stable across reruns"
         }
       ],
       "primaryCta": {
         "id": "scenario_catalog",
         "label": {
-          "en": "Review trusted servers",
-          "ru": "Проверить доверенные серверы"
+          "en": "Review trusted servers"
         },
         "href": "/catalog"
       }
@@ -177,183 +143,148 @@
   ],
   "clientReference": {
     "title": {
-      "en": "Client setup reference",
-      "ru": "Справочник по настройке клиентов"
+      "en": "Client setup reference"
     },
     "description": {
-      "en": "Open your client tab, configure endpoint + auth, then finish with smoke test.",
-      "ru": "Откройте вкладку своего клиента, настройте endpoint + auth и завершите smoke-тестом."
+      "en": "Open your client tab, configure endpoint + auth, then finish with smoke test."
     },
     "whereLabel": {
-      "en": "Where to configure",
-      "ru": "Где настраивать"
+      "en": "Where to configure"
     },
     "smokeLabel": {
-      "en": "Smoke test",
-      "ru": "Smoke-тест"
+      "en": "Smoke test"
     },
     "items": [
       {
         "client": "OpenAI Codex",
         "badge": {
-          "en": "Codex",
-          "ru": "Codex"
+          "en": "Codex"
         },
         "where": {
-          "en": "Open MCP/Tools settings, add endpoint and credentials, then reload workspace.",
-          "ru": "Откройте настройки MCP/Tools, добавьте endpoint и credentials, затем перезагрузите workspace."
+          "en": "Open MCP/Tools settings, add endpoint and credentials, then reload workspace."
         },
         "smoke": {
-          "en": "Run one read-only call and confirm stable response schema.",
-          "ru": "Запустите один read-only вызов и проверьте стабильную схему ответа."
+          "en": "Run one read-only call and confirm stable response schema."
         }
       },
       {
         "client": "Claude Code",
         "badge": {
-          "en": "CLI agent",
-          "ru": "CLI-агент"
+          "en": "CLI agent"
         },
         "where": {
-          "en": "Add MCP server in local config, restart agent session, and re-open tool list.",
-          "ru": "Добавьте MCP-сервер в локальный конфиг, перезапустите сессию агента и заново откройте список инструментов."
+          "en": "Add MCP server in local config, restart agent session, and re-open tool list."
         },
         "smoke": {
-          "en": "Execute one health/list/read call and verify deterministic output.",
-          "ru": "Выполните один health/list/read вызов и проверьте детерминированный вывод."
+          "en": "Execute one health/list/read call and verify deterministic output."
         }
       },
       {
         "client": "Cursor",
         "badge": {
-          "en": "IDE",
-          "ru": "IDE"
+          "en": "IDE"
         },
         "where": {
-          "en": "Configure MCP integration with server URL and token, then reload IDE window.",
-          "ru": "Настройте MCP-интеграцию с URL сервера и токеном, затем перезагрузите окно IDE."
+          "en": "Configure MCP integration with server URL and token, then reload IDE window."
         },
         "smoke": {
-          "en": "Call a simple tool from agent mode and confirm no timeout.",
-          "ru": "Вызовите простой инструмент в agent-режиме и убедитесь, что нет таймаута."
+          "en": "Call a simple tool from agent mode and confirm no timeout."
         }
       },
       {
         "client": "GitHub Copilot",
         "badge": {
-          "en": "Copilot",
-          "ru": "Copilot"
+          "en": "Copilot"
         },
         "where": {
-          "en": "Register MCP endpoint in extension/settings path and restart VS Code.",
-          "ru": "Добавьте MCP endpoint через extension/settings и перезапустите VS Code."
+          "en": "Register MCP endpoint in extension/settings path and restart VS Code."
         },
         "smoke": {
-          "en": "Run a tool-assisted request and verify MCP output is visible to the agent.",
-          "ru": "Запустите tool-assisted запрос и проверьте, что MCP-вывод доступен агенту."
+          "en": "Run a tool-assisted request and verify MCP output is visible to the agent."
         }
       }
     ]
   },
   "trustChecks": {
     "title": {
-      "en": "Trust and production checks",
-      "ru": "Проверки доверия и production"
+      "en": "Trust and production checks"
     },
     "description": {
-      "en": "Complete these checks before moving from trial setup to business-critical workflows.",
-      "ru": "Пройдите эти проверки перед переходом от пробной настройки к критичным бизнес-процессам."
+      "en": "Complete these checks before moving from trial setup to business-critical workflows."
     },
     "items": [
       {
         "title": {
-          "en": "Auth boundaries and least privilege",
-          "ru": "Границы auth и least privilege"
+          "en": "Auth boundaries and least privilege"
         },
         "description": {
-          "en": "Grant only required scopes, set rotation schedule, and revoke stale tokens quickly.",
-          "ru": "Выдавайте только нужные scope, задайте график ротации и быстро отзывайте устаревшие токены."
+          "en": "Grant only required scopes, set rotation schedule, and revoke stale tokens quickly."
         }
       },
       {
         "title": {
-          "en": "Maintainer trust verification",
-          "ru": "Проверка доверия к мейнтейнеру"
+          "en": "Maintainer trust verification"
         },
         "description": {
-          "en": "Review ownership metadata, verification level, and incident history before rollout.",
-          "ru": "Проверяйте ownership-метаданные, уровень верификации и историю инцидентов до запуска."
+          "en": "Review ownership metadata, verification level, and incident history before rollout."
         }
       },
       {
         "title": {
-          "en": "Operational rollback readiness",
-          "ru": "Готовность к откату"
+          "en": "Operational rollback readiness"
         },
         "description": {
-          "en": "Document rollback, fallback server, and escalation contacts in your runbook.",
-          "ru": "Зафиксируйте в runbook процедуру отката, fallback-сервер и контакты эскалации."
+          "en": "Document rollback, fallback server, and escalation contacts in your runbook."
         }
       }
     ]
   },
   "troubleshooting": {
     "title": {
-      "en": "Troubleshooting",
-      "ru": "Диагностика проблем"
+      "en": "Troubleshooting"
     },
     "description": {
-      "en": "Use this list before replacing architecture or changing the whole toolchain.",
-      "ru": "Используйте этот список до замены архитектуры или полной смены toolchain."
+      "en": "Use this list before replacing architecture or changing the whole toolchain."
     },
     "items": [
       {
         "problem": {
-          "en": "Server is missing in client tools",
-          "ru": "Сервер отсутствует в списке инструментов клиента"
+          "en": "Server is missing in client tools"
         },
         "fix": {
-          "en": "Validate JSON syntax, restart client fully, and check logs for parse errors.",
-          "ru": "Проверьте синтаксис JSON, полностью перезапустите клиент и изучите логи на ошибки парсинга."
+          "en": "Validate JSON syntax, restart client fully, and check logs for parse errors."
         }
       },
       {
         "problem": {
-          "en": "Authentication failures",
-          "ru": "Ошибки аутентификации"
+          "en": "Authentication failures"
         },
         "fix": {
-          "en": "Confirm token scope and expiration. Rotate credentials and retry with fresh session.",
-          "ru": "Проверьте scope и срок действия токена. Ротируйте credentials и повторите в новой сессии."
+          "en": "Confirm token scope and expiration. Rotate credentials and retry with fresh session."
         }
       },
       {
         "problem": {
-          "en": "Tool call timeouts",
-          "ru": "Таймауты вызовов инструментов"
+          "en": "Tool call timeouts"
         },
         "fix": {
-          "en": "Check endpoint availability, firewall/proxy configuration, and server latency outside client.",
-          "ru": "Проверьте доступность endpoint, настройки firewall/proxy и задержки сервера вне клиента."
+          "en": "Check endpoint availability, firewall/proxy configuration, and server latency outside client."
         }
       }
     ]
   },
   "ctaRail": {
     "title": {
-      "en": "Continue setup",
-      "ru": "Продолжить настройку"
+      "en": "Continue setup"
     },
     "description": {
-      "en": "Browse trusted MCP servers for your stack or submit your own integration to the directory.",
-      "ru": "Выберите доверенные MCP-серверы под ваш стек или отправьте собственную интеграцию в каталог."
+      "en": "Browse trusted MCP servers for your stack or submit your own integration to the directory."
     },
     "actions": [
       {
         "id": "final_catalog",
         "label": {
-          "en": "Browse MCP servers",
-          "ru": "Смотреть MCP-серверы"
+          "en": "Browse MCP servers"
         },
         "href": "/catalog",
         "variant": "primary"
@@ -361,8 +292,7 @@
       {
         "id": "final_submit",
         "label": {
-          "en": "Submit your server",
-          "ru": "Отправить свой сервер"
+          "en": "Submit your server"
         },
         "href": "/submit-server#submit",
         "variant": "secondary"

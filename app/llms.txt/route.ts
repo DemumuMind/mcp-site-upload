@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-
 function absoluteUrl(path: string, siteUrl: string) {
-  return new URL(path, siteUrl).toString();
+    return new URL(path, siteUrl).toString();
 }
-
 function buildLlmsText(siteUrl: string) {
-  return `# BridgeMind
+    return `# BridgeMind
 
 Machine-readable sitemaps: ${absoluteUrl("/sitemap.xml", siteUrl)} | ${absoluteUrl("/llms.txt", siteUrl)}
 
@@ -17,7 +15,7 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 
 - [Home](${absoluteUrl("/", siteUrl)}): Discover vibe coding and join the agentic coding revolution
 - [About BridgeMind](${absoluteUrl("/about", siteUrl)}): Our mission, vision, and approach to vibe coding and agentic coding
-- [Free & Open](${absoluteUrl("/pricing", siteUrl)}): Free access today with a transparent roadmap for future Pro capabilities
+- [Pricing](${absoluteUrl("/pricing", siteUrl)}): Free access today with a transparent roadmap for future Pro capabilities
 
 ## Resources
 
@@ -38,16 +36,14 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 - [Sitemap](${absoluteUrl("/sitemap", siteUrl)}): Full site navigation
 `;
 }
-
 export function GET() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const responseText = buildLlmsText(siteUrl);
-
-  return new NextResponse(responseText, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-    },
-  });
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const responseText = buildLlmsText(siteUrl);
+    return new NextResponse(responseText, {
+        status: 200,
+        headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        },
+    });
 }
