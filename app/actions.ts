@@ -7,6 +7,7 @@ import { getSubmissionSchema, type SubmissionInput } from "@/lib/submission-sche
 export type SubmissionActionResult = {
     success: boolean;
     message: string;
+    serverSlug?: string;
     fieldErrors?: Partial<Record<keyof SubmissionInput, string>>;
 };
 const SLUG_FALLBACK_PREFIX = "server";
@@ -96,5 +97,6 @@ export async function submitServerAction(input: SubmissionInput): Promise<Submis
     return {
         success: true,
         message: tr(locale, "Server submitted successfully. Status: pending moderation.", "Server submitted successfully. Status: pending moderation."),
+        serverSlug,
     };
 }

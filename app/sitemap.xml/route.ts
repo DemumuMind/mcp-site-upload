@@ -27,6 +27,7 @@ const staticRoutes: readonly StaticSitemapRoute[] = [
     { path: "/tools", changeFrequency: "weekly", priority: 0.7 },
     { path: "/how-to-use", changeFrequency: "weekly", priority: 0.7 },
     { path: "/submit-server", changeFrequency: "weekly", priority: 0.7 },
+    { path: "/cookie-settings", changeFrequency: "monthly", priority: 0.5 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
     { path: "/auth", changeFrequency: "monthly", priority: 0.4 },

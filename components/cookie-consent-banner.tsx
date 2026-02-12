@@ -18,8 +18,12 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
         }
         function handleConsentChange(event: Event) {
             const customEvent = event as CustomEvent<{
-                value?: CookieConsentChoice;
+                value?: CookieConsentChoice | null;
             }>;
+            if (customEvent.detail?.value === null) {
+                setConsent(null);
+                return;
+            }
             if (customEvent.detail?.value === "all" || customEvent.detail?.value === "necessary") {
                 setConsent(customEvent.detail.value);
             }

@@ -41,6 +41,14 @@ export function setCookieConsent(value: CookieConsentChoice) {
     document.cookie = `${COOKIE_CONSENT_COOKIE_KEY}=${value}; path=/; max-age=${COOKIE_CONSENT_MAX_AGE_SECONDS}; samesite=lax`;
     window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: { value } }));
 }
+export function clearCookieConsent() {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+        return;
+    }
+    window.localStorage.removeItem(COOKIE_CONSENT_STORAGE_KEY);
+    document.cookie = `${COOKIE_CONSENT_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
+    window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: { value: null } }));
+}
 export function openCookieConsentSettings() {
     if (typeof window === "undefined") {
         return;

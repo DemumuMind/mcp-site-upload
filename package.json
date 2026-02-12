@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "predev": "node scripts/patch-contentlayer-win-warning.mjs",
+    "dev": "next dev --webpack -p 3000",
+    "prebuild": "node scripts/patch-contentlayer-win-warning.mjs",
     "build": "contentlayer2 build && next build --webpack",
     "start": "next start",
     "content:build": "contentlayer2 build",
