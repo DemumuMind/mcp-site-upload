@@ -22,29 +22,15 @@ test.describe("Redesigned company/legal and submit pages", () => {
     await expect(page.getByRole("heading", { name: "Cookie Settings" })).toBeVisible();
 
     await page.getByRole("button", { name: "Use necessary only" }).click();
-    await expect(page.getByText("Necessary cookies only")).toBeVisible();
+    await expect(page.getByText("Necessary cookies only", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Reset cookie preference" }).click();
     await expect(page.getByText("No preference saved yet")).toBeVisible();
   });
 
-  test("submit server uses 3-step guest-friendly wizard", async ({ page }) => {
+  test("submit server route requires auth and redirects to login", async ({ page }) => {
     await page.goto("/submit-server");
-    await expect(page.getByRole("heading", { name: "Submit your MCP server" })).toBeVisible();
-
-    await page.getByLabel("Server name").fill("QA Wizard Server");
-    await page.getByLabel("Category").fill("Automation");
-    await page
-      .getByLabel("Description")
-      .fill("A test MCP server used to verify redesigned 3-step submission flow.");
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    await page.getByLabel("Server URL").fill("https://example.com/mcp");
-    await page.getByLabel("Maintainer name").fill("QA User");
-    await page.getByLabel("Maintainer email").fill("qa@example.com");
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    await expect(page.getByText("You can review everything now. Sign in is required only when you click final submit.")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Sign in and submit|Submit for moderation/ })).toBeVisible();
+    await expect(page).toHaveURL(/\/auth\?next=%2Fsubmit-server/);
+    await expect(page.getByLabel("Email")).toBeVisible();
   });
 });

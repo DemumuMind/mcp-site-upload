@@ -1,3 +1,44 @@
+## Latest Update (2026-02-15, Submit Route Guard Enforcement)
+- Objective: enforce `/submit-server` as an authenticated route at edge/proxy level (not only at final server action).
+- Status: completed.
+- Touched files:
+  - `proxy.ts`
+  - `app/submit-server/page.tsx`
+  - `tests/legal-and-submit-redesign.spec.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added `/submit-server` to protected user route set in `proxy.ts`.
+  - Extended proxy matcher to include `/submit-server` and `/submit-server/:path*`.
+  - Updated submit page copy from guest-first wording to authenticated-access wording.
+  - Updated Playwright scenario to assert redirect to `/auth?next=%2Fsubmit-server`.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npx playwright test tests/legal-and-submit-redesign.spec.ts` -> pass
+- Open risks:
+  - Existing local auth/session state in a browser profile can alter redirect behavior in manual checks; Playwright run uses isolated context.
+
+## Latest Update (2026-02-15, MCP Catalog Full-Implementation Gap Closure)
+- Objective: complete remaining implementation gaps for MCP Catalog deployment/security readiness after prompt-pack alignment.
+- Status: completed.
+- Touched files:
+  - `README.md`
+  - `docs/runbooks/deploy.md`
+  - `docs/production-readiness-checklist.md`
+  - `lib/admin-auth.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added explicit Blog Auto-Publish endpoint/auth/schedule documentation aligned with `vercel.json`.
+  - Added deploy prerequisites (GitHub secrets + repo vars) to deployment docs.
+  - Added UTF-8 strict check to documented quality/deploy gates.
+  - Hardened admin-role lookup observability in `lib/admin-auth.ts` (explicit logging for query errors/unexpected role values instead of silent failures).
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - Repository contains many unrelated in-progress modifications; keep commit scope isolated to files listed above.
 ## Latest Update (2026-02-15, Granular Cookie Preferences + Default Policy)
 - Objective: add selectable cookie categories (preferences/analytics), keep a clear default policy, and keep compatibility with existing all/necessary consent flow.
 - Status: completed (implementation + verification).
@@ -27,7 +68,7 @@
 - Open risks:
   - Local environment may keep occupied ports from background Next processes; use alternate port for manual verification.
 ## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
-- Objective: finalize “Ïî÷èíè” follow-up by ensuring lint/build are stable after security hardening pass.
+- Objective: finalize â€œĞŸĞ¾Ñ‡Ğ¸Ğ½Ğ¸â€ follow-up by ensuring lint/build are stable after security hardening pass.
 - Status: completed.
 - Touched files:
   - `eslint.config.mjs`

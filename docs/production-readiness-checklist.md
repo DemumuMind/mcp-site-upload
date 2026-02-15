@@ -1,6 +1,7 @@
 # Production Readiness Checklist
 
 ## Build and Quality
+- [ ] `npm run check:utf8:strict` passes.
 - [ ] `npm run lint` passes.
 - [ ] `npm run build` passes.
 - [ ] `npm run smoke:check -- <target-url>` passes.

@@ -18,6 +18,7 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
 1. Merge to `main` or run `.github/workflows/deploy.yml` manually.
 2. Workflow runs:
    - `npm ci`
+   - `npm run check:utf8:strict`
    - `npm run lint`
    - `npm run build`
    - Vercel deploy
@@ -29,6 +30,11 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
 
 ## Manual Smoke Fallback
 Use existing workflow `.github/workflows/deploy-smoke-check.yml` if post-deploy validation must be rerun independently.
+
+## Vercel Cron Schedule (UTC)
+- `/api/health-check` -> `03:00`
+- `/api/blog/auto-publish` -> `00:15`, `06:15`, `12:15`, `18:15`
+- `/api/catalog/auto-sync` -> `01:45`, `07:45`, `13:45`, `19:45`
 
 ## Rollback
 1. Open Vercel project deployments and find last known healthy deployment.

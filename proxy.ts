@@ -10,7 +10,7 @@ import {
 import { normalizeInternalPath } from "@/lib/auth-redirects";
 import { createSupabaseProxyAuthClient } from "@/lib/supabase/proxy-auth";
 
-const protectedUserPathnames = ["/account"] as const;
+const protectedUserPathnames = ["/account", "/submit-server"] as const;
 
 function isProtectedUserPath(pathname: string): boolean {
   return protectedUserPathnames.some(
@@ -101,5 +101,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*", "/submit-server", "/submit-server/:path*"],
 };

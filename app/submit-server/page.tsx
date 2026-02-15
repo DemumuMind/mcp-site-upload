@@ -16,8 +16,8 @@ const highlights = [
   },
   {
     icon: ShieldCheck,
-    title: "Guest-friendly drafting",
-    description: "Anyone can fill the flow first; sign in is required only at final submit.",
+    title: "Authenticated submission flow",
+    description: "Sign in first, then complete the guided flow and submit with your account context.",
   },
   {
     icon: ClipboardCheck,
@@ -58,8 +58,8 @@ export default async function SubmitServerPage() {
           <p className="mt-5 max-w-4xl text-sm leading-8 text-violet-200 sm:text-lg">
             {tr(
               locale,
-              "Use the guided flow to prepare a high-signal submission for moderation. You can complete the form as a guest and sign in only on final submit.",
-              "Use the guided flow to prepare a high-signal submission for moderation. You can complete the form as a guest and sign in only on final submit.",
+              "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
+              "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
             )}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">

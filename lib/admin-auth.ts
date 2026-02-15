@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 export const ADMIN_SESSION_COOKIE = "mcp_admin_session";
 const ADMIN_AUTH_MODES = ["hybrid", "supabase", "token"] as const;
@@ -61,12 +62,20 @@ export function getAdminAccessToken(): string {
     }
     return "";
 }
+function timingSafeStringEqual(providedValue: string, expectedValue: string): boolean {
+    const provided = Buffer.from(providedValue);
+    const expected = Buffer.from(expectedValue);
+    if (provided.length !== expected.length) {
+        return false;
+    }
+    return timingSafeEqual(provided, expected);
+}
 export function isValidAdminToken(token: string): boolean {
     const expectedToken = getAdminAccessToken();
     if (!expectedToken) {
         return false;
     }
-    return token === expectedToken;
+    return timingSafeStringEqual(token, expectedToken);
 }
 export function isAdminSessionCookieValue(value: string | undefined): boolean {
     if (!value) {
@@ -91,12 +100,32 @@ export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId
             .eq("user_id", userId)
             .limit(1)
             .maybeSingle<AdminRoleRow>();
-        if (error || !data) {
+        if (error) {
+            console.error("[admin-auth] failed to resolve admin role", {
+                userId,
+                code: error.code,
+                message: error.message,
+            });
             return null;
         }
-        return toAdminRole(data.role);
+        if (!data) {
+            return null;
+        }
+        const normalizedRole = toAdminRole(data.role);
+        if (!normalizedRole && data.role) {
+            console.warn("[admin-auth] unexpected admin role value", {
+                userId,
+                role: data.role,
+            });
+        }
+        return normalizedRole;
     }
-    catch {
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        console.error("[admin-auth] unexpected role lookup failure", {
+            userId,
+            message,
+        });
         return null;
     }
 }

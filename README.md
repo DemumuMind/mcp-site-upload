@@ -109,6 +109,27 @@ Scheduler:
 
 Detailed operational notes: `docs/health-check-runbook.md`.
 
+## Blog Auto-Publish
+
+Endpoint:
+- `GET/POST /api/blog/auto-publish`
+
+Auth:
+- `Authorization: Bearer <BLOG_AUTOPUBLISH_CRON_SECRET|CRON_SECRET>`
+
+Manual trigger:
+
+```bash
+curl -X POST "http://localhost:3000/api/blog/auto-publish?count=1" \
+  -H "Authorization: Bearer $BLOG_AUTOPUBLISH_CRON_SECRET"
+```
+
+Default Vercel cron schedule:
+- `00:15` UTC
+- `06:15` UTC
+- `12:15` UTC
+- `18:15` UTC
+
 ## Catalog Auto-Sync
 
 Endpoint:
@@ -148,6 +169,8 @@ Moderation pattern syntax:
 
 ```bash
 npm run dev
+npm run check:utf8
+npm run check:utf8:strict
 npm run lint
 npm run build
 npm run start
@@ -155,6 +178,14 @@ npm run smoke:check -- https://your-domain
 npm run ops:health-report -- --base-url https://your-domain
 npm run ops:backup-verify
 npm run ops:backup-verify-remote
+```
+
+Recommended pre-merge verification:
+
+```bash
+npm run check:utf8:strict
+npm run lint
+npm run build
 ```
 
 ## Catalog Data Defaults
@@ -168,6 +199,17 @@ npm run ops:backup-verify-remote
 This means catalog cards remain usable even when upstream DB rows are incomplete.
 
 ## Deployment (Vercel)
+
+Deployment prerequisites (GitHub + Vercel integration):
+- GitHub secrets:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+  - `SMOKE_HEALTH_TOKEN` (optional but recommended)
+- Repository variables:
+  - `SMOKE_BASE_URL` (recommended for CI and nightly smoke)
+  - `SMOKE_ALLOW_PROTECTED=true` only for protected preview URLs that return `401` to anonymous probes
+  - `VERCEL_DEPLOY_ENABLED=true` to activate deploy steps in `.github/workflows/deploy.yml`
 
 1. Import repository into Vercel.
 2. Configure required env vars for Production:
