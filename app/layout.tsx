@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ConsentAnalytics } from "@/components/consent-analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
-import { COOKIE_CONSENT_COOKIE_KEY, parseCookieConsent } from "@/lib/cookie-consent";
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 import "./globals.css";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -62,8 +61,6 @@ export default async function RootLayout({ children, }: Readonly<{
     children: React.ReactNode;
 }>) {
     const locale = await getServerLocale();
-    const cookieStore = await cookies();
-    const initialConsent = parseCookieConsent(cookieStore.get(COOKIE_CONSENT_COOKIE_KEY)?.value);
     return (<html lang={locale} className="dark" data-theme="cosmic-burst" data-scroll-behavior="smooth">
       <body className="min-h-screen bg-background text-foreground antialiased">
         <LocaleProvider locale={locale}>
@@ -75,9 +72,10 @@ export default async function RootLayout({ children, }: Readonly<{
             <SiteHeader locale={locale}/>
             <main className="relative z-10 flex-1">{children}</main>
             <SiteFooter locale={locale}/>
-            <CookieConsentBanner initialConsent={initialConsent}/>
+            <CookieConsentBanner />
             <Toaster richColors position="top-right"/>
-            <ConsentAnalytics initialConsent={initialConsent}/>
+            <ConsentAnalytics />
+            <SpeedInsights />
           </div>
         </LocaleProvider>
       </body>
