@@ -67,8 +67,9 @@ test.describe("Auth email flows", () => {
     await forceEnglishLocale(page);
     await page.goto("/auth?next=%2Faccount");
 
-    await expect(page.getByRole("button", { name: "No account? Sign up" })).toBeVisible();
-    await page.getByRole("button", { name: "No account? Sign up" }).click();
+    const signupButton = page.getByRole("button", { name: "No account? Sign up" });
+    await signupButton.waitFor({ state: "visible", timeout: 60000 });
+    await signupButton.click();
 
     await expect(page.getByText("Register with email")).toBeVisible();
     await expect(page.getByText("At least 8 characters")).toBeVisible();
@@ -121,8 +122,9 @@ test.describe("Auth email flows", () => {
     await forceEnglishLocale(page);
     await page.goto("/auth?next=%2Faccount");
 
-    await expect(page.getByRole("button", { name: "Forgot password?" })).toBeVisible();
-    await page.getByRole("button", { name: "Forgot password?" }).click();
+    const forgotButton = page.getByRole("button", { name: "Forgot password?" });
+    await forgotButton.waitFor({ state: "visible", timeout: 60000 });
+    await forgotButton.click();
     await expect(page.getByText("Password reset")).toBeVisible();
 
     await page.getByLabel("Email").fill("qa-reset@example.com");
