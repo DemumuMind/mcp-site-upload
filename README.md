@@ -220,6 +220,10 @@ Deployment prerequisites (GitHub + Vercel integration):
   - `SMOKE_BASE_URL` (recommended for CI and nightly smoke)
   - `SMOKE_ALLOW_PROTECTED=true` only for protected preview URLs that return `401` to anonymous probes
   - `VERCEL_DEPLOY_ENABLED=true` to activate deploy steps in `.github/workflows/deploy.yml`
+  - `CATALOG_GUARD_ENABLED=true` to enable nightly catalog-count alerting workflow
+  - `CATALOG_GUARD_MIN_TOTAL` optional minimum expected `/api/catalog/search` total (default `1000`)
+  - `CATALOG_GUARD_SEARCH_PATH` optional override path (default `/api/catalog/search?page=1&pageSize=1`)
+  - `CATALOG_GUARD_TIMEOUT_MS` optional request timeout in ms (default `12000`)
 
 1. Import repository into Vercel.
 2. Configure required env vars for Production:

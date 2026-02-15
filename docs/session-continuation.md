@@ -1,3 +1,32 @@
+## Latest Update (2026-02-15, CI Alerting for Catalog Count Drops)
+- Objective: add automatic CI alerting when deployed catalog count unexpectedly drops.
+- Status: completed.
+- Touched files:
+  - `scripts/catalog-count-guard.mjs` (new)
+  - `.github/workflows/catalog-count-guard.yml` (new)
+  - `package.json`
+  - `README.md`
+  - `docs/catalog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added guard script that checks deployed `/api/catalog/search?page=1&pageSize=1` and fails when `total` is below configured minimum.
+  - Added nightly/manual GitHub Actions workflow `Catalog Count Guard`:
+    - schedule: daily `03:55 UTC`
+    - enable switch: `CATALOG_GUARD_ENABLED=true`
+    - threshold var: `CATALOG_GUARD_MIN_TOTAL` (default `1000`)
+    - uses `SMOKE_BASE_URL` as deployment target
+    - runs best-effort registry diagnostics on failure for context.
+  - Added npm command: `npm run catalog:count:guard`.
+  - Documented required repository variables in README + catalog automation runbook.
+- Verification commands and outcomes:
+  - `node` local harness validation for guard script -> pass (`Observed total: 1500`, threshold `1000`)
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - External availability/network issues to `SMOKE_BASE_URL` can fail guard runs; this still provides early signal but may include transient failures.
+  - Threshold must be tuned to your real baseline to avoid noisy alerts.
+
 ## Latest Update (2026-02-15, Catalog Scale Guard + Registry Diagnostics Script)
 - Objective: continue count-recovery work by removing future auto-sync truncation risk and adding a direct registry diagnostics script.
 - Status: completed.

@@ -16,6 +16,7 @@
     "blog:migrate-mdx": "node scripts/blog-migrate-json-to-mdx.mjs",
     "catalog:new": "node scripts/catalog-new-entry.mjs",
     "catalog:registry:stats": "node scripts/catalog-registry-stats.mjs",
+    "catalog:count:guard": "node scripts/catalog-count-guard.mjs",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "test:e2e": "playwright test",
     "test:e2e:auth": "playwright test tests/auth-flow.spec.ts",

@@ -1,0 +1,79 @@
+name: Catalog Count Guard
+
+on:
+  schedule:
+    - cron: "55 3 * * *"
+  workflow_dispatch:
+    inputs:
+      min_total:
+        description: "Minimum acceptable /api/catalog/search total"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CATALOG_GUARD_ENABLED: ${{ vars.CATALOG_GUARD_ENABLED || 'false' }}
+      SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL }}
+      CATALOG_GUARD_MIN_TOTAL: ${{ vars.CATALOG_GUARD_MIN_TOTAL || '1000' }}
+      CATALOG_GUARD_SEARCH_PATH: ${{ vars.CATALOG_GUARD_SEARCH_PATH || '/api/catalog/search?page=1&pageSize=1' }}
+      CATALOG_GUARD_TIMEOUT_MS: ${{ vars.CATALOG_GUARD_TIMEOUT_MS || '12000' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: UTF-8 check
+        run: npm run check:utf8:strict
+
+      - name: Resolve guard execution
+        id: resolve_guard
+        shell: bash
+        run: |
+          if [ "$CATALOG_GUARD_ENABLED" != "true" ]; then
+            echo "Catalog guard disabled (set CATALOG_GUARD_ENABLED=true to enable)."
+            echo "run_guard=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$SMOKE_BASE_URL" ]; then
+            echo "Repository variable SMOKE_BASE_URL is required."
+            exit 1
+          fi
+          min_total="${{ github.event.inputs.min_total || '' }}"
+          if [ -z "$min_total" ]; then
+            min_total="$CATALOG_GUARD_MIN_TOTAL"
+          fi
+          echo "run_guard=true" >> "$GITHUB_OUTPUT"
+          echo "min_total=$min_total" >> "$GITHUB_OUTPUT"
+
+      - name: Run catalog count guard
+        if: ${{ steps.resolve_guard.outputs.run_guard == 'true' }}
+        run: |
+          npm run catalog:count:guard -- \
+            --base-url "$SMOKE_BASE_URL" \
+            --min-total "${{ steps.resolve_guard.outputs.min_total }}" \
+            --path "$CATALOG_GUARD_SEARCH_PATH" \
+            --timeout-ms "$CATALOG_GUARD_TIMEOUT_MS"
+
+      - name: Registry diagnostics (best effort)
+        if: ${{ failure() && steps.resolve_guard.outputs.run_guard == 'true' }}
+        continue-on-error: true
+        run: npm run catalog:registry:stats -- --limit 100 --pages 120
+
+      - name: Guard disabled summary
+        if: ${{ steps.resolve_guard.outputs.run_guard != 'true' }}
+        run: echo "Catalog count guard is disabled by CATALOG_GUARD_ENABLED=false."

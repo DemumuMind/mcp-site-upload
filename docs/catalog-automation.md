@@ -53,6 +53,13 @@ npm run catalog:registry:stats -- --limit 100 --pages 120
 
 This command only reads MCP Registry pages and helps confirm expected totals vs. configured pagination bounds.
 
+## CI alerting for sudden catalog drops
+- Workflow: `.github/workflows/catalog-count-guard.yml`
+- Recommended repository vars:
+  - `CATALOG_GUARD_ENABLED=true`
+  - `CATALOG_GUARD_MIN_TOTAL=1000` (tune for your expected baseline)
+  - `SMOKE_BASE_URL=https://your-domain`
+
 ## Response signals
 Important fields in response JSON:
 - `created`, `updated`
