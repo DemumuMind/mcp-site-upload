@@ -85,7 +85,7 @@ export default async function RootLayout({
   const initialAnalyticsAllowed = initialProfile?.analytics ?? false;
 
   return (
-    <html lang={locale} className="dark" data-theme="cosmic-burst" data-scroll-behavior="smooth">
+    <html lang="en" suppressHydrationWarning className="dark" data-theme="cosmic-burst" data-scroll-behavior="smooth">
       <body className="min-h-screen bg-background text-foreground antialiased">
         <LocaleProvider locale={locale}>
           <div className="relative flex min-h-screen flex-col overflow-hidden">
@@ -106,3 +106,4 @@ export default async function RootLayout({
     </html>
   );
 }
+
