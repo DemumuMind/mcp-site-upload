@@ -74,6 +74,7 @@ const fallbackThemes: readonly LogoFallbackTheme[] = [
     },
 ];
 type LogoSourceServer = Pick<McpServer, "slug" | "name" | "repoUrl" | "serverUrl">;
+const localServerLogoBasePath = "/server-logos/simpleicons";
 const simpleIconSlugByAlias: Record<string, string> = {
     a2a: "googlegemini",
     a2abench: "googlegemini",
@@ -83,13 +84,19 @@ const simpleIconSlugByAlias: Record<string, string> = {
     brave: "brave",
     chrome: "googlechrome",
     discord: "discord",
+    exa: "exa",
+    filesystem: "files",
     figma: "figma",
     github: "github",
     gitlab: "gitlab",
+    google: "google",
     hubspot: "hubspot",
     jira: "jira",
     linear: "linear",
+    modelcontextprotocol: "modelcontextprotocol",
     notion: "notion",
+    openai: "openai",
+    playwright: "playwright",
     postgresql: "postgresql",
     sentry: "sentry",
     shopify: "shopify",
@@ -97,11 +104,8 @@ const simpleIconSlugByAlias: Record<string, string> = {
     stripe: "stripe",
     trello: "trello",
 };
-function createSimpleIconCandidate(simpleIconSlug: string): string {
-    return `https://cdn.simpleicons.org/${encodeURIComponent(simpleIconSlug)}/FFFFFF`;
-}
-function createDomainFaviconCandidate(hostname: string): string {
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`;
+function createLocalSimpleIconCandidate(simpleIconSlug: string): string {
+    return `${localServerLogoBasePath}/${encodeURIComponent(simpleIconSlug)}.svg`;
 }
 function getInitials(name: string): string {
     const words = name
@@ -154,41 +158,18 @@ function toHostname(urlValue?: string): string | null {
         return null;
     }
 }
-function getGitHubOwnerAvatar(urlValue?: string): string | null {
-    if (!urlValue) {
-        return null;
-    }
-    try {
-        const parsed = new URL(urlValue);
-        if (parsed.hostname !== "github.com" && parsed.hostname !== "www.github.com") {
-            return null;
-        }
-        const [owner] = parsed.pathname.split("/").filter(Boolean);
-        if (!owner) {
-            return null;
-        }
-        return `https://avatars.githubusercontent.com/${encodeURIComponent(owner)}?size=256`;
-    }
-    catch {
-        return null;
-    }
-}
 function getDomainLogoCandidates(hostname: string): string[] {
     const candidates = new Set<string>();
     const normalizedHost = hostname.toLowerCase();
     const hostAliases = normalizedHost.split(".");
-    candidates.add(createDomainFaviconCandidate(normalizedHost));
     for (const alias of hostAliases) {
         const simpleIconSlug = simpleIconSlugByAlias[alias];
         if (simpleIconSlug) {
-            candidates.add(createSimpleIconCandidate(simpleIconSlug));
+            candidates.add(createLocalSimpleIconCandidate(simpleIconSlug));
         }
     }
-    if (normalizedHost.includes("google")) {
-        candidates.add(createSimpleIconCandidate("google"));
-    }
     if (normalizedHost.includes("chrome")) {
-        candidates.add(createSimpleIconCandidate("googlechrome"));
+        candidates.add(createLocalSimpleIconCandidate("googlechrome"));
     }
     return [...candidates];
 }
@@ -198,14 +179,14 @@ function getNameBasedLogoCandidates(mcpServer: LogoSourceServer): string[] {
     const normalizedName = mcpServer.name.toLowerCase();
     for (const [alias, simpleIconSlug] of Object.entries(simpleIconSlugByAlias)) {
         if (slug.includes(alias) || normalizedName.includes(alias)) {
-            candidates.add(createSimpleIconCandidate(simpleIconSlug));
+            candidates.add(createLocalSimpleIconCandidate(simpleIconSlug));
         }
     }
     if (normalizedName.includes("devtools")) {
-        candidates.add(createSimpleIconCandidate("googlechrome"));
+        candidates.add(createLocalSimpleIconCandidate("googlechrome"));
     }
     if (normalizedName.includes("filesystem")) {
-        candidates.add(createSimpleIconCandidate("files"));
+        candidates.add(createLocalSimpleIconCandidate("files"));
     }
     return [...candidates];
 }
@@ -219,10 +200,6 @@ export function getServerLogoCandidates(mcpServer: LogoSourceServer): string[] {
         for (const candidate of getDomainLogoCandidates(host)) {
             candidates.add(candidate);
         }
-    }
-    const githubAvatar = getGitHubOwnerAvatar(mcpServer.repoUrl);
-    if (githubAvatar && candidates.size === 0) {
-        candidates.add(githubAvatar);
     }
     return [...candidates];
 }

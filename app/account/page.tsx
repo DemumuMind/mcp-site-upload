@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CalendarDays, Clock3, FileCheck2, FolderGit2, MailCheck, ShieldAlert, ShieldCheck, UserCircle2, } from "lucide-react";
@@ -20,6 +21,10 @@ type AccountSubmissionRow = {
     auth_type: string | null;
     status: string | null;
 };
+const ACCOUNT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+});
 function getStatusLabel(locale: Locale, status: string | null): string {
     if (status === "pending") {
         return tr(locale, "Pending", "Pending");
@@ -51,11 +56,7 @@ function formatDate(dateValue: string | null, locale: Locale): string {
     if (!dateValue) {
         return tr(locale, "Unknown date", "Unknown date");
     }
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        dateStyle: "medium",
-        timeStyle: "short",
-    });
-    return formatter.format(new Date(dateValue));
+    return ACCOUNT_DATE_FORMATTER.format(new Date(dateValue));
 }
 function getMetadataString(metadata: unknown, key: string): string {
     if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
@@ -70,7 +71,7 @@ function normalizeAvatarUrl(value: string): string | null {
     }
     try {
         const url = new URL(value);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
+        if (url.protocol !== "https:") {
             return null;
         }
         return url.toString();
@@ -153,8 +154,7 @@ export default async function AccountPage() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             {avatarUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatarUrl} alt={displayName} className="size-16 rounded-2xl border border-blue-300/30 object-cover" loading="lazy" decoding="async" referrerPolicy="no-referrer"/>) : (<div className="inline-flex size-16 items-center justify-center rounded-2xl border border-blue-300/30 bg-blue-500/10 text-xl font-semibold text-blue-200">
+        <Image src={avatarUrl} alt={displayName} width={64} height={64} sizes="64px" className="size-16 rounded-2xl border border-blue-300/30 object-cover" referrerPolicy="no-referrer"/>) : (<div className="inline-flex size-16 items-center justify-center rounded-2xl border border-blue-300/30 bg-blue-500/10 text-xl font-semibold text-blue-200">
                 {initials}
               </div>)}
             <div className="space-y-1">

@@ -90,6 +90,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
             <ServerLogo
               mcpServer={mcpServer}
               className="size-18"
+              imageSizes="72px"
               imageClassName="h-full w-full object-contain p-2"
               symbolClassName="text-4xl leading-none"
               showWordmark
