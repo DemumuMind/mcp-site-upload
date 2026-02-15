@@ -8,6 +8,63 @@
 - Prefer reversible iterations; `revert` is normal if a branch of work is weak.
 - For large/independent workstreams, use `git worktree` and parallelize safely.
 
+## Slide-Mapped Operating Rules (5/9/11/12/13/15/16/17/19/20/22/23/24)
+### 5) Project brain file
+- `AGENTS.md` is the project contract and must be read first.
+- `AGENTS.local.md` is personal/local-only and must stay out of git.
+
+### 9) Prompt style
+- Prefer short natural prompts:
+  - "add dark mode to settings page"
+  - "fix mobile upload bug"
+  - "migrate X to Y"
+- Translate work into conventional commits after implementation.
+
+### 11) Agent loop
+- Execute agent cycle explicitly: read files -> plan -> edit -> run checks -> fix -> done.
+- Do not answer as chat-only when code execution is required.
+
+### 12/13) Subagents and parallelism
+- If task has 2+ independent parts, split and run in parallel.
+- Merge outputs into one final validated result.
+- Keep responsibilities isolated (API/UI/tests/docs lanes).
+
+### 15/16/17) Skills usage
+- Use available skills/rules before custom ad-hoc flow.
+- Process order: process-skill -> implementation-skill -> verification-skill.
+- For missing capability, add a reusable skill/rule instead of one-off behavior.
+
+### 19) MCP-first routing
+- Prefer MCP-backed tools for docs/search/browser work.
+- Current baseline MCP set for this workflow:
+  - `openaiDeveloperDocs`
+  - `exa`
+  - `playwright`
+  - `chrome-devtools`
+
+### 20) Permissions + safety
+- Never run destructive commands without explicit request.
+- Keep sensitive values in env vars; never commit secrets.
+- Local personal overrides belong in `AGENTS.local.md` only.
+
+### 22) Typical session flow
+1. Open repo and restate task in plain language.
+2. Implement with minimal reversible diffs.
+3. Run verification gates.
+4. Review diff.
+5. Atomic commit.
+6. Move to next task with fresh context.
+
+### 23) Revert discipline
+- Revert is acceptable and expected when an iteration underperforms.
+- Keep commit granularity small to make rollback cheap.
+
+### 24) Worktrees for large features
+- Default pattern:
+  - `git worktree add .worktrees/<name> -b feature/<name>`
+  - work in isolated context
+  - merge after verification
+
 ## Project Structure & Module Organization
 - `app/`: Next.js App Router pages, layouts, and route handlers (`app/api/*`).
 - `components/`: Reusable UI and feature components (including `components/ui/*` primitives).
