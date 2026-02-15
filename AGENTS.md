@@ -1,5 +1,13 @@
 # Repository Guidelines
 
+## Vibe-Coding Contract (Mandatory)
+- Write tasks in plain language; no heavy prompt templates required.
+- For non-trivial tasks always follow: **Plan v1 -> Check v1 -> Plan v2 -> Implement -> Verify**.
+- Commit after each completed task with an atomic diff.
+- Before claiming "done", always run verification commands and report outputs.
+- Prefer reversible iterations; `revert` is normal if a branch of work is weak.
+- For large/independent workstreams, use `git worktree` and parallelize safely.
+
 ## Project Structure & Module Organization
 - `app/`: Next.js App Router pages, layouts, and route handlers (`app/api/*`).
 - `components/`: Reusable UI and feature components (including `components/ui/*` primitives).
@@ -41,6 +49,7 @@
   - `feat(scope): ...`
   - `fix(scope): ...`
   - `chore(scope): ...`
+- Commit frequency rule: one logical task -> one commit.
 - PRs should include:
   - concise summary and motivation,
   - linked issue/task (if available),
