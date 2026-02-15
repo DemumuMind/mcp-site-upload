@@ -18,7 +18,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "npm run build && npm run start -- -p 3101",
+        command: "npm run start -- -p 3101",
         url: baseURL,
         reuseExistingServer: true,
         timeout: 300_000,
