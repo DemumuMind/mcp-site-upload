@@ -57,3 +57,5 @@ ops/backup-manifest.json
 bridgemind-agents-full/
 bridgemind-prompts-full/
 bridgemind-skills-full/
+
+AGENTS.local.md
