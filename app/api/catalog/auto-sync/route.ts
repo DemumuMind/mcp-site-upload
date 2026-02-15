@@ -5,7 +5,7 @@ import { runCatalogRegistrySync } from "@/lib/catalog/registry-sync";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 export const dynamic = "force-dynamic";
 const DEFAULT_PAGE_LIMIT = 100;
-const DEFAULT_MAX_PAGES = 60;
+const DEFAULT_MAX_PAGES = 120;
 const DEFAULT_STALE_CLEANUP_ENABLED = true;
 const DEFAULT_QUALITY_FILTER_ENABLED = true;
 type NumberEnvOptions = {

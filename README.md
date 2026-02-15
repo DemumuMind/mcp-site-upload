@@ -65,7 +65,7 @@ npm run dev
 | `EXA_API_KEY` | required for blog automation | deep research provider key for auto blog posts |
 | `CATALOG_AUTOSYNC_REGISTRY_URL` | optional | MCP Registry base URL override |
 | `CATALOG_AUTOSYNC_PAGE_LIMIT` | optional | page size per registry fetch (default `100`) |
-| `CATALOG_AUTOSYNC_MAX_PAGES` | optional | max pages per sync run (default `60`) |
+| `CATALOG_AUTOSYNC_MAX_PAGES` | optional | max pages per sync run (default `120`) |
 | `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` | optional | enable stale auto-row cleanup (default `true`) |
 | `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` | optional | filter obvious test/staging/template entries (default `true`) |
 | `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
@@ -143,9 +143,17 @@ Auth:
 Manual trigger:
 
 ```bash
-curl -X POST "http://localhost:3000/api/catalog/auto-sync?limit=100&pages=60&cleanupStale=true&qualityFilter=true" \
+curl -X POST "http://localhost:3000/api/catalog/auto-sync?limit=100&pages=120&cleanupStale=true&qualityFilter=true" \
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
 ```
+
+### Registry diagnostics helper
+
+```bash
+npm run catalog:registry:stats -- --limit 100 --pages 120
+```
+
+Useful to quickly verify how many entries are currently visible in MCP Registry and whether your page window is truncating results.
 
 Default Vercel cron schedule:
 - `01:45` UTC

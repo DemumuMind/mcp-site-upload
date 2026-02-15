@@ -1,3 +1,29 @@
+## Latest Update (2026-02-15, Catalog Scale Guard + Registry Diagnostics Script)
+- Objective: continue count-recovery work by removing future auto-sync truncation risk and adding a direct registry diagnostics script.
+- Status: completed.
+- Touched files:
+  - `lib/catalog/registry-sync.ts`
+  - `app/api/catalog/auto-sync/route.ts`
+  - `scripts/catalog-registry-stats.mjs` (new)
+  - `package.json`
+  - `README.md`
+  - `docs/catalog-automation.md`
+  - `.env.example`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Increased default auto-sync page window from `60` to `120` pages to avoid future count clipping as registry grows.
+  - Kept page limit hard-capped at `100` (registry-compatible) to avoid 422 failures from unsupported values.
+  - Added `npm run catalog:registry:stats` script to measure current registry totals without DB writes.
+  - Documented diagnostics usage and updated all defaults/examples to `pages=120`.
+- Verification commands and outcomes:
+  - `npm run catalog:registry:stats -- --limit 100 --pages 120` -> pass (`Fetched records: 5524`, `Reached end: yes`)
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - Source registry totals can fluctuate over time; diagnostics should be used to validate expected ranges before tuning filters.
+  - If registry grows beyond `12000` entries, increase `CATALOG_AUTOSYNC_MAX_PAGES` above default `120`.
+
 ## Latest Update (2026-02-15, Catalog Count Recovery Hardening + Auto-Sync Guard)
 - Objective: fix incorrect catalog totals caused by fallback-mode execution and prevent silent auto-sync breakage from invalid registry page-size configuration.
 - Status: completed.

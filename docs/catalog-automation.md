@@ -13,7 +13,7 @@ Keep the MCP catalog auto-filled from the public MCP Registry with zero manual m
 
 ## Runtime settings
 - `CATALOG_AUTOSYNC_PAGE_LIMIT` (default `100`, max `100`)
-- `CATALOG_AUTOSYNC_MAX_PAGES` (default `60`, max `200`)
+- `CATALOG_AUTOSYNC_MAX_PAGES` (default `120`, max `200`)
 - `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` (default `true`)
 - `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` (default `true`)
 - `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` (default empty, allow overrides)
@@ -38,13 +38,20 @@ Keep the MCP catalog auto-filled from the public MCP Registry with zero manual m
 
 ## Manual trigger
 ```bash
-curl -X POST "https://your-domain/api/catalog/auto-sync?limit=100&pages=60&cleanupStale=true&qualityFilter=true" \
+curl -X POST "https://your-domain/api/catalog/auto-sync?limit=100&pages=120&cleanupStale=true&qualityFilter=true" \
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
 ```
 
 Optional one-off tuning from query string:
 - `allowlist=pattern1,pattern2`
 - `denylist=pattern1,pattern2`
+
+## Registry diagnostics (no DB writes)
+```bash
+npm run catalog:registry:stats -- --limit 100 --pages 120
+```
+
+This command only reads MCP Registry pages and helps confirm expected totals vs. configured pagination bounds.
 
 ## Response signals
 Important fields in response JSON:

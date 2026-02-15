@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { AuthType, ServerStatus, VerificationLevel } from "@/lib/types";
 const DEFAULT_REGISTRY_URL = "https://registry.modelcontextprotocol.io/v0.1/servers";
 const DEFAULT_PAGE_LIMIT = 100;
-const DEFAULT_MAX_PAGES = 60;
+const DEFAULT_MAX_PAGES = 120;
 const MAX_PAGE_LIMIT = 100;
 const MAX_PAGES = 200;
 const UPSERT_CHUNK_SIZE = 50;
