@@ -19,6 +19,7 @@ import { getLocale as getServerLocale } from "@/lib/i18n-server";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const isVercelDeployment = process.env.VERCEL === "1" || process.env.VERCEL === "true";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -98,8 +99,8 @@ export default async function RootLayout({
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
             <Toaster richColors position="top-right" />
-            <ConsentAnalytics initialAnalyticsAllowed={initialAnalyticsAllowed} />
-            <SpeedInsightsClient />
+            {isVercelDeployment ? <ConsentAnalytics initialAnalyticsAllowed={initialAnalyticsAllowed} /> : null}
+            {isVercelDeployment ? <SpeedInsightsClient /> : null}
           </div>
         </LocaleProvider>
       </body>
