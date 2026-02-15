@@ -7,7 +7,13 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SpeedInsightsClient } from "@/components/speed-insights-client";
 import { Toaster } from "@/components/ui/sonner";
-import { COOKIE_CONSENT_COOKIE_KEY, parseCookieConsent } from "@/lib/cookie-consent";
+import {
+  COOKIE_CONSENT_COOKIE_KEY,
+  COOKIE_CONSENT_PROFILE_COOKIE_KEY,
+  cookieConsentChoiceToProfile,
+  parseCookieConsent,
+  parseCookieConsentProfile,
+} from "@/lib/cookie-consent";
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
 import "./globals.css";
@@ -70,7 +76,13 @@ export default async function RootLayout({
 }>) {
   const locale = await getServerLocale();
   const cookieStore = await cookies();
+
   const initialConsent = parseCookieConsent(cookieStore.get(COOKIE_CONSENT_COOKIE_KEY)?.value ?? null);
+  const initialProfile =
+    parseCookieConsentProfile(cookieStore.get(COOKIE_CONSENT_PROFILE_COOKIE_KEY)?.value ?? null) ??
+    (initialConsent ? cookieConsentChoiceToProfile(initialConsent) : null);
+
+  const initialAnalyticsAllowed = initialProfile?.analytics ?? false;
 
   return (
     <html lang={locale} className="dark" data-theme="cosmic-burst" data-scroll-behavior="smooth">
@@ -84,9 +96,9 @@ export default async function RootLayout({
             <SiteHeader locale={locale} />
             <main className="relative z-10 flex-1">{children}</main>
             <SiteFooter locale={locale} />
-            <CookieConsentBanner initialConsent={initialConsent} />
+            <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
             <Toaster richColors position="top-right" />
-            <ConsentAnalytics initialConsent={initialConsent} />
+            <ConsentAnalytics initialAnalyticsAllowed={initialAnalyticsAllowed} />
             <SpeedInsightsClient />
           </div>
         </LocaleProvider>

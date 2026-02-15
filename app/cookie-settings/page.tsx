@@ -14,11 +14,11 @@ const cookieTypes = [
   },
   {
     title: "Preference and UX",
-    description: "Stores interface preferences like locale and consent choices.",
+    description: "Stores optional interface preferences and user experience personalization.",
   },
   {
     title: "Analytics (optional)",
-    description: "Used to understand usage patterns only when you allow all cookies.",
+    description: "Used only if analytics is enabled in your cookie preferences.",
   },
 ] as const;
 
@@ -100,3 +100,4 @@ export default async function CookieSettingsRoute() {
     </div>
   );
 }
+

@@ -1,25 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Cookie, X } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
 import {
   COOKIE_CONSENT_EVENT,
   COOKIE_CONSENT_OPEN_EVENT,
-  getCookieConsent,
+  cookieConsentProfileToChoice,
   setCookieConsent,
   type CookieConsentChoice,
+  type CookieConsentProfile,
 } from "@/lib/cookie-consent";
 import { tr } from "@/lib/i18n";
 
 type CookieConsentBannerProps = {
   initialConsent: CookieConsentChoice | null;
+  initialProfile: CookieConsentProfile | null;
 };
 
-export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps) {
+export function CookieConsentBanner({ initialConsent, initialProfile }: CookieConsentBannerProps) {
   const locale = useLocale();
-  const [consent, setConsent] = useState<CookieConsentChoice | null>(initialConsent);
+
+  const fallbackConsent = useMemo(() => {
+    if (initialConsent) {
+      return initialConsent;
+    }
+
+    if (initialProfile) {
+      return cookieConsentProfileToChoice(initialProfile);
+    }
+
+    return null;
+  }, [initialConsent, initialProfile]);
+
+  const [consent, setConsent] = useState<CookieConsentChoice | null>(fallbackConsent);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const isVisible = consent === null || isSettingsOpen;
@@ -35,10 +50,7 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
 
       if (nextValue === "all" || nextValue === "necessary" || nextValue === null) {
         setConsent(nextValue);
-        return;
       }
-
-      setConsent(getCookieConsent());
     }
 
     window.addEventListener(COOKIE_CONSENT_OPEN_EVENT, handleOpenEvent);

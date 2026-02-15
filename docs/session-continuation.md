@@ -1,5 +1,33 @@
-ï»¿## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
-- Objective: finalize â€œÐŸÐ¾Ñ‡Ð¸Ð½Ð¸â€ follow-up by ensuring lint/build are stable after security hardening pass.
+## Latest Update (2026-02-15, Granular Cookie Preferences + Default Policy)
+- Objective: add selectable cookie categories (preferences/analytics), keep a clear default policy, and keep compatibility with existing all/necessary consent flow.
+- Status: completed (implementation + verification).
+- Touched files:
+  - `lib/cookie-consent.ts`
+  - `app/api/cookie-consent/route.ts`
+  - `app/layout.tsx`
+  - `components/consent-analytics.tsx`
+  - `components/cookie-consent-banner.tsx`
+  - `components/cookie-settings-page.tsx`
+  - `app/cookie-settings/page.tsx`
+  - `lib/analytics/track-consented.ts`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added granular consent profile model (`necessary` + optional `preferences` + `analytics`) with default policy `necessary-only`.
+  - Added profile storage in cookie + localStorage and compatibility bridge to legacy `all|necessary` choice.
+  - Extended consent API (`/api/cookie-consent`) to read/write both `consent` and `profile`.
+  - Updated layout to hydrate consent/profile snapshot from server cookies.
+  - Updated analytics gate to use profile-level `analytics` flag.
+  - Updated cookie settings UI to support category selection, save selected cookies, and explicit default policy messaging.
+  - Kept banner quick actions (`Accept All` / `Necessary Only`) and manage preferences path.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - Playwright smoke (manual script, local start) -> pass (`/api/cookie-consent` returns expected profile after custom and necessary-only selections)
+- Open risks:
+  - Local environment may keep occupied ports from background Next processes; use alternate port for manual verification.
+## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
+- Objective: finalize “Ïî÷èíè” follow-up by ensuring lint/build are stable after security hardening pass.
 - Status: completed.
 - Touched files:
   - `eslint.config.mjs`
@@ -2410,10 +2438,11 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - Admin role seed: pass (`dezveer2@gmail.com` -> `super_admin`)
   - UTF-8 strict: pass
   - lint: fail (unrelated pre-existing binary/corrupted files: `components/catalog-section.tsx`, `components/catalog-taxonomy-panel.tsx`)
-  - build: fail for same unrelated corrupted files (unexpected `ï¿½` characters)
+  - build: fail for same unrelated corrupted files (unexpected `?` characters)
 - Notes:
   - The admin rollout objective is complete (DB schema + role seed done remotely).
   - Current lint/build failures are outside admin scope and come from existing catalog file corruption in the working tree.
+
 
 
 
