@@ -184,7 +184,7 @@ export function AuthResetPasswordPanel() {
             {tr(locale, "Auth is not configured", "Auth is not configured")}
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-amber-50/85">
-            {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to reset passwords.", "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to reset passwords.")}
+            {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.")}
           </p>
           <Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-indigo-950 hover:bg-amber-200">
             <Link href="/auth">{tr(locale, "Open login page", "Open login page")}</Link>

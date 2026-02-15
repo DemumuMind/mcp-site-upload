@@ -12,7 +12,7 @@ Keep the MCP catalog auto-filled from the public MCP Registry with zero manual m
 - Override with `CATALOG_AUTOSYNC_REGISTRY_URL`
 
 ## Runtime settings
-- `CATALOG_AUTOSYNC_PAGE_LIMIT` (default `100`, max `200`)
+- `CATALOG_AUTOSYNC_PAGE_LIMIT` (default `100`, max `100`)
 - `CATALOG_AUTOSYNC_MAX_PAGES` (default `60`, max `200`)
 - `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` (default `true`)
 - `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` (default `true`)

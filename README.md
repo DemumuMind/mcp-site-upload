@@ -49,7 +49,9 @@ npm run dev
 | Variable | Required | Purpose |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | yes (for DB mode) | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes (for DB mode) | Supabase anon key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | one of two required (for DB mode) | Supabase legacy anon key |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | one of two required (for DB mode) | Supabase publishable key (preferred) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | optional fallback | legacy publishable-key alias supported by this app |
 | `NEXT_PUBLIC_SITE_URL` | recommended | Canonical URL for metadata/sitemap |
 | `SUPABASE_SERVICE_ROLE_KEY` | required for admin + health updates | server-side privileged Supabase access |
 | `ADMIN_AUTH_MODE` | optional | admin auth mode: `hybrid` (default), `supabase`, or `token` |
@@ -214,7 +216,9 @@ Deployment prerequisites (GitHub + Vercel integration):
 1. Import repository into Vercel.
 2. Configure required env vars for Production:
    - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - one of:
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ADMIN_ACCESS_TOKEN`
    - `CRON_SECRET` (or route-specific cron secrets)

@@ -2,13 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabasePublicEnv } from "@/lib/supabase/env";
 export function createSupabaseProxyAuthClient(request: NextRequest): {
     supabaseClient: SupabaseClient;
     getResponse: () => NextResponse;
 } | null {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) {
+    const env = getSupabasePublicEnv();
+    if (!env) {
         return null;
     }
     const state = {
@@ -18,7 +18,7 @@ export function createSupabaseProxyAuthClient(request: NextRequest): {
             },
         }),
     };
-    const supabaseClient = createServerClient(supabaseUrl, supabaseAnonKey, {
+    const supabaseClient = createServerClient(env.supabaseUrl, env.supabasePublishableKey, {
         cookies: {
             getAll() {
                 return request.cookies.getAll();

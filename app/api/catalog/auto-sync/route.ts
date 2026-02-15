@@ -105,7 +105,7 @@ async function runCatalogAutoSync(request: NextRequest) {
     }
     const envPageLimit = parseNumberEnv("CATALOG_AUTOSYNC_PAGE_LIMIT", DEFAULT_PAGE_LIMIT, {
         min: 1,
-        max: 200,
+        max: 100,
     });
     const envMaxPages = parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_MAX_PAGES, {
         min: 1,
@@ -117,7 +117,7 @@ async function runCatalogAutoSync(request: NextRequest) {
     const envDenylistPatterns = parsePatternListEnv("CATALOG_AUTOSYNC_DENYLIST_PATTERNS");
     const pageLimit = parseNumber(request.nextUrl.searchParams.get("limit"), envPageLimit, {
         min: 1,
-        max: 200,
+        max: 100,
     });
     const maxPages = parseNumber(request.nextUrl.searchParams.get("pages"), envMaxPages, {
         min: 1,

@@ -2,13 +2,16 @@ import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { getSupabasePublicEnv } from "@/lib/supabase/env";
 function getSupabaseAuthEnv() {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) {
+    const env = getSupabasePublicEnv();
+    if (!env) {
         return null;
     }
-    return { supabaseUrl, supabaseAnonKey };
+    return {
+        supabaseUrl: env.supabaseUrl,
+        supabaseAnonKey: env.supabasePublishableKey,
+    };
 }
 export async function createSupabaseServerAuthClient(): Promise<SupabaseClient | null> {
     const env = getSupabaseAuthEnv();

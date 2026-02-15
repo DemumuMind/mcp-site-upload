@@ -1,11 +1,11 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { getSupabasePublicEnv } from "@/lib/supabase/env";
 export function createSupabaseServerClient(): SupabaseClient | null {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) {
+    const env = getSupabasePublicEnv();
+    if (!env) {
         return null;
     }
-    return createClient(supabaseUrl, supabaseAnonKey, {
+    return createClient(env.supabaseUrl, env.supabasePublishableKey, {
         auth: {
             persistSession: false,
             autoRefreshToken: false,

@@ -1,3 +1,40 @@
+## Latest Update (2026-02-15, Catalog Count Recovery Hardening + Auto-Sync Guard)
+- Objective: fix incorrect catalog totals caused by fallback-mode execution and prevent silent auto-sync breakage from invalid registry page-size configuration.
+- Status: completed.
+- Touched files:
+  - `lib/supabase/env.ts` (new)
+  - `lib/supabase/browser.ts`
+  - `lib/supabase/auth-server.ts`
+  - `lib/supabase/server.ts`
+  - `lib/supabase/proxy-auth.ts`
+  - `lib/supabase/admin.ts`
+  - `app/api/catalog/auto-sync/route.ts`
+  - `lib/catalog/registry-sync.ts`
+  - `components/submission-access-panel.tsx`
+  - `components/submit-server-wizard.tsx`
+  - `components/auth-sign-in-panel.tsx`
+  - `components/auth-reset-password-panel.tsx`
+  - `README.md`
+  - `.env.example`
+  - `docs/catalog-automation.md`
+  - `docs/session-continuation.md`
+- Implemented:
+  - Added centralized Supabase env resolver with trimming and key fallback support:
+    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+  - Rewired all Supabase client factories (browser/server/auth/proxy/admin) to use normalized env resolution.
+  - Updated user-facing auth/submission guidance text to reference publishable-key compatibility.
+  - Hardened catalog auto-sync page-size bounds from `max=200` to `max=100` (registry-compatible) in both route parsing and sync engine limits.
+  - Updated env/docs to reflect publishable-key compatibility and corrected page-limit constraints.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - If deployment is still missing **all** supported publishable key vars, app will continue using fallback/mock catalog mode by design.
+  - Existing production Supabase dataset quality still depends on successful cron auth/secrets and auto-sync execution.
+
 ## Latest Update (2026-02-15, Submit Route Guard Enforcement)
 - Objective: enforce `/submit-server` as an authenticated route at edge/proxy level (not only at final server action).
 - Status: completed.

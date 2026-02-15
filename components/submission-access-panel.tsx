@@ -30,7 +30,7 @@ export function SubmissionAccessPanel() {
           {tr(locale, "Auth is not configured", "Auth is not configured")}
         </h4>
         <p className="mt-2 text-sm text-amber-100/90">
-          {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable server submissions.", "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable server submissions.")}
+          {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable server submissions.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable server submissions.")}
         </p>
         <Button asChild className="mt-4 bg-blue-500 hover:bg-blue-400">
           <Link href="/auth">{tr(locale, "Open sign in page", "Open sign in page")}</Link>
