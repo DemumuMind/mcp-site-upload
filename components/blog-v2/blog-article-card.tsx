@@ -18,7 +18,7 @@ function formatDate(value: string): string {
 
 export function BlogArticleCard({ post }: BlogArticleCardProps) {
   return (
-    <Card className="group h-full border-slate-700/70 bg-slate-950/72 shadow-[0_0_0_1px_rgba(35,52,95,0.25),0_22px_64px_rgba(2,8,24,0.56)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-primary/35">
+    <Card className="group h-full border-slate-700/70 bg-slate-950/72 shadow-[0_0_0_1px_rgba(35,52,95,0.25),0_22px_64px_rgba(2,8,24,0.56)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.005] hover:border-primary/35">
       <CardHeader className="space-y-3 pb-3">
         <div className="flex flex-wrap gap-2">
           {post.topics.map((topic) => (

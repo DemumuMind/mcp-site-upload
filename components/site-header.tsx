@@ -57,11 +57,11 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-blacksmith bg-[rgba(9,9,9,0.88)] backdrop-blur-xl transition-all duration-300 ${
+      className={`sticky top-0 z-40 border-b border-blacksmith bg-[rgba(9,9,9,0.88)] backdrop-blur-xl transition-all duration-200 ${
         isScrolled ? "shadow-[0_6px_24px_rgba(0,0,0,0.35)]" : ""
       }`}
     >
-      <div className={`section-shell flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-300 ${isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"}`}>
+      <div className={`section-shell flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-200 ${isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"}`}>
         <Link
           className="inline-flex min-h-11 items-center rounded-md text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           href="/"
