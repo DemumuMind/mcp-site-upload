@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 # next.js
 /.next/
@@ -57,5 +59,11 @@ ops/backup-manifest.json
 bridgemind-agents-full/
 bridgemind-prompts-full/
 bridgemind-skills-full/
+
+AGENTS.local.md
+
+CLAUDE.local.md
+
+AGENTS.local.md
 
 AGENTS.local.md

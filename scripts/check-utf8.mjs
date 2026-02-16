@@ -104,6 +104,28 @@ async function getTrackedFiles() {
     .filter(Boolean);
 }
 
+async function getDeletedTrackedFiles() {
+  const [unstaged, staged] = await Promise.all([
+    execFileAsync("git", ["diff", "--name-only", "--diff-filter=D"], {
+      windowsHide: true,
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+    }),
+    execFileAsync("git", ["diff", "--cached", "--name-only", "--diff-filter=D"], {
+      windowsHide: true,
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+    }),
+  ]);
+
+  const names = `${unstaged.stdout}\n${staged.stdout}`
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return new Set(names);
+}
+
 async function main() {
   const strictMissing = process.argv.includes("--strict-missing");
   const showHelp = process.argv.includes("--help") || process.argv.includes("-h");
@@ -116,6 +138,7 @@ async function main() {
 
   const decoder = new TextDecoder("utf-8", { fatal: true });
   const trackedFiles = await getTrackedFiles();
+  const deletedTrackedFiles = await getDeletedTrackedFiles();
   const filesToCheck = trackedFiles.filter(isTextFileCandidate);
 
   const invalidUtf8Files = [];
@@ -127,7 +150,9 @@ async function main() {
       content = await readFile(filePath);
     } catch (error) {
       if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
-        missingFiles.push(filePath);
+        if (!deletedTrackedFiles.has(filePath)) {
+          missingFiles.push(filePath);
+        }
         continue;
       }
       throw error;
