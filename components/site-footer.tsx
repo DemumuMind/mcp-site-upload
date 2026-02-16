@@ -23,7 +23,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
 
   return (
     <footer className="border-t border-blacksmith bg-background">
-      <div className="section-shell grid gap-10 py-14 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="section-shell grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-5">
           <Link
             href="/"
@@ -31,7 +31,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           >
             <BrandLockup className="gap-2.5" markClassName="size-8" textClassName="text-3xl tracking-[0.05em] sm:text-4xl" subtitle="MCP Directory" />
           </Link>
-          <p className="max-w-sm text-sm text-muted-foreground">
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
             {tr(
               locale,
               "Community-curated MCP directory for discovering trusted servers, reviewing auth and verification signals, and submitting integrations.",

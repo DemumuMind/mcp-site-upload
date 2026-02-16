@@ -21,10 +21,10 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
 
   return (
     <section className="border-y border-blacksmith bg-background">
-      <div className="section-shell grid gap-6 py-18 lg:grid-cols-[1fr_1.15fr] lg:items-center">
+      <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.15fr] lg:items-center">
         <div className="space-y-4">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
-          <p className="max-w-xl text-muted-foreground">{content.description}</p>
+          <h2 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
+          <p className="max-w-xl leading-relaxed text-muted-foreground">{content.description}</p>
 
           <div className="max-w-xs space-y-2">
             <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">{content.selectorLabel}</p>
@@ -43,7 +43,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Card className="border-blacksmith bg-black/30">
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">Legacy process</CardTitle>
@@ -62,7 +62,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
               <p><span className="text-muted-foreground">Effort:</span> {selectedStack.demumuCost}</p>
             </CardContent>
           </Card>
-          <p className="sm:col-span-2 text-sm text-muted-foreground">{selectedStack.summary}</p>
+          <p className="sm:col-span-2 text-sm leading-relaxed text-muted-foreground">{selectedStack.summary}</p>
         </div>
       </div>
     </section>

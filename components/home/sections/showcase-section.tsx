@@ -8,10 +8,10 @@ type ShowcaseSectionProps = {
 export function ShowcaseSection({ content }: ShowcaseSectionProps) {
   return (
     <section className="border-y border-blacksmith bg-black/20">
-      <div className="section-shell space-y-7 py-18">
+      <div className="section-shell space-y-8 py-20">
         <div className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
-          <p className="mx-auto max-w-3xl text-muted-foreground">{content.description}</p>
+          <p className="mx-auto max-w-3xl leading-relaxed text-muted-foreground">{content.description}</p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
