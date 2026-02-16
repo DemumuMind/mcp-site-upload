@@ -15,7 +15,8 @@ type TrustSignalsSectionProps = {
 
 export function TrustSignalsSection({ content, featuredServers, topCategories, topLanguages }: TrustSignalsSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-black/20">
+    <section className="relative overflow-hidden border-y border-blacksmith bg-black/20">
+      <div className="section-pan pointer-events-none absolute -left-16 bottom-12 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.05fr]">
         <div className="space-y-6">
           <h3 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">{content.heading}</h3>

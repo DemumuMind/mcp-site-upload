@@ -7,7 +7,8 @@ type ShowcaseSectionProps = {
 
 export function ShowcaseSection({ content }: ShowcaseSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-black/20">
+    <section className="relative overflow-hidden border-y border-blacksmith bg-black/20">
+      <div className="section-pan pointer-events-none absolute -right-20 top-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell space-y-8 py-20">
         <div className="home-reveal home-delay-0 space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>

@@ -20,7 +20,8 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
   if (!selectedStack) return null;
 
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="relative overflow-hidden border-y border-blacksmith bg-background">
+      <div className="section-pan pointer-events-none absolute -left-20 top-12 h-52 w-52 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.15fr] lg:items-center">
         <div className="home-reveal home-delay-0 space-y-4">
           <h2 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>

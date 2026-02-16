@@ -105,7 +105,7 @@ export default async function RootLayout({
 
             <SiteHeader locale={locale} />
             <AuthHashRedirector />
-            <main className="relative z-10 flex-1">{children}</main>
+            <main className="page-enter relative z-10 flex-1">{children}</main>
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
             <Toaster richColors position="top-right" />

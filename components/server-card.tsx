@@ -55,7 +55,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
   return (
     <Card
       className={cn(
-        "flex h-full flex-col overflow-hidden border-blacksmith bg-card shadow-[0_16px_40px_-28px_rgba(15,23,42,0.95)] transition duration-200 hover:border-blue-400/45 hover:shadow-[0_24px_45px_-30px_rgba(59,130,246,0.45)]",
+        "group flex h-full flex-col overflow-hidden border-blacksmith bg-card shadow-[0_16px_40px_-28px_rgba(15,23,42,0.95)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-blue-400/45 hover:shadow-[0_24px_45px_-30px_rgba(59,130,246,0.45)]",
         viewMode === "list" && "md:grid md:grid-cols-[220px_1fr]",
       )}
     >
@@ -103,7 +103,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
       <div className="flex min-w-0 flex-1 flex-col">
         <CardHeader className="space-y-2 pb-3">
           <CardTitle className="min-h-[2.75rem] text-base leading-tight text-foreground sm:text-lg">
-            <Link className="line-clamp-2 transition hover:text-primary" href={`/server/${mcpServer.slug}`}>
+            <Link className="line-clamp-2 transition group-hover:text-primary hover:text-primary" href={`/server/${mcpServer.slug}`}>
               {mcpServer.name}
             </Link>
           </CardTitle>
