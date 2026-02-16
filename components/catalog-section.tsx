@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, FilterX, Loader2, SearchX, X } from "lucide-react";
@@ -412,36 +412,36 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         };
     }, [isMobileFiltersOpen]);
     return (<div className="space-y-4">
-      <div className="sticky top-14 z-30 rounded-2xl border border-white/15 bg-indigo-950/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
+      <div className="sticky top-14 z-30 rounded-2xl border border-blacksmith bg-indigo-950/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
         <CatalogFilterBar searchQuery={searchInputValue} sortField={queryState.sortBy} sortDirection={queryState.sortDir} pageSize={queryState.pageSize} viewMode={queryState.layout} activeFilterCount={activeFilterCount} isMobileFiltersOpen={isMobileFiltersOpen} onSearchQueryChange={setSearchInputValue} onSortFieldChange={handleSortFieldChange} onSortDirectionChange={handleSortDirectionChange} onPageSizeChange={handlePageSizeChange} onViewModeChange={handleViewModeChange} onToggleMobileFilters={() => setIsMobileFiltersOpen((current) => !current)}/>
       </div>
 
-      {activeFilterChips.length > 0 ? (<div className="rounded-xl border border-white/12 bg-indigo-950/80 p-2.5 shadow-[0_16px_32px_-24px_rgba(15,23,42,0.9)] backdrop-blur">
+      {activeFilterChips.length > 0 ? (<div className="rounded-xl border border-blacksmith bg-card p-2.5 shadow-[0_16px_32px_-24px_rgba(15,23,42,0.9)] backdrop-blur">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-semibold tracking-[0.08em] text-violet-300 uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
               {tr(locale, "Active filters", "Active filters")}
             </p>
 
-            {activeFilterChips.map((chip) => (<button key={chip.key} type="button" onClick={chip.onRemove} className="inline-flex max-w-full items-center gap-1 rounded-full border border-white/15 bg-indigo-900/75 px-2.5 py-1 text-xs text-violet-100 transition hover:bg-indigo-800 hover:text-white">
+            {activeFilterChips.map((chip) => (<button key={chip.key} type="button" onClick={chip.onRemove} className="inline-flex max-w-full items-center gap-1 rounded-full border border-blacksmith bg-card px-2.5 py-1 text-xs text-foreground transition hover:bg-accent hover:text-foreground">
                 <span className="max-w-[170px] truncate">{chip.label}</span>
                 <X className="size-3"/>
               </button>))}
 
-            <Button type="button" variant="ghost" size="xs" onClick={handleClearAllFilters} className="text-violet-200 hover:bg-indigo-800 hover:text-violet-50 sm:ml-auto">
+            <Button type="button" variant="ghost" size="xs" onClick={handleClearAllFilters} className="text-muted-foreground hover:bg-accent hover:text-foreground sm:ml-auto">
               <FilterX className="size-3.5"/>
               {tr(locale, "Clear all", "Clear all")}
             </Button>
           </div>
         </div>) : null}
 
-      <div className="space-y-1 text-sm text-violet-100">
+      <div className="space-y-1 text-sm text-foreground">
         <p>
           {tr(locale, `${result.total} tools found`, `${result.total} tools found`)}
         </p>
-        {result.total > 0 ? (<p className="text-xs text-violet-300">
+        {result.total > 0 ? (<p className="text-xs text-muted-foreground">
             {tr(locale, `Showing ${firstVisibleIndex}-${lastVisibleIndex} on this page`, `Showing ${firstVisibleIndex}-${lastVisibleIndex} on this page`)}
           </p>) : null}
-        {isLoading ? (<p className="inline-flex items-center gap-1.5 text-xs text-violet-300">
+        {isLoading ? (<p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Loader2 className="size-3.5 animate-spin"/>
             {tr(locale, "Refreshing catalog...", "Refreshing catalog...")}
           </p>) : null}
@@ -452,7 +452,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       </div>
 
       {isMobileFiltersOpen ? (<>
-          <button type="button" className="fixed inset-0 z-40 bg-indigo-950/65 backdrop-blur-[1.5px] lg:hidden" onClick={() => setIsMobileFiltersOpen(false)} aria-label={tr(locale, "Close filters", "Close filters")}/>
+          <button type="button" className="fixed inset-0 z-40 bg-card backdrop-blur-[1.5px] lg:hidden" onClick={() => setIsMobileFiltersOpen(false)} aria-label={tr(locale, "Close filters", "Close filters")}/>
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm p-3 lg:hidden">
             <CatalogTaxonomyPanel mode="filters" panelId="catalog-mobile-filters" className="h-full overflow-y-auto" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.pricing} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters} onRequestClose={() => setIsMobileFiltersOpen(false)}/>
           </div>
@@ -468,30 +468,30 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
               </div>
 
               {result.totalPages > 1 ? (<div className="flex flex-wrap items-center justify-center gap-1" role="navigation" aria-label="Catalog pagination">
-                  <Button type="button" variant="ghost" size="xs" onClick={() => setCatalogPage(result.page - 1)} disabled={result.page <= 1} aria-label={tr(locale, "Previous page", "Previous page")} className="text-violet-200 hover:bg-indigo-800 hover:text-violet-50">
+                  <Button type="button" variant="ghost" size="xs" onClick={() => setCatalogPage(result.page - 1)} disabled={result.page <= 1} aria-label={tr(locale, "Previous page", "Previous page")} className="text-muted-foreground hover:bg-accent hover:text-foreground">
                     {tr(locale, "Prev", "Prev")}
                   </Button>
 
-                  {paginationEntries.map((entry, index) => entry === "ellipsis" ? (<span key={`ellipsis-${index}`} className="inline-flex h-6 min-w-8 items-center justify-center px-1 text-xs text-violet-400" aria-hidden>
+                  {paginationEntries.map((entry, index) => entry === "ellipsis" ? (<span key={`ellipsis-${index}`} className="inline-flex h-6 min-w-8 items-center justify-center px-1 text-xs text-muted-foreground" aria-hidden>
                         ...
                       </span>) : (<Button key={`page-${entry}`} type="button" variant={entry === result.page ? "default" : "ghost"} size="xs" onClick={() => setCatalogPage(entry)} aria-current={entry === result.page ? "page" : undefined} className={entry === result.page
-                        ? "min-w-8 bg-blue-600 text-white hover:bg-blue-500"
-                        : "min-w-8 text-violet-200 hover:bg-indigo-800 hover:text-violet-50"}>
+                        ? "min-w-8 bg-blue-600 text-foreground hover:bg-blue-500"
+                        : "min-w-8 text-muted-foreground hover:bg-accent hover:text-foreground"}>
                         {entry}
                       </Button>))}
 
-                  <Button type="button" variant="ghost" size="xs" onClick={() => setCatalogPage(result.page + 1)} disabled={result.page >= result.totalPages} aria-label={tr(locale, "Next page", "Next page")} className="text-violet-200 hover:bg-indigo-800 hover:text-violet-50">
+                  <Button type="button" variant="ghost" size="xs" onClick={() => setCatalogPage(result.page + 1)} disabled={result.page >= result.totalPages} aria-label={tr(locale, "Next page", "Next page")} className="text-muted-foreground hover:bg-accent hover:text-foreground">
                     {tr(locale, "Next", "Next")}
                   </Button>
                 </div>) : null}
-            </div>) : (<Card className="border-white/12 bg-indigo-950/85 shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
+            </div>) : (<Card className="border-blacksmith bg-card shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-violet-50">
-                  <SearchX className="size-4 text-violet-300"/>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <SearchX className="size-4 text-muted-foreground"/>
                   {tr(locale, "No tools found", "No tools found")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-violet-100">
+              <CardContent className="text-sm text-foreground">
                 {tr(locale, "Try another search query or reset categories/tags/access filters.", "Try another search query or reset categories/tags/access filters.")}
               </CardContent>
             </Card>)}
@@ -499,3 +499,4 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       </div>
     </div>);
 }
+

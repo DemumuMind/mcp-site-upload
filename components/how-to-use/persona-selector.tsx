@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,33 +17,33 @@ type PersonaSelectorProps = {
 export function PersonaSelector({ title, description, scenarios, selectedPersona, chooseLabel, selectedLabel, onSelect, }: PersonaSelectorProps) {
     return (<div className="space-y-4">
       <div className="space-y-2">
-        <h2 className="text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">{title}</h2>
-        <p className="text-sm leading-7 text-violet-200 sm:text-base">{description}</p>
+        <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{title}</h2>
+        <p className="text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {scenarios.map((scenario) => {
             const isSelected = scenario.id === selectedPersona;
-            return (<Card key={scenario.id} className={cn("border-white/10 bg-indigo-950/75 transition duration-300", isSelected
-                    ? "border-cyan-400/45 shadow-[0_0_0_1px_rgba(34,211,238,0.22)]"
-                    : "hover:-translate-y-1 hover:border-cyan-400/35")}>
+            return (<Card key={scenario.id} className={cn("border-blacksmith bg-card transition duration-300", isSelected
+                    ? "border-primary/45 shadow-[0_0_0_1px_rgba(34,211,238,0.22)]"
+                    : "hover:-translate-y-1 hover:border-primary/35")}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-3">
-                  <Badge variant="outline" className={cn("border-cyan-400/30 bg-cyan-500/10 text-cyan-200", isSelected && "border-emerald-400/40 bg-emerald-500/10 text-emerald-200")}>
+                  <Badge variant="outline" className={cn("border-primary/30 bg-primary/10 text-primary", isSelected && "border-emerald-400/40 bg-primary/10 text-primary")}>
                     {scenario.badge}
                   </Badge>
-                  {isSelected ? (<span className="inline-flex items-center gap-1 text-xs text-emerald-300">
+                  {isSelected ? (<span className="inline-flex items-center gap-1 text-xs text-primary">
                       <CheckCircle2 className="size-3.5"/>
                       {selectedLabel}
                     </span>) : null}
                 </div>
-                <CardTitle className="text-xl text-violet-50">{scenario.title}</CardTitle>
+                <CardTitle className="text-xl text-foreground">{scenario.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm leading-7 text-violet-200">{scenario.description}</p>
+                <p className="text-sm leading-7 text-muted-foreground">{scenario.description}</p>
                 <Button type="button" variant={isSelected ? "default" : "outline"} className={cn("h-10 rounded-xl", isSelected
-                    ? "bg-emerald-500 text-white hover:bg-emerald-400"
-                    : "border-white/20 bg-indigo-900/70 text-violet-50 hover:bg-indigo-900")} onClick={() => onSelect(scenario.id)}>
+                    ? "bg-emerald-500 text-foreground hover:bg-emerald-400"
+                    : "border-blacksmith bg-card text-foreground hover:bg-accent")} onClick={() => onSelect(scenario.id)}>
                   {isSelected ? selectedLabel : chooseLabel}
                 </Button>
               </CardContent>
@@ -52,3 +52,4 @@ export function PersonaSelector({ title, description, scenarios, selectedPersona
       </div>
     </div>);
 }
+

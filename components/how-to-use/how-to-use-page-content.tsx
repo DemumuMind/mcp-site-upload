@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, ListChecks, ShieldCheck, Sparkles, TriangleAlert, } from "lucide-react";
@@ -68,36 +68,36 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
         label: content.heroActions.primaryLabel,
         variant: "primary",
     };
-    return (<div className="relative overflow-hidden border-t border-white/10">
+    return (<div className="relative overflow-hidden border-t border-blacksmith">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02070f_0%,#030a15_42%,#050814_100%)]"/>
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(circle_at_14%_4%,rgba(56,189,248,0.28),transparent_42%),radial-gradient(circle_at_84%_6%,rgba(59,130,246,0.18),transparent_38%)]"/>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(56,189,248,0.06)_1px,transparent_1px),linear-gradient(rgba(56,189,248,0.05)_1px,transparent_1px)] bg-[size:42px_42px] opacity-30"/>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-6 pt-10 sm:px-6 sm:pt-14">
-        <div className="space-y-5 rounded-3xl border border-cyan-400/25 bg-indigo-950/72 p-6 sm:p-10">
-          <Badge className="w-fit border-cyan-400/35 bg-cyan-500/10 text-cyan-200">
+        <div className="space-y-5 rounded-3xl border border-primary/30 bg-card p-6 sm:p-10">
+          <Badge className="w-fit border-primary/35 bg-primary/10 text-primary">
             <Sparkles className="size-3"/>
             {sectionCopy?.eyebrow ?? tr(locale, "Developer-First Onboarding", "Developer-First Onboarding")}
           </Badge>
 
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight text-violet-50 sm:text-6xl">
+            <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
               {sectionCopy?.heroTitle ?? tr(locale, "Setup Guide", "Setup Guide")}
             </h1>
-            <p className="max-w-4xl text-base leading-8 text-violet-200 sm:text-lg">
+            <p className="max-w-4xl text-base leading-8 text-muted-foreground sm:text-lg">
               {sectionCopy?.heroDescription ??
             tr(locale, "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.", "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.")}
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button asChild className="h-11 rounded-xl bg-blue-500 px-6 text-white hover:bg-blue-400">
+            <Button asChild className="h-11 rounded-xl bg-blue-500 px-6 text-foreground hover:bg-blue-400">
               <Link href={heroCatalogAction.href} onClick={() => trackCtaClick(heroCatalogAction, "hero")}>
                 {heroCatalogAction.label}
                 <ArrowRight className="size-4"/>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="h-11 rounded-xl border-white/20 bg-indigo-950/70 text-violet-50 hover:bg-indigo-900">
+            <Button asChild variant="outline" className="h-11 rounded-xl border-blacksmith bg-card text-foreground hover:bg-accent">
               <Link href="#scenario-paths">
                 <ListChecks className="size-4"/>
                 {content.heroActions.secondaryLabel}
@@ -137,40 +137,40 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-        <div className="space-y-4 rounded-3xl border border-white/10 bg-indigo-950/72 p-6 sm:p-8">
+        <div className="space-y-4 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
           <div className="space-y-2">
-            <h2 className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">
-              <ShieldCheck className="size-6 text-cyan-300"/>
+            <h2 className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              <ShieldCheck className="size-6 text-primary"/>
               {content.trustChecks.title}
             </h2>
-            <p className="text-sm leading-7 text-violet-200 sm:text-base">{content.trustChecks.description}</p>
+            <p className="text-sm leading-7 text-muted-foreground sm:text-base">{content.trustChecks.description}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {content.trustChecks.items.map((item) => (<Card key={item.title} className="border-white/10 bg-indigo-900/70">
+            {content.trustChecks.items.map((item) => (<Card key={item.title} className="border-blacksmith bg-card">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-violet-50">{item.title}</CardTitle>
+                  <CardTitle className="text-lg text-foreground">{item.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm leading-7 text-violet-200">{item.description}</CardContent>
+                <CardContent className="text-sm leading-7 text-muted-foreground">{item.description}</CardContent>
               </Card>))}
           </div>
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-        <div className="space-y-4 rounded-3xl border border-white/10 bg-indigo-950/72 p-6 sm:p-8">
+        <div className="space-y-4 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
           <div className="space-y-2">
-            <h2 className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">
+            <h2 className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               <TriangleAlert className="size-6 text-amber-300"/>
               {content.troubleshooting.title}
             </h2>
-            <p className="text-sm leading-7 text-violet-200 sm:text-base">{content.troubleshooting.description}</p>
+            <p className="text-sm leading-7 text-muted-foreground sm:text-base">{content.troubleshooting.description}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {content.troubleshooting.items.map((item) => (<Card key={item.problem} className="border-white/10 bg-indigo-900/70">
+            {content.troubleshooting.items.map((item) => (<Card key={item.problem} className="border-blacksmith bg-card">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-violet-50">{item.problem}</CardTitle>
+                  <CardTitle className="text-lg text-foreground">{item.problem}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm leading-7 text-violet-200">{item.fix}</CardContent>
+                <CardContent className="text-sm leading-7 text-muted-foreground">{item.fix}</CardContent>
               </Card>))}
           </div>
         </div>
@@ -178,8 +178,8 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6">
         <CtaRail title={content.ctaRail.title} description={content.ctaRail.description} actions={content.ctaRail.actions} onActionClick={(action) => trackCtaClick(action, "final")}/>
-        <div className="mt-4 flex items-center gap-2 text-xs text-violet-300">
-          <CheckCircle2 className="size-4 text-emerald-300"/>
+        <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+          <CheckCircle2 className="size-4 text-primary"/>
           <span>
             {tr(locale, "Track clicks and completion milestones in analytics to compare conversion before and after redesign.", "Track clicks and completion milestones in analytics to compare conversion before and after redesign.")}
           </span>
@@ -187,3 +187,4 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
       </section>
     </div>);
 }
+

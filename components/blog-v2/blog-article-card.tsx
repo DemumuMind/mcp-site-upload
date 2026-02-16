@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,12 +22,12 @@ export function BlogArticleCard({ post }: BlogArticleCardProps) {
       <CardHeader className="space-y-3 pb-3">
         <div className="flex flex-wrap gap-2">
           {post.topics.map((topic) => (
-            <Badge key={topic.slug} variant="outline" className="border-cyan-400/35 bg-cyan-500/10 text-cyan-100">
+            <Badge key={topic.slug} variant="outline" className="border-primary/35 bg-primary/10 text-primary">
               {topic.name}
             </Badge>
           ))}
         </div>
-        <CardTitle className="text-xl leading-tight text-white">{post.title}</CardTitle>
+        <CardTitle className="text-xl leading-tight text-foreground">{post.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex h-full flex-col gap-4 text-sm text-slate-300">
         <p className="text-base leading-7 text-slate-200/90">{post.excerpt}</p>
@@ -42,7 +42,7 @@ export function BlogArticleCard({ post }: BlogArticleCardProps) {
           </span>
         </div>
 
-        <Link href={post.url} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-100 transition hover:text-cyan-50">
+        <Link href={post.url} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-cyan-50">
           Read article
           <ArrowRight className="size-4" />
         </Link>
@@ -50,3 +50,4 @@ export function BlogArticleCard({ post }: BlogArticleCardProps) {
     </Card>
   );
 }
+

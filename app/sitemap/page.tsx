@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, Compass } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -77,20 +77,20 @@ export default async function SitemapPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <div className="relative overflow-hidden border-t border-blacksmith">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#030711_0%,#060d1f_48%,#07091b_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_18%_9%,rgba(56,189,248,0.2),transparent_40%),radial-gradient(circle_at_82%_8%,rgba(129,140,248,0.18),transparent_42%)]" />
 
       <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <section className="rounded-3xl border border-cyan-400/20 bg-indigo-950/72 p-6 sm:p-10">
-          <Badge className="mb-4 border-cyan-400/35 bg-cyan-500/10 text-cyan-200">
+        <section className="rounded-3xl border border-primary/30 bg-card p-6 sm:p-10">
+          <Badge className="mb-4 border-primary/35 bg-primary/10 text-primary">
             <Compass className="size-3" />
             {tr(locale, "Navigation", "Navigation")}
           </Badge>
-          <h1 className="text-4xl font-semibold tracking-tight text-violet-50 sm:text-6xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
             {tr(locale, "DemumuMind Sitemap", "DemumuMind Sitemap")}
           </h1>
-          <p className="mt-4 max-w-4xl text-sm leading-8 text-violet-200 sm:text-lg">
+          <p className="mt-4 max-w-4xl text-sm leading-8 text-muted-foreground sm:text-lg">
             {tr(
               locale,
               "A full route index of the platform, grouped by product, company, account workflows, and legal pages.",
@@ -101,23 +101,23 @@ export default async function SitemapPage() {
 
         <section className="grid gap-4 lg:grid-cols-2">
           {sitemapGroups.map((group) => (
-            <Card key={group.title} className="border-white/10 bg-indigo-950/76">
+            <Card key={group.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl text-violet-50">{group.title}</CardTitle>
-                <p className="text-sm text-violet-300">{group.description}</p>
+                <CardTitle className="text-xl text-foreground">{group.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">{group.description}</p>
               </CardHeader>
               <CardContent className="space-y-2.5">
                 {group.links.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block rounded-xl border border-white/10 bg-indigo-900/65 px-4 py-3 transition hover:border-cyan-400/35 hover:bg-indigo-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80"
+                    className="block rounded-xl border border-blacksmith bg-card px-4 py-3 transition hover:border-primary/35 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                   >
-                    <span className="flex items-center justify-between gap-2 text-sm font-medium text-violet-50">
+                    <span className="flex items-center justify-between gap-2 text-sm font-medium text-foreground">
                       {item.label}
-                      <ArrowUpRight className="size-4 text-cyan-200" />
+                      <ArrowUpRight className="size-4 text-primary" />
                     </span>
-                    <span className="mt-1 block text-xs leading-6 text-violet-300">{item.hint}</span>
+                    <span className="mt-1 block text-xs leading-6 text-muted-foreground">{item.hint}</span>
                   </Link>
                 ))}
               </CardContent>
@@ -128,3 +128,4 @@ export default async function SitemapPage() {
     </div>
   );
 }
+

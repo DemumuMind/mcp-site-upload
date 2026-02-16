@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
+﻿import { ArrowLeft, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import Link from "next/link";
 import { BlogArticleMdx } from "@/components/blog-v2/blog-article-mdx";
 import { BlogEngagementTracker } from "@/components/blog-v2/blog-engagement-tracker";
@@ -36,7 +36,7 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-12">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-300 transition hover:text-white"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-300 transition hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to blog
@@ -46,13 +46,13 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
           <header className="space-y-5 border-b border-slate-700/65 pb-6">
             <div className="flex flex-wrap items-center gap-2">
               {post.topics.map((topic) => (
-                <Badge key={topic.slug} variant="outline" className="border-cyan-400/35 bg-cyan-500/10 text-cyan-100">
+                <Badge key={topic.slug} variant="outline" className="border-primary/35 bg-primary/10 text-primary">
                   {topic.name}
                 </Badge>
               ))}
             </div>
 
-            <h1 className="text-3xl leading-tight font-semibold tracking-tight text-white sm:text-5xl">{post.title}</h1>
+            <h1 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">{post.title}</h1>
             <p className="max-w-4xl text-base leading-8 text-slate-200/92">{post.excerpt}</p>
 
             <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.12em] text-slate-400 uppercase">
@@ -75,12 +75,12 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
 
         {related.length > 0 ? (
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">Related reading</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">Related reading</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {related.map((item) => (
                 <Card key={item.slug} className="border-slate-700/70 bg-slate-950/70">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg leading-tight text-white">{item.title}</CardTitle>
+                    <CardTitle className="text-lg leading-tight text-foreground">{item.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm text-slate-300">
                     <p className="line-clamp-3">{item.excerpt}</p>
@@ -92,7 +92,7 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
                         from_topic: primaryTag,
                         to_slug: item.slug,
                       }}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-100 transition hover:text-cyan-50"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-cyan-50"
                     >
                       Read article
                       <ArrowRight className="size-4" />
@@ -104,8 +104,8 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
           </section>
         ) : null}
 
-        <section className="rounded-3xl border border-cyan-500/25 bg-[linear-gradient(120deg,rgba(9,30,52,0.75),rgba(4,10,20,0.95))] p-6 sm:p-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Continue the conversation</h2>
+        <section className="rounded-3xl border border-primary/30 bg-[linear-gradient(120deg,rgba(9,30,52,0.75),rgba(4,10,20,0.95))] p-6 sm:p-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Continue the conversation</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-200 sm:text-base">
             Bring your production lessons and open questions to our weekly editorial queue.
           </p>
@@ -114,7 +114,7 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
               href="/contact"
               eventName="blog_cta_click"
               payload={{ location: "article_bottom", action: "contact_editorial_team", slug: post.slug }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
             >
               Contact editorial team
             </BlogTrackedLink>
@@ -132,3 +132,4 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
     </div>
   );
 }
+

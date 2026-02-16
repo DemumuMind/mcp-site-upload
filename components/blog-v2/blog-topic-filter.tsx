@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ export function BlogTopicFilter({ selectedTopic, topics }: BlogTopicFilterProps)
             "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition",
             normalizedSelected
               ? "border-slate-600/80 bg-slate-900/70 text-slate-300 hover:border-slate-500 hover:text-slate-100"
-              : "border-cyan-300/50 bg-cyan-500/12 text-cyan-100",
+              : "border-primary/50 bg-primary/10 text-primary",
           )}
         >
           All
@@ -46,7 +46,7 @@ export function BlogTopicFilter({ selectedTopic, topics }: BlogTopicFilterProps)
               className={cn(
                 "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                 isActive
-                  ? "border-cyan-300/50 bg-cyan-500/12 text-cyan-100"
+                  ? "border-primary/50 bg-primary/10 text-primary"
                   : "border-slate-600/80 bg-slate-900/70 text-slate-300 hover:border-slate-500 hover:text-slate-100",
               )}
             >
@@ -56,7 +56,7 @@ export function BlogTopicFilter({ selectedTopic, topics }: BlogTopicFilterProps)
                 className={cn(
                   "h-4 border px-1.5 text-[10px]",
                   isActive
-                    ? "border-cyan-300/55 bg-cyan-500/15 text-cyan-100"
+                    ? "border-primary/55 bg-primary/15 text-primary"
                     : "border-slate-500/80 bg-slate-800/70 text-slate-300",
                 )}
               >
@@ -69,3 +69,5 @@ export function BlogTopicFilter({ selectedTopic, topics }: BlogTopicFilterProps)
     </section>
   );
 }
+
+

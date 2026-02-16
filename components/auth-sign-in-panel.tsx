@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { type FormEvent, useMemo, useState, useSyncExternalStore } from "react";
 import { LoaderCircle } from "lucide-react";
@@ -15,6 +15,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 type AuthSignInPanelProps = {
     nextPath: string;
     errorCode?: string;
+    authErrorCode?: string;
+    authErrorDescription?: string;
 };
 type EmailAuthMode = "sign-in" | "sign-up" | "reset-request";
 type EmailAuthValues = {
@@ -39,7 +41,16 @@ function isUnsupportedOAuthProviderErrorMessage(message: string | undefined): bo
     }
     return normalizedMessage.includes("unsupported provider") || normalizedMessage.includes("provider is not enabled");
 }
-function getAuthErrorMessage(locale: Locale, errorCode?: string): string | null {
+function getAuthErrorMessage(locale: Locale, errorCode?: string, authErrorCode?: string, authErrorDescription?: string): string | null {
+    if (authErrorCode === "otp_expired") {
+        return tr(locale, "This email link has expired or was already used. Request a new confirmation/reset email and open the latest one.", "This email link has expired or was already used. Request a new confirmation/reset email and open the latest one.");
+    }
+    if (authErrorCode === "access_denied") {
+        return tr(locale, "Access denied for this auth link. Please start sign-in again and use the newest email link.", "Access denied for this auth link. Please start sign-in again and use the newest email link.");
+    }
+    if (authErrorDescription?.trim()) {
+        return authErrorDescription.replace(/\+/g, " ");
+    }
     if (!errorCode) {
         return null;
     }
@@ -118,7 +129,7 @@ function getStrengthTextClass(score: PasswordStrengthScore): string {
     if (score === 3) {
         return "text-sky-300";
     }
-    return "text-emerald-300";
+    return "text-primary";
 }
 function getPasswordChecklistItems(locale: Locale, password: string) {
     const checks = getPasswordRuleChecks(password);
@@ -150,14 +161,76 @@ function getPasswordChecklistItems(locale: Locale, password: string) {
         },
     ] as const;
 }
-export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
+type SecurityPrecheckResult = {
+    ok: boolean;
+    failedAttemptsInWindow?: number;
+    maxFailedAttempts?: number;
+    retryAfterSeconds?: number;
+};
+type SecurityLoginResult = {
+    ok: boolean;
+    alert?: {
+        type: "failed_attempts";
+        failedAttemptsInWindow: number;
+        windowSeconds: number;
+        threshold: number;
+    } | null;
+};
+async function runLoginSecurityPrecheck(email: string): Promise<SecurityPrecheckResult | null> {
+    try {
+        const response = await fetch("/api/auth/security", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "precheck",
+                email,
+            }),
+        });
+        if (!response.ok) {
+            return null;
+        }
+        return (await response.json()) as SecurityPrecheckResult;
+    }
+    catch {
+        return null;
+    }
+}
+async function reportLoginSecurityResult(input: {
+    email: string;
+    success: boolean;
+    userId?: string | null;
+    reason?: string;
+}): Promise<SecurityLoginResult | null> {
+    try {
+        const response = await fetch("/api/auth/security", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "login-result",
+                email: input.email,
+                success: input.success,
+                userId: input.userId ?? null,
+                reason: input.reason,
+            }),
+        });
+        if (!response.ok) {
+            return null;
+        }
+        return (await response.json()) as SecurityLoginResult;
+    }
+    catch {
+        return null;
+    }
+}
+export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorDescription }: AuthSignInPanelProps) {
     const locale = useLocale();
     const hasMounted = useSyncExternalStore((onStoreChange) => {
         onStoreChange();
         return () => undefined;
     }, () => true, () => false);
     const safeNextPath = useMemo(() => normalizeInternalPath(nextPath), [nextPath]);
-    const callbackErrorMessage = useMemo(() => getAuthErrorMessage(locale, errorCode), [errorCode, locale]);
+    const callbackErrorMessage = useMemo(() => getAuthErrorMessage(locale, errorCode, authErrorCode, authErrorDescription), [authErrorCode, authErrorDescription, errorCode, locale]);
+    const isEmailLinkError = authErrorCode === "otp_expired" || authErrorCode === "access_denied";
     const { isConfigured, isLoading, user } = useSupabaseUser();
     const [pendingOAuthProvider, setPendingOAuthProvider] = useState<"google" | "github" | null>(null);
     const [isEmailPending, setIsEmailPending] = useState(false);
@@ -172,13 +245,19 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
     const [oauthProviderMessage, setOauthProviderMessage] = useState<string | null>(null);
     const emailPasswordStrengthScore = useMemo(() => getPasswordStrengthScore(emailAuthValues.password), [emailAuthValues.password]);
     const signupChecklistItems = useMemo(() => getPasswordChecklistItems(locale, emailAuthValues.password), [locale, emailAuthValues.password]);
-    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-indigo-600/65 bg-indigo-900/75 px-4 text-left text-sm font-semibold text-violet-50 transition hover:border-violet-300/70 hover:bg-indigo-900 focus-visible:ring-violet-200/40";
-    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-violet-50 text-indigo-950 transition hover:bg-white";
-    function getOAuthOrSignupRedirectTo(): string | undefined {
+    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-indigo-600/65 bg-card px-4 text-left text-sm font-semibold text-foreground transition hover:border-violet-300/70 hover:bg-accent focus-visible:ring-violet-200/40";
+    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-violet-50 text-primary-foreground transition hover:bg-white";
+    function getOAuthRedirectTo(): string | undefined {
         if (typeof window === "undefined") {
             return undefined;
         }
         return buildAuthCallbackRedirect(window.location.origin, safeNextPath);
+    }
+    function getEmailSignupRedirectTo(): string | undefined {
+        if (typeof window === "undefined") {
+            return undefined;
+        }
+        return `${window.location.origin}/auth?next=${encodeURIComponent(safeNextPath)}`;
     }
     function getResetRedirectTo(): string | undefined {
         if (typeof window === "undefined") {
@@ -237,7 +316,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         const { error } = await supabaseClient.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: getOAuthOrSignupRedirectTo(),
+                redirectTo: getOAuthRedirectTo(),
             },
         });
         if (error) {
@@ -272,12 +351,31 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         setEmailAuthErrors({});
         setEmailMessage(null);
         if (emailAuthMode === "sign-in") {
-            const { error } = await supabaseClient.auth.signInWithPassword({
+            const precheckResult = await runLoginSecurityPrecheck(normalizedValues.email);
+            if (precheckResult && !precheckResult.ok) {
+                setIsEmailPending(false);
+                const retryAfterSeconds = precheckResult.retryAfterSeconds ?? 0;
+                const blockMessage = tr(locale, `Too many failed login attempts. Try again in ${retryAfterSeconds} seconds.`, `Too many failed login attempts. Try again in ${retryAfterSeconds} seconds.`);
+                setEmailMessage(blockMessage);
+                toast.error(blockMessage);
+                return;
+            }
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: normalizedValues.email,
                 password: normalizedValues.password,
             });
             setIsEmailPending(false);
             if (error) {
+                const securityResult = await reportLoginSecurityResult({
+                    email: normalizedValues.email,
+                    success: false,
+                    reason: error.message,
+                });
+                if (securityResult?.alert?.type === "failed_attempts") {
+                    const loginAlertMessage = tr(locale, `Security alert: ${securityResult.alert.failedAttemptsInWindow} failed login attempts in the last 15 minutes.`, `Security alert: ${securityResult.alert.failedAttemptsInWindow} failed login attempts in the last 15 minutes.`);
+                    setEmailMessage(loginAlertMessage);
+                    toast.error(loginAlertMessage);
+                }
                 if (isEmailNotConfirmedErrorMessage(error.message)) {
                     const confirmEmailMessage = tr(locale, "Email is not confirmed yet. Check your inbox or request another confirmation email.", "Email is not confirmed yet. Check your inbox or request another confirmation email.");
                     setEmailMessage(confirmEmailMessage);
@@ -290,6 +388,11 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
                 toast.error(error.message);
                 return;
             }
+            await reportLoginSecurityResult({
+                email: normalizedValues.email,
+                success: true,
+                userId: data.user?.id ?? null,
+            });
             toast.success(tr(locale, "Signed in successfully.", "Signed in successfully."));
             if (typeof window !== "undefined") {
                 window.location.assign(safeNextPath);
@@ -301,7 +404,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
                 email: normalizedValues.email,
                 password: normalizedValues.password,
                 options: {
-                    emailRedirectTo: getOAuthOrSignupRedirectTo(),
+                    emailRedirectTo: getEmailSignupRedirectTo(),
                 },
             });
             setIsEmailPending(false);
@@ -356,14 +459,14 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
-          <span className="inline-flex rounded-full border border-violet-400/65 bg-indigo-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-100">
+          <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
             {tr(locale, "Secure access", "Secure access")}
           </span>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-violet-100/85 sm:text-base">
-            {tr(locale, "Loading sign-in panel…", "Loading sign-in panel…")}
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
+            {tr(locale, "Loading sign-in panelвЂ¦", "Loading sign-in panelвЂ¦")}
           </p>
         </div>
       </section>);
@@ -378,7 +481,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
           <p className="mt-2 max-w-2xl text-sm text-amber-50/85">
             {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.")}
           </p>
-          <Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-indigo-950 hover:bg-amber-200">
+          <Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-primary-foreground hover:bg-amber-200">
             <Link href="/">{tr(locale, "Back to catalog", "Back to catalog")}</Link>
           </Button>
         </div>
@@ -388,22 +491,22 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         return (<div className="relative overflow-hidden rounded-[1.75rem] border border-indigo-700/80 bg-indigo-950 p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/30 to-transparent"/>
         <div className="relative">
-          <h1 className="text-2xl font-semibold text-violet-50">
+          <h1 className="text-2xl font-semibold text-foreground">
             {tr(locale, "You are signed in", "You are signed in")}
           </h1>
-          <p className="mt-2 text-sm text-violet-200">
+          <p className="mt-2 text-sm text-muted-foreground">
             {tr(locale, "Account:", "Account:")}{" "}
-            <span className="font-medium text-violet-50">
+            <span className="font-medium text-foreground">
               {user.email || tr(locale, "authenticated user", "authenticated user")}
             </span>
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className="h-10 rounded-xl bg-violet-50 text-indigo-950 hover:bg-white">
+            <Button asChild className="h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white">
               <Link href={safeNextPath}>{tr(locale, "Continue", "Continue")}</Link>
             </Button>
             <Button type="button" variant="outline" onClick={() => {
                 void signOut();
-            }} className="h-10 rounded-xl border-indigo-600/70 bg-indigo-900/70 hover:bg-indigo-900">
+            }} className="h-10 rounded-xl border-indigo-600/70 bg-card hover:bg-accent">
               {tr(locale, "Sign out", "Sign out")}
             </Button>
           </div>
@@ -415,30 +518,41 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
     return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-violet-400/65 bg-indigo-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-100">
+        <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
           {tr(locale, "Secure access", "Secure access")}
         </span>
 
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-violet-100/85 sm:text-base">
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
           {tr(locale, "Sign in to submit MCP servers and manage your integrations.", "Sign in to submit MCP servers and manage your integrations.")}
         </p>
 
         {callbackErrorMessage ? (<p className="mt-5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100">
             {callbackErrorMessage}
           </p>) : null}
+        {isEmailLinkError ? (<div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-100">
+            <span>{tr(locale, "Enter your email and request a fresh confirmation link.", "Enter your email and request a fresh confirmation link.")}</span>
+            <Button type="button" variant="outline" className="h-8 rounded-lg border-amber-200/40 bg-transparent px-3 text-amber-100 hover:bg-amber-500/15" disabled={!emailAuthValues.email.trim()} onClick={() => {
+            if (typeof window === "undefined") {
+                return;
+            }
+            window.location.assign(getCheckEmailPath("signup", emailAuthValues.email.trim()));
+        }}>
+              {tr(locale, "Open check-email page", "Open check-email page")}
+            </Button>
+          </div>) : null}
         {oauthProviderMessage ? (<p className="mt-3 rounded-xl border border-amber-300/45 bg-amber-400/10 px-3 py-2.5 text-sm text-amber-100">
             {oauthProviderMessage}
           </p>) : null}
 
-        {isLoading ? (<p className="mt-3 text-xs text-violet-200/70">
+        {isLoading ? (<p className="mt-3 text-xs text-muted-foreground/70">
             {tr(locale, "Checking your session...", "Checking your session...")}
           </p>) : null}
 
         <div className="mt-8">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {tr(locale, "Continue with social login", "Continue with social login")}
           </p>
 
@@ -446,7 +560,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
             <Button type="button" variant="outline" onClick={() => {
             void signInWithProvider("google");
         }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "google" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-xs font-bold text-violet-100">
+              {pendingOAuthProvider === "google" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-xs font-bold text-foreground">
                   G
                 </span>)}
               <span>{tr(locale, "Continue with Google", "Continue with Google")}</span>
@@ -455,7 +569,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
             <Button type="button" variant="outline" onClick={() => {
             void signInWithProvider("github");
         }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "github" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-[10px] font-bold text-violet-100">
+              {pendingOAuthProvider === "github" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-[10px] font-bold text-foreground">
                   GH
                 </span>)}
               <span>{tr(locale, "Continue with GitHub", "Continue with GitHub")}</span>
@@ -463,8 +577,8 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-indigo-700/80 bg-indigo-950/70 p-4 sm:p-5">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300">
+        <div className="mt-6 rounded-2xl border border-indigo-700/80 bg-card p-4 sm:p-5">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {isSignUpMode
             ? tr(locale, "Register with email", "Register with email")
             : isResetRequestMode
@@ -474,22 +588,22 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
 
           <form className="mt-4 grid gap-3" onSubmit={submitEmailAuth}>
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm text-violet-100">
+              <Label htmlFor="email" className="text-sm text-foreground">
                 Email
               </Label>
-              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-indigo-600 bg-indigo-900/90 text-violet-50 placeholder:text-violet-400 focus-visible:ring-violet-200/35"/>
+              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
               {emailAuthErrors.email ? (<p className="text-xs text-rose-300">{emailAuthErrors.email}</p>) : null}
             </div>
 
             {!isResetRequestMode ? (<div className="space-y-1.5">
-                <Label htmlFor="password" className="text-sm text-violet-100">
+                <Label htmlFor="password" className="text-sm text-foreground">
                   {tr(locale, "Password", "Password")}
                 </Label>
                 <Input id="password" type="password" autoComplete={isSignUpMode ? "new-password" : "current-password"} required value={emailAuthValues.password} onChange={(event) => updateEmailField("password", event.target.value)} placeholder={tr(locale, isSignUpMode
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
                 : "Enter your password", isSignUpMode
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
-                : "Enter your password")} className="h-11 rounded-xl border-indigo-600 bg-indigo-900/90 text-violet-50 placeholder:text-violet-400 focus-visible:ring-violet-200/35"/>
+                : "Enter your password")} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
                 {isSignUpMode ? (<div className="space-y-1.5">
                     <div className="grid grid-cols-4 gap-1">
                       {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < emailPasswordStrengthScore
@@ -500,11 +614,11 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
                       {getStrengthLabel(locale, emailPasswordStrengthScore)}
                     </p>
                     <ul className="space-y-1 text-xs">
-                      {signupChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-emerald-300" : "text-violet-300"}`}>
+                      {signupChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>
                           <span className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${item.passed
                         ? "border-emerald-400/60 bg-emerald-400/20"
                         : "border-indigo-600/80 bg-indigo-800/80"}`}>
-                            {item.passed ? "✓" : "•"}
+                            {item.passed ? "вњ“" : "вЂў"}
                           </span>
                           <span>{item.label}</span>
                         </li>))}
@@ -514,10 +628,10 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
               </div>) : null}
 
             {isSignUpMode ? (<div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-sm text-violet-100">
+                <Label htmlFor="confirmPassword" className="text-sm text-foreground">
                   {tr(locale, "Confirm password", "Confirm password")}
                 </Label>
-                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-indigo-600 bg-indigo-900/90 text-violet-50 placeholder:text-violet-400 focus-visible:ring-violet-200/35"/>
+                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
                 {emailAuthErrors.confirmPassword ? (<p className="text-xs text-rose-300">{emailAuthErrors.confirmPassword}</p>) : null}
               </div>) : null}
 
@@ -531,37 +645,37 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
             </Button>
           </form>
 
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-violet-200">
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
             {emailAuthMode === "sign-in" ? (<>
-                <button type="button" onClick={() => switchEmailAuthMode("sign-up")} className="underline underline-offset-4 transition hover:text-white">
+                <button type="button" onClick={() => switchEmailAuthMode("sign-up")} className="underline underline-offset-4 transition hover:text-foreground">
                   {tr(locale, "No account? Sign up", "No account? Sign up")}
                 </button>
-                <button type="button" onClick={() => switchEmailAuthMode("reset-request")} className="underline underline-offset-4 transition hover:text-white">
+                <button type="button" onClick={() => switchEmailAuthMode("reset-request")} className="underline underline-offset-4 transition hover:text-foreground">
                   {tr(locale, "Forgot password?", "Forgot password?")}
                 </button>
               </>) : null}
 
-            {emailAuthMode === "sign-up" ? (<button type="button" onClick={() => switchEmailAuthMode("sign-in")} className="underline underline-offset-4 transition hover:text-white">
+            {emailAuthMode === "sign-up" ? (<button type="button" onClick={() => switchEmailAuthMode("sign-in")} className="underline underline-offset-4 transition hover:text-foreground">
                 {tr(locale, "Already have an account? Sign in", "Already have an account? Sign in")}
               </button>) : null}
 
-            {emailAuthMode === "reset-request" ? (<button type="button" onClick={() => switchEmailAuthMode("sign-in")} className="underline underline-offset-4 transition hover:text-white">
+            {emailAuthMode === "reset-request" ? (<button type="button" onClick={() => switchEmailAuthMode("sign-in")} className="underline underline-offset-4 transition hover:text-foreground">
                 {tr(locale, "Remembered your password? Sign in", "Remembered your password? Sign in")}
               </button>) : null}
           </div>
         </div>
 
-        {emailMessage ? (<p className="mt-4 rounded-xl border border-emerald-300/35 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-100">
+        {emailMessage ? (<p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2.5 text-sm text-primary">
             {emailMessage}
           </p>) : null}
 
-        <p className="mt-6 border-t border-indigo-700/80 pt-4 text-xs leading-6 text-violet-300">
+        <p className="mt-6 border-t border-indigo-700/80 pt-4 text-xs leading-6 text-muted-foreground">
           {tr(locale, "By signing in, you agree to our", "By signing in, you agree to our")}{" "}
-          <Link href="/terms" className="font-semibold text-violet-100 underline underline-offset-4 transition hover:text-white">
+          <Link href="/terms" className="font-semibold text-foreground underline underline-offset-4 transition hover:text-foreground">
             {tr(locale, "Terms", "Terms")}
           </Link>{" "}
           {tr(locale, "and", "and")}{" "}
-          <Link href="/privacy" className="font-semibold text-violet-100 underline underline-offset-4 transition hover:text-white">
+          <Link href="/privacy" className="font-semibold text-foreground underline underline-offset-4 transition hover:text-foreground">
             {tr(locale, "Privacy Policy", "Privacy Policy")}
           </Link>
           .
@@ -569,3 +683,5 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
       </div>
     </section>);
 }
+
+

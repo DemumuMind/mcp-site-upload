@@ -21,20 +21,20 @@ export default async function CatalogPage() {
     const sectionCopy = getSectionLocaleCopy(getSectionIndex("catalog"), locale);
     const catalogSnapshot = await getCatalogSnapshot();
     return (<PageFrame variant="directory">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 sm:px-6 sm:py-12">
+      <div className="section-shell flex flex-col gap-5 py-8 sm:py-12">
         <PageHero className="space-y-4 p-5 sm:p-7" badgeTone="cyan" eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Directory Control Center")} title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Find Trusted MCP Servers Faster")} description={sectionCopy?.heroDescription ??
             tr(locale, "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.", "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.")} actions={<>
-              <Button asChild className="h-10 rounded-xl bg-blue-500 px-5 text-white hover:bg-blue-400">
+            <Button asChild className="h-10 rounded-lg px-5">
                 <Link href="/submit-server">{tr(locale, "Submit server", "Submit server")}</Link>
               </Button>
-              <Button asChild variant="outline" className="h-10 rounded-xl border-white/20 bg-indigo-950/70 text-violet-50 hover:bg-indigo-900">
+            <Button asChild variant="outline" className="h-10 rounded-lg">
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
               </Button>
             </>} metrics={<>
               <PageMetric label={tr(locale, "Active servers", "Active servers")} value={catalogSnapshot.totalServers}/>
               <PageMetric label={tr(locale, "Published tools", "Published tools")} value={catalogSnapshot.totalTools}/>
               <PageMetric label={tr(locale, "Categories", "Categories")} value={catalogSnapshot.totalCategories}/>
-              <PageMetric label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-cyan-200"/>
+              <PageMetric label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-primary"/>
             </>}/>
         <CatalogSection initialServers={catalogSnapshot.servers}/>
       </div>

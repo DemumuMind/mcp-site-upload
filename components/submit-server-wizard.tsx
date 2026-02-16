@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -89,17 +89,9 @@ export function SubmitServerWizard() {
   const locale = useLocale();
   const router = useRouter();
   const { isConfigured, isLoading, user } = useSupabaseUser();
-  const initialDraft = useMemo(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
-
-    return parseDraftState(window.localStorage.getItem(DRAFT_STORAGE_KEY));
-  }, []);
-  const [step, setStep] = useState<0 | 1 | 2>(() => clampStep(initialDraft?.step ?? 0));
-  const [restoredDraftAt, setRestoredDraftAt] = useState<string | null>(() =>
-    initialDraft ? new Date(initialDraft.updatedAt).toLocaleString("en-US") : null,
-  );
+  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [restoredDraftAt, setRestoredDraftAt] = useState<string | null>(null);
+  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [submittedMessage, setSubmittedMessage] = useState<string | null>(null);
   const [submittedSlug, setSubmittedSlug] = useState<string | null>(null);
@@ -107,7 +99,7 @@ export function SubmitServerWizard() {
 
   const form = useForm<SubmissionInput>({
     resolver: zodResolver(submissionSchema),
-    defaultValues: initialDraft?.values ?? defaultFormValues,
+    defaultValues: defaultFormValues,
     mode: "onBlur",
   });
 
@@ -115,7 +107,23 @@ export function SubmitServerWizard() {
   const isAuthenticated = Boolean(user);
 
   useEffect(() => {
-    if (submittedMessage) {
+    const draft = parseDraftState(window.localStorage.getItem(DRAFT_STORAGE_KEY));
+    const applyDraftTimer = window.setTimeout(() => {
+      if (draft) {
+        setStep(clampStep(draft.step));
+        setRestoredDraftAt(new Date(draft.updatedAt).toLocaleString("en-US"));
+        form.reset({
+          ...defaultFormValues,
+          ...draft.values,
+        });
+      }
+      setIsDraftHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(applyDraftTimer);
+  }, [form]);
+
+  useEffect(() => {
+    if (!isDraftHydrated || submittedMessage) {
       return;
     }
 
@@ -129,7 +137,7 @@ export function SubmitServerWizard() {
     };
 
     window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
-  }, [step, submittedMessage, watchedValues]);
+  }, [isDraftHydrated, step, submittedMessage, watchedValues]);
 
   function clearDraft() {
     window.localStorage.removeItem(DRAFT_STORAGE_KEY);
@@ -244,24 +252,24 @@ export function SubmitServerWizard() {
               className={[
                 "rounded-xl border p-4 transition",
                 isCurrent
-                  ? "border-cyan-400/40 bg-cyan-500/10"
+                  ? "border-cyan-400/40 bg-primary/10"
                   : isCompleted
-                    ? "border-emerald-300/35 bg-emerald-500/10"
-                    : "border-white/10 bg-indigo-900/65",
+                    ? "border-primary/30 bg-primary/10"
+                    : "border-blacksmith bg-card",
               ].join(" ")}
             >
-              <p className="text-xs tracking-[0.14em] text-violet-300 uppercase">
+              <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">
                 {tr(locale, `Step ${index + 1}`, `Step ${index + 1}`)}
               </p>
-              <p className="mt-1 text-base font-medium text-violet-50">{item.title}</p>
-              <p className="mt-1 text-xs leading-6 text-violet-300">{item.description}</p>
+              <p className="mt-1 text-base font-medium text-foreground">{item.title}</p>
+              <p className="mt-1 text-xs leading-6 text-muted-foreground">{item.description}</p>
             </div>
           );
         })}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <Badge className="border-cyan-400/25 bg-cyan-500/10 text-cyan-200">
+        <Badge className="border-primary/30 bg-primary/10 text-primary">
           {isLoading
             ? tr(locale, "Checking session...", "Checking session...")
             : isAuthenticated
@@ -269,7 +277,7 @@ export function SubmitServerWizard() {
               : tr(locale, "Guest mode: sign in only on final submit", "Guest mode: sign in only on final submit")}
         </Badge>
         {restoredDraftAt ? (
-          <Badge className="border-white/15 bg-white/5 text-violet-200">
+          <Badge className="border-blacksmith bg-card text-muted-foreground">
             {tr(locale, "Draft restored", "Draft restored")}: {restoredDraftAt}
           </Badge>
         ) : null}
@@ -289,12 +297,12 @@ export function SubmitServerWizard() {
       ) : null}
 
       {submittedMessage ? (
-        <div className="rounded-2xl border border-emerald-300/35 bg-emerald-500/10 p-4 text-sm text-emerald-50">
+        <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm text-primary-foreground">
           <p className="flex items-center gap-2 font-medium">
             <CheckCircle2 className="size-4" />
             {submittedMessage}
           </p>
-          <p className="mt-2 text-emerald-100/90">
+          <p className="mt-2 text-primary/90">
             {submittedSlug
               ? tr(locale, `Server slug: ${submittedSlug}`, `Server slug: ${submittedSlug}`)
               : tr(locale, "Track moderation status from your account page.", "Track moderation status from your account page.")}
@@ -302,7 +310,7 @@ export function SubmitServerWizard() {
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-white/10 bg-indigo-950/74 p-5">
+      <div className="rounded-2xl border border-blacksmith bg-card p-5">
         {step === 0 ? <SubmitStepBasics form={form} locale={locale} /> : null}
         {step === 1 ? <SubmitStepTechnical form={form} locale={locale} /> : null}
         {step === 2 ? <SubmitStepReview locale={locale} values={form.getValues()} isAuthenticated={isAuthenticated} /> : null}
@@ -312,7 +320,7 @@ export function SubmitServerWizard() {
         <Button
           type="button"
           variant="outline"
-          className="border-white/20 bg-indigo-900/70 text-violet-50 hover:bg-indigo-900"
+          className="border-blacksmith bg-card text-foreground hover:bg-accent"
           onClick={goBack}
           disabled={step === 0 || isPending}
         >
@@ -335,7 +343,7 @@ export function SubmitServerWizard() {
         )}
       </div>
 
-      <p className="flex items-start gap-2 text-xs leading-6 text-violet-300">
+      <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground">
         <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
         {tr(
           locale,
@@ -346,3 +354,4 @@ export function SubmitServerWizard() {
     </div>
   );
 }
+

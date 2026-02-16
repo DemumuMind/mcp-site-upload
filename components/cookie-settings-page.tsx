@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Cookie, RotateCcw, ShieldCheck } from "lucide-react";
@@ -83,13 +83,13 @@ export function CookieSettingsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-cyan-400/20 bg-indigo-950/72 p-5">
-        <Badge className="mb-3 border-cyan-400/35 bg-cyan-500/10 text-cyan-200">
+      <div className="rounded-2xl border border-primary/30 bg-card p-5">
+        <Badge className="mb-3 border-primary/35 bg-primary/10 text-primary">
           <Cookie className="size-3" />
           {tr(locale, "Current consent status", "Current consent status")}
         </Badge>
-        <p className="text-sm leading-7 text-violet-100">{consentLabel}</p>
-        <p className="mt-1 text-xs leading-6 text-violet-300">
+        <p className="text-sm leading-7 text-foreground">{consentLabel}</p>
+        <p className="mt-1 text-xs leading-6 text-muted-foreground">
           {tr(
             locale,
             `Default policy: ${defaultChoice === "necessary" ? "Necessary cookies only" : "All cookies"}`,
@@ -99,46 +99,46 @@ export function CookieSettingsPage() {
       </div>
 
       <div className="space-y-3">
-        <div className="rounded-xl border border-white/10 bg-indigo-900/65 px-4 py-3">
-          <p className="font-medium text-violet-100">{tr(locale, "Strictly necessary", "Strictly necessary")}</p>
-          <p className="mt-1 text-sm text-violet-300">
+        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
+          <p className="font-medium text-foreground">{tr(locale, "Strictly necessary", "Strictly necessary")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             {tr(locale, "Required for core navigation, authentication, and platform security.", "Required for core navigation, authentication, and platform security.")}
           </p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-cyan-300">{tr(locale, "Always enabled", "Always enabled")}</p>
+          <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-primary">{tr(locale, "Always enabled", "Always enabled")}</p>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-indigo-900/65 px-4 py-3">
+        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-medium text-violet-100">{tr(locale, "Preferences and UX", "Preferences and UX")}</p>
+            <p className="font-medium text-foreground">{tr(locale, "Preferences and UX", "Preferences and UX")}</p>
             <button
               type="button"
               onClick={() => {
                 setDraftProfile((prev) => ({ ...prev, preferences: !prev.preferences }));
               }}
-              className="rounded-full border border-cyan-400/35 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 transition hover:bg-cyan-500/20"
+              className="rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20"
             >
               {draftProfile.preferences ? tr(locale, "Enabled", "Enabled") : tr(locale, "Disabled", "Disabled")}
             </button>
           </div>
-          <p className="mt-1 text-sm text-violet-300">
+          <p className="mt-1 text-sm text-muted-foreground">
             {tr(locale, "Stores optional interface preferences (for example personalized UI choices).", "Stores optional interface preferences (for example personalized UI choices).")}
           </p>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-indigo-900/65 px-4 py-3">
+        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-medium text-violet-100">{tr(locale, "Analytics (optional)", "Analytics (optional)")}</p>
+            <p className="font-medium text-foreground">{tr(locale, "Analytics (optional)", "Analytics (optional)")}</p>
             <button
               type="button"
               onClick={() => {
                 setDraftProfile((prev) => ({ ...prev, analytics: !prev.analytics }));
               }}
-              className="rounded-full border border-cyan-400/35 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 transition hover:bg-cyan-500/20"
+              className="rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20"
             >
               {draftProfile.analytics ? tr(locale, "Enabled", "Enabled") : tr(locale, "Disabled", "Disabled")}
             </button>
           </div>
-          <p className="mt-1 text-sm text-violet-300">
+          <p className="mt-1 text-sm text-muted-foreground">
             {tr(locale, "Used only to measure product usage and performance trends.", "Used only to measure product usage and performance trends.")}
           </p>
         </div>
@@ -147,7 +147,7 @@ export function CookieSettingsPage() {
       <div className="grid gap-3 sm:grid-cols-2">
         <Button
           type="button"
-          className="h-11 bg-cyan-500 hover:bg-cyan-400"
+          className="h-11 bg-primary hover:bg-cyan-400"
           onClick={() => {
             setCookieConsentProfile(draftProfile);
             setSavedProfile(draftProfile);
@@ -179,7 +179,7 @@ export function CookieSettingsPage() {
         <Button
           type="button"
           variant="outline"
-          className="h-11 border-white/20 bg-indigo-900/70 text-violet-50 hover:bg-indigo-900 sm:col-span-2"
+          className="h-11 border-blacksmith bg-card text-foreground hover:bg-accent sm:col-span-2"
           onClick={() => {
             const nextProfile = { ...DEFAULT_COOKIE_CONSENT_PROFILE };
             setCookieConsent("necessary");
@@ -195,7 +195,7 @@ export function CookieSettingsPage() {
       <Button
         type="button"
         variant="ghost"
-        className="h-10 text-violet-200 hover:bg-white/8 hover:text-white"
+        className="h-10 text-muted-foreground hover:bg-card hover:text-foreground"
         onClick={() => {
           clearCookieConsent();
           setSavedProfile(null);
@@ -208,3 +208,4 @@ export function CookieSettingsPage() {
     </div>
   );
 }
+

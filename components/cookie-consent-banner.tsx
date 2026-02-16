@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -81,14 +81,14 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
         className="pointer-events-auto rounded-3xl border border-indigo-500/55 bg-[#332f8f] p-4 shadow-[0_22px_64px_rgba(4,10,40,0.5)]"
       >
         <div className="flex items-start gap-2.5">
-          <div className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-violet-100">
+          <div className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-foreground">
             <Cookie className="size-4" />
           </div>
           <div className="flex-1">
-            <h2 className="text-[1.95rem] font-semibold leading-none text-violet-50">
+            <h2 className="text-[1.95rem] font-semibold leading-none text-foreground">
               {tr(locale, "We value your privacy", "We value your privacy")}
             </h2>
-            <p className="mt-2 text-[1.03rem] leading-8 text-violet-200/95">
+            <p className="mt-2 text-[1.03rem] leading-8 text-muted-foreground/95">
               {tr(
                 locale,
                 "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.",
@@ -96,7 +96,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
               )}
             </p>
             {consent !== null && isSettingsOpen ? (
-              <p className="mt-2 text-sm text-violet-400 dark:text-violet-300">
+              <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
                 {tr(locale, "You can update your cookie preferences at any time.", "You can update your cookie preferences at any time.")}
               </p>
             ) : null}
@@ -107,7 +107,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
               onClick={() => {
                 setIsSettingsOpen(false);
               }}
-              className="inline-flex size-8 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-violet-100 transition hover:bg-indigo-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
+              className="inline-flex size-8 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-foreground transition hover:bg-indigo-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
               aria-label={tr(locale, "Close cookie settings", "Close cookie settings")}
             >
               <X className="size-4" />
@@ -130,7 +130,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
             onClick={() => {
               chooseConsent("necessary");
             }}
-            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-indigo-500 bg-transparent px-4 text-[1.05rem] font-semibold text-violet-100 transition hover:bg-indigo-700/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-indigo-500 bg-transparent px-4 text-[1.05rem] font-semibold text-foreground transition hover:bg-indigo-700/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
           >
             {tr(locale, "Necessary Cookies Only", "Necessary Cookies Only")}
           </button>
@@ -139,7 +139,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
         <div className="mt-3 text-center">
           <Link
             href="/cookie-settings"
-            className="inline-flex items-center justify-center text-sm font-medium text-violet-200 underline underline-offset-4 transition hover:text-white"
+            className="inline-flex items-center justify-center text-sm font-medium text-muted-foreground underline underline-offset-4 transition hover:text-foreground"
           >
             {tr(locale, "Manage Preferences", "Manage Preferences")}
           </Link>
@@ -148,3 +148,4 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
     </div>
   );
 }
+

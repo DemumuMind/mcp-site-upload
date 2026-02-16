@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,38 +9,38 @@ type ScenarioStepsProps = {
     onPrimaryCtaClick: (action: HowToUseLocaleAction, persona: HowToUsePersona) => void;
 };
 export function ScenarioSteps({ scenario, onPrimaryCtaClick }: ScenarioStepsProps) {
-    return (<div id="scenario-paths" className="space-y-5 rounded-3xl border border-white/10 bg-indigo-950/72 p-6 sm:p-8">
+    return (<div id="scenario-paths" className="space-y-5 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
       <div className="space-y-2">
-        <h3 className="text-2xl font-semibold tracking-tight text-violet-50 sm:text-3xl">{scenario.stepsTitle}</h3>
+        <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{scenario.stepsTitle}</h3>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-3">
-          {scenario.steps.map((step, index) => (<Card key={step.title} className="border-white/10 bg-indigo-900/70">
+          {scenario.steps.map((step, index) => (<Card key={step.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-lg text-violet-50">
-                  <span className="inline-flex size-7 items-center justify-center rounded-full border border-cyan-400/35 bg-cyan-500/10 text-xs font-semibold text-cyan-200">
+                <CardTitle className="flex items-center gap-2 text-lg text-foreground">
+                  <span className="inline-flex size-7 items-center justify-center rounded-full border border-primary/35 bg-primary/10 text-xs font-semibold text-primary">
                     {index + 1}
                   </span>
                   {step.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm leading-7 text-violet-200">{step.description}</CardContent>
+              <CardContent className="text-sm leading-7 text-muted-foreground">{step.description}</CardContent>
             </Card>))}
         </div>
 
-        <Card className="border-white/10 bg-indigo-900/70">
+        <Card className="border-blacksmith bg-card">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-violet-50">{scenario.checklistTitle}</CardTitle>
+            <CardTitle className="text-lg text-foreground">{scenario.checklistTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <ul className="space-y-2 text-sm leading-7 text-violet-200">
+            <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
               {scenario.checklistItems.map((item) => (<li key={item} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-300"/>
+                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-primary"/>
                   <span>{item}</span>
                 </li>))}
             </ul>
-            <Button asChild className="h-11 w-full rounded-xl bg-blue-500 text-white hover:bg-blue-400">
+            <Button asChild className="h-11 w-full rounded-xl bg-blue-500 text-foreground hover:bg-blue-400">
               <Link href={scenario.primaryCta.href} onClick={() => onPrimaryCtaClick(scenario.primaryCta, scenario.id)}>
                 {scenario.primaryCta.label}
                 <ArrowRight className="size-4"/>
@@ -51,3 +51,4 @@ export function ScenarioSteps({ scenario, onPrimaryCtaClick }: ScenarioStepsProp
       </div>
     </div>);
 }
+

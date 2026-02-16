@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr, type Locale } from "@/lib/i18n";
@@ -12,19 +12,19 @@ export function BlogRelatedPosts({ posts, locale }: BlogRelatedPostsProps) {
         return null;
     }
     return (<section className="space-y-3">
-      <h2 className="text-2xl font-semibold tracking-tight text-violet-50">
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">
         {tr(locale, "Related reads", "Related reads")}
       </h2>
       <div className="grid gap-3 md:grid-cols-3">
         {posts.map((post) => {
             const localized = post.locale[locale];
-            return (<Card key={post.slug} className="border-white/10 bg-indigo-950/75">
+            return (<Card key={post.slug} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base text-violet-50">{localized.title}</CardTitle>
+                <CardTitle className="text-base text-foreground">{localized.title}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-violet-200">
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>{localized.excerpt}</p>
-                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-50 transition hover:text-white">
+                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition hover:text-foreground">
                   {tr(locale, "Read article", "Read article")}
                   <ArrowRight className="size-4"/>
                 </Link>
@@ -34,3 +34,4 @@ export function BlogRelatedPosts({ posts, locale }: BlogRelatedPostsProps) {
       </div>
     </section>);
 }
+

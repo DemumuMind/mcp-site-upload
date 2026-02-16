@@ -13,13 +13,17 @@ type AuthPageProps = {
     searchParams: Promise<{
         next?: string;
         error?: string;
+        error_code?: string;
+        error_description?: string;
     }>;
 };
 export default async function AuthPage({ searchParams }: AuthPageProps) {
-    const { next, error } = await searchParams;
+    const { next, error, error_code, error_description } = await searchParams;
     const nextPath = typeof next === "string" ? next : "/";
     const errorCode = typeof error === "string" ? error : undefined;
+    const authErrorCode = typeof error_code === "string" ? error_code : undefined;
+    const authErrorDescription = typeof error_description === "string" ? error_description : undefined;
     return (<div className="mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col justify-center px-4 py-12 sm:px-6">
-      <AuthSignInPanel nextPath={nextPath} errorCode={errorCode}/>
+      <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} authErrorCode={authErrorCode} authErrorDescription={authErrorDescription}/>
     </div>);
 }

@@ -2731,3 +2731,45 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - `npm run test:e2e` -> pass (`19 passed`)
 - Open risks:
   - Repository still has many unrelated local modifications outside this cleanup scope; keep commits atomic and path-scoped.
+
+## Latest Update (2026-02-16, Full-site Blacksmith-style redesign via feature flag)
+- Objective: implement the approved Blacksmith-style redesign plan across the public site with a safe rollout switch.
+- Status: completed (implementation + verification gates passed).
+- Touched files:
+  - `.env.example`
+  - `lib/design-flags.ts`
+  - `app/layout.tsx`
+  - `app/globals.css`
+  - `components/ui/button.tsx`
+  - `components/ui/badge.tsx`
+  - `components/ui/card.tsx`
+  - `components/ui/input.tsx`
+  - `components/ui/textarea.tsx`
+  - `components/ui/select.tsx`
+  - `components/page-templates.tsx`
+  - `components/site-header.tsx`
+  - `components/site-footer.tsx`
+  - `components/home/home-page-content.tsx`
+  - `components/home/sections/hero-section.tsx`
+  - `components/home/sections/proof-metrics-section.tsx`
+  - `components/home/sections/workflow-section.tsx`
+  - `components/home/sections/trust-signals-section.tsx`
+  - `components/home/sections/icp-section.tsx`
+  - `components/home/sections/final-cta-section.tsx`
+  - `app/catalog/page.tsx`
+  - `app/pricing/page.tsx`
+- Implemented:
+  - Added runtime rollout flag `NEXT_PUBLIC_REDESIGN_V2`.
+  - Switched layout theme/background layers to Blacksmith-style foundation.
+  - Replaced cosmic token styling with high-contrast dark + gold design language.
+  - Updated shared UI primitives and page templates to propagate redesign across pages.
+  - Reworked header/footer and all homepage sections to match the new style and motion profile.
+  - Updated catalog and pricing page shells to align with redesigned primitives.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - Repository currently contains many pre-existing unrelated modified/untracked files; commit should be scoped carefully to redesign files only.
+- Follow-up (2026-02-16): extended Blacksmith-style pass across remaining public-facing routes/components (about/contact/discord/submit-server/terms/mcp/categories/not-found/error/server page/legacy blog + blog topic filter + auth panels) by replacing legacy indigo-violet utility usage with the new blacksmith tokenized classes.
+- Re-verified after this pass: `npm run check:utf8:strict` -> pass, `npm run lint` -> pass, `npm run build` -> pass.

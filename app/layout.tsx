@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ConsentAnalytics } from "@/components/consent-analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { AuthHashRedirector } from "@/components/auth-hash-redirector";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -14,6 +15,7 @@ import {
   parseCookieConsent,
   parseCookieConsentProfile,
 } from "@/lib/cookie-consent";
+import { isRedesignV2Enabled } from "@/lib/design-flags";
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
 import "./globals.css";
@@ -75,6 +77,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const redesignV2Enabled = isRedesignV2Enabled();
   const locale = await getServerLocale();
   const cookieStore = await cookies();
 
@@ -86,15 +89,22 @@ export default async function RootLayout({
   const initialAnalyticsAllowed = initialProfile?.analytics ?? false;
 
   return (
-    <html lang="en" suppressHydrationWarning className="dark" data-theme="cosmic-burst" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="dark"
+      data-theme={redesignV2Enabled ? "blacksmith-v2" : "cosmic-burst"}
+      data-scroll-behavior="smooth"
+    >
       <body className="min-h-screen bg-background text-foreground antialiased">
         <LocaleProvider locale={locale}>
           <div className="relative flex min-h-screen flex-col overflow-hidden">
-            <div className="pointer-events-none absolute inset-0 -z-30 bg-cosmic-burst" />
-            <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_48%_48%,rgba(255,210,255,0.22),transparent_25%),radial-gradient(circle_at_46%_52%,rgba(80,95,255,0.45),transparent_54%),radial-gradient(circle_at_18%_14%,rgba(58,116,255,0.22),transparent_40%)] animate-cosmic-pulse" />
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-[repeating-conic-gradient(from_220deg_at_48%_48%,rgba(255,255,255,0.16)_0deg,rgba(255,255,255,0)_4deg,rgba(255,255,255,0)_18deg)] opacity-[0.14]" />
+            <div className="pointer-events-none absolute inset-0 -z-30 bg-blacksmith-foundation" />
+            <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.18),transparent_42%)] animate-blacksmith-pulse" />
+            <div className="pointer-events-none absolute inset-0 -z-10 hero-grid opacity-50" />
 
             <SiteHeader locale={locale} />
+            <AuthHashRedirector />
             <main className="relative z-10 flex-1">{children}</main>
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />

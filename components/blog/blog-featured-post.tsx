@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock3, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,25 +30,25 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
     })));
     return (<Card className="border-violet-400/20 bg-[linear-gradient(130deg,rgba(53,30,96,0.45),rgba(10,18,35,0.85))]">
       <CardHeader className="pb-2">
-        <Badge className="w-fit border-violet-300/40 bg-violet-500/15 text-violet-100">
+        <Badge className="w-fit border-violet-300/40 bg-violet-500/15 text-foreground">
           <Sparkles className="size-3"/>
           {tr(locale, "Featured article", "Featured article")}
         </Badge>
-        <CardTitle className="mt-3 text-2xl text-violet-50 sm:text-3xl">{localized.title}</CardTitle>
+        <CardTitle className="mt-3 text-2xl text-foreground sm:text-3xl">{localized.title}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 text-sm text-violet-200">
+      <CardContent className="space-y-4 text-sm text-muted-foreground">
         <p>{localized.excerpt}</p>
 
         <div className="flex flex-wrap items-center gap-2">
           {tags.map(({ tagSlug, tag }) => {
-            return (<Badge key={tagSlug} variant="outline" className="border-violet-300/40 bg-violet-500/15 text-violet-100">
+            return (<Badge key={tagSlug} variant="outline" className="border-violet-300/40 bg-violet-500/15 text-foreground">
                 {tag ? tag.label[locale] : tagSlug}
               </Badge>);
         })}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3 text-xs tracking-[0.1em] text-violet-300 uppercase">
+          <div className="flex flex-wrap items-center gap-3 text-xs tracking-[0.1em] text-muted-foreground uppercase">
             <span className="inline-flex items-center gap-1.5">
               <CalendarDays className="size-3.5"/>
               {formatDate(post.publishedAt, locale)}
@@ -69,3 +69,4 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
       </CardContent>
     </Card>);
 }
+

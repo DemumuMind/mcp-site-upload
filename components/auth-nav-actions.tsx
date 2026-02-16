@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
             return;
         }
         toast.success(tr(locale, "Signed out", "Signed out"));
+        window.location.assign(authRedirectHref);
     }
     if (!isConfigured) {
         return (<Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
@@ -43,7 +44,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>);
     }
     return (<div className="flex items-center gap-2">
-      <Button asChild variant="outline" className="h-11 rounded-full border-white/15 bg-white/[0.02] px-3 text-xs font-semibold hover:bg-white/[0.06] sm:h-10 sm:px-4 sm:text-sm">
+      <Button asChild variant="outline" className="h-11 rounded-full border-blacksmith bg-card px-3 text-xs font-semibold hover:bg-accent sm:h-10 sm:px-4 sm:text-sm">
         <Link href={accountHref}>
           <span className="sm:hidden">{tr(locale, "Account", "Account")}</span>
           <span className="hidden sm:inline">{tr(locale, "My account", "My account")}</span>
@@ -57,9 +58,10 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>
       <Button type="button" variant="outline" size="sm" onClick={() => {
             void signOut();
-        }} className="h-11 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06] sm:h-10 sm:px-3 sm:text-sm" aria-label={tr(locale, "Sign out", "Sign out")}>
+        }} className="h-11 border-blacksmith bg-card px-2.5 text-xs hover:bg-accent sm:h-10 sm:px-3 sm:text-sm" aria-label={tr(locale, "Sign out", "Sign out")}>
         <LogOut className="size-4"/>
         <span className="hidden sm:inline">{tr(locale, "Sign out", "Sign out")}</span>
       </Button>
     </div>);
 }
+

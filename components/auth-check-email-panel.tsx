@@ -1,11 +1,12 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { LoaderCircle, MailCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useLocale } from "@/components/locale-provider";
+import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { Button } from "@/components/ui/button";
-import { buildAuthCallbackRedirect, buildResetPasswordRedirect, normalizeInternalPath, type AuthCheckEmailFlow, } from "@/lib/auth-redirects";
+import { buildResetPasswordRedirect, normalizeInternalPath, type AuthCheckEmailFlow, } from "@/lib/auth-redirects";
 import { tr } from "@/lib/i18n";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 const RESEND_COOLDOWN_SECONDS = 30;
@@ -39,6 +40,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
     const [cooldownSeconds, setCooldownSeconds] = useState(0);
     const [resendFeedback, setResendFeedback] = useState<ResendFeedback>(null);
     const maskedEmail = useMemo(() => maskEmail(email), [email]);
+    const { user } = useSupabaseUser();
     const loginPath = useMemo(() => {
         if (safeNextPath === "/") {
             return "/auth";
@@ -54,6 +56,28 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
         }, 1000);
         return () => window.clearTimeout(timer);
     }, [cooldownSeconds]);
+    const isRedirectingAfterConfirm = Boolean(user && flow === "signup");
+    useEffect(() => {
+        if (!user || flow !== "signup" || typeof window === "undefined") {
+            return;
+        }
+        const destination = safeNextPath || "/";
+        if (window.opener && !window.opener.closed) {
+            window.opener.location.href = destination;
+            window.close();
+            return;
+        }
+        const timer = window.setTimeout(() => {
+            window.location.assign(destination);
+        }, 1200);
+        return () => window.clearTimeout(timer);
+    }, [flow, safeNextPath, user]);
+    function getEmailSignupRedirectTo(): string | undefined {
+        if (typeof window === "undefined") {
+            return undefined;
+        }
+        return `${window.location.origin}/auth?next=${encodeURIComponent(safeNextPath)}`;
+    }
     function getResendErrorMessage(message: string): string {
         const normalizedMessage = message.trim().toLowerCase();
         if (normalizedMessage.includes("rate limit") ||
@@ -84,9 +108,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
         setIsResending(true);
         setResendFeedback(null);
         if (flow === "signup") {
-            const redirectTo = typeof window !== "undefined"
-                ? buildAuthCallbackRedirect(window.location.origin, safeNextPath)
-                : undefined;
+            const redirectTo = getEmailSignupRedirectTo();
             const { error } = await supabaseClient.auth.resend({
                 type: "signup",
                 email: normalizedEmail,
@@ -126,7 +148,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
     return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-violet-400/65 bg-indigo-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-100">
+        <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
           {flow === "signup"
             ? tr(locale, "Confirm your email", "Confirm your email")
             : tr(locale, "Reset link sent", "Reset link sent")}
@@ -134,14 +156,14 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
 
         <div className="mt-4 flex items-center gap-3">
           <MailCheck className="size-6 text-sky-300"/>
-          <h1 className="text-2xl font-semibold text-violet-50 sm:text-3xl">
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
             {flow === "signup"
             ? tr(locale, "Check your inbox", "Check your inbox")
             : tr(locale, "Check your email for reset link", "Check your email for reset link")}
           </h1>
         </div>
 
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-violet-100/85 sm:text-base">
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
           {flow === "signup"
             ? tr(locale, "We sent a confirmation link. Open it to finish account registration.", "We sent a confirmation link. Open it to finish account registration.")
             : tr(locale, "We sent a password reset link. Open it to set a new password.", "We sent a password reset link. Open it to set a new password.")}{" "}
@@ -153,7 +175,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => {
             void resendEmail();
-        }} disabled={isResending || cooldownSeconds > 0} className="h-10 rounded-xl bg-violet-50 text-indigo-950 hover:bg-white">
+        }} disabled={isResending || cooldownSeconds > 0} className="h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white">
             {isResending ? <LoaderCircle className="size-4 animate-spin"/> : null}
             {cooldownSeconds > 0
             ? tr(locale, `Resend in ${cooldownSeconds}s`, `Resend in ${cooldownSeconds}s`)
@@ -162,20 +184,25 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
                 : tr(locale, "Resend reset email", "Resend reset email")}
           </Button>
 
-          <Button asChild type="button" variant="outline" className="h-10 rounded-xl border-indigo-600/70 bg-indigo-900/70 hover:bg-indigo-900">
+          <Button asChild type="button" variant="outline" className="h-10 rounded-xl border-indigo-600/70 bg-card hover:bg-accent">
             <Link href={loginPath}>{tr(locale, "Back to login", "Back to login")}</Link>
           </Button>
         </div>
 
         {resendFeedback ? (<p className={resendFeedback.tone === "error"
                 ? "mt-4 rounded-xl border border-rose-300/35 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100"
-                : "mt-4 rounded-xl border border-emerald-300/35 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-100"}>
+                : "mt-4 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2.5 text-sm text-primary"}>
             {resendFeedback.text}
           </p>) : null}
+        {isRedirectingAfterConfirm ? (<p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2.5 text-sm text-primary">
+            {tr(locale, "Email confirmed. Redirecting...", "Email confirmed. Redirecting...")}
+          </p>) : null}
 
-        <p className="mt-4 text-xs leading-6 text-violet-200/80">
+        <p className="mt-4 text-xs leading-6 text-muted-foreground/80">
           {tr(locale, "Tip: if emails do not arrive, check spam/promotions and review Supabase Auth SMTP + rate-limit settings.", "Tip: if emails do not arrive, check spam/promotions and review Supabase Auth SMTP + rate-limit settings.")}
         </p>
       </div>
     </section>);
 }
+
+

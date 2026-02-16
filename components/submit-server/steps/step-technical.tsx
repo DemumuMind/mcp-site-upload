@@ -1,4 +1,4 @@
-import { Controller, type UseFormReturn } from "react-hook-form";
+﻿import { Controller, type UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,7 +29,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           autoComplete="url"
           spellCheck={false}
           placeholder="https://mcp.example.com/sse"
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("serverUrl")}
         />
         <ErrorText message={form.formState.errors.serverUrl?.message} />
@@ -42,7 +42,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           name="authType"
           render={({ field }) => (
             <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger id="authType" className="border-white/10 bg-indigo-950/80">
+              <SelectTrigger id="authType" className="border-blacksmith bg-card">
                 <SelectValue placeholder={tr(locale, "Select auth type", "Select auth type")} />
               </SelectTrigger>
               <SelectContent>
@@ -64,7 +64,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           autoComplete="url"
           spellCheck={false}
           placeholder="https://github.com/org/repo"
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("repoUrl")}
         />
         <ErrorText message={form.formState.errors.repoUrl?.message} />
@@ -76,7 +76,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           id="maintainerName"
           autoComplete="name"
           placeholder={tr(locale, "Jane Doe", "Jane Doe")}
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("maintainerName")}
         />
         <ErrorText message={form.formState.errors.maintainerName?.message} />
@@ -89,7 +89,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           type="email"
           autoComplete="email"
           placeholder="maintainer@example.com"
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("maintainerEmail")}
         />
         <ErrorText message={form.formState.errors.maintainerEmail?.message} />
@@ -97,3 +97,4 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
     </div>
   );
 }
+

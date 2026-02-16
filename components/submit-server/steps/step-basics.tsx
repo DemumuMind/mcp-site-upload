@@ -1,4 +1,4 @@
-import type { UseFormReturn } from "react-hook-form";
+﻿import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,7 +27,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
           id="name"
           placeholder={tr(locale, "Acme MCP Gateway", "Acme MCP Gateway")}
           autoComplete="organization"
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("name")}
         />
         <ErrorText message={form.formState.errors.name?.message} />
@@ -39,7 +39,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
           id="category"
           placeholder={tr(locale, "Developer Tools", "Developer Tools")}
           autoComplete="off"
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("category")}
         />
         <ErrorText message={form.formState.errors.category?.message} />
@@ -56,7 +56,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
             "Describe core capabilities, tools exposed by your server, and when teams should use it.",
             "Describe core capabilities, tools exposed by your server, and when teams should use it.",
           )}
-          className="border-white/10 bg-indigo-950/80"
+          className="border-blacksmith bg-card"
           {...form.register("description")}
         />
         <ErrorText message={form.formState.errors.description?.message} />
@@ -64,3 +64,4 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
     </div>
   );
 }
+

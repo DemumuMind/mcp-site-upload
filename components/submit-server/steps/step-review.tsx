@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { tr, type Locale } from "@/lib/i18n";
 import type { SubmissionInput } from "@/lib/submission-schema";
 
@@ -11,8 +11,8 @@ type SubmitStepReviewProps = {
 export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStepReviewProps) {
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-white/10 bg-indigo-900/65 p-4">
-        <p className="text-sm text-violet-200">
+      <div className="rounded-2xl border border-blacksmith bg-card p-4">
+        <p className="text-sm text-muted-foreground">
           {isAuthenticated
             ? tr(
                 locale,
@@ -41,11 +41,11 @@ export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStep
         />
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-indigo-900/65 p-4">
-        <p className="text-xs tracking-[0.14em] text-violet-300 uppercase">
+      <div className="rounded-2xl border border-blacksmith bg-card p-4">
+        <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">
           {tr(locale, "Description", "Description")}
         </p>
-        <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-violet-100">{values.description || "-"}</p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-foreground">{values.description || "-"}</p>
       </div>
     </div>
   );
@@ -53,11 +53,12 @@ export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStep
 
 function SummaryItem({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
-    <div className={["rounded-xl border border-white/10 bg-indigo-900/65 p-3", className].filter(Boolean).join(" ")}>
-      <p className="text-xs tracking-[0.14em] text-violet-300 uppercase">{label}</p>
+    <div className={["rounded-xl border border-blacksmith bg-card p-3", className].filter(Boolean).join(" ")}>
+      <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">{label}</p>
       <div className="mt-2 flex items-center gap-2">
-        <Badge className="border-cyan-400/25 bg-cyan-500/10 text-cyan-200">{value}</Badge>
+        <Badge className="border-primary/30 bg-primary/10 text-primary">{value}</Badge>
       </div>
     </div>
   );
 }
+

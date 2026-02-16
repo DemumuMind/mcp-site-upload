@@ -65,28 +65,28 @@ export default async function PricingPage() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
-      <section className="space-y-3 rounded-2xl border border-white/10 bg-indigo-900/65 p-6 sm:p-8">
-        <p className="text-xs font-semibold tracking-[0.14em] text-cyan-300 uppercase">{tr(locale, "Pricing", "Pricing")}</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">{tr(locale, "Two simple plans", "Two simple plans")}</h1>
-        <p className="max-w-3xl text-sm text-violet-200 sm:text-base">
+    <div className="section-shell flex max-w-6xl flex-col gap-6 py-10 sm:py-14">
+      <section className="space-y-3 rounded-2xl border border-blacksmith bg-card p-6 sm:p-8">
+        <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{tr(locale, "Pricing", "Pricing")}</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{tr(locale, "Two simple plans", "Two simple plans")}</h1>
+        <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
           {tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}
         </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
         {plans.map((plan) => (
-          <Card key={plan.id} className={plan.highlighted ? "border-cyan-400/40 bg-indigo-900/75" : "border-white/10 bg-indigo-900/65"}>
+          <Card key={plan.id} className={plan.highlighted ? "border-primary/40 bg-card" : "bg-card"}>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-violet-50">{tr(locale, plan.name.en, plan.name.en)}</CardTitle>
-              <p className="text-xl font-semibold text-cyan-300">{tr(locale, plan.price.en, plan.price.en)}</p>
-              <p className="text-sm text-violet-200">{tr(locale, plan.description.en, plan.description.en)}</p>
+              <CardTitle className="text-2xl text-foreground">{tr(locale, plan.name.en, plan.name.en)}</CardTitle>
+              <p className="text-xl font-semibold text-primary">{tr(locale, plan.price.en, plan.price.en)}</p>
+              <p className="text-sm text-muted-foreground">{tr(locale, plan.description.en, plan.description.en)}</p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2 text-sm text-violet-200">
+              <div className="space-y-2 text-sm text-muted-foreground">
                 {plan.features.map((feature) => (
                   <div key={feature.en} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-cyan-300" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
                     <p>{tr(locale, feature.en, feature.en)}</p>
                   </div>
                 ))}
@@ -103,7 +103,7 @@ export default async function PricingPage() {
         ))}
       </section>
 
-      <p className="text-center text-xs text-violet-300/80">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
+      <p className="text-center text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
     </div>
   );
 }

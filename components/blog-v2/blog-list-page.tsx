@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, Newspaper } from "lucide-react";
 import { BlogArticleCard } from "@/components/blog-v2/blog-article-card";
 import { BlogFeaturedCard } from "@/components/blog-v2/blog-featured-card";
@@ -47,10 +47,10 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
 
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
         <section className="rounded-3xl border border-slate-700/70 bg-[linear-gradient(145deg,rgba(10,18,33,0.92),rgba(6,12,24,0.9))] p-6 shadow-[0_0_0_1px_rgba(35,52,95,0.2),0_24px_90px_rgba(2,8,24,0.62)] sm:p-8">
-          <span className="inline-flex rounded-full border border-cyan-400/35 bg-cyan-500/10 px-3 py-1 text-[11px] font-semibold tracking-[0.2em] text-cyan-100 uppercase">
+          <span className="inline-flex rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.2em] text-primary uppercase">
             Resources
           </span>
-          <h1 className="mt-4 max-w-5xl text-4xl leading-[1.03] font-semibold tracking-tight text-white sm:text-6xl">
+          <h1 className="mt-4 max-w-5xl text-4xl leading-[1.03] font-semibold tracking-tight text-foreground sm:text-6xl">
             BridgeMind Blog
           </h1>
           <p className="mt-4 max-w-4xl text-base leading-8 text-slate-200/92">
@@ -69,13 +69,13 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
         />
 
         {selectedTopicMeta ? (
-          <Card className="border-cyan-500/25 bg-cyan-500/8">
+          <Card className="border-primary/30 bg-primary/8">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-cyan-100">Topic: {selectedTopicMeta.name}</CardTitle>
+              <CardTitle className="text-xl text-primary">Topic: {selectedTopicMeta.name}</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm text-cyan-100/90">
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm text-primary/90">
               <p>{selectedTopicMeta.description}</p>
-              <Button asChild variant="outline" className="border-cyan-400/30 bg-slate-900/65 text-cyan-100 hover:bg-slate-900">
+              <Button asChild variant="outline" className="border-primary/30 bg-slate-900/65 text-primary hover:bg-slate-900">
                 <Link href="/blog">Reset topic</Link>
               </Button>
             </CardContent>
@@ -86,7 +86,7 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
 
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-3xl font-semibold tracking-tight text-white">Latest from BridgeMind</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground">Latest from BridgeMind</h2>
           </div>
 
           {withoutFeatured.length > 0 ? (
@@ -104,14 +104,14 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
           )}
         </section>
 
-        <section className="rounded-3xl border border-cyan-500/25 bg-[linear-gradient(120deg,rgba(9,30,52,0.75),rgba(4,10,20,0.95))] p-6 shadow-[0_0_0_1px_rgba(35,72,110,0.3),0_28px_90px_rgba(2,8,24,0.64)] sm:p-8">
-          <h2 className="text-3xl font-semibold tracking-tight text-white">Suggest an article or benchmark scenario</h2>
+        <section className="rounded-3xl border border-primary/30 bg-[linear-gradient(120deg,rgba(9,30,52,0.75),rgba(4,10,20,0.95))] p-6 shadow-[0_0_0_1px_rgba(35,72,110,0.3),0_28px_90px_rgba(2,8,24,0.64)] sm:p-8">
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground">Suggest an article or benchmark scenario</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-200 sm:text-base">
             Share your production challenge, architecture question, or model comparison request. We review incoming
             ideas in the editorial queue every week.
           </p>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button asChild className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
+            <Button asChild className="bg-primary text-slate-950 hover:bg-cyan-400">
               <BlogTrackedLink
                 href="/contact"
                 eventName="blog_cta_click"
@@ -137,3 +137,4 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
     </div>
   );
 }
+

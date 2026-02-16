@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,21 +27,21 @@ export async function BlogPostCard({ post, locale }: BlogPostCardProps) {
         tagSlug,
         tag: await getBlogTagBySlug(tagSlug),
     })));
-    return (<Card className="border-white/10 bg-indigo-950/75">
+    return (<Card className="border-blacksmith bg-card">
       <CardHeader className="space-y-3 pb-2">
         <div className="flex flex-wrap items-center gap-2">
           {tags.map(({ tagSlug, tag }) => {
-            return (<Badge key={tagSlug} variant="outline" className="border-cyan-400/30 bg-cyan-500/10 text-cyan-200">
+            return (<Badge key={tagSlug} variant="outline" className="border-primary/30 bg-primary/10 text-primary">
                 {tag ? tag.label[locale] : tagSlug}
               </Badge>);
         })}
         </div>
-        <CardTitle className="text-lg text-violet-50">{localized.title}</CardTitle>
+        <CardTitle className="text-lg text-foreground">{localized.title}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 text-sm text-violet-200">
+      <CardContent className="space-y-4 text-sm text-muted-foreground">
         <p>{localized.excerpt}</p>
 
-        <div className="flex flex-wrap items-center gap-3 text-xs tracking-[0.1em] text-violet-300 uppercase">
+        <div className="flex flex-wrap items-center gap-3 text-xs tracking-[0.1em] text-muted-foreground uppercase">
           <span className="inline-flex items-center gap-1.5">
             <CalendarDays className="size-3.5"/>
             {formatDate(post.publishedAt, locale)}
@@ -52,10 +52,11 @@ export async function BlogPostCard({ post, locale }: BlogPostCardProps) {
           </span>
         </div>
 
-        <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-50 transition hover:text-white">
+        <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition hover:text-foreground">
           {tr(locale, "Read article", "Read article")}
           <ArrowRight className="size-4"/>
         </Link>
       </CardContent>
     </Card>);
 }
+

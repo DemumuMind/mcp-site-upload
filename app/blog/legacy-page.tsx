@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Newspaper } from "lucide-react";
 import { BlogFeaturedPost } from "@/components/blog/blog-featured-post";
@@ -105,7 +105,7 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
     .filter((tagItem) => tagItem.count > 0);
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <div className="relative overflow-hidden border-t border-blacksmith">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#050d1b_0%,#060b16_45%,#040811_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_15%_5%,rgba(139,92,246,0.2),transparent_38%),radial-gradient(circle_at_82%_5%,rgba(56,189,248,0.14),transparent_38%)]" />
 
@@ -115,18 +115,18 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
         <BlogFilterBar locale={locale} selectedTag={selectedTag?.slug ?? null} tags={tagsWithCounts} />
 
         {selectedTag ? (
-          <Card className="border-white/10 bg-indigo-950/75">
+          <Card className="border-blacksmith bg-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-violet-50">
+              <CardTitle className="text-xl text-foreground">
                 {tr(locale, "Filtered by", "Filtered by")}: {selectedTag.label[locale]}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm text-violet-200">
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
               <p>{selectedTag.description[locale]}</p>
               <Button
                 asChild
                 variant="outline"
-                className="border-white/20 bg-indigo-900/70 text-violet-50 hover:bg-indigo-900"
+                className="border-blacksmith bg-card text-foreground hover:bg-accent"
               >
                 <Link href="/blog">{tr(locale, "Reset filter", "Reset filter")}</Link>
               </Button>
@@ -138,7 +138,7 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
 
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-2xl font-semibold tracking-tight text-violet-50 sm:text-3xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               {tr(locale, "Latest from BridgeMind", "Latest from BridgeMind")}
             </h2>
           </div>
@@ -150,8 +150,8 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
               ))}
             </div>
           ) : (
-            <Card className="border-white/10 bg-indigo-950/75">
-              <CardContent className="py-8 text-center text-sm text-violet-200">
+            <Card className="border-blacksmith bg-card">
+              <CardContent className="py-8 text-center text-sm text-muted-foreground">
                 {tr(
                   locale,
                   "No posts match this filter yet. Try another topic.",
@@ -162,15 +162,15 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
           )}
         </section>
 
-        <section className="rounded-3xl border border-cyan-400/20 bg-[linear-gradient(120deg,rgba(11,30,50,0.85),rgba(6,12,24,0.95))] p-6 sm:p-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-violet-50 sm:text-3xl">
+        <section className="rounded-3xl border border-primary/30 bg-[linear-gradient(120deg,rgba(11,30,50,0.85),rgba(6,12,24,0.95))] p-6 sm:p-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             {tr(
               locale,
               "Want to suggest an article or benchmark scenario?",
               "Want to suggest an article or benchmark scenario?",
             )}
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-violet-200 sm:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">
             {tr(
               locale,
               "Send us your topic idea, production challenge, or model comparison request and we will include it in the editorial queue.",
@@ -187,7 +187,7 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
             <Button
               asChild
               variant="outline"
-              className="border-white/20 bg-indigo-900/70 text-violet-50 hover:bg-indigo-900"
+              className="border-blacksmith bg-card text-foreground hover:bg-accent"
             >
               <Link href="/discord">
                 <Newspaper className="size-4" />
@@ -200,3 +200,5 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
     </div>
   );
 }
+
+

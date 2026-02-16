@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, Scale } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -33,24 +33,24 @@ export default async function TermsPage() {
   const updatedLabel = getTermsLastUpdatedLabel();
 
   return (
-    <div className="relative overflow-hidden border-t border-white/10">
+    <div className="relative overflow-hidden border-t border-blacksmith">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#030711_0%,#050b1c_48%,#07091a_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_22%_8%,rgba(56,189,248,0.2),transparent_42%),radial-gradient(circle_at_78%_4%,rgba(99,102,241,0.17),transparent_38%)]" />
 
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[280px_1fr] lg:px-8 lg:py-14">
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl border border-cyan-400/20 bg-indigo-950/72 p-4">
-            <Badge className="mb-3 border-cyan-400/35 bg-cyan-500/10 text-cyan-200">
+          <div className="rounded-2xl border border-primary/30 bg-card p-4">
+            <Badge className="mb-3 border-primary/35 bg-primary/10 text-primary">
               <Scale className="size-3" />
               {tr(locale, "Legal", "Legal")}
             </Badge>
-            <h1 className="text-2xl font-semibold tracking-tight text-violet-50">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {tr(locale, "Terms of Service", "Terms of Service")}
             </h1>
-            <p className="mt-2 text-sm leading-6 text-violet-200">
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {tr(locale, "Last updated", "Last updated")}: {updatedLabel}
             </p>
-            <p className="mt-3 text-xs leading-5 text-violet-300">
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
               {tr(
                 locale,
                 "Global baseline terms with U.S. (Delaware) governing law and venue.",
@@ -59,9 +59,9 @@ export default async function TermsPage() {
             </p>
           </div>
 
-          <Card className="border-white/10 bg-indigo-950/75">
+          <Card className="border-blacksmith bg-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm tracking-[0.13em] text-violet-300 uppercase">
+              <CardTitle className="text-sm tracking-[0.13em] text-muted-foreground uppercase">
                 {tr(locale, "Contents", "Contents")}
               </CardTitle>
             </CardHeader>
@@ -70,7 +70,7 @@ export default async function TermsPage() {
                 <a
                   key={section.id}
                   href={`#${section.id}`}
-                  className="block rounded-md px-2 py-1.5 text-violet-200 transition hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/80"
+                  className="block rounded-md px-2 py-1.5 text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                 >
                   {section.title}
                 </a>
@@ -80,8 +80,8 @@ export default async function TermsPage() {
         </aside>
 
         <section className="space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-indigo-950/74 p-5">
-            <p className="text-sm leading-7 text-violet-200">
+          <div className="rounded-2xl border border-blacksmith bg-card p-5">
+            <p className="text-sm leading-7 text-muted-foreground">
               {tr(
                 locale,
                 "Please read these Terms carefully. They describe your rights, responsibilities, and key limits when using DemumuMind MCP.",
@@ -91,17 +91,17 @@ export default async function TermsPage() {
           </div>
 
           {termsV2Sections.map((section) => (
-            <Card key={section.id} id={section.id} className="scroll-mt-24 border-white/10 bg-indigo-950/76">
+            <Card key={section.id} id={section.id} className="scroll-mt-24 border-blacksmith bg-card">
               <CardHeader className="space-y-2 pb-2">
-                <CardTitle className="text-xl text-violet-50">{section.title}</CardTitle>
-                <p className="text-sm text-violet-300">{section.summary}</p>
+                <CardTitle className="text-xl text-foreground">{section.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">{section.summary}</p>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm leading-7 text-violet-200 sm:text-base">
+              <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground sm:text-base">
                 {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 {section.bullets ? (
                   <ul className="space-y-2 pl-5">
                     {section.bullets.map((bullet) => (
-                      <li key={bullet} className="list-disc marker:text-cyan-300">
+                      <li key={bullet} className="list-disc marker:text-primary">
                         {bullet}
                       </li>
                     ))}
@@ -129,7 +129,7 @@ export default async function TermsPage() {
                 {tr(locale, "Contact", "Contact")}:{" "}
                 <Link
                   href={`mailto:${legalEmail}`}
-                  className="inline-flex items-center gap-1 text-amber-100 underline underline-offset-2 transition hover:text-white"
+                  className="inline-flex items-center gap-1 text-amber-100 underline underline-offset-2 transition hover:text-foreground"
                 >
                   {legalEmail}
                   <ArrowUpRight className="size-3" />
@@ -142,3 +142,5 @@ export default async function TermsPage() {
     </div>
   );
 }
+
+
