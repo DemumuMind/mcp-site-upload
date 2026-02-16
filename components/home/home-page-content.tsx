@@ -3,7 +3,11 @@ import type { HomePageViewModel } from "@/lib/home/types";
 import { FinalCtaSection } from "@/components/home/sections/final-cta-section";
 import { HeroSection } from "@/components/home/sections/hero-section";
 import { IcpSection } from "@/components/home/sections/icp-section";
+import { LogoCloudSection } from "@/components/home/sections/logo-cloud-section";
+import { ComparisonSection } from "@/components/home/sections/comparison-section";
 import { ProofMetricsSection } from "@/components/home/sections/proof-metrics-section";
+import { ProductProofSection } from "@/components/home/sections/product-proof-section";
+import { ShowcaseSection } from "@/components/home/sections/showcase-section";
 import { TrustSignalsSection } from "@/components/home/sections/trust-signals-section";
 import { WorkflowSection } from "@/components/home/sections/workflow-section";
 
@@ -39,7 +43,9 @@ export function HomePageContent({ content, viewModel }: HomePageContentProps) {
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.22),transparent_56%)]" />
 
       <HeroSection content={content.hero} />
+      <LogoCloudSection content={content.logoCloud} />
       <ProofMetricsSection content={content.metrics} metrics={viewModel.metrics} />
+      <ComparisonSection content={content.comparison} />
       <WorkflowSection content={content.workflows} />
       <TrustSignalsSection
         content={content.trust}
@@ -47,6 +53,8 @@ export function HomePageContent({ content, viewModel }: HomePageContentProps) {
         topCategories={viewModel.topCategories}
         topLanguages={viewModel.topLanguages}
       />
+      <ShowcaseSection content={content.showcases} />
+      <ProductProofSection content={content.productProof} />
       <IcpSection content={content.icp} />
       <FinalCtaSection content={content.finalCta} />
     </div>

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
               <div className="flex flex-wrap gap-2">
                 {topCategories.map((entry) => (
                   <Badge key={entry.label} variant="secondary">
-                    {entry.label} · {entry.count}
+                    {entry.label} - {entry.count}
                   </Badge>
                 ))}
               </div>
@@ -47,7 +47,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
               <div className="flex flex-wrap gap-2">
                 {topLanguages.map((entry) => (
                   <Badge key={entry.label} variant="secondary">
-                    {entry.label} · {entry.count}
+                    {entry.label} - {entry.count}
                   </Badge>
                 ))}
               </div>
@@ -77,7 +77,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
                     <Badge variant="secondary" className="text-[10px]">{server.category}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {content.featuredAuthLabel}: {server.authLabel} · {server.toolsCount} {content.featuredToolsLabel}
+                    {content.featuredAuthLabel}: {server.authLabel} - {server.toolsCount} {content.featuredToolsLabel}
                   </p>
                   <p className="mt-1 text-xs text-primary">{server.verificationLabel}</p>
                 </div>
@@ -89,4 +89,5 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
     </section>
   );
 }
+
 

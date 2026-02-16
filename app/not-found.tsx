@@ -21,13 +21,13 @@ const quickLinks: readonly QuickLink[] = [
   },
   {
     href: "/how-to-use",
-    title: "Setup Guide",
+    title: "Read the Setup Guide",
     description: "Connect MCP clients and verify tool calls",
     icon: BookOpen,
   },
   {
     href: "/submit-server",
-    title: "Submit Server",
+    title: "Submit Your Server",
     description: "Publish your MCP server in the directory",
     icon: Send,
   },
@@ -68,7 +68,7 @@ export default async function NotFound() {
             className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary/30 bg-gradient-to-r from-primary to-[#f3b811] px-6 py-2 text-sm font-semibold text-primary-foreground shadow-[0_0_30px_rgba(14,165,233,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <House className="size-4" />
-            {tr(locale, "Open Catalog", "Open Catalog")}
+            {tr(locale, "Open the Catalog", "Open the Catalog")}
           </Link>
         </div>
 
@@ -100,4 +100,5 @@ export default async function NotFound() {
     </div>
   );
 }
+
 

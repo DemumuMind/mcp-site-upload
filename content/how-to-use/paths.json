@@ -1,7 +1,7 @@
-{
+﻿{
   "heroActions": {
     "primaryLabel": {
-      "en": "Open Catalog"
+      "en": "Open the Catalog"
     },
     "secondaryLabel": {
       "en": "Jump to setup paths"
@@ -300,3 +300,4 @@
     ]
   }
 }
+

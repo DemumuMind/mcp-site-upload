@@ -45,8 +45,8 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
+                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                 aria-label={item.label}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-blacksmith bg-card text-muted-foreground transition hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:h-9 sm:w-9"
               >
                 <item.icon className="size-4" />
               </a>
@@ -61,6 +61,9 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           <p><Link href="/mcp" className={footerLinkClass}>{tr(locale, "MCP Overview", "MCP Overview")}</Link></p>
           <p><Link href="/tools" className={footerLinkClass}>{tr(locale, "Tools", "Tools")}</Link></p>
           <p><Link href="/blog" className={footerLinkClass}>{tr(locale, "Blog", "Blog")}</Link></p>
+          <p><Link href="/how-to-use" className={footerLinkClass}>{tr(locale, "Documentation", "Documentation")}</Link></p>
+          <p><Link href="/privacy" className={footerLinkClass}>{tr(locale, "Security", "Security")}</Link></p>
+          <p><Link href="/sitemap" className={footerLinkClass}>{tr(locale, "Status & Trust", "Status & Trust")}</Link></p>
         </div>
 
         <div className="space-y-3 text-sm">
@@ -77,14 +80,14 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         <div className="space-y-3 text-sm">
           <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">{tr(locale, "Community", "Community")}</p>
           <p><Link href="/discord" className={footerLinkClass}>{tr(locale, "Discord", "Discord")}</Link></p>
-          <p><Link href="/submit-server" className={footerLinkClass}>{tr(locale, "Submit Server", "Submit Server")}</Link></p>
-          <p><Link href="/how-to-use" className={footerLinkClass}>{tr(locale, "Setup Guide", "Setup Guide")}</Link></p>
+          <p><Link href="/submit-server" className={footerLinkClass}>{tr(locale, "Submit Your Server", "Submit Your Server")}</Link></p>
+          <p><Link href="/how-to-use" className={footerLinkClass}>{tr(locale, "Read the Setup Guide", "Read the Setup Guide")}</Link></p>
           <p><Link href="/auth" className={footerLinkClass}>{tr(locale, "Sign In", "Sign In")}</Link></p>
         </div>
       </div>
 
       <div className="section-shell flex flex-wrap items-center justify-between gap-3 border-t border-blacksmith py-4 text-xs text-muted-foreground">
-        <p>{tr(locale, `© ${year} DemumuMind. All rights reserved.`, `© ${year} DemumuMind. All rights reserved.`)}</p>
+        <p>{tr(locale, `(c) ${year} DemumuMind. All rights reserved.`, `(c) ${year} DemumuMind. All rights reserved.`)}</p>
         <p>{tr(locale, "Built for modern AI agent workflows.", "Built for modern AI agent workflows.")}</p>
       </div>
     </footer>

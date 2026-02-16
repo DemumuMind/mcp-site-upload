@@ -53,7 +53,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={submitHref}>
           <span className="sm:hidden">{tr(locale, "Submit", "Submit")}</span>
-          <span className="hidden sm:inline">{tr(locale, "Submit Server", "Submit Server")}</span>
+          <span className="hidden sm:inline">{tr(locale, "Submit Your Server", "Submit Your Server")}</span>
         </Link>
       </Button>
       <Button type="button" variant="outline" size="sm" onClick={() => {
@@ -64,4 +64,5 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>
     </div>);
 }
+
 

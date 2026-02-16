@@ -1,4 +1,4 @@
-import fs from "node:fs";
+﻿import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import type { Locale } from "@/lib/i18n";
@@ -160,7 +160,7 @@ let hasLoadedHowToUsePaths = false;
 const fallbackHowToUsePaths: HowToUsePaths = {
     heroActions: {
         primaryLabel: {
-            en: "Open Catalog",
+            en: "Open the Catalog",
         },
         secondaryLabel: {
             en: "Jump to setup paths",
@@ -502,3 +502,4 @@ export function getHowToUseLocaleContent(locale: Locale): HowToUseLocaleContent 
         },
     };
 }
+

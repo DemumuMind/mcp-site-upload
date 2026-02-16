@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -20,6 +20,12 @@ type AccountSubmissionRow = {
     category: string | null;
     auth_type: string | null;
     status: string | null;
+};
+type AccountAuthEventRow = {
+    id: string;
+    created_at: string | null;
+    event_type: string;
+    ip_address: string | null;
 };
 const ACCOUNT_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -111,6 +117,36 @@ function getShortUserId(userId: string): string {
     }
     return `${userId.slice(0, 8)}...${userId.slice(-4)}`;
 }
+function getAuthEventLabel(locale: Locale, eventType: string): string {
+    if (eventType === "login_success") {
+        return tr(locale, "Successful login", "Successful login");
+    }
+    if (eventType === "login_failure") {
+        return tr(locale, "Failed login", "Failed login");
+    }
+    if (eventType === "login_rate_limited") {
+        return tr(locale, "Rate limit triggered", "Rate limit triggered");
+    }
+    if (eventType === "password_reset_request") {
+        return tr(locale, "Password reset requested", "Password reset requested");
+    }
+    if (eventType === "password_reset_success") {
+        return tr(locale, "Password reset completed", "Password reset completed");
+    }
+    if (eventType === "logout") {
+        return tr(locale, "Sign out", "Sign out");
+    }
+    return eventType;
+}
+function getAuthEventClass(eventType: string): string {
+    if (eventType === "login_success" || eventType === "password_reset_success") {
+        return "border-emerald-400/35 bg-emerald-500/10 text-emerald-200";
+    }
+    if (eventType === "login_failure" || eventType === "login_rate_limited") {
+        return "border-rose-400/35 bg-rose-500/10 text-rose-200";
+    }
+    return "border-violet-300/25 bg-indigo-900/60 text-violet-200";
+}
 export async function generateMetadata(): Promise<Metadata> {
     const locale = await getLocale();
     return {
@@ -134,7 +170,14 @@ export default async function AccountPage() {
         .select("id, created_at, name, slug, category, auth_type, status")
         .eq("owner_user_id", userData.user.id)
         .order("created_at", { ascending: false });
+    const { data: authEventRows } = await supabaseClient
+        .from("auth_security_events")
+        .select("id, created_at, event_type, ip_address")
+        .eq("user_id", userData.user.id)
+        .order("created_at", { ascending: false })
+        .limit(8);
     const submissions = (submissionRows ?? []) as AccountSubmissionRow[];
+    const authEvents = (authEventRows ?? []) as AccountAuthEventRow[];
     const pendingCount = submissions.filter((submission) => submission.status === "pending").length;
     const rejectedCount = submissions.filter((submission) => submission.status === "rejected").length;
     const activeCount = submissions.length - pendingCount - rejectedCount;
@@ -280,6 +323,31 @@ export default async function AccountPage() {
           </Card>
 
           <AccountProfileForms locale={locale} initialProfile={initialProfile}/>
+
+          <Card className="border-white/10 bg-indigo-900/72">
+            <CardHeader className="space-y-2">
+              <CardTitle className="flex items-center gap-2 text-xl text-violet-50">
+                <ShieldCheck className="size-5 text-blue-300"/>
+                {tr(locale, "Security activity", "Security activity")}
+              </CardTitle>
+              <p className="text-sm text-violet-200">
+                {tr(locale, "Recent login/security events for your account.", "Recent login/security events for your account.")}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {authEvents.length === 0 ? (<div className="rounded-lg border border-dashed border-white/15 bg-indigo-950/45 px-4 py-3 text-sm text-violet-200">
+                  {tr(locale, "No security events yet.", "No security events yet.")}
+                </div>) : (authEvents.map((event) => (<div key={event.id} className="rounded-lg border border-white/10 bg-indigo-950/60 px-3 py-2.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className={getAuthEventClass(event.event_type)}>{getAuthEventLabel(locale, event.event_type)}</Badge>
+                      <span className="text-xs text-violet-300">{formatDate(event.created_at, locale)}</span>
+                    </div>
+                    {event.ip_address ? (<p className="mt-1 text-xs text-violet-300">
+                        IP: {event.ip_address}
+                      </p>) : null}
+                  </div>)))}
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="border-white/10 bg-indigo-900/72">
@@ -299,7 +367,7 @@ export default async function AccountPage() {
               </div>) : null}
 
             {!submissionError && submissions.length === 0 ? (<div className="rounded-lg border border-dashed border-white/15 bg-indigo-950/45 px-4 py-3 text-sm text-violet-200">
-                {tr(locale, "No submissions yet. Open Submit Server to send your first MCP server for moderation.", "No submissions yet. Open Submit Server to send your first MCP server for moderation.")}
+                {tr(locale, "No submissions yet. Use “Submit Your Server” to send your first MCP server for moderation.", "No submissions yet. Use “Submit Your Server” to send your first MCP server for moderation.")}
               </div>) : null}
 
             {submissions.map((submission) => {
@@ -322,11 +390,11 @@ export default async function AccountPage() {
 
                   <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-violet-300">
                     <span>{submission.category ?? tr(locale, "Other", "Other")}</span>
-                    <span className="text-violet-400">•</span>
+                    <span className="text-violet-400">вЂў</span>
                     {hasPublicPage && submission.slug ? (<Link href={`/server/${submission.slug}`} className="font-medium text-blue-300 transition hover:text-blue-200">
                         /server/{submission.slug}
                       </Link>) : (<span>{submission.slug ?? "-"}</span>)}
-                    <span className="text-violet-400">•</span>
+                    <span className="text-violet-400">вЂў</span>
                     <span className="inline-flex items-center gap-1">
                       <CalendarDays className="size-3.5"/>
                       {formatDate(submission.created_at, locale)}
@@ -339,3 +407,4 @@ export default async function AccountPage() {
       </div>
     </div>);
 }
+
