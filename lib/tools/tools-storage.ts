@@ -76,8 +76,3 @@ export function appendRulesHistory(item: RulesHistoryItem): RulesHistoryItem[] {
   persistArray(HISTORY_STORAGE_KEY, next);
   return next;
 }
-
-export function clearRulesHistory(): RulesHistoryItem[] {
-  persistArray<RulesHistoryItem>(HISTORY_STORAGE_KEY, []);
-  return [];
-}

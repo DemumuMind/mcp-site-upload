@@ -13,21 +13,6 @@ const healthOrder: HealthStatus[] = ["unknown", "healthy", "degraded", "down"];
 const sortByValues: CatalogSortField[] = ["rating", "name", "tools", "updated"];
 const sortDirValues: CatalogSortDirection[] = ["asc", "desc"];
 const layoutValues: CatalogViewMode[] = ["grid", "list"];
-export const defaultCatalogQueryV2: CatalogQueryV2 = {
-    page: defaultPage,
-    pageSize: defaultPageSize,
-    query: "",
-    categories: [],
-    pricing: [],
-    tags: [],
-    verification: [],
-    health: [],
-    toolsMin: null,
-    toolsMax: null,
-    sortBy: defaultSortBy,
-    sortDir: defaultSortDir,
-    layout: defaultLayout,
-};
 function parsePositiveInt(value: string | null | undefined, fallback: number): number {
     if (!value) {
         return fallback;

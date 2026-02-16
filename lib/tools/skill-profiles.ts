@@ -1,5 +1,3 @@
-import type { Locale } from "@/lib/i18n";
-
 export type RulesByFormat = {
   agents: string[];
   cursor: string[];
@@ -204,14 +202,8 @@ export const SKILL_PROFILES: SkillProfile[] = [
   },
 ];
 
-const SKILL_PROFILE_BY_ID = new Map(SKILL_PROFILES.map((profile) => [profile.id, profile]));
-
 export function listSkillProfiles(): SkillProfile[] {
   return [...SKILL_PROFILES];
-}
-
-export function getSkillProfileById(id: string): SkillProfile | undefined {
-  return SKILL_PROFILE_BY_ID.get(id);
 }
 
 export function getSkillProfilesByIds(ids: string[]): SkillProfile[] {
@@ -225,14 +217,4 @@ export function getSkillProfilesByIds(ids: string[]): SkillProfile[] {
   }
 
   return orderedProfiles;
-}
-
-export function localizeText(locale: Locale, text: string): string {
-  void locale;
-  return text;
-}
-
-export function localizeRules(locale: Locale, rules: string[]): string[] {
-  void locale;
-  return rules;
 }

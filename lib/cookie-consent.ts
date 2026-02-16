@@ -240,10 +240,3 @@ export function clearCookieConsent() {
   void syncCookieConsentToEndpoint(null, null);
 }
 
-export function openCookieConsentSettings() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.dispatchEvent(new Event(COOKIE_CONSENT_OPEN_EVENT));
-}
