@@ -46,6 +46,8 @@ npm run dev
 
 ## Environment Variables
 
+Detailed env management guide: [`docs/environment-variables.md`](docs/environment-variables.md)
+
 | Variable | Required | Purpose |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | yes (for DB mode) | Supabase project URL |
@@ -67,9 +69,12 @@ npm run dev
 | `CATALOG_AUTOSYNC_PAGE_LIMIT` | optional | page size per registry fetch (default `100`) |
 | `CATALOG_AUTOSYNC_MAX_PAGES` | optional | max pages per sync run (default `120`) |
 | `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` | optional | enable stale auto-row cleanup (default `true`) |
+| `CATALOG_AUTOSYNC_MIN_STALE_BASELINE_RATIO` | optional | safety threshold (0..1) to skip stale cleanup when fetched registry coverage drops unexpectedly (default `0.7`) |
+| `CATALOG_AUTOSYNC_MAX_STALE_MARK_RATIO` | optional | caps stale-processing volume per run (0..1 of auto-managed active rows, default `0.15`) |
 | `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` | optional | filter obvious test/staging/template entries (default `true`) |
 | `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
 | `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to auto-reject noisy entries |
+| `MULTI_AGENT_DEMO_SECRET` | optional (recommended in production) | bearer token for `/api/multi-agent/demo`; if unset, endpoint stays open (use only in trusted environments) |
 
 Notes:
 - If Supabase env vars are missing, app falls back to local mock data for public catalog.
@@ -147,6 +152,22 @@ curl -X POST "http://localhost:3000/api/catalog/auto-sync?limit=100&pages=120&cl
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
 ```
 
+Safety diagnostics in response (`safety`):
+- `coverage.ratio` vs `coverage.minRequiredRatio` -> if below threshold, stale cleanup is skipped.
+- `staleCap.deferredCount` -> number of stale rows postponed by per-run cap.
+- `graceMode.markedAsCandidates` / `graceMode.rejectedAfterGrace` -> two-step stale lifecycle metrics.
+
+Alerting diagnostics in response (`alerting`):
+- `status`: `ok` | `partial` | `error`
+- `shouldWarn`: warning-level alert signal present
+- `shouldPage`: paging-level alert signal present
+- `signals[]`: structured alert events (`code`, `severity`, `message`, optional `value`/`threshold`)
+
+Operational monitoring:
+- structured completion logs use `event: "catalog.auto_sync.completed"`
+- alert on warnings when `shouldWarn=true`
+- page on failures when `shouldPage=true` or `alerting.status=error` (HTTP `207`)
+
 ### Registry diagnostics helper
 
 ```bash
@@ -167,8 +188,10 @@ Behavior:
 - applies denylist/allowlist moderation patterns (allowlist overrides denylist)
 - filters obvious low-quality records (test/demo/staging/template signals)
 - updates only previously auto-managed rows (`registry-auto` tag)
-- marks stale auto-managed rows as `rejected` when they disappear from registry
+- uses two-step stale cleanup for safety: first marks missing rows as `registry-stale-candidate`, rejects only if still missing on next healthy sync
 - stale cleanup runs only after a full pagination sweep (safety guard)
+- stale cleanup is skipped if fetched coverage is below `CATALOG_AUTOSYNC_MIN_STALE_BASELINE_RATIO`
+- stale cleanup per-run volume is capped by `CATALOG_AUTOSYNC_MAX_STALE_MARK_RATIO`
 - leaves manually curated rows unchanged
 
 Moderation pattern syntax:
@@ -294,7 +317,7 @@ Workflow: `.github/workflows/deploy-smoke-check.yml`
 | `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
 | `.github/workflows/supabase-migrations.yml` | Auto/manual Supabase migration push to remote DB |
 
-Repository variables controlling execution:
+- Repository variables controlling execution:
 - `SMOKE_ENABLED=true` enables automatic smoke checks via `SMOKE_BASE_URL`.
 - `SMOKE_ALLOW_PROTECTED=true` allows smoke checks to accept `401` for protected preview URLs.
 - `VERCEL_DEPLOY_ENABLED=true` enables actual deploy steps in `deploy.yml`.
@@ -303,6 +326,17 @@ Repository variables controlling execution:
 - `BACKUP_REMOTE_CHECK_METHOD=auto|http|aws-cli` controls validation strategy (`auto` by default).
 - `BACKUP_REMOTE_S3_REGION` sets region for S3 probe fallback.
 - `SUPABASE_MIGRATIONS_ENABLED=true` enables remote migration workflow (`supabase-migrations.yml`).
+
+## Catalog Count Guard
+
+- Run `npm run catalog:count:guard -- --base-url https://your-domain` to validate that `/api/catalog/search` reports at least `CATALOG_GUARD_MIN_TOTAL`.
+- Override defaults via repository variables (matching `.github/workflows/catalog-count-guard.yml`):
+  - `CATALOG_GUARD_ENABLED=true`
+  - `CATALOG_GUARD_MIN_TOTAL=1000`
+  - `CATALOG_GUARD_SEARCH_PATH=/api/catalog/search?page=1&pageSize=1`
+  - `CATALOG_GUARD_TIMEOUT_MS` for longer probes when the catalog is slow to respond
+- When the guard fails, inspect Supabase ingestion (`app/api/catalog/auto-sync`), `CATALOG_AUTOSYNC_*` settings, and Supabase credential health before rerunning.
+Running `npm run build` picks up `.env` and `.env.local` via `scripts/run-build.mjs`, so deployment artifacts inherit the same Supabase vars that developers configure locally.
 
 Optional repository secrets for remote backup checks:
 - `BACKUP_REMOTE_AUTH_HEADER` (`Header-Name: value`)
@@ -335,4 +369,12 @@ npm run lint
 npm run build
 ```
 
-Both must pass.
+- `npm run check:env:supabase`
+  - Verifies that the required Supabase variables are present before running the rest of the suite
+- `npm run test:e2e:auth` (relies on Playwright building and running the app)
+
+### Running Auth E2E Locally
+
+- Start the app with `npm run dev` or `npm run start -- -p 3101`.
+- Run `npm run test:e2e:auth:local` to reuse an existing server via `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3101`.
+
