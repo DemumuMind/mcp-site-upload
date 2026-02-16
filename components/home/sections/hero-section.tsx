@@ -24,8 +24,9 @@ export function HeroSection({ content }: HeroSectionProps) {
       </div>
 
       <div className="home-reveal home-delay-2 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
-        <Button asChild size="lg" className="h-12 w-full rounded-lg px-7 text-sm font-semibold sm:w-auto">
+        <Button asChild size="lg" className="relative h-12 w-full overflow-hidden rounded-lg px-7 text-sm font-semibold sm:w-auto">
           <Link href="/catalog">
+            <span className="pointer-events-none absolute inset-0 cta-shimmer opacity-70" aria-hidden />
             {content.primaryCta}
             <ArrowRight className="size-4" />
           </Link>

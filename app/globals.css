@@ -366,6 +366,21 @@
   .animate-grid-drift {
     animation: grid-drift 14s linear infinite;
   }
+
+  @keyframes cta-shimmer {
+    0% {
+      background-position: -220% 0;
+    }
+    100% {
+      background-position: 220% 0;
+    }
+  }
+
+  .cta-shimmer {
+    background-image: linear-gradient(110deg, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0) 65%);
+    background-size: 220% 100%;
+    animation: cta-shimmer 3.4s linear infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -376,7 +391,8 @@
   .animate-blacksmith-pulse,
   .home-reveal,
   .home-float-slow,
-  .animate-grid-drift {
+  .animate-grid-drift,
+  .cta-shimmer {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
