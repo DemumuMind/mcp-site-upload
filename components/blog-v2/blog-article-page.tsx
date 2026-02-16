@@ -92,7 +92,7 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
                         from_topic: primaryTag,
                         to_slug: item.slug,
                       }}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-cyan-50"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary"
                     >
                       Read article
                       <ArrowRight className="size-4" />
@@ -114,7 +114,7 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
               href="/contact"
               eventName="blog_cta_click"
               payload={{ location: "article_bottom", action: "contact_editorial_team", slug: post.slug }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-105"
             >
               Contact editorial team
             </BlogTrackedLink>

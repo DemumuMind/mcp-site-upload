@@ -133,7 +133,7 @@ export async function LegacyBlogArticlePage({ params }: LegacyBlogArticlePagePro
 
         <div className="flex flex-wrap items-center gap-2">
           {tagEntries.map(({ slug: tagSlug, tag }) => (
-            <Badge key={tagSlug} variant="outline" className="border-cyan-400/30 bg-cyan-500/10 text-cyan-200">
+            <Badge key={tagSlug} variant="outline" className="border-primary/30 bg-cyan-500/10 text-cyan-200">
               {tag ? tag.label[locale] : tagSlug}
             </Badge>
           ))}

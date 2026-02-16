@@ -65,7 +65,7 @@ export default async function NotFound() {
         <div className="mt-8 flex justify-center">
           <Link
             href="/catalog"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary/30 bg-gradient-to-r from-sky-500 to-cyan-400 px-6 py-2 text-sm font-semibold text-primary-foreground shadow-[0_0_30px_rgba(14,165,233,0.35)] transition hover:from-sky-400 hover:to-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary/30 bg-gradient-to-r from-primary to-[#f3b811] px-6 py-2 text-sm font-semibold text-primary-foreground shadow-[0_0_30px_rgba(14,165,233,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <House className="size-4" />
             {tr(locale, "Open Catalog", "Open Catalog")}
@@ -77,7 +77,7 @@ export default async function NotFound() {
             <Link
               key={item.href}
               href={item.href}
-              className="group rounded-2xl border border-cyan-400/15 bg-card px-4 py-5 text-left transition hover:border-primary/35 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="group rounded-2xl border border-primary/25 bg-card px-4 py-5 text-left transition hover:border-primary/35 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <item.icon className="size-5 text-primary transition group-hover:text-primary" />
               <p className="mt-3 text-base font-semibold text-foreground">{tr(locale, item.title, item.title)}</p>

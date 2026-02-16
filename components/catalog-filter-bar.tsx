@@ -35,16 +35,16 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
           <SelectValue placeholder={tr(locale, "Sort by", "Sort by")}/>
         </SelectTrigger>
         <SelectContent className="border-blacksmith bg-card text-foreground">
-          <SelectItem value="rating" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="rating" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Rating", "Rating")}
           </SelectItem>
-          <SelectItem value="name" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="name" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Name", "Name")}
           </SelectItem>
-          <SelectItem value="tools" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="tools" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Tool count", "Tool count")}
           </SelectItem>
-          <SelectItem value="updated" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="updated" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Recently added", "Recently added")}
           </SelectItem>
         </SelectContent>
@@ -55,10 +55,10 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
           <SelectValue placeholder={tr(locale, "Order", "Order")}/>
         </SelectTrigger>
         <SelectContent className="border-blacksmith bg-card text-foreground">
-          <SelectItem value="desc" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="desc" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Descending", "Descending")}
           </SelectItem>
-          <SelectItem value="asc" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="asc" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Ascending", "Ascending")}
           </SelectItem>
         </SelectContent>
@@ -69,13 +69,13 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
           <SelectValue placeholder={tr(locale, "Page size", "Page size")}/>
         </SelectTrigger>
         <SelectContent className="border-blacksmith bg-card text-foreground">
-          <SelectItem value="12" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="12" className="focus:bg-card focus:text-foreground">
             12 / {tr(locale, "page", "page")}
           </SelectItem>
-          <SelectItem value="24" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="24" className="focus:bg-card focus:text-foreground">
             24 / {tr(locale, "page", "page")}
           </SelectItem>
-          <SelectItem value="48" className="focus:bg-indigo-800 focus:text-foreground">
+          <SelectItem value="48" className="focus:bg-card focus:text-foreground">
             48 / {tr(locale, "page", "page")}
           </SelectItem>
         </SelectContent>

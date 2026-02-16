@@ -24,7 +24,7 @@ export function BlogFilterBar({ locale, selectedTag, tags }: BlogFilterBarProps)
       </div>
       <div className="flex flex-wrap gap-2">
         <Link href="/blog" className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs transition ${!normalizedSelectedTag
-            ? "border-violet-300/45 bg-violet-500/15 text-foreground"
+            ? "border-primary/40 bg-primary0/15 text-foreground"
             : "border-blacksmith bg-card text-muted-foreground hover:border-white/25 hover:text-foreground"}`}>
           {tr(locale, "All", "All")}
         </Link>
@@ -32,11 +32,11 @@ export function BlogFilterBar({ locale, selectedTag, tags }: BlogFilterBarProps)
         {tags.map((tag) => {
             const isActive = normalizeTag(tag.slug) === normalizedSelectedTag;
             return (<Link key={tag.slug} href={`/blog?tag=${encodeURIComponent(tag.slug)}`} className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition ${isActive
-                    ? "border-violet-300/45 bg-violet-500/15 text-foreground"
+                    ? "border-primary/40 bg-primary0/15 text-foreground"
                     : "border-blacksmith bg-card text-muted-foreground hover:border-white/25 hover:text-foreground"}`}>
               <span>{tag.label}</span>
               <Badge variant="outline" className={`h-4 border px-1.5 text-[10px] ${isActive
-                    ? "border-violet-300/50 bg-violet-500/20 text-foreground"
+                    ? "border-primary/45 bg-primary0/20 text-foreground"
                     : "border-blacksmith bg-indigo-900 text-muted-foreground"}`}>
                 {tag.count}
               </Badge>

@@ -412,7 +412,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         };
     }, [isMobileFiltersOpen]);
     return (<div className="space-y-4">
-      <div className="sticky top-14 z-30 rounded-2xl border border-blacksmith bg-indigo-950/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
+      <div className="sticky top-14 z-30 rounded-2xl border border-blacksmith bg-card/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
         <CatalogFilterBar searchQuery={searchInputValue} sortField={queryState.sortBy} sortDirection={queryState.sortDir} pageSize={queryState.pageSize} viewMode={queryState.layout} activeFilterCount={activeFilterCount} isMobileFiltersOpen={isMobileFiltersOpen} onSearchQueryChange={setSearchInputValue} onSortFieldChange={handleSortFieldChange} onSortDirectionChange={handleSortDirectionChange} onPageSizeChange={handlePageSizeChange} onViewModeChange={handleViewModeChange} onToggleMobileFilters={() => setIsMobileFiltersOpen((current) => !current)}/>
       </div>
 

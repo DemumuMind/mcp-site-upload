@@ -81,7 +81,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
         className="pointer-events-auto rounded-3xl border border-indigo-500/55 bg-[#332f8f] p-4 shadow-[0_22px_64px_rgba(4,10,40,0.5)]"
       >
         <div className="flex items-start gap-2.5">
-          <div className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-foreground">
+          <div className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-indigo-400/70 bg-card text-foreground">
             <Cookie className="size-4" />
           </div>
           <div className="flex-1">
@@ -107,7 +107,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
               onClick={() => {
                 setIsSettingsOpen(false);
               }}
-              className="inline-flex size-8 items-center justify-center rounded-full border border-indigo-400/70 bg-indigo-700/45 text-foreground transition hover:bg-indigo-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
+              className="inline-flex size-8 items-center justify-center rounded-full border border-indigo-400/70 bg-card text-foreground transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
               aria-label={tr(locale, "Close cookie settings", "Close cookie settings")}
             >
               <X className="size-4" />
@@ -121,7 +121,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
             onClick={() => {
               chooseConsent("all");
             }}
-            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-transparent bg-white px-4 text-[1.05rem] font-medium text-black transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-transparent bg-primary px-4 text-[1.05rem] font-medium text-black transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
           >
             {tr(locale, "Accept All", "Accept All")}
           </button>
@@ -130,7 +130,7 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
             onClick={() => {
               chooseConsent("necessary");
             }}
-            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-indigo-500 bg-transparent px-4 text-[1.05rem] font-semibold text-foreground transition hover:bg-indigo-700/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-[15px] border border-indigo-500 bg-transparent px-4 text-[1.05rem] font-semibold text-foreground transition hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-900"
           >
             {tr(locale, "Necessary Cookies Only", "Necessary Cookies Only")}
           </button>

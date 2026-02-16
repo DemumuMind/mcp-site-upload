@@ -31,7 +31,7 @@ export default async function PrivacyPage() {
             </p>) : null}
 
           {section.bullets ? (<ul className="space-y-3 pl-5 text-base leading-8 text-muted-foreground">
-              {section.bullets.map((bullet) => (<li key={bullet.en} className="list-disc marker:text-sky-400">
+              {section.bullets.map((bullet) => (<li key={bullet.en} className="list-disc marker:text-primary">
                   {tr(locale, bullet.en, bullet.en)}
                 </li>))}
             </ul>) : null}
@@ -43,7 +43,7 @@ export default async function PrivacyPage() {
         </h2>
         <p className="text-base leading-8 text-muted-foreground">
           {tr(locale, "Email:", "Email:")}{" "}
-          <a href={legalGmailComposeUrl} target="_blank" rel="noreferrer" className="text-sky-300 underline underline-offset-2 transition hover:text-sky-200">
+          <a href={legalGmailComposeUrl} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2 transition hover:text-primary">
             {legalEmail}
           </a>
         </p>

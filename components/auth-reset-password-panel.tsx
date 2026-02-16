@@ -69,7 +69,7 @@ function getStrengthTextClass(score: PasswordStrengthScore): string {
         return "text-amber-300";
     }
     if (score === 3) {
-        return "text-sky-300";
+        return "text-primary";
     }
     return "text-primary";
 }
@@ -214,7 +214,7 @@ export function AuthResetPasswordPanel() {
         toast.success(tr(locale, "Password updated.", "Password updated."));
     }
     if (!isConfigured) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-indigo-950 p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-card p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent"/>
         <div className="relative">
           <h1 className="text-2xl font-semibold text-amber-100">
@@ -230,28 +230,28 @@ export function AuthResetPasswordPanel() {
       </div>);
     }
     if (isLoading || isRecoveryInitializing) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-indigo-700/80 bg-indigo-950 p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
         <p className="text-sm text-muted-foreground">
           {tr(locale, "Checking recovery session...", "Checking recovery session...")}
         </p>
       </div>);
     }
     if (!user) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-indigo-700/80 bg-indigo-950 p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
         <h1 className="text-2xl font-semibold text-foreground">
           {tr(locale, "Recovery session is missing", "Recovery session is missing")}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
           {tr(locale, "Open the reset link from your email first, or request a new reset email on the login page.", "Open the reset link from your email first, or request a new reset email on the login page.")}
         </p>
-        <Button asChild className="mt-6 h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white">
+        <Button asChild className="mt-6 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
           <Link href="/auth">{tr(locale, "Back to login", "Back to login")}</Link>
         </Button>
       </div>);
     }
     if (isCompleted) {
-        return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+        return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
           <span className="inline-flex rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
             {tr(locale, "Password updated", "Password updated")}
@@ -268,17 +268,17 @@ export function AuthResetPasswordPanel() {
             {tr(locale, "s.", "s.")}
           </p>
           <div className="mt-5">
-            <Button type="button" className="h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white" onClick={() => router.replace("/auth")}>
+            <Button type="button" className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary" onClick={() => router.replace("/auth")}>
               {tr(locale, "Go to login now", "Go to login now")}
             </Button>
           </div>
         </div>
       </section>);
     }
-    return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+    return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
+        <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
           {tr(locale, "Password recovery", "Password recovery")}
         </span>
 
@@ -289,17 +289,17 @@ export function AuthResetPasswordPanel() {
           {tr(locale, "This page is linked to your recovery email. Enter and confirm your new password.", "This page is linked to your recovery email. Enter and confirm your new password.")}
         </p>
 
-        <form className="mt-6 grid gap-3 rounded-2xl border border-indigo-700/80 bg-card p-4 sm:p-5" onSubmit={submitPasswordReset}>
+        <form className="mt-6 grid gap-3 rounded-2xl border border-blacksmith bg-card p-4 sm:p-5" onSubmit={submitPasswordReset}>
           <div className="space-y-1.5">
             <Label htmlFor="newPassword" className="text-sm text-foreground">
               {tr(locale, "New password", "New password")}
             </Label>
-            <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
+            <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             <div className="space-y-1.5">
               <div className="grid grid-cols-4 gap-1">
                 {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < passwordStrengthScore
                 ? getStrengthColorClass(passwordStrengthScore)
-                : "bg-indigo-700/80"}`}/>))}
+                : "bg-card"}`}/>))}
               </div>
               <p className={`text-xs ${getStrengthTextClass(passwordStrengthScore)}`}>
                 {getStrengthLabel(locale, passwordStrengthScore)}
@@ -308,7 +308,7 @@ export function AuthResetPasswordPanel() {
                 {passwordChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>
                     <span className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${item.passed
                 ? "border-emerald-400/60 bg-emerald-400/20"
-                : "border-indigo-600/80 bg-indigo-800/80"}`}>
+                : "border-blacksmith/80 bg-card"}`}>
                       {item.passed ? "вњ“" : "вЂў"}
                     </span>
                     <span>{item.label}</span>
@@ -322,11 +322,11 @@ export function AuthResetPasswordPanel() {
             <Label htmlFor="confirmPassword" className="text-sm text-foreground">
               {tr(locale, "Confirm password", "Confirm password")}
             </Label>
-            <Input id="confirmPassword" type="password" autoComplete="new-password" required value={values.confirmPassword} onChange={(event) => updateField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
+            <Input id="confirmPassword" type="password" autoComplete="new-password" required value={values.confirmPassword} onChange={(event) => updateField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             {errors.confirmPassword ? (<p className="text-xs text-rose-300">{errors.confirmPassword}</p>) : null}
           </div>
 
-          <Button type="submit" disabled={isPending} className="h-11 rounded-xl bg-violet-50 text-primary-foreground transition hover:bg-white">
+          <Button type="submit" disabled={isPending} className="h-11 rounded-xl bg-primary text-primary-foreground transition hover:bg-primary">
             {isPending ? <LoaderCircle className="size-4 animate-spin"/> : null}
             {tr(locale, "Update password", "Update password")}
           </Button>

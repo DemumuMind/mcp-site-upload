@@ -52,7 +52,7 @@ const healthBadgeConfig: Record<
   },
   unknown: {
     label: "Unknown",
-    className: "border-white/10 bg-white/5 text-violet-200",
+    className: "border-white/10 bg-primary/5 text-violet-200",
     dotClassName: "bg-violet-300",
   },
 };
@@ -182,7 +182,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
               <div className="flex items-start gap-4">
                 <ServerLogo
                   mcpServer={mcpServer}
-                  className="size-16 border-white/20 bg-white/90 sm:size-20"
+                  className="size-16 border-white/20 bg-primary/90 sm:size-20"
                   imageClassName="h-full w-full object-contain p-2"
                   symbolClassName="text-3xl sm:text-4xl"
                 />
@@ -195,7 +195,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
 
               <div className="flex flex-wrap gap-2">
                 <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-                <Badge variant="outline" className="border-white/10 bg-indigo-950/70 text-violet-200">
+                <Badge variant="outline" className="border-white/10 bg-card/70 text-violet-200">
                   <AuthIcon className="mr-1 size-3" />
                   {tr(locale, authBadge.label, authBadge.label)}
                 </Badge>
@@ -212,7 +212,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="rounded-xl border border-white/10 bg-indigo-950/70 p-4">
+            <div className="rounded-xl border border-white/10 bg-card/70 p-4">
               <p className="mb-2 text-xs font-medium tracking-wide text-violet-300 uppercase">{tr(locale, "Server URL", "Server URL")}</p>
               <p className="break-all text-sm text-violet-100">{mcpServer.serverUrl}</p>
             </div>
@@ -232,7 +232,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
               )}
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-indigo-950/70 p-4">
+            <div className="rounded-xl border border-white/10 bg-card/70 p-4">
               <p className="mb-2 text-xs font-medium tracking-wide text-violet-300 uppercase">{tr(locale, "Health check", "Health check")}</p>
               <div className="flex flex-wrap items-center gap-3 text-sm text-violet-200">
                 <span>

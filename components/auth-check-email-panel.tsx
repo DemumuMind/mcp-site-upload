@@ -145,17 +145,17 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
         setResendFeedback({ tone: "success", text: successMessage });
         toast.success(successMessage);
     }
-    return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+    return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
+        <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
           {flow === "signup"
             ? tr(locale, "Confirm your email", "Confirm your email")
             : tr(locale, "Reset link sent", "Reset link sent")}
         </span>
 
         <div className="mt-4 flex items-center gap-3">
-          <MailCheck className="size-6 text-sky-300"/>
+          <MailCheck className="size-6 text-primary"/>
           <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
             {flow === "signup"
             ? tr(locale, "Check your inbox", "Check your inbox")
@@ -175,7 +175,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => {
             void resendEmail();
-        }} disabled={isResending || cooldownSeconds > 0} className="h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white">
+        }} disabled={isResending || cooldownSeconds > 0} className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
             {isResending ? <LoaderCircle className="size-4 animate-spin"/> : null}
             {cooldownSeconds > 0
             ? tr(locale, `Resend in ${cooldownSeconds}s`, `Resend in ${cooldownSeconds}s`)
@@ -184,7 +184,7 @@ export function AuthCheckEmailPanel({ flow, email, nextPath }: AuthCheckEmailPan
                 : tr(locale, "Resend reset email", "Resend reset email")}
           </Button>
 
-          <Button asChild type="button" variant="outline" className="h-10 rounded-xl border-indigo-600/70 bg-card hover:bg-accent">
+          <Button asChild type="button" variant="outline" className="h-10 rounded-xl border-blacksmith bg-card hover:bg-accent">
             <Link href={loginPath}>{tr(locale, "Back to login", "Back to login")}</Link>
           </Button>
         </div>

@@ -42,7 +42,7 @@ export function BlogArticleCard({ post }: BlogArticleCardProps) {
           </span>
         </div>
 
-        <Link href={post.url} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-cyan-50">
+        <Link href={post.url} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary">
           Read article
           <ArrowRight className="size-4" />
         </Link>

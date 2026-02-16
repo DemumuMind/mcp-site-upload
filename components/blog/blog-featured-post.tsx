@@ -28,9 +28,9 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
         tagSlug,
         tag: await getBlogTagBySlug(tagSlug),
     })));
-    return (<Card className="border-violet-400/20 bg-[linear-gradient(130deg,rgba(53,30,96,0.45),rgba(10,18,35,0.85))]">
+    return (<Card className="border-primary/30 bg-[linear-gradient(130deg,rgba(53,30,96,0.45),rgba(10,18,35,0.85))]">
       <CardHeader className="pb-2">
-        <Badge className="w-fit border-violet-300/40 bg-violet-500/15 text-foreground">
+        <Badge className="w-fit border-violet-300/40 bg-primary0/15 text-foreground">
           <Sparkles className="size-3"/>
           {tr(locale, "Featured article", "Featured article")}
         </Badge>
@@ -41,7 +41,7 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
 
         <div className="flex flex-wrap items-center gap-2">
           {tags.map(({ tagSlug, tag }) => {
-            return (<Badge key={tagSlug} variant="outline" className="border-violet-300/40 bg-violet-500/15 text-foreground">
+            return (<Badge key={tagSlug} variant="outline" className="border-violet-300/40 bg-primary0/15 text-foreground">
                 {tag ? tag.label[locale] : tagSlug}
               </Badge>);
         })}

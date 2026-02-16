@@ -11,8 +11,8 @@ export function BlogHero({ locale, copy }: BlogHeroProps) {
     const title = copy?.heroTitle ?? tr(locale, "BridgeMind Blog", "BridgeMind Blog");
     const description = copy?.heroDescription ??
         tr(locale, "Editorial notes, benchmarks, and implementation playbooks for teams shipping agentic coding workflows.", "Editorial notes, benchmarks, and implementation playbooks for teams shipping agentic coding workflows.");
-    return (<section className="rounded-3xl border border-violet-400/20 bg-card p-6 sm:p-8">
-      <Badge className="mb-4 w-fit border-violet-400/35 bg-violet-500/10 text-muted-foreground">
+    return (<section className="rounded-3xl border border-primary/30 bg-card p-6 sm:p-8">
+      <Badge className="mb-4 w-fit border-primary/35 bg-primary0/10 text-muted-foreground">
         <Sparkles className="size-3"/>
         {eyebrow}
       </Badge>

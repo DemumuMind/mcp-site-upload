@@ -20,7 +20,7 @@ function TaxonomyList({ title, items, }: {
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (<li key={item.label} className="flex items-center justify-between gap-3 rounded-lg border border-blacksmith bg-card px-3 py-1.5 text-xs text-muted-foreground">
             <span>{item.label}</span>
-            {typeof item.count === "number" ? (<span className="rounded-full border border-blacksmith bg-indigo-800/80 px-2 py-0.5 text-[11px] text-muted-foreground">
+            {typeof item.count === "number" ? (<span className="rounded-full border border-blacksmith bg-card px-2 py-0.5 text-[11px] text-muted-foreground">
                 {item.count}
               </span>) : null}
           </li>))}
@@ -148,7 +148,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           <div className="max-h-52 space-y-1 overflow-y-auto pr-1">
             {props.categoryEntries.map(([categoryName, count]) => (<label key={categoryName} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
                 <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-indigo-950 text-blue-500 focus:ring-blue-500" checked={props.selectedCategories.includes(categoryName)} onChange={() => props.onToggleCategory(categoryName)}/>
+                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedCategories.includes(categoryName)} onChange={() => props.onToggleCategory(categoryName)}/>
                   <span className="text-sm text-muted-foreground">{categoryName}</span>
                 </span>
                 <span className="text-xs text-muted-foreground">{count}</span>
@@ -163,7 +163,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           <div className="space-y-1">
             {props.authTypeOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
                 <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-indigo-950 text-blue-500 focus:ring-blue-500" checked={props.selectedAuthTypes.includes(option.value)} onChange={() => props.onToggleAuthType(option.value)}/>
+                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedAuthTypes.includes(option.value)} onChange={() => props.onToggleAuthType(option.value)}/>
                   <span className="text-sm text-muted-foreground">{option.label}</span>
                 </span>
                 <span className="text-xs text-muted-foreground">{option.count}</span>
@@ -178,7 +178,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           <div className="space-y-1">
             {props.verificationOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
                 <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-indigo-950 text-blue-500 focus:ring-blue-500" checked={props.selectedVerificationLevels.includes(option.value)} onChange={() => props.onToggleVerificationLevel(option.value)}/>
+                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedVerificationLevels.includes(option.value)} onChange={() => props.onToggleVerificationLevel(option.value)}/>
                   <span className="text-sm text-muted-foreground">{option.label}</span>
                 </span>
                 <span className="text-xs text-muted-foreground">{option.count}</span>
@@ -193,7 +193,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           <div className="space-y-1">
             {props.healthOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
                 <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-indigo-950 text-blue-500 focus:ring-blue-500" checked={props.selectedHealthStatuses.includes(option.value)} onChange={() => props.onToggleHealthStatus(option.value)}/>
+                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedHealthStatuses.includes(option.value)} onChange={() => props.onToggleHealthStatus(option.value)}/>
                   <span className="text-sm text-muted-foreground">{option.label}</span>
                 </span>
                 <span className="text-xs text-muted-foreground">{option.count}</span>
@@ -224,7 +224,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
             {visibleTagEntries.map(([tag, count]) => (<label key={tag} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
                 <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-indigo-950 text-blue-500 focus:ring-blue-500" checked={props.selectedTags.includes(tag)} onChange={() => props.onToggleTag(tag)}/>
+                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedTags.includes(tag)} onChange={() => props.onToggleTag(tag)}/>
                   <span className={cn("inline-block size-2 rounded-full", getTagDotClass(tag))}/>
                   <span className="text-sm text-muted-foreground">{tag}</span>
                 </span>

@@ -66,7 +66,7 @@ export default async function DiscordPage() {
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 sm:py-14">
         <section className="rounded-3xl border border-indigo-400/20 bg-card p-6 sm:p-8">
-          <Badge className="mb-4 w-fit border-indigo-400/35 bg-indigo-500/10 text-indigo-200">
+          <Badge className="mb-4 w-fit border-indigo-400/35 bg-primary/10 text-primary">
             {tr(locale, "Community", "Community")}
           </Badge>
           <h1 className="text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-6xl">
@@ -92,7 +92,7 @@ export default async function DiscordPage() {
           {communityChannels.map((channel) => (<Card key={channel.name} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg text-foreground">
-                  <channel.icon className="size-4 text-indigo-200"/>
+                  <channel.icon className="size-4 text-primary"/>
                   {channel.name}
                 </CardTitle>
               </CardHeader>

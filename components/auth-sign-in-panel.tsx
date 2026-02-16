@@ -127,7 +127,7 @@ function getStrengthTextClass(score: PasswordStrengthScore): string {
         return "text-amber-300";
     }
     if (score === 3) {
-        return "text-sky-300";
+        return "text-primary";
     }
     return "text-primary";
 }
@@ -245,8 +245,8 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
     const [oauthProviderMessage, setOauthProviderMessage] = useState<string | null>(null);
     const emailPasswordStrengthScore = useMemo(() => getPasswordStrengthScore(emailAuthValues.password), [emailAuthValues.password]);
     const signupChecklistItems = useMemo(() => getPasswordChecklistItems(locale, emailAuthValues.password), [locale, emailAuthValues.password]);
-    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-indigo-600/65 bg-card px-4 text-left text-sm font-semibold text-foreground transition hover:border-violet-300/70 hover:bg-accent focus-visible:ring-violet-200/40";
-    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-violet-50 text-primary-foreground transition hover:bg-white";
+    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-blacksmith bg-card px-4 text-left text-sm font-semibold text-foreground transition hover:border-violet-300/70 hover:bg-accent focus-visible:ring-primary/40";
+    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-primary text-primary-foreground transition hover:bg-primary";
     function getOAuthRedirectTo(): string | undefined {
         if (typeof window === "undefined") {
             return undefined;
@@ -456,10 +456,10 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
         toast.success(tr(locale, "Signed out", "Signed out"));
     }
     if (!hasMounted) {
-        return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+        return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
-          <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
+          <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
             {tr(locale, "Secure access", "Secure access")}
           </span>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -472,7 +472,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
       </section>);
     }
     if (!isConfigured) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-indigo-950 p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-card p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent"/>
         <div className="relative">
           <h1 className="text-2xl font-semibold text-amber-100">
@@ -488,8 +488,8 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
       </div>);
     }
     if (user) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-indigo-700/80 bg-indigo-950 p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/30 to-transparent"/>
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"/>
         <div className="relative">
           <h1 className="text-2xl font-semibold text-foreground">
             {tr(locale, "You are signed in", "You are signed in")}
@@ -501,12 +501,12 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             </span>
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className="h-10 rounded-xl bg-violet-50 text-primary-foreground hover:bg-white">
+            <Button asChild className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
               <Link href={safeNextPath}>{tr(locale, "Continue", "Continue")}</Link>
             </Button>
             <Button type="button" variant="outline" onClick={() => {
                 void signOut();
-            }} className="h-10 rounded-xl border-indigo-600/70 bg-card hover:bg-accent">
+            }} className="h-10 rounded-xl border-blacksmith bg-card hover:bg-accent">
               {tr(locale, "Sign out", "Sign out")}
             </Button>
           </div>
@@ -515,10 +515,10 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
     }
     const isSignUpMode = emailAuthMode === "sign-up";
     const isResetRequestMode = emailAuthMode === "reset-request";
-    return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+    return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-violet-400/65 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
+        <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
           {tr(locale, "Secure access", "Secure access")}
         </span>
 
@@ -560,7 +560,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             <Button type="button" variant="outline" onClick={() => {
             void signInWithProvider("google");
         }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "google" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-xs font-bold text-foreground">
+              {pendingOAuthProvider === "google" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card text-xs font-bold text-foreground">
                   G
                 </span>)}
               <span>{tr(locale, "Continue with Google", "Continue with Google")}</span>
@@ -569,7 +569,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             <Button type="button" variant="outline" onClick={() => {
             void signInWithProvider("github");
         }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "github" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-indigo-800 text-[10px] font-bold text-foreground">
+              {pendingOAuthProvider === "github" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card text-[10px] font-bold text-foreground">
                   GH
                 </span>)}
               <span>{tr(locale, "Continue with GitHub", "Continue with GitHub")}</span>
@@ -577,7 +577,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-indigo-700/80 bg-card p-4 sm:p-5">
+        <div className="mt-6 rounded-2xl border border-blacksmith bg-card p-4 sm:p-5">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {isSignUpMode
             ? tr(locale, "Register with email", "Register with email")
@@ -591,7 +591,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
               <Label htmlFor="email" className="text-sm text-foreground">
                 Email
               </Label>
-              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
+              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
               {emailAuthErrors.email ? (<p className="text-xs text-rose-300">{emailAuthErrors.email}</p>) : null}
             </div>
 
@@ -603,12 +603,12 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
                 : "Enter your password", isSignUpMode
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
-                : "Enter your password")} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
+                : "Enter your password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
                 {isSignUpMode ? (<div className="space-y-1.5">
                     <div className="grid grid-cols-4 gap-1">
                       {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < emailPasswordStrengthScore
                         ? getStrengthColorClass(emailPasswordStrengthScore)
-                        : "bg-indigo-700/80"}`}/>))}
+                        : "bg-card"}`}/>))}
                     </div>
                     <p className={`text-xs ${getStrengthTextClass(emailPasswordStrengthScore)}`}>
                       {getStrengthLabel(locale, emailPasswordStrengthScore)}
@@ -617,7 +617,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                       {signupChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>
                           <span className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${item.passed
                         ? "border-emerald-400/60 bg-emerald-400/20"
-                        : "border-indigo-600/80 bg-indigo-800/80"}`}>
+                        : "border-blacksmith/80 bg-card"}`}>
                             {item.passed ? "вњ“" : "вЂў"}
                           </span>
                           <span>{item.label}</span>
@@ -631,7 +631,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                 <Label htmlFor="confirmPassword" className="text-sm text-foreground">
                   {tr(locale, "Confirm password", "Confirm password")}
                 </Label>
-                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-indigo-600 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-violet-200/35"/>
+                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
                 {emailAuthErrors.confirmPassword ? (<p className="text-xs text-rose-300">{emailAuthErrors.confirmPassword}</p>) : null}
               </div>) : null}
 
@@ -669,7 +669,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             {emailMessage}
           </p>) : null}
 
-        <p className="mt-6 border-t border-indigo-700/80 pt-4 text-xs leading-6 text-muted-foreground">
+        <p className="mt-6 border-t border-blacksmith pt-4 text-xs leading-6 text-muted-foreground">
           {tr(locale, "By signing in, you agree to our", "By signing in, you agree to our")}{" "}
           <Link href="/terms" className="font-semibold text-foreground underline underline-offset-4 transition hover:text-foreground">
             {tr(locale, "Terms", "Terms")}

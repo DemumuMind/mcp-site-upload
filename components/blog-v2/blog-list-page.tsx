@@ -111,7 +111,7 @@ export function BlogListPage({ selectedTopic }: BlogListPageProps) {
             ideas in the editorial queue every week.
           </p>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button asChild className="bg-primary text-slate-950 hover:bg-cyan-400">
+            <Button asChild className="bg-primary text-primary-foreground hover:brightness-105">
               <BlogTrackedLink
                 href="/contact"
                 eventName="blog_cta_click"
