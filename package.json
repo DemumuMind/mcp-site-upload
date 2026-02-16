@@ -26,6 +26,7 @@
     "check:env:supabase": "node scripts/check-supabase-envs.mjs",
     "smoke:check": "node scripts/smoke-check.mjs",
     "smoke:i18n": "node scripts/smoke-i18n.mjs",
+    "logs:tail": "node scripts/tail-logs.mjs",
     "ops:health-report": "node scripts/ops-health-report.mjs",
     "ops:backup-verify": "node scripts/backup-verify.mjs",
     "ops:backup-verify-remote": "node scripts/backup-verify-remote.mjs"
@@ -44,6 +45,7 @@
     "next": "16.1.6",
     "next-contentlayer2": "^0.5.8",
     "next-themes": "^0.4.6",
+    "nodemailer": "^8.0.1",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -57,14 +59,15 @@
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^25",
+    "@types/nodemailer": "^7.0.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.4",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.1.6",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.4.0",
-    "typescript": "^5",
-    "dotenv": "^17.2.4"
+    "typescript": "^5"
   }
 }

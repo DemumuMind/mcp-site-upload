@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import { createAdminSystemEventAction, deleteAdminSystemEventAction, logoutAdminAction, moderateServerStatusAction, saveAdminDashboardMetricsAction, saveAdminDashboardSettingsAction, } from "@/app/admin/actions";
+import { AdminAutoRefresh } from "@/components/admin-auto-refresh";
+import { AdminSecurityPresets } from "@/components/admin-security-presets";
 import { PageFrame, PageHero, PageMetric, PageSection } from "@/components/page-templates";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import { requireAdminAccess } from "@/lib/admin-access";
 import { getAdminDashboardSnapshot } from "@/lib/admin-dashboard";
 import { tr, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
+import { writeAdminRequestLog } from "@/lib/admin-request-log";
 import { getPendingServers } from "@/lib/servers";
 export const metadata: Metadata = {
     title: "Moderation",
@@ -23,6 +26,16 @@ type AdminPageProps = {
         q?: string;
         category?: string;
         auth?: string;
+        securityEvent?: string;
+        securityEmail?: string;
+        securityFrom?: string;
+        securityTo?: string;
+        securityFromTs?: string;
+        securityToTs?: string;
+        securityPage?: string;
+        securityPageSize?: string;
+        securitySortBy?: "created_at" | "event_type" | "email" | "ip_address";
+        securitySortOrder?: "asc" | "desc";
     }>;
 };
 function formatCompactNumber(locale: Locale, value: number): string {
@@ -105,18 +118,81 @@ function formatQueuedAt(locale: Locale, value?: string): string {
         year: "numeric",
     }).format(parsed);
 }
+function getSecurityEventLabel(locale: Locale, eventType: string): string {
+    if (eventType === "login_success") {
+        return tr(locale, "Successful login", "Successful login");
+    }
+    if (eventType === "login_failure") {
+        return tr(locale, "Failed login", "Failed login");
+    }
+    if (eventType === "login_rate_limited") {
+        return tr(locale, "Rate limit triggered", "Rate limit triggered");
+    }
+    if (eventType === "password_reset_request") {
+        return tr(locale, "Password reset requested", "Password reset requested");
+    }
+    if (eventType === "password_reset_success") {
+        return tr(locale, "Password reset completed", "Password reset completed");
+    }
+    if (eventType === "logout") {
+        return tr(locale, "Sign out", "Sign out");
+    }
+    return eventType;
+}
+function getSecurityEventBadgeClass(eventType: string): string {
+    if (eventType === "login_success" || eventType === "password_reset_success") {
+        return "border-emerald-400/35 bg-emerald-500/10 text-emerald-200";
+    }
+    if (eventType === "login_failure" || eventType === "login_rate_limited") {
+        return "border-rose-400/35 bg-rose-500/10 text-rose-200";
+    }
+    return "border-violet-300/30 bg-indigo-900/60 text-violet-200";
+}
 export default async function AdminPage({ searchParams }: AdminPageProps) {
     await requireAdminAccess("/admin");
     const locale = await getLocale();
-    const [pendingServers, dashboardSnapshot, queryState] = await Promise.all([
+    const queryState = await searchParams;
+    const rawSearchParams = new URLSearchParams();
+    Object.entries(queryState).forEach(([key, value]) => {
+        if (typeof value === "string" && value.length > 0) {
+            rawSearchParams.set(key, value);
+        }
+    });
+    await writeAdminRequestLog({
+        path: "/admin",
+        query: rawSearchParams.toString(),
+        source: "admin_page",
+    });
+    const securityFilterEvent = queryState.securityEvent ?? "all";
+    const securityFilterEmail = (queryState.securityEmail ?? "").trim();
+    const securityFilterFrom = (queryState.securityFrom ?? "").trim();
+    const securityFilterTo = (queryState.securityTo ?? "").trim();
+    const securityFilterFromTs = (queryState.securityFromTs ?? "").trim();
+    const securityFilterToTs = (queryState.securityToTs ?? "").trim();
+    const securityPage = Math.max(Number(queryState.securityPage ?? "1") || 1, 1);
+    const securityPageSize = Math.max(Number(queryState.securityPageSize ?? "50") || 50, 10);
+    const securitySortBy = queryState.securitySortBy ?? "created_at";
+    const securitySortOrder = queryState.securitySortOrder ?? "desc";
+    const [pendingServers, dashboardSnapshot] = await Promise.all([
         getPendingServers(),
-        getAdminDashboardSnapshot(),
-        searchParams,
+        getAdminDashboardSnapshot({
+            eventType: securityFilterEvent,
+            emailQuery: securityFilterEmail,
+            fromDate: securityFilterFrom,
+            toDate: securityFilterTo,
+            fromTs: securityFilterFromTs || undefined,
+            toTs: securityFilterToTs || undefined,
+            page: securityPage,
+            pageSize: securityPageSize,
+            sortBy: securitySortBy,
+            sortOrder: securitySortOrder,
+        }),
     ]);
     const pendingCount = pendingServers.length;
     const query = (queryState.q ?? "").trim();
     const selectedCategory = queryState.category ?? "all";
     const selectedAuth = queryState.auth ?? "all";
+    const selectedSecurityEvent = securityFilterEvent;
     const normalizedQuery = query.toLowerCase();
     const categoryOptions = Array.from(new Set(pendingServers.map((item) => item.category))).sort((left, right) => left.localeCompare(right));
     const authOptions = Array.from(new Set(pendingServers.map((item) => item.authType))).sort((left, right) => left.localeCompare(right));
@@ -131,16 +207,60 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         return queryMatches && categoryMatches && authMatches;
     });
     const filteredCount = filteredPendingServers.length;
+    const securityEventOptions = Array.from(new Set(dashboardSnapshot.security.recentEvents.map((item) => item.eventType))).sort((left, right) => left.localeCompare(right));
+    const filteredSecurityEvents = dashboardSnapshot.security.recentEvents;
     const feedback = getFeedbackMessage({
         locale,
         success: queryState.success,
         error: queryState.error,
     });
+    const stickyParams = new URLSearchParams();
+    if (query) {
+        stickyParams.set("q", query);
+    }
+    if (selectedCategory !== "all") {
+        stickyParams.set("category", selectedCategory);
+    }
+    if (selectedAuth !== "all") {
+        stickyParams.set("auth", selectedAuth);
+    }
+    if (selectedSecurityEvent !== "all") {
+        stickyParams.set("securityEvent", selectedSecurityEvent);
+    }
+    if (securityFilterEmail) {
+        stickyParams.set("securityEmail", securityFilterEmail);
+    }
+    if (securityFilterFrom) {
+        stickyParams.set("securityFrom", securityFilterFrom);
+    }
+    if (securityFilterTo) {
+        stickyParams.set("securityTo", securityFilterTo);
+    }
+    if (securityFilterFromTs) {
+        stickyParams.set("securityFromTs", securityFilterFromTs);
+    }
+    if (securityFilterToTs) {
+        stickyParams.set("securityToTs", securityFilterToTs);
+    }
+    if (securitySortBy !== "created_at") {
+        stickyParams.set("securitySortBy", securitySortBy);
+    }
+    if (securitySortOrder !== "desc") {
+        stickyParams.set("securitySortOrder", securitySortOrder);
+    }
+    if (securityPageSize !== 50) {
+        stickyParams.set("securityPageSize", String(securityPageSize));
+    }
+    if (securityPage !== 1) {
+        stickyParams.set("securityPage", String(securityPage));
+    }
+    const stickyQueryString = stickyParams.toString();
+    const stickyAdminHref = `/admin${stickyQueryString ? `?${stickyQueryString}` : ""}`;
     return (<PageFrame variant="ops">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
         <PageHero badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Moderation Dashboard", "Moderation Dashboard")} description={tr(locale, "Review pending MCP submissions, manage analytics, and keep catalog quality high.", "Review pending MCP submissions, manage analytics, and keep catalog quality high.")} actions={<div className="flex flex-wrap items-center gap-2">
               <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
-                <Link href="/admin/blog">
+                <Link href={`/admin/blog?from=${encodeURIComponent(stickyAdminHref)}`}>
                   <FileText className="size-4"/>
                   {tr(locale, "Blog studio", "Blog studio")}
                 </Link>
@@ -158,6 +278,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 : "border-rose-400/35 bg-rose-500/10 text-rose-200"}`}>
             {feedback.text}
           </div>) : null}
+
+        <AdminAutoRefresh intervalSec={dashboardSnapshot.settings.statusUpdateIntervalSec} labels={{
+            autoRefresh: tr(locale, "Auto refresh", "Auto refresh"),
+            refreshNow: tr(locale, "Refresh now", "Refresh now"),
+            lastUpdated: tr(locale, "Last updated", "Last updated"),
+        }}/>
 
         <PageSection>
           <div className="space-y-4">
@@ -262,6 +388,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </h2>
 
             <form action={saveAdminDashboardSettingsAction} className="grid gap-4 lg:grid-cols-2">
+              <input type="hidden" name="returnTo" value={stickyAdminHref}/>
               <Card className="border-white/10 bg-indigo-900/70">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base text-violet-50">
@@ -321,6 +448,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </h2>
 
             <form action={saveAdminDashboardMetricsAction} className="grid gap-4 lg:grid-cols-3">
+              <input type="hidden" name="returnTo" value={stickyAdminHref}/>
               <label className="grid gap-1.5 text-sm text-violet-200">
                 <span>{tr(locale, "Total requests", "Total requests")}</span>
                 <Input name="totalRequests" type="number" min={0} defaultValue={dashboardSnapshot.overview.totalRequests} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
@@ -355,6 +483,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardHeader>
               <CardContent>
                 <form action={createAdminSystemEventAction} className="space-y-3">
+                  <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                   <label className="grid gap-1.5 text-sm text-violet-200">
                     <span>{tr(locale, "Level", "Level")}</span>
                     <select name="level" defaultValue="info" className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
@@ -397,6 +526,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       </p>
                     </div>
                     <form action={deleteAdminSystemEventAction}>
+                      <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                       <input type="hidden" name="eventId" value={event.id}/>
                       <Button type="submit" variant="outline" className="border-rose-400/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20">
                         {tr(locale, "Delete", "Delete")}
@@ -406,6 +536,134 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardContent>
             </Card>
           </div>
+        </PageSection>
+
+        <PageSection>
+          <Card className="border-white/10 bg-indigo-900/70">
+            <CardHeader className="space-y-2">
+              <CardTitle className="text-base text-violet-50">
+                {tr(locale, "Auth security events", "Auth security events")}
+              </CardTitle>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <Badge variant="secondary" className="bg-rose-500/15 text-rose-200">
+                  {tr(locale, "Failed logins (24h)", "Failed logins (24h)")}: {dashboardSnapshot.security.failedLast24h}
+                </Badge>
+                <Badge variant="secondary" className="bg-amber-500/15 text-amber-200">
+                  {tr(locale, "Rate-limited (24h)", "Rate-limited (24h)")}: {dashboardSnapshot.security.rateLimitedLast24h}
+                </Badge>
+                <Badge variant="secondary" className="bg-blue-500/15 text-blue-200">
+                  {tr(locale, "Total", "Total")}: {dashboardSnapshot.security.totalEvents}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <AdminSecurityPresets labels={{
+            title: tr(locale, "Presets:", "Presets:"),
+            failed24h: tr(locale, "Failed 24h", "Failed 24h"),
+            rateLimited: tr(locale, "Rate-limited", "Rate-limited"),
+            successfulLogins: tr(locale, "Successful logins", "Successful logins"),
+            latest100: tr(locale, "Latest 100", "Latest 100"),
+            last7days: tr(locale, "Last 7 days", "Last 7 days"),
+        }}/>
+              {securityFilterFromTs || securityFilterToTs ? (<p className="text-xs text-cyan-200/90">
+                  {tr(locale, "Local browser time-range is active for this filter.", "Local browser time-range is active for this filter.")}
+                </p>) : null}
+
+              <form method="get" className="grid gap-2 rounded-md border border-white/10 bg-indigo-950/40 p-3 md:grid-cols-[160px_minmax(0,1fr)_160px_160px_160px_140px_160px_auto]">
+                <select name="securityEvent" defaultValue={selectedSecurityEvent} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                  <option value="all">{tr(locale, "All event types", "All event types")}</option>
+                  {securityEventOptions.map((eventType) => (<option key={eventType} value={eventType}>
+                      {eventType}
+                    </option>))}
+                </select>
+                <Input name="securityEmail" defaultValue={queryState.securityEmail ?? ""} placeholder={tr(locale, "Filter by email", "Filter by email")} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="securityFrom" type="date" defaultValue={securityFilterFrom} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="securityTo" type="date" defaultValue={securityFilterTo} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <input type="hidden" name="securityFromTs" value={securityFilterFromTs}/>
+                <input type="hidden" name="securityToTs" value={securityFilterToTs}/>
+                <select name="securitySortBy" defaultValue={securitySortBy} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                  <option value="created_at">created_at</option>
+                  <option value="event_type">event_type</option>
+                  <option value="email">email</option>
+                  <option value="ip_address">ip_address</option>
+                </select>
+                <select name="securitySortOrder" defaultValue={securitySortOrder} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                  <option value="desc">desc</option>
+                  <option value="asc">asc</option>
+                </select>
+                <Input name="securityPageSize" type="number" min={10} max={200} defaultValue={securityPageSize} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <input type="hidden" name="securityPage" value="1"/>
+                <div className="flex gap-2">
+                  <Button type="submit" variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                    {tr(locale, "Apply", "Apply")}
+                  </Button>
+                  <Button asChild variant="outline" className="border-cyan-300/35 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20">
+                    <Link href={`/api/admin/security-events/export?eventType=${encodeURIComponent(selectedSecurityEvent)}&email=${encodeURIComponent(queryState.securityEmail ?? "")}&from=${encodeURIComponent(securityFilterFrom)}&to=${encodeURIComponent(securityFilterTo)}&fromTs=${encodeURIComponent(securityFilterFromTs)}&toTs=${encodeURIComponent(securityFilterToTs)}`}>
+                      {tr(locale, "Export CSV", "Export CSV")}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="text-violet-200 hover:bg-white/5">
+                    <Link href="/admin">{tr(locale, "Reset", "Reset")}</Link>
+                  </Button>
+                </div>
+              </form>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs text-violet-300">
+                <span>{tr(locale, "Quick sort:", "Quick sort:")}</span>
+                {(["created_at", "event_type", "email", "ip_address"] as const).map((sortKey) => {
+                const nextOrder = securitySortBy === sortKey && securitySortOrder === "desc" ? "asc" : "desc";
+                return (<Button key={sortKey} asChild variant="outline" className="h-7 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06]">
+                      <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(sortKey)}&securitySortOrder=${encodeURIComponent(nextOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=1`}>
+                        {sortKey}
+                        {securitySortBy === sortKey ? ` (${securitySortOrder})` : ""}
+                      </Link>
+                    </Button>);
+            })}
+              </div>
+
+              {filteredSecurityEvents.length === 0 ? (<p className="text-sm text-violet-300">
+                  {tr(locale, "No security events found for selected filters.", "No security events found for selected filters.")}
+                </p>) : (filteredSecurityEvents.map((event) => (<div key={event.id} className="flex flex-wrap items-center gap-2 rounded-md border border-white/10 bg-indigo-950/70 px-3 py-2 text-xs text-violet-200">
+                    <span className="font-mono text-violet-300">{event.timeLabel}</span>
+                    <Badge className={getSecurityEventBadgeClass(event.eventType)}>
+                      {getSecurityEventLabel(locale, event.eventType)}
+                    </Badge>
+                    <span className="text-violet-100">{event.email}</span>
+                    {event.ipAddress ? (<span className="text-violet-300">IP: {event.ipAddress}</span>) : null}
+                    {event.userId ? (<span className="text-violet-300">uid:{event.userId.slice(0, 8)}</span>) : null}
+                  </div>)))}
+              <div className="flex items-center justify-between text-xs text-violet-300">
+                <span>
+                  {tr(locale, "Page", "Page")} {dashboardSnapshot.security.page} / {dashboardSnapshot.security.totalPages}
+                </span>
+                <div className="flex items-center gap-2">
+                  <form method="get" className="flex items-center gap-2">
+                    <input type="hidden" name="securityEvent" value={selectedSecurityEvent}/>
+                    <input type="hidden" name="securityEmail" value={queryState.securityEmail ?? ""}/>
+                    <input type="hidden" name="securityFrom" value={securityFilterFrom}/>
+                    <input type="hidden" name="securityTo" value={securityFilterTo}/>
+                    <input type="hidden" name="securitySortBy" value={securitySortBy}/>
+                    <input type="hidden" name="securitySortOrder" value={securitySortOrder}/>
+                    <input type="hidden" name="securityPageSize" value={dashboardSnapshot.security.pageSize}/>
+                    <Input name="securityPage" type="number" min={1} max={dashboardSnapshot.security.totalPages} defaultValue={dashboardSnapshot.security.page} className="h-8 w-20 border-white/15 bg-indigo-950/80 text-violet-50"/>
+                    <Button type="submit" variant="outline" className="h-8 border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                      {tr(locale, "Go", "Go")}
+                    </Button>
+                  </form>
+                  <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]" disabled={dashboardSnapshot.security.page <= 1}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.max(1, dashboardSnapshot.security.page - 1)}`}>
+                      {tr(locale, "Prev", "Prev")}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]" disabled={dashboardSnapshot.security.page >= dashboardSnapshot.security.totalPages}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.min(dashboardSnapshot.security.totalPages, dashboardSnapshot.security.page + 1)}`}>
+                      {tr(locale, "Next", "Next")}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </PageSection>
 
         <PageSection>
@@ -513,6 +771,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
                     <div className="flex gap-2">
                       <form action={moderateServerStatusAction} className="w-full">
+                        <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                         <input type="hidden" name="serverId" value={mcpServer.id}/>
                         <input type="hidden" name="status" value="active"/>
                         <Button type="submit" className="w-full bg-emerald-500/80 text-white hover:bg-emerald-400">
@@ -521,6 +780,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       </form>
 
                       <form action={moderateServerStatusAction} className="w-full">
+                        <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                         <input type="hidden" name="serverId" value={mcpServer.id}/>
                         <input type="hidden" name="status" value="rejected"/>
                         <Button type="submit" variant="outline" className="w-full border-rose-400/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20">

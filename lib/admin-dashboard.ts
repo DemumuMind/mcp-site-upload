@@ -30,6 +30,15 @@ export type AdminDashboardAuditItem = {
     targetLabel: string;
     targetId?: string;
 };
+export type AdminSecurityEventItem = {
+    id: string;
+    timeLabel: string;
+    occurredAt?: string;
+    eventType: string;
+    email: string;
+    userId?: string;
+    ipAddress?: string;
+};
 export type AdminDashboardSnapshot = {
     overview: {
         activeServers: number;
@@ -45,6 +54,29 @@ export type AdminDashboardSnapshot = {
     audit: {
         recentActions: AdminDashboardAuditItem[];
     };
+    security: {
+        recentEvents: AdminSecurityEventItem[];
+        failedLast24h: number;
+        rateLimitedLast24h: number;
+        totalEvents: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+        sortBy: "created_at" | "event_type" | "email" | "ip_address";
+        sortOrder: "asc" | "desc";
+    };
+};
+export type AdminSecurityFilters = {
+    eventType?: string;
+    emailQuery?: string;
+    fromDate?: string;
+    toDate?: string;
+    fromTs?: string;
+    toTs?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: "created_at" | "event_type" | "email" | "ip_address";
+    sortOrder?: "asc" | "desc";
 };
 type SettingsRow = {
     status_update_interval_sec: number | null;
@@ -79,6 +111,14 @@ type AuditRow = {
     actor_user_id: string | null;
     target_type: string | null;
     target_id: string | null;
+};
+type AuthSecurityEventRow = {
+    id: string;
+    created_at: string | null;
+    event_type: string | null;
+    user_id: string | null;
+    email: string | null;
+    ip_address: string | null;
 };
 const DEFAULT_SETTINGS: AdminDashboardSettings = {
     statusUpdateIntervalSec: 5,
@@ -185,6 +225,26 @@ function toHealthEventLevel(healthStatus: HealthStatus | undefined): AdminEventL
     }
     return "info";
 }
+function toStartOfDayIso(value: string | undefined): string | null {
+    if (!value) {
+        return null;
+    }
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    if (Number.isNaN(parsed.getTime())) {
+        return null;
+    }
+    return parsed.toISOString();
+}
+function toEndOfDayIso(value: string | undefined): string | null {
+    if (!value) {
+        return null;
+    }
+    const parsed = new Date(`${value}T23:59:59.999Z`);
+    if (Number.isNaN(parsed.getTime())) {
+        return null;
+    }
+    return parsed.toISOString();
+}
 function toAuditActorLabel(row: AuditRow): string {
     if (row.actor_user_id) {
         const prefix = row.actor_role || "admin";
@@ -206,7 +266,7 @@ function toAuditTargetLabel(row: AuditRow): string {
     }
     return `${targetType}:${targetId}`;
 }
-export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapshot> {
+export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters): Promise<AdminDashboardSnapshot> {
     const activeServers = await getActiveServers();
     const activeServerCount = activeServers.length;
     const adminClient = createSupabaseAdminClient();
@@ -217,8 +277,36 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
     let requestDistribution: AdminDashboardDistributionItem[] = [];
     let latestEvents: AdminDashboardEventItem[] = [];
     let recentActions: AdminDashboardAuditItem[] = [];
+    let recentSecurityEvents: AdminSecurityEventItem[] = [];
+    let failedLast24h = 0;
+    let rateLimitedLast24h = 0;
+    let totalSecurityEvents = 0;
+    const securityPageSize = Math.max(10, Math.min(filters?.pageSize ?? 50, 200));
+    const securityPage = Math.max(filters?.page ?? 1, 1);
+    const securitySortBy = filters?.sortBy ?? "created_at";
+    const securitySortOrder = filters?.sortOrder === "asc" ? "asc" : "desc";
     if (adminClient) {
-        const [settingsResult, metricsResult, distributionResult, eventsResult, auditResult] = await Promise.all([
+        const since24hIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const securityFromIso = filters?.fromTs || toStartOfDayIso(filters?.fromDate);
+        const securityToIso = filters?.toTs || toEndOfDayIso(filters?.toDate);
+        let securityEventsQuery = adminClient
+            .from("auth_security_events")
+            .select("id, created_at, event_type, user_id, email, ip_address", { count: "exact" })
+            .order(securitySortBy, { ascending: securitySortOrder === "asc" })
+            .range((securityPage - 1) * securityPageSize, securityPage * securityPageSize - 1);
+        if (filters?.eventType && filters.eventType !== "all") {
+            securityEventsQuery = securityEventsQuery.eq("event_type", filters.eventType);
+        }
+        if (filters?.emailQuery) {
+            securityEventsQuery = securityEventsQuery.ilike("email", `%${filters.emailQuery}%`);
+        }
+        if (securityFromIso) {
+            securityEventsQuery = securityEventsQuery.gte("created_at", securityFromIso);
+        }
+        if (securityToIso) {
+            securityEventsQuery = securityEventsQuery.lte("created_at", securityToIso);
+        }
+        const [settingsResult, metricsResult, distributionResult, eventsResult, auditResult, securityEventsResult, failedCountResult, rateLimitedCountResult,] = await Promise.all([
             adminClient
                 .from("admin_dashboard_settings")
                 .select("status_update_interval_sec, request_limit_per_minute, notify_email_on_errors, notify_push_notifications, notify_webhook_integrations")
@@ -247,6 +335,17 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
                 .order("occurred_at", { ascending: false })
                 .limit(50)
                 .returns<AuditRow[]>(),
+            securityEventsQuery.returns<AuthSecurityEventRow[]>(),
+            adminClient
+                .from("auth_security_events")
+                .select("id", { head: true, count: "exact" })
+                .eq("event_type", "login_failure")
+                .gte("created_at", since24hIso),
+            adminClient
+                .from("auth_security_events")
+                .select("id", { head: true, count: "exact" })
+                .eq("event_type", "login_rate_limited")
+                .gte("created_at", since24hIso),
         ]);
         if (!settingsResult.error && settingsResult.data) {
             settings = {
@@ -306,6 +405,24 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
                 targetId: row.target_id ?? undefined,
             }));
         }
+        if (!securityEventsResult.error && securityEventsResult.data && securityEventsResult.data.length > 0) {
+            recentSecurityEvents = securityEventsResult.data.map((row, index) => ({
+                id: row.id || `auth-security-${index + 1}`,
+                timeLabel: toTimeLabel(row.created_at),
+                occurredAt: row.created_at ?? undefined,
+                eventType: row.event_type?.trim() || "unknown",
+                email: row.email?.trim() || "unknown",
+                userId: row.user_id ?? undefined,
+                ipAddress: row.ip_address ?? undefined,
+            }));
+        }
+        totalSecurityEvents = securityEventsResult.count ?? 0;
+        if (!failedCountResult.error) {
+            failedLast24h = failedCountResult.count ?? 0;
+        }
+        if (!rateLimitedCountResult.error) {
+            rateLimitedLast24h = rateLimitedCountResult.count ?? 0;
+        }
     }
     if (requestDistribution.length === 0) {
         const fallbackTotal = DEFAULT_DISTRIBUTION_BASE.reduce((accumulator, row) => accumulator + row.requestCount, 0);
@@ -346,6 +463,17 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
         settings,
         audit: {
             recentActions,
+        },
+        security: {
+            recentEvents: recentSecurityEvents,
+            failedLast24h,
+            rateLimitedLast24h,
+            totalEvents: totalSecurityEvents,
+            page: securityPage,
+            pageSize: securityPageSize,
+            totalPages: Math.max(1, Math.ceil(totalSecurityEvents / securityPageSize)),
+            sortBy: securitySortBy,
+            sortOrder: securitySortOrder,
         },
     };
 }

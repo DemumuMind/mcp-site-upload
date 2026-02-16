@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { requireAdminAccess } from "@/lib/admin-access";
 import { getRecentAdminBlogRuns, type AdminBlogRunStatus } from "@/lib/admin-blog-runs";
+import { normalizeInternalPath } from "@/lib/auth-redirects";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ type AdminBlogPageProps = {
         research?: string;
         sources?: string;
         status?: string;
+        from?: string;
     }>;
 };
 function formatError(error?: string) {
@@ -43,7 +45,8 @@ function toStatusFilter(value: string | undefined): AdminBlogRunStatus | undefin
 export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps) {
     await requireAdminAccess("/admin/blog");
     const locale = await getLocale();
-    const { success, error, slug, research, sources, status } = await searchParams;
+    const { success, error, slug, research, sources, status, from } = await searchParams;
+    const backHref = normalizeInternalPath(from || "/admin");
     const selectedStatus = toStatusFilter(status);
     const recentRuns = await getRecentAdminBlogRuns({
         limit: 20,
@@ -66,7 +69,7 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
 
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
-            <Link href="/admin">
+            <Link href={backHref}>
               <ArrowLeft className="size-4"/>
               {tr(locale, "Back to moderation", "Back to moderation")}
             </Link>

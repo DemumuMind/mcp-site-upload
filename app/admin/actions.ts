@@ -70,6 +70,22 @@ function redirectWithAdminError(pathname: string, errorCode: string): never {
     const safePath = normalizeInternalPath(pathname);
     redirect(`${safePath}?error=${encodeURIComponent(errorCode)}`);
 }
+function getAdminReturnPath(formData: FormData, fallbackPath: string): string {
+    const returnToRaw = String(formData.get("returnTo") || "").trim();
+    if (!returnToRaw) {
+        return fallbackPath;
+    }
+    return normalizeInternalPath(returnToRaw);
+}
+function withQueryParam(pathname: string, key: string, value: string): string {
+    const [pathOnly, hashPart = ""] = pathname.split("#");
+    const [basePath, queryPart = ""] = pathOnly.split("?");
+    const searchParams = new URLSearchParams(queryPart);
+    searchParams.set(key, value);
+    const queryString = searchParams.toString();
+    const nextPath = `${basePath}${queryString ? `?${queryString}` : ""}`;
+    return hashPart ? `${nextPath}#${hashPart}` : nextPath;
+}
 function requireAdminClientOrRedirect(pathname: string) {
     const adminClient = createSupabaseAdminClient();
     if (!adminClient) {
@@ -131,6 +147,7 @@ export async function moderateServerStatusAction(formData: FormData) {
     const actor = await requireAdminAccess("/admin");
     const serverId = String(formData.get("serverId") || "");
     const nextStatus = String(formData.get("status") || "") as ServerStatus;
+    const returnPath = getAdminReturnPath(formData, "/admin");
     if (!serverId || !moderationStatuses.includes(nextStatus)) {
         redirectWithAdminError("/admin", "invalid");
     }
@@ -158,10 +175,11 @@ export async function moderateServerStatusAction(formData: FormData) {
     revalidatePath("/sitemap.xml");
     revalidatePath("/admin");
     updateTag(CATALOG_SERVERS_CACHE_TAG);
-    redirect(`/admin?success=${nextStatus}`);
+    redirect(withQueryParam(returnPath, "success", nextStatus));
 }
 export async function saveAdminDashboardSettingsAction(formData: FormData) {
     const actor = await requireAdminAccess("/admin");
+    const returnPath = getAdminReturnPath(formData, "/admin");
     const statusUpdateIntervalSec = parseBoundedInt(formData.get("statusUpdateIntervalSec"), 5, 1, 300);
     const requestLimitPerMinute = parseBoundedInt(formData.get("requestLimitPerMinute"), 1000, 1, 100000);
     const notifyEmailOnErrors = toCheckedBoolean(formData.get("notifyEmailOnErrors"));
@@ -197,10 +215,11 @@ export async function saveAdminDashboardSettingsAction(formData: FormData) {
         },
     });
     revalidatePath("/admin");
-    redirect("/admin?success=settings");
+    redirect(withQueryParam(returnPath, "success", "settings"));
 }
 export async function saveAdminDashboardMetricsAction(formData: FormData) {
     const actor = await requireAdminAccess("/admin");
+    const returnPath = getAdminReturnPath(formData, "/admin");
     const totalRequests = parseBoundedInt(formData.get("totalRequests"), 0, 0, 10000000000);
     const averageLatencyMs = parseBoundedInt(formData.get("averageLatencyMs"), 0, 0, 600000);
     const uptimePercent = parseBoundedFloat(formData.get("uptimePercent"), 99.9, 0, 100);
@@ -230,10 +249,11 @@ export async function saveAdminDashboardMetricsAction(formData: FormData) {
         },
     });
     revalidatePath("/admin");
-    redirect("/admin?success=metrics");
+    redirect(withQueryParam(returnPath, "success", "metrics"));
 }
 export async function createAdminSystemEventAction(formData: FormData) {
     const actor = await requireAdminAccess("/admin");
+    const returnPath = getAdminReturnPath(formData, "/admin");
     const levelInput = String(formData.get("level") || "").trim().toLowerCase();
     const messageEn = String(formData.get("messageEn") || "").trim();
     const occurredAtRaw = String(formData.get("occurredAt") || "").trim();
@@ -271,10 +291,11 @@ export async function createAdminSystemEventAction(formData: FormData) {
         },
     });
     revalidatePath("/admin");
-    redirect("/admin?success=event_created");
+    redirect(withQueryParam(returnPath, "success", "event_created"));
 }
 export async function deleteAdminSystemEventAction(formData: FormData) {
     const actor = await requireAdminAccess("/admin");
+    const returnPath = getAdminReturnPath(formData, "/admin");
     const eventId = String(formData.get("eventId") || "").trim();
     if (!eventId) {
         redirectWithAdminError("/admin", "invalid_event");
@@ -290,7 +311,7 @@ export async function deleteAdminSystemEventAction(formData: FormData) {
         targetId: eventId,
     });
     revalidatePath("/admin");
-    redirect("/admin?success=event_deleted");
+    redirect(withQueryParam(returnPath, "success", "event_deleted"));
 }
 async function finalizeBlogRunStatus(params: {
     runId: string | null;
