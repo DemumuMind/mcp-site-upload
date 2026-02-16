@@ -32,6 +32,13 @@ function isEmailNotConfirmedErrorMessage(message: string | undefined): boolean {
     return (normalizedMessage.includes("email not confirmed") ||
         normalizedMessage.includes("email_not_confirmed"));
 }
+function isUnsupportedOAuthProviderErrorMessage(message: string | undefined): boolean {
+    const normalizedMessage = message?.trim().toLowerCase();
+    if (!normalizedMessage) {
+        return false;
+    }
+    return normalizedMessage.includes("unsupported provider") || normalizedMessage.includes("provider is not enabled");
+}
 function getAuthErrorMessage(locale: Locale, errorCode?: string): string | null {
     if (!errorCode) {
         return null;
@@ -162,6 +169,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
     });
     const [emailAuthErrors, setEmailAuthErrors] = useState<EmailAuthErrors>({});
     const [emailMessage, setEmailMessage] = useState<string | null>(null);
+    const [oauthProviderMessage, setOauthProviderMessage] = useState<string | null>(null);
     const emailPasswordStrengthScore = useMemo(() => getPasswordStrengthScore(emailAuthValues.password), [emailAuthValues.password]);
     const signupChecklistItems = useMemo(() => getPasswordChecklistItems(locale, emailAuthValues.password), [locale, emailAuthValues.password]);
     const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-indigo-600/65 bg-indigo-900/75 px-4 text-left text-sm font-semibold text-violet-50 transition hover:border-violet-300/70 hover:bg-indigo-900 focus-visible:ring-violet-200/40";
@@ -225,6 +233,7 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
         }
         setPendingOAuthProvider(provider);
         setEmailMessage(null);
+        setOauthProviderMessage(null);
         const { error } = await supabaseClient.auth.signInWithOAuth({
             provider,
             options: {
@@ -232,7 +241,15 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
             },
         });
         if (error) {
-            toast.error(error.message);
+            if (isUnsupportedOAuthProviderErrorMessage(error.message)) {
+                const providerLabel = provider === "google" ? "Google" : "GitHub";
+                const details = tr(locale, `${providerLabel} login is not enabled in Supabase Auth providers for this project. Enable the provider in Supabase Dashboard -> Authentication -> Providers, then retry.`, `${providerLabel} login is not enabled in Supabase Auth providers for this project. Enable the provider in Supabase Dashboard -> Authentication -> Providers, then retry.`);
+                setOauthProviderMessage(details);
+                toast.error(details);
+            }
+            else {
+                toast.error(error.message);
+            }
             setPendingOAuthProvider(null);
         }
     }
@@ -411,6 +428,9 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
 
         {callbackErrorMessage ? (<p className="mt-5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100">
             {callbackErrorMessage}
+          </p>) : null}
+        {oauthProviderMessage ? (<p className="mt-3 rounded-xl border border-amber-300/45 bg-amber-400/10 px-3 py-2.5 text-sm text-amber-100">
+            {oauthProviderMessage}
           </p>) : null}
 
         {isLoading ? (<p className="mt-3 text-xs text-violet-200/70">
