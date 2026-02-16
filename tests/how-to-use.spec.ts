@@ -19,39 +19,17 @@ async function setLocaleCookies(page: Page, locale: "en") {
 }
 
 test.describe("How-to-use page", () => {
-  test("renders operations-first rollout guide and key conversion paths", async ({ page }) => {
+  test("renders setup guide and key conversion paths", async ({ page }) => {
     await setLocaleCookies(page, "en");
     await page.goto("/how-to-use");
 
-    await expect(
-      page.getByRole("heading", { name: "MCP Setup Guide for Teams", level: 1 }),
-    ).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Choose rollout track", level: 2 })).toBeVisible();
-
-    const governedRolloutHeading = page.getByRole("heading", {
-      name: "Governed rollout phases",
-      level: 3,
-    });
-
-    await page.getByRole("button", { name: "Use this track" }).click();
-
-    if (!(await governedRolloutHeading.isVisible())) {
-      const retryButton = page.getByRole("button", { name: "Use this track" });
-      if ((await retryButton.count()) > 0) {
-        await retryButton.click();
-      }
-    }
-
-    await expect(governedRolloutHeading).toBeVisible();
-    await expect(page.getByText("Separate environment-specific access")).toBeVisible();
-
-    await expect(page.getByRole("heading", { name: "Execution runbook", level: 3 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Setup Guide", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Choose your setup path", level: 2 })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Use this path" }).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Claude Code" }).click();
     await expect(
-      page.getByText(
-        "Add server in local MCP config, restart session, and verify tool inventory refresh.",
-      ),
+      page.getByText("Add MCP server in local config, restart agent session, and re-open tool list."),
     ).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Open Catalog", exact: true })).toBeVisible();

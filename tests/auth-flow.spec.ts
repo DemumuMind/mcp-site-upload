@@ -92,9 +92,7 @@ test.describe("Auth email flows", () => {
 
     await expect(page).toHaveURL(/\/auth\/check-email\?.*flow=signup/);
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
-    await expect(
-      page.getByText("We sent a confirmation link. Open it to finish account registration."),
-    ).toBeVisible();
+    await expect(page.getByText(/We sent a confirmation link/i)).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Resend confirmation email" })).toBeVisible();
   });
@@ -136,9 +134,7 @@ test.describe("Auth email flows", () => {
 
     await expect(page).toHaveURL(/\/auth\/check-email\?.*flow=reset/);
     await expect(page.getByRole("heading", { name: "Check your email for reset link" })).toBeVisible();
-    await expect(
-      page.getByText("We sent a password reset link. Open it to set a new password."),
-    ).toBeVisible();
+    await expect(page.getByText(/We sent a password reset link/i)).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Resend reset email" })).toBeVisible();
   });

@@ -71,8 +71,23 @@ Important fields in response JSON:
 - `skippedManual`, `skippedInvalid`
 - `failed`, `failures[]`
 - `changedSlugs[]`
+- `alerting.status` (`ok` | `partial` | `error`)
+- `alerting.shouldWarn`, `alerting.shouldPage`
+- `alerting.signalCount`, `alerting.signals[]` with `code`, `severity`, `message`, and optional `value`/`threshold`
 
-Non-zero `failed` returns HTTP `207`.
+HTTP status:
+- `200` when `alerting.status` is `ok` or `partial`
+- `207` when `alerting.status` is `error`
+
+## Monitoring and alerting
+- The route now emits structured logs with `event: "catalog.auto_sync.completed"` and includes `alertStatus`, `signals`, and failure counts.
+- Warning conditions (partial): stale cleanup skipped, stale cleanup capped, low coverage ratio.
+- Error conditions: any sync failure (`failed > 0`) or unhandled route error.
+- Recommended alert wiring:
+  1. Filter logs by `event = catalog.auto_sync.completed`.
+  2. Trigger warning alert when `shouldWarn=true`.
+  3. Trigger paging alert when `shouldPage=true` or when response has `alerting.status=error`.
+  4. Include `alerting.signals[]` and `failures[]` in incident payload.
 
 ## Rollback
 1. Disable cron jobs for `/api/catalog/auto-sync` in `vercel.json`.

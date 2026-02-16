@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState, useSyncExternalStore } from "react";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useLocale } from "@/components/locale-provider";
@@ -145,6 +145,10 @@ function getPasswordChecklistItems(locale: Locale, password: string) {
 }
 export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
     const locale = useLocale();
+    const hasMounted = useSyncExternalStore((onStoreChange) => {
+        onStoreChange();
+        return () => undefined;
+    }, () => true, () => false);
     const safeNextPath = useMemo(() => normalizeInternalPath(nextPath), [nextPath]);
     const callbackErrorMessage = useMemo(() => getAuthErrorMessage(locale, errorCode), [errorCode, locale]);
     const { isConfigured, isLoading, user } = useSupabaseUser();
@@ -330,6 +334,22 @@ export function AuthSignInPanel({ nextPath, errorCode }: AuthSignInPanelProps) {
             return;
         }
         toast.success(tr(locale, "Signed out", "Signed out"));
+    }
+    if (!hasMounted) {
+        return (<section className="relative overflow-hidden rounded-[2rem] border border-indigo-700/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-200/35 to-transparent"/>
+        <div className="relative p-6 sm:p-10">
+          <span className="inline-flex rounded-full border border-violet-400/65 bg-indigo-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-100">
+            {tr(locale, "Secure access", "Secure access")}
+          </span>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-violet-50 sm:text-4xl">
+            {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-violet-100/85 sm:text-base">
+            {tr(locale, "Loading sign-in panel…", "Loading sign-in panel…")}
+          </p>
+        </div>
+      </section>);
     }
     if (!isConfigured) {
         return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-indigo-950 p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">

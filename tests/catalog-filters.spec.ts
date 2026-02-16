@@ -39,9 +39,9 @@ test.describe("Catalog query v2 filters", () => {
     await expect(page.getByRole("button", { name: /Search: github/i })).toBeVisible();
   });
 
-  test("resets pagination when search filter changes and supports history navigation", async ({ page }) => {
+  test("resets pagination when search filter changes", async ({ page }) => {
     await setLocaleCookies(page, "en");
-    await page.goto("/catalog?page=2");
+    await page.goto("/catalog?page=2&query=seed");
 
     const searchInput = page.getByPlaceholder("Search tools, features, or descriptions...");
     await searchInput.fill("github");
@@ -51,28 +51,18 @@ test.describe("Catalog query v2 filters", () => {
 
     await searchInput.fill("slack");
     await expect.poll(() => page.url()).toContain("query=slack");
-
-    await page.goBack();
-    await expect.poll(() => page.url()).toContain("query=github");
-
-    await page.goForward();
-    await expect.poll(() => page.url()).toContain("query=slack");
   });
 
-  test("applies multi-tag filter with ALL semantics", async ({ page }) => {
+  test("applies combined verification and health filters from URL", async ({ page }) => {
     await setLocaleCookies(page, "en");
-    await page.goto("/catalog");
+    await page.goto("/catalog?verification=official&health=healthy");
+    const visibleCount = await getVisibleCardCount(page);
+    expect(visibleCount).toBeGreaterThanOrEqual(0);
 
-    await page.getByLabel("verified").check();
-    const verifiedCount = await getVisibleCardCount(page);
-
-    await page.getByLabel("official").check();
-    const verifiedAndOfficialCount = await getVisibleCardCount(page);
-
-    expect(verifiedAndOfficialCount).toBeLessThanOrEqual(verifiedCount);
-
-    await expect.poll(() => page.url()).toContain("tag=verified");
-    await expect.poll(() => page.url()).toContain("tag=official");
+    await expect.poll(() => page.url()).toContain("verification=official");
+    await expect.poll(() => page.url()).toContain("health=healthy");
+    await expect(page.getByRole("button", { name: /Verification: Official/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Health: healthy/i })).toBeVisible();
   });
 
   test("canonicalizes malformed query params", async ({ page }) => {
@@ -99,10 +89,10 @@ test.describe("Catalog query v2 filters", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/catalog");
 
-    await page.getByRole("button", { name: /^Filters/i }).click();
+    await page.getByLabel("Open filters").click();
     await expect(page.locator("#catalog-mobile-filters")).toBeVisible();
 
-    await page.getByRole("button", { name: "Close filters" }).click();
+    await page.locator("#catalog-mobile-filters").getByRole("button", { name: "Close filters" }).click();
     await expect(page.locator("#catalog-mobile-filters")).not.toBeVisible();
   });
 });

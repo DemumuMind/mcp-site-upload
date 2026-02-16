@@ -5,6 +5,8 @@ import type { AuthType, ServerStatus, VerificationLevel } from "@/lib/types";
 const DEFAULT_REGISTRY_URL = "https://registry.modelcontextprotocol.io/v0.1/servers";
 const DEFAULT_PAGE_LIMIT = 100;
 const DEFAULT_MAX_PAGES = 120;
+const DEFAULT_MIN_STALE_BASELINE_RATIO = 0.7;
+const DEFAULT_MAX_STALE_MARK_RATIO = 0.15;
 const MAX_PAGE_LIMIT = 100;
 const MAX_PAGES = 200;
 const UPSERT_CHUNK_SIZE = 50;
@@ -12,6 +14,7 @@ const STALE_UPDATE_CHUNK_SIZE = 25;
 const QUALITY_FILTER_SAMPLE_LIMIT = 50;
 const MODERATION_FILTER_SAMPLE_LIMIT = 50;
 const STALE_MARK_TAG = "registry-stale";
+const STALE_CANDIDATE_TAG = "registry-stale-candidate";
 const AUTO_MANAGED_TAG = "registry-auto";
 const REGISTRY_SOURCE_TAG = "mcp-registry";
 const FALLBACK_CATEGORY = "Other Tools and Integrations";
@@ -123,7 +126,14 @@ export type CatalogRegistrySyncResult = {
     staleCleanupEnabled: boolean;
     staleCleanupApplied: boolean;
     staleCleanupReason: string | null;
+    minStaleBaselineRatio: number;
+    maxStaleMarkRatio: number;
+    staleBaselineCount: number;
+    staleCoverageRatio: number | null;
     staleCandidates: number;
+    staleCappedCount: number;
+    staleGraceMarked: number;
+    staleRejectedAfterGrace: number;
     staleMarked: number;
     staleFailed: number;
 };
@@ -132,6 +142,8 @@ export type CatalogRegistrySyncOptions = {
     pageLimit?: number;
     maxPages?: number;
     cleanupStale?: boolean;
+    minStaleBaselineRatio?: number;
+    maxStaleMarkRatio?: number;
     qualityFilter?: boolean;
     allowlistPatterns?: string[];
     denylistPatterns?: string[];
@@ -247,6 +259,13 @@ function parseBoundedInt(raw: number | undefined, fallback: number, min: number,
         return fallback;
     }
     return Math.max(min, Math.min(Math.round(numericRaw), max));
+}
+function parseBoundedRatio(raw: number | undefined, fallback: number, min: number, max: number): number {
+    const numericRaw = typeof raw === "number" ? raw : Number.NaN;
+    if (!Number.isFinite(numericRaw)) {
+        return fallback;
+    }
+    return Math.max(min, Math.min(numericRaw, max));
 }
 function toErrorMessage(error: unknown): string {
     if (error instanceof Error) {
@@ -638,11 +657,26 @@ async function upsertRows(adminClient: SupabaseClient, rows: SyncRowPayload[], e
         }
     }
 }
-function buildStaleTags(tags: string[] | null): string[] {
+function hasTag(tags: string[] | null, expected: string): boolean {
+    return (tags ?? []).some((tag) => normalizeTag(tag) === expected);
+}
+function buildGraceCandidateTags(tags: string[] | null): string[] {
     const normalized = new Set<string>();
     for (const tag of tags ?? []) {
         const safeTag = normalizeTag(tag);
-        if (safeTag) {
+        if (safeTag && safeTag !== STALE_MARK_TAG) {
+            normalized.add(safeTag);
+        }
+    }
+    normalized.add(AUTO_MANAGED_TAG);
+    normalized.add(STALE_CANDIDATE_TAG);
+    return [...normalized].slice(0, 12);
+}
+function buildRejectedStaleTags(tags: string[] | null): string[] {
+    const normalized = new Set<string>();
+    for (const tag of tags ?? []) {
+        const safeTag = normalizeTag(tag);
+        if (safeTag && safeTag !== STALE_CANDIDATE_TAG) {
             normalized.add(safeTag);
         }
     }
@@ -653,15 +687,21 @@ function buildStaleTags(tags: string[] | null): string[] {
 async function markStaleRows(adminClient: SupabaseClient, staleRows: AutoManagedActiveRow[], result: CatalogRegistrySyncResult): Promise<void> {
     for (const chunk of chunkArray(staleRows, STALE_UPDATE_CHUNK_SIZE)) {
         const outcomes = await Promise.all(chunk.map(async (row) => {
+            const shouldRejectNow = hasTag(row.tags, STALE_CANDIDATE_TAG);
             const { error } = await adminClient
                 .from("servers")
-                .update({
-                status: "rejected",
-                tags: buildStaleTags(row.tags),
-            })
+                .update(shouldRejectNow
+                ? {
+                    status: "rejected",
+                    tags: buildRejectedStaleTags(row.tags),
+                }
+                : {
+                    tags: buildGraceCandidateTags(row.tags),
+                })
                 .eq("slug", row.slug);
             return {
                 slug: row.slug,
+                shouldRejectNow,
                 error,
             };
         }));
@@ -675,7 +715,13 @@ async function markStaleRows(adminClient: SupabaseClient, staleRows: AutoManaged
                 });
                 continue;
             }
-            result.staleMarked += 1;
+            if (outcome.shouldRejectNow) {
+                result.staleRejectedAfterGrace += 1;
+                result.staleMarked += 1;
+            }
+            else {
+                result.staleGraceMarked += 1;
+            }
             addChangedSlug(result, outcome.slug);
         }
     }
@@ -685,6 +731,8 @@ export async function runCatalogRegistrySync(options: CatalogRegistrySyncOptions
     const pageLimit = parseBoundedInt(options.pageLimit, DEFAULT_PAGE_LIMIT, 1, MAX_PAGE_LIMIT);
     const maxPages = parseBoundedInt(options.maxPages, DEFAULT_MAX_PAGES, 1, MAX_PAGES);
     const cleanupStale = options.cleanupStale ?? true;
+    const minStaleBaselineRatio = parseBoundedRatio(options.minStaleBaselineRatio, DEFAULT_MIN_STALE_BASELINE_RATIO, 0, 1);
+    const maxStaleMarkRatio = parseBoundedRatio(options.maxStaleMarkRatio, DEFAULT_MAX_STALE_MARK_RATIO, 0, 1);
     const qualityFilter = options.qualityFilter ?? true;
     const allowlistMatchers = buildModerationPatternMatchers(options.allowlistPatterns);
     const denylistMatchers = buildModerationPatternMatchers(options.denylistPatterns);
@@ -717,7 +765,14 @@ export async function runCatalogRegistrySync(options: CatalogRegistrySyncOptions
         staleCleanupEnabled: cleanupStale,
         staleCleanupApplied: false,
         staleCleanupReason: null,
+        minStaleBaselineRatio,
+        maxStaleMarkRatio,
+        staleBaselineCount: 0,
+        staleCoverageRatio: null,
         staleCandidates: 0,
+        staleCappedCount: 0,
+        staleGraceMarked: 0,
+        staleRejectedAfterGrace: 0,
         staleMarked: 0,
         staleFailed: 0,
     };
@@ -850,8 +905,18 @@ export async function runCatalogRegistrySync(options: CatalogRegistrySyncOptions
         result.staleCleanupReason = "Skipped because sync encountered failures.";
         return result;
     }
-    result.staleCleanupApplied = true;
     const activeAutoManagedRows = await fetchActiveAutoManagedRows(adminClient);
+    result.staleBaselineCount = activeAutoManagedRows.length;
+    if (activeAutoManagedRows.length > 0) {
+        const staleCoverageRatio = candidates.length / activeAutoManagedRows.length;
+        result.staleCoverageRatio = staleCoverageRatio;
+        if (staleCoverageRatio < minStaleBaselineRatio) {
+            result.staleCleanupReason =
+                `Skipped because fetched registry coverage (${(staleCoverageRatio * 100).toFixed(1)}%) is below safety threshold (${(minStaleBaselineRatio * 100).toFixed(1)}%).`;
+            return result;
+        }
+    }
+    result.staleCleanupApplied = true;
     const registrySlugSet = new Set(candidates.map((candidate) => candidate.slug));
     const staleRows = activeAutoManagedRows.filter((row) => !registrySlugSet.has(row.slug));
     result.staleCandidates = staleRows.length;
@@ -859,9 +924,32 @@ export async function runCatalogRegistrySync(options: CatalogRegistrySyncOptions
         result.staleCleanupReason = "No stale auto-managed rows found.";
         return result;
     }
-    await markStaleRows(adminClient, staleRows, result);
+    const staleLimit = maxStaleMarkRatio <= 0
+        ? 0
+        : Math.max(1, Math.floor(activeAutoManagedRows.length * maxStaleMarkRatio));
+    let staleRowsToProcess = staleRows;
+    if (staleRows.length > staleLimit) {
+        result.staleCappedCount = staleRows.length - staleLimit;
+        staleRowsToProcess = [...staleRows].sort((left, right) => left.slug.localeCompare(right.slug)).slice(0, staleLimit);
+    }
+    if (staleRowsToProcess.length === 0) {
+        result.staleCleanupReason =
+            "Skipped because max stale mark ratio is 0; stale candidates were detected but not processed.";
+        return result;
+    }
+    await markStaleRows(adminClient, staleRowsToProcess, result);
     if (result.staleFailed === 0) {
-        result.staleCleanupReason = "Stale auto-managed rows were marked as rejected.";
+        if (result.staleRejectedAfterGrace > 0) {
+            result.staleCleanupReason =
+                "Stale cleanup applied with grace: previously marked rows were rejected, newly stale rows were marked as candidates.";
+        }
+        else {
+            result.staleCleanupReason =
+                "Stale cleanup applied with grace: rows were marked as stale candidates and will be rejected only if still stale on the next healthy sync.";
+        }
+        if (result.staleCappedCount > 0) {
+            result.staleCleanupReason += ` Processing was capped this run (deferred ${result.staleCappedCount} stale rows).`;
+        }
     }
     else {
         result.staleCleanupReason =

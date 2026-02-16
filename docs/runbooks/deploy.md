@@ -16,11 +16,12 @@ Safe deployment for `mcp-site` through GitHub Actions + Vercel, with smoke valid
 
 ## Automated Path
 1. Merge to `main` or run `.github/workflows/deploy.yml` manually.
-2. Workflow runs:
+  2. Workflow runs:
    - `npm ci`
    - `npm run check:utf8:strict`
    - `npm run lint`
    - `npm run build`
+     - `scripts/run-build.mjs` loads both `.env` and `.env.local` before bundling, so verify those files contain the Supabase URL, publishable key, and related secrets.
    - Vercel deploy
    - post-deploy `npm run smoke:check -- <target-url>`
 3. Confirm workflow summary includes:

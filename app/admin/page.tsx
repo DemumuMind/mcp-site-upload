@@ -20,6 +20,9 @@ type AdminPageProps = {
     searchParams: Promise<{
         success?: string;
         error?: string;
+        q?: string;
+        category?: string;
+        auth?: string;
     }>;
 };
 function formatCompactNumber(locale: Locale, value: number): string {
@@ -79,6 +82,29 @@ function getFeedbackMessage({ locale, success, error, }: {
     }
     return null;
 }
+function getAuthTypeLabel(locale: Locale, authType: string): string {
+    if (authType === "oauth") {
+        return tr(locale, "OAuth", "OAuth");
+    }
+    if (authType === "api_key") {
+        return tr(locale, "API key", "API key");
+    }
+    return tr(locale, "No auth", "No auth");
+}
+function formatQueuedAt(locale: Locale, value?: string): string {
+    if (!value) {
+        return tr(locale, "Unknown", "Unknown");
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return tr(locale, "Unknown", "Unknown");
+    }
+    return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    }).format(parsed);
+}
 export default async function AdminPage({ searchParams }: AdminPageProps) {
     await requireAdminAccess("/admin");
     const locale = await getLocale();
@@ -88,6 +114,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         searchParams,
     ]);
     const pendingCount = pendingServers.length;
+    const query = (queryState.q ?? "").trim();
+    const selectedCategory = queryState.category ?? "all";
+    const selectedAuth = queryState.auth ?? "all";
+    const normalizedQuery = query.toLowerCase();
+    const categoryOptions = Array.from(new Set(pendingServers.map((item) => item.category))).sort((left, right) => left.localeCompare(right));
+    const authOptions = Array.from(new Set(pendingServers.map((item) => item.authType))).sort((left, right) => left.localeCompare(right));
+    const filteredPendingServers = pendingServers.filter((server) => {
+        const queryMatches = normalizedQuery.length === 0 ||
+            server.name.toLowerCase().includes(normalizedQuery) ||
+            server.slug.toLowerCase().includes(normalizedQuery) ||
+            server.description.toLowerCase().includes(normalizedQuery) ||
+            server.serverUrl.toLowerCase().includes(normalizedQuery);
+        const categoryMatches = selectedCategory === "all" || server.category === selectedCategory;
+        const authMatches = selectedAuth === "all" || server.authType === selectedAuth;
+        return queryMatches && categoryMatches && authMatches;
+    });
+    const filteredCount = filteredPendingServers.length;
     const feedback = getFeedbackMessage({
         locale,
         success: queryState.success,
@@ -389,7 +432,46 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </PageSection>
 
         <PageSection>
-          {pendingServers.length === 0 ? (<Card className="border-white/10 bg-indigo-900/55">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-violet-50">
+                {tr(locale, "Moderation queue", "Moderation queue")}
+              </h2>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <Badge variant="secondary" className="bg-white/10 text-violet-100">
+                  {tr(locale, "Total", "Total")}: {pendingCount}
+                </Badge>
+                <Badge variant="secondary" className="bg-blue-500/15 text-blue-200">
+                  {tr(locale, "Showing", "Showing")}: {filteredCount}
+                </Badge>
+              </div>
+            </div>
+
+            <form method="get" className="grid gap-3 rounded-lg border border-white/10 bg-indigo-900/50 p-3 lg:grid-cols-[minmax(0,1fr)_220px_200px_auto]">
+              <Input name="q" defaultValue={query} placeholder={tr(locale, "Search by name, slug, description, or URL", "Search by name, slug, description, or URL")} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+              <select name="category" defaultValue={selectedCategory} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                <option value="all">{tr(locale, "All categories", "All categories")}</option>
+                {categoryOptions.map((category) => (<option key={category} value={category}>
+                    {category}
+                  </option>))}
+              </select>
+              <select name="auth" defaultValue={selectedAuth} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                <option value="all">{tr(locale, "All auth types", "All auth types")}</option>
+                {authOptions.map((authType) => (<option key={authType} value={authType}>
+                    {getAuthTypeLabel(locale, authType)}
+                  </option>))}
+              </select>
+              <div className="flex items-center gap-2">
+                <Button type="submit" variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                  {tr(locale, "Apply", "Apply")}
+                </Button>
+                <Button asChild variant="ghost" className="text-violet-200 hover:bg-white/5">
+                  <Link href="/admin">{tr(locale, "Reset", "Reset")}</Link>
+                </Button>
+              </div>
+            </form>
+
+            {pendingServers.length === 0 ? (<Card className="border-white/10 bg-indigo-900/55">
               <CardHeader>
                 <CardTitle className="text-violet-50">
                   {tr(locale, "No pending submissions", "No pending submissions")}
@@ -398,14 +480,29 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <CardContent className="text-sm text-violet-200">
                 {tr(locale, "New servers submitted through the public form will appear here.", "New servers submitted through the public form will appear here.")}
               </CardContent>
+            </Card>) : filteredPendingServers.length === 0 ? (<Card className="border-white/10 bg-indigo-900/55">
+              <CardHeader>
+                <CardTitle className="text-violet-50">
+                  {tr(locale, "No results", "No results")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-violet-200">
+                {tr(locale, "Try changing search text or filters.", "Try changing search text or filters.")}
+              </CardContent>
             </Card>) : (<div className="grid gap-4 lg:grid-cols-2">
-              {pendingServers.map((mcpServer) => (<Card key={mcpServer.id} className="border-white/10 bg-indigo-900/70">
+              {filteredPendingServers.map((mcpServer) => (<Card key={mcpServer.id} className="border-white/10 bg-indigo-900/70">
                   <CardHeader className="space-y-2">
-                    <CardTitle className="text-base text-violet-50">{mcpServer.name}</CardTitle>
+                    <div className="flex items-start justify-between gap-3">
+                      <CardTitle className="text-base text-violet-50">{mcpServer.name}</CardTitle>
+                      <p className="shrink-0 text-xs text-violet-300">
+                        {tr(locale, "Queued", "Queued")}: {formatQueuedAt(locale, mcpServer.createdAt)}
+                      </p>
+                    </div>
+                    <p className="font-mono text-xs text-violet-300">/{mcpServer.slug}</p>
                     <div className="flex flex-wrap gap-2">
                       <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
                       <Badge variant="secondary" className="bg-white/8 text-violet-200">
-                        {mcpServer.authType}
+                        {getAuthTypeLabel(locale, mcpServer.authType)}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -434,6 +531,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   </CardContent>
                 </Card>))}
             </div>)}
+          </div>
         </PageSection>
       </div>
     </PageFrame>);
