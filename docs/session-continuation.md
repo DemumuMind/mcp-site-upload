@@ -1,3 +1,45 @@
+﻿## Latest Update (2026-02-15, Parallel #17 + #18 Implementation)
+- Objective: execute Phase 2 in parallel for catalog auto-sync observability/alerts (#17) and admin moderation queue UX (#18).
+- Status: completed.
+- Touched files:
+  - `app/api/catalog/auto-sync/route.ts`
+  - `docs/catalog-automation.md`
+  - `README.md`
+  - `app/admin/page.tsx`
+  - `tests/catalog-filters.spec.ts`
+- Implemented:
+  - Added structured auto-sync alerting payload (`alerting`) with warning/page signals and signal codes.
+  - Added structured auto-sync completion/unhandled-error logging for monitoring integration.
+  - Added safety diagnostics block (`safety`) in auto-sync response and documented runbook-level alert wiring.
+  - Improved admin moderation queue UX with query/category/auth filters, total/showing summary badges, richer card metadata (queued date, slug, auth label), and no-results state.
+  - Stabilized catalog filter E2E assertion to avoid nondeterministic count comparison.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm run test:e2e` -> pass (`19 passed`)
+- Open risks:
+  - Auto-sync alerting currently log/response-driven (no persistent telemetry table yet); for long-term trend analytics, a DB-backed run-history table may still be added later.
+## Latest Update (2026-02-15, E2E Reliability + Flake Reduction for Issue #21)
+- Objective: stabilize flaky Playwright coverage for catalog filters, how-to-use content assertions, and auth check-email confirmations.
+- Status: completed (tests refactored for deterministic selectors/assertions).
+- Touched files:
+  - `tests/catalog-filters.spec.ts`
+  - `tests/how-to-use.spec.ts`
+  - `tests/auth-flow.spec.ts`
+- Implemented:
+  - Removed fragile browser history assertion that could navigate to `about:blank`; kept stable pagination-reset query assertions.
+  - Reworked catalog combined-filter test to use deterministic deep-link query combinations instead of brittle checkbox interactions across duplicated mobile/desktop panels.
+  - Made mobile filter drawer close action strict-safe by scoping close-button locator to `#catalog-mobile-filters`.
+  - Updated how-to-use test expectations to current content contract (`Setup Guide` / `Choose your setup path`) and resilient CTA checks.
+  - Relaxed auth check-email copy assertions to robust regex fragments for confirmation/reset text to avoid brittle full-string failures.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm run test:e2e` -> pass (`19 passed`)
+- Open risks:
+  - Playwright output still includes `NO_COLOR` warning noise from env settings; non-blocking but can obscure failures in CI logs.
 ## Latest Update (2026-02-15, CI Alerting for Catalog Count Drops)
 - Objective: add automatic CI alerting when deployed catalog count unexpectedly drops.
 - Status: completed.
@@ -160,7 +202,7 @@
 - Open risks:
   - Local environment may keep occupied ports from background Next processes; use alternate port for manual verification.
 ## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
-- Objective: finalize “Почини” follow-up by ensuring lint/build are stable after security hardening pass.
+- Objective: finalize вЂњРџРѕС‡РёРЅРёвЂќ follow-up by ensuring lint/build are stable after security hardening pass.
 - Status: completed.
 - Touched files:
   - `eslint.config.mjs`
@@ -2588,3 +2630,104 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
 
 
 
+
+
+
+## Latest Update (2026-02-16, Deep Research Quick-Wins Implementation)
+- Objective: implement high-confidence reliability fixes discovered during deep research audit.
+- Status: completed.
+- Touched files:
+  - `package.json`
+  - `.gitignore`
+  - `scripts/run-playwright.mjs` (new)
+  - `docs/deep-research-audit-2026-02-16.md` (new)
+- Implemented:
+  - Added canonical `npm test` script alias to Playwright suite.
+  - Switched Playwright npm scripts to shared wrapper script that unsets `NO_COLOR`, removing repeated `NO_COLOR`/`FORCE_COLOR` warnings.
+  - Added test artifact folders to `.gitignore` (`test-results/`, `playwright-report/`).
+  - Added deep research report with architecture, bugs, unused-code candidates, and incomplete areas.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm test -- --list` -> pass
+  - `npm run test:e2e -- tests/multi-agent-demo.spec.ts` -> pass (`1 passed`)
+- Open risks:
+  - Unused-code candidate list is diagnostic only and still needs safe-by-safe removal PRs.
+  - Repository currently contains many unrelated in-progress local changes; keep commit scope isolated.
+
+## Latest Update (2026-02-16, Deep Research Cleanup Pass #2)
+- Objective: execute safe unused-code cleanup from deep-research findings without breaking quality gates.
+- Status: completed (safe subset).
+- Touched files:
+  - `lib/tools/tools-storage.ts`
+  - `lib/tools/skill-profiles.ts`
+  - `lib/cookie-consent.ts`
+  - `lib/i18n.ts`
+  - `lib/legal-content.ts`
+  - `lib/catalog/query-v2.ts`
+- Implemented:
+  - Removed confirmed-unused helpers/exports (history clear helper, profile lookup/localization helpers, cookie-settings open dispatcher, locale cookie parser, legacy terms block, default query object export).
+  - Kept potentially reusable UI component files in place to avoid tracked-file removal side effects in strict UTF-8 guard flow.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm test -- --list` -> pass
+- Open risks:
+  - Additional candidate cleanup in UI layer should be done in dedicated PR with explicit product ownership confirmation.
+
+## Latest Update (2026-02-16, Cleanup Pass #3 + Multi-agent API Hardening)
+- Objective: execute remaining approved follow-up items (UI orphan cleanup prep, multi-agent endpoint hardening, ops helper for dirty worktree).
+- Status: completed.
+- Touched files:
+  - `components/language-switcher.tsx`
+  - `components/submission-access-panel.tsx`
+  - `components/submit-server-cta.tsx`
+  - `app/api/multi-agent/demo/route.ts`
+  - `README.md`
+  - `scripts/git-scope-status.mjs` (new)
+  - `package.json`
+- Implemented:
+  - Converted legacy/orphan UI components into explicit deprecated placeholders (no runtime logic) to remove dead branch complexity without tracked-file deletion side effects.
+  - Hardened `/api/multi-agent/demo` input contract and response metadata:
+    - request ID propagation
+    - stricter payload limits (`task`/`context` size)
+    - optional bearer auth via `MULTI_AGENT_DEMO_SECRET`
+    - structured validation/unhandled error logging
+  - Added operational helper script `npm run git:scope-status -- <filter>` for scoped local-change triage in dirty worktrees.
+  - Documented `MULTI_AGENT_DEMO_SECRET` in README env matrix.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm run test:e2e -- tests/multi-agent-demo.spec.ts` -> pass (`1 passed`)
+- Open risks:
+  - Placeholder deprecated components are still present intentionally; full physical deletion can be done in a dedicated cleanup PR when strict tracked-file policy/process is aligned.
+
+## Latest Update (2026-02-16, Cleanup Pass #4 Finalization)
+- Objective: complete remaining cleanup items (physical deletion of deprecated orphan components, strict-check compatibility for intentional deletions, full e2e gate).
+- Status: completed.
+- Touched files:
+  - `components/language-switcher.tsx` (deleted)
+  - `components/submission-access-panel.tsx` (deleted)
+  - `components/submit-server-cta.tsx` (deleted)
+  - `components/bridge-page-shell.tsx` (deleted)
+  - `components/theme-toggle.tsx` (deleted)
+  - `components/submission-form.tsx` (deleted)
+  - `lib/i18n.ts`
+  - `scripts/check-utf8.mjs`
+  - `README.md`
+- Implemented:
+  - Physically removed confirmed orphan UI components/files with no runtime references.
+  - Removed unused `LOCALES` export from i18n module.
+  - Hardened UTF-8 strict checker to treat files deleted via git diff (`--diff-filter=D`) as intentional deletions, preventing false-negative gate failures during cleanup PRs.
+  - Aligned README wording for `MULTI_AGENT_DEMO_SECRET` with actual endpoint behavior.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm test -- --list` -> pass
+  - `npm run test:e2e` -> pass (`19 passed`)
+- Open risks:
+  - Repository still has many unrelated local modifications outside this cleanup scope; keep commits atomic and path-scoped.
