@@ -22,7 +22,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
   return (
     <section className="border-y border-blacksmith bg-background">
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.15fr] lg:items-center">
-        <div className="space-y-4">
+        <div className="home-reveal home-delay-0 space-y-4">
           <h2 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
           <p className="max-w-xl leading-relaxed text-muted-foreground">{content.description}</p>
 
@@ -43,8 +43,8 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Card className="border-blacksmith bg-black/30">
+        <div className="home-reveal home-delay-1 grid gap-4 sm:grid-cols-2">
+          <Card className="border-blacksmith bg-black/30 transition-transform duration-300 hover:-translate-y-0.5">
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">Legacy process</CardTitle>
             </CardHeader>
@@ -53,7 +53,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
               <p><span className="text-muted-foreground">Effort:</span> {selectedStack.legacyCost}</p>
             </CardContent>
           </Card>
-          <Card className="border-primary/40 bg-primary/10 shadow-blacksmith-gold">
+          <Card className="border-primary/40 bg-primary/10 shadow-blacksmith-gold transition-transform duration-300 hover:-translate-y-0.5">
             <CardHeader>
               <CardTitle className="text-sm text-primary">DemumuMind flow</CardTitle>
             </CardHeader>

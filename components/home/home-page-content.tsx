@@ -39,8 +39,8 @@ export function HomePageContent({ content, viewModel }: HomePageContentProps) {
     <div className="relative isolate w-full overflow-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }} />
 
-      <div className="pointer-events-none absolute inset-0 -z-10 hero-grid opacity-45" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.22),transparent_56%)]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 hero-grid animate-grid-drift opacity-45" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] animate-blacksmith-pulse bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.22),transparent_56%)]" />
 
       <HeroSection content={content.hero} />
       <LogoCloudSection content={content.logoCloud} />

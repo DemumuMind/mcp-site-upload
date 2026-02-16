@@ -9,14 +9,18 @@ export function ShowcaseSection({ content }: ShowcaseSectionProps) {
   return (
     <section className="border-y border-blacksmith bg-black/20">
       <div className="section-shell space-y-8 py-20">
-        <div className="space-y-2 text-center">
+        <div className="home-reveal home-delay-0 space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
           <p className="mx-auto max-w-3xl leading-relaxed text-muted-foreground">{content.description}</p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          {content.cards.map((item) => (
-            <Card key={item.title} className="bg-card">
+          {content.cards.map((item, index) => (
+            <Card
+              key={item.title}
+              className="home-reveal bg-card transition-transform duration-300 hover:-translate-y-0.5"
+              style={{ animationDelay: `${110 + index * 70}ms` }}
+            >
               <CardHeader className="space-y-2">
                 <CardTitle className="text-sm text-muted-foreground">{item.title}</CardTitle>
                 <p className="text-3xl font-semibold text-primary">{item.value}</p>
