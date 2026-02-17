@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 type Comet = {
   x: number;
@@ -28,20 +29,23 @@ type IntensityPreset = {
   wrapperHeightClass: string;
 };
 
-const intensityPresets: Record<"low" | "medium" | "epic", IntensityPreset> = {
-  low: { fps: 28, comets: 20, orbs: 3, maxDpr: 1.1, glow: 0.14, wrapperHeightClass: "h-[760px]" },
-  medium: { fps: 36, comets: 32, orbs: 4, maxDpr: 1.35, glow: 0.2, wrapperHeightClass: "h-[900px]" },
-  epic: { fps: 48, comets: 46, orbs: 5, maxDpr: 1.55, glow: 0.26, wrapperHeightClass: "h-[1080px]" },
+const intensityPresets: Record<"low" | "medium" | "hard", IntensityPreset> = {
+  low: { fps: 24, comets: 0, orbs: 1, maxDpr: 1.05, glow: 0.07, wrapperHeightClass: "h-[760px]" },
+  medium: { fps: 28, comets: 0, orbs: 2, maxDpr: 1.2, glow: 0.1, wrapperHeightClass: "h-[860px]" },
+  hard: { fps: 34, comets: 0, orbs: 2, maxDpr: 1.35, glow: 0.13, wrapperHeightClass: "h-[920px]" },
 };
 
 function getIntensityPreset(value?: string): IntensityPreset {
-  if (value === "low" || value === "medium" || value === "epic") return intensityPresets[value];
-  return intensityPresets.epic;
+  if (value === "epic") return intensityPresets.medium;
+  if (value === "low" || value === "medium" || value === "hard") return intensityPresets[value];
+  return intensityPresets.medium;
 }
 
 export function HomeCinematicBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pathname = usePathname();
   const preset = getIntensityPreset(process.env.NEXT_PUBLIC_HERO_ANIMATION_INTENSITY);
+  const disableHomeMotion = pathname === "/";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -76,8 +80,8 @@ export function HomeCinematicBackground() {
           y: Math.random() * height,
           vx: 0.2 + Math.random() * 0.55,
           vy: -0.04 - Math.random() * 0.22,
-          len: 18 + Math.random() * 52,
-          alpha: 0.08 + Math.random() * 0.22,
+          len: 12 + Math.random() * 30,
+          alpha: 0.025 + Math.random() * 0.05,
         });
       }
 
@@ -105,17 +109,17 @@ export function HomeCinematicBackground() {
       resetScene();
     }
 
-    function drawBackdrop(timeSec: number) {
+    function drawBackdrop() {
       const horizon = ctx.createLinearGradient(0, 0, 0, height);
-      horizon.addColorStop(0, "rgba(247,201,72,0.35)");
-      horizon.addColorStop(0.44, "rgba(247,201,72,0.09)");
+      horizon.addColorStop(0, "rgba(247,201,72,0.16)");
+      horizon.addColorStop(0.44, "rgba(247,201,72,0.04)");
       horizon.addColorStop(1, "rgba(247,201,72,0)");
       ctx.fillStyle = horizon;
       ctx.fillRect(0, 0, width, height);
 
-      const pulse = 0.5 + Math.sin(timeSec * 1.4) * 0.5;
+      const pulse = 0.94;
       const halo = ctx.createRadialGradient(width * 0.5, height * 0.26, 10, width * 0.5, height * 0.26, width * 0.62);
-      halo.addColorStop(0, `rgba(255,220,110,${preset.glow * (0.9 + pulse * 0.4)})`);
+      halo.addColorStop(0, `rgba(255,220,110,${preset.glow * pulse})`);
       halo.addColorStop(1, "rgba(247,201,72,0)");
       ctx.fillStyle = halo;
       ctx.fillRect(0, 0, width, height);
@@ -124,10 +128,11 @@ export function HomeCinematicBackground() {
     function drawOrbiters(timeSec: number) {
       const cx = width * 0.5;
       const cy = height * 0.36;
+      const orbitTime = disableHomeMotion ? 0 : timeSec;
 
       for (const orb of orbs) {
-        const x = cx + Math.cos(timeSec * orb.speed + orb.phase) * orb.radius;
-        const y = cy + Math.sin(timeSec * orb.speed * 1.1 + orb.phase) * (orb.radius * 0.24);
+        const x = cx + Math.cos(orbitTime * orb.speed + orb.phase) * orb.radius;
+        const y = cy + Math.sin(orbitTime * orb.speed * 1.1 + orb.phase) * (orb.radius * 0.24);
 
         const g = ctx.createRadialGradient(x, y, 0, x, y, orb.size);
         g.addColorStop(0, `rgba(255,225,128,${orb.alpha})`);
@@ -158,7 +163,7 @@ export function HomeCinematicBackground() {
         streak.addColorStop(1, "rgba(255,226,132,0)");
 
         ctx.strokeStyle = streak;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 0.7;
         ctx.beginPath();
         ctx.moveTo(c.x, c.y);
         ctx.lineTo(x2, y2);
@@ -181,7 +186,7 @@ export function HomeCinematicBackground() {
       const timeSec = elapsed / 1000;
 
       ctx.clearRect(0, 0, width, height);
-      drawBackdrop(timeSec);
+      drawBackdrop();
 
       ctx.globalCompositeOperation = "screen";
       drawOrbiters(timeSec);
@@ -213,7 +218,7 @@ export function HomeCinematicBackground() {
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [preset]);
+  }, [disableHomeMotion, preset]);
 
   return (
     <div className={`pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden ${preset.wrapperHeightClass}`}>

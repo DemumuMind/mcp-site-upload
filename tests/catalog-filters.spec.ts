@@ -23,6 +23,26 @@ async function getVisibleCardCount(page: Page): Promise<number> {
 }
 
 test.describe("Catalog query v2 filters", () => {
+  test("has no hydration mismatch errors in console on catalog page", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    const consoleErrors: string[] = [];
+
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        consoleErrors.push(message.text());
+      }
+    });
+
+    await page.goto("/catalog");
+    await page.waitForTimeout(1200);
+
+    const hydrationErrors = consoleErrors.filter((errorText) =>
+      /(hydration|hydrated|didn't match|server rendered html didn't match)/i.test(errorText),
+    );
+
+    expect(hydrationErrors).toEqual([]);
+  });
+
   test("preserves deep-link filter state and sort after reload", async ({ page }) => {
     await setLocaleCookies(page, "en");
     await page.goto("/catalog?query=github&pricing=oauth&sortBy=name&sortDir=asc&pageSize=24&layout=list");
@@ -124,6 +144,18 @@ test.describe("Catalog query v2 filters", () => {
       .first();
     await expect(submitCta).toBeVisible();
     await expect(submitCta).toHaveAttribute("href", "/submit-server");
+  });
+
+  test("renders logo image for every visible MCP card", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    const logoContainers = page.locator("div.size-18");
+    const visibleCardCount = await logoContainers.count();
+    expect(visibleCardCount).toBeGreaterThan(0);
+
+    const cardLogoImages = page.locator('img[alt$=" logo"]');
+    await expect(cardLogoImages).toHaveCount(visibleCardCount);
   });
 
   test("empty state offers reset and submit actions", async ({ page }) => {

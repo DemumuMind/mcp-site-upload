@@ -1,5 +1,3 @@
-import { getCatalogEntriesFromDisk } from "@/lib/catalog/disk-content";
-import { mockServers } from "@/lib/mock-servers";
 import { applyServerCatalogDefaults } from "@/lib/server-catalog-defaults";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthType, HealthStatus, McpServer, ServerStatus, VerificationLevel, } from "@/lib/types";
@@ -77,33 +75,10 @@ function mapSupabaseRow(row: SupabaseServerRow): McpServer {
         tools: [],
     });
 }
-function withMockHealthFallback(mcpServer: McpServer): McpServer {
-    if (mcpServer.healthStatus) {
-        return mcpServer;
-    }
-    return {
-        ...mcpServer,
-        healthStatus: mcpServer.status === "active" ? "healthy" : "unknown",
-        healthCheckedAt: mcpServer.status === "active" ? new Date().toISOString() : undefined,
-    };
-}
-function mergeServersBySlug(baseServers: McpServer[], overrideServers: McpServer[]): McpServer[] {
-    const serverMap = new Map<string, McpServer>();
-    for (const mcpServer of baseServers) {
-        serverMap.set(mcpServer.slug.toLowerCase(), mcpServer);
-    }
-    for (const mcpServer of overrideServers) {
-        serverMap.set(mcpServer.slug.toLowerCase(), mcpServer);
-    }
-    return [...serverMap.values()];
-}
 export async function getActiveServers(): Promise<McpServer[]> {
     const supabaseClient = createSupabaseServerClient();
-    const diskActiveServers = getCatalogEntriesFromDisk("active");
     if (!supabaseClient) {
-        return mergeServersBySlug(mockServers
-            .filter((mcpServer) => mcpServer.status === "active")
-            .map(withMockHealthFallback), diskActiveServers.map(withMockHealthFallback));
+        return [];
     }
     try {
         const { data, error } = await supabaseClient
@@ -112,25 +87,18 @@ export async function getActiveServers(): Promise<McpServer[]> {
             .eq("status", "active")
             .order("created_at", { ascending: false });
         if (error || !data) {
-            return mergeServersBySlug(mockServers
-                .filter((mcpServer) => mcpServer.status === "active")
-                .map(withMockHealthFallback), diskActiveServers.map(withMockHealthFallback));
+            return [];
         }
-        return mergeServersBySlug((data as SupabaseServerRow[]).map(mapSupabaseRow), diskActiveServers);
+        return (data as SupabaseServerRow[]).map(mapSupabaseRow);
     }
     catch {
-        return mergeServersBySlug(mockServers
-            .filter((mcpServer) => mcpServer.status === "active")
-            .map(withMockHealthFallback), diskActiveServers.map(withMockHealthFallback));
+        return [];
     }
 }
 export async function getPendingServers(): Promise<McpServer[]> {
     const supabaseClient = createSupabaseServerClient();
-    const diskPendingServers = getCatalogEntriesFromDisk("pending");
     if (!supabaseClient) {
-        return mergeServersBySlug(mockServers
-            .filter((mcpServer) => mcpServer.status === "pending")
-            .map(withMockHealthFallback), diskPendingServers.map(withMockHealthFallback));
+        return [];
     }
     try {
         const { data, error } = await supabaseClient
@@ -139,21 +107,19 @@ export async function getPendingServers(): Promise<McpServer[]> {
             .eq("status", "pending")
             .order("created_at", { ascending: false });
         if (error || !data || data.length === 0) {
-            return diskPendingServers.map(withMockHealthFallback);
+            return [];
         }
-        return mergeServersBySlug((data as SupabaseServerRow[]).map(mapSupabaseRow), diskPendingServers);
+        return (data as SupabaseServerRow[]).map(mapSupabaseRow);
     }
     catch {
-        return diskPendingServers.map(withMockHealthFallback);
+        return [];
     }
 }
 export async function getServerBySlug(slug: string): Promise<McpServer | null> {
     const normalizedSlug = slug.trim().toLowerCase();
     const supabaseClient = createSupabaseServerClient();
-    const activeCatalogEntries = getCatalogEntriesFromDisk("active");
     if (!supabaseClient) {
-        const fallbackServer = mergeServersBySlug(mockServers.filter((mcpServer) => mcpServer.status === "active"), activeCatalogEntries).find((mcpServer) => mcpServer.slug.toLowerCase() === normalizedSlug);
-        return fallbackServer ? withMockHealthFallback(fallbackServer) : null;
+        return null;
     }
     try {
         const { data, error } = await supabaseClient
@@ -164,15 +130,11 @@ export async function getServerBySlug(slug: string): Promise<McpServer | null> {
             .limit(1)
             .maybeSingle();
         if (error || !data) {
-            const diskMatch = activeCatalogEntries.find((catalogEntry) => catalogEntry.slug.toLowerCase() === normalizedSlug);
-            return diskMatch ? withMockHealthFallback(diskMatch) : null;
+            return null;
         }
-        const supabaseServer = mapSupabaseRow(data as SupabaseServerRow);
-        const diskOverride = activeCatalogEntries.find((catalogEntry) => catalogEntry.slug.toLowerCase() === normalizedSlug);
-        return diskOverride ?? supabaseServer;
+        return mapSupabaseRow(data as SupabaseServerRow);
     }
     catch {
-        const diskMatch = activeCatalogEntries.find((catalogEntry) => catalogEntry.slug.toLowerCase() === normalizedSlug);
-        return diskMatch ? withMockHealthFallback(diskMatch) : null;
+        return null;
     }
 }

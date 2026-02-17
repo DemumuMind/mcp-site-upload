@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="slack logo"><rect width="128" height="128" rx="22" fill="#4A154B"/><text x="64" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="0">SL</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="slack logo">
+  <rect width="128" height="128" rx="22" fill="#4A154B"/>
+  <g transform="translate(24 24)">
+    <rect x="30" y="0" width="20" height="34" rx="10" fill="#36C5F0"/>
+    <rect x="46" y="30" width="34" height="20" rx="10" fill="#2EB67D"/>
+    <rect x="30" y="46" width="20" height="34" rx="10" fill="#E01E5A"/>
+    <rect x="0" y="30" width="34" height="20" rx="10" fill="#ECB22E"/>
+  </g>
+</svg>

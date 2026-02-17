@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="modelcontextprotocol logo"><rect width="128" height="128" rx="22" fill="#1E293B"/><text x="64" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="0">MCP</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="modelcontextprotocol logo">
+  <rect width="128" height="128" rx="22" fill="#1E293B"/>
+  <g fill="none" stroke="#E2E8F0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 44h28l14 20h30"/>
+    <path d="M28 84h28l14-20h30"/>
+    <circle cx="24" cy="44" r="6" fill="#38BDF8" stroke="none"/>
+    <circle cx="24" cy="84" r="6" fill="#22D3EE" stroke="none"/>
+    <circle cx="104" cy="64" r="6" fill="#60A5FA" stroke="none"/>
+  </g>
+</svg>

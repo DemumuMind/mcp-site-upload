@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
     try {
         const query = parseCatalogQueryV2(request.nextUrl.searchParams);
-        const snapshot = await getCatalogSnapshot();
+        const snapshot = await getCatalogSnapshot({ bypassCache: true });
         const result = runCatalogSearch(snapshot.servers, query);
         return NextResponse.json(result);
     }

@@ -53,6 +53,9 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
         run: npm run test:e2e:auth
 
+      - name: Catalog hydration guard (Playwright)
+        run: npx playwright test tests/catalog-filters.spec.ts --grep "hydration mismatch"
+
       - name: Remote backup artifact check
         if: ${{ vars.BACKUP_REMOTE_CHECK_ENABLED == 'true' }}
         env:
@@ -83,3 +86,64 @@ jobs:
         run: |
           echo "Smoke check skipped."
           echo "Pass workflow input smoke_base_url, or set SMOKE_ENABLED=true and SMOKE_BASE_URL repository variable."
+
+  dashboard-metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify dashboard metrics
+        shell: bash
+        run: |
+          npm run start &
+          APP_PID=$!
+          trap "kill $APP_PID" EXIT
+
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3000/api/health-check >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          npm run verify:dashboard:metrics -- --base-url http://127.0.0.1:3000
+
+  python-automation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync Python dependencies
+        run: uv sync --project tools/python
+
+      - name: Catalog enrichment dry-run
+        run: uv run --project tools/python python tools/python/scripts/catalog_enrich.py --dry-run
+
+      - name: Ops report generation
+        run: uv run --project tools/python python tools/python/scripts/ops_report.py --output docs/python-ops-report-ci.md

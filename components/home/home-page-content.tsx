@@ -1,7 +1,6 @@
 ﻿import type { HomeContent } from "@/lib/home/content";
 import type { HomePageViewModel } from "@/lib/home/types";
 import { FinalCtaSection } from "@/components/home/sections/final-cta-section";
-import { HomeAnimeIntro } from "@/components/home/home-anime-intro";
 import { HomeCinematicBackground } from "@/components/home/home-cinematic-background";
 import { HomeHeroParallax } from "@/components/home/home-hero-parallax";
 import { HeroSection } from "@/components/home/sections/hero-section";
@@ -47,7 +46,6 @@ export function HomePageContent({ content, viewModel }: HomePageContentProps) {
         data-anime="pulse"
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.22),transparent_56%)]"
       />
-      <HomeAnimeIntro />
       <HomeCinematicBackground />
       <HomeHeroParallax />
 

@@ -1,15 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import { runCatalogRegistrySync } from "@/lib/catalog/registry-sync";
+import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 export const dynamic = "force-dynamic";
-const DEFAULT_PAGE_LIMIT = 100;
 const DEFAULT_MAX_PAGES = 120;
-const DEFAULT_STALE_CLEANUP_ENABLED = true;
-const DEFAULT_MIN_STALE_BASELINE_RATIO = 0.7;
-const DEFAULT_MAX_STALE_MARK_RATIO = 0.15;
-const DEFAULT_QUALITY_FILTER_ENABLED = true;
 type NumberEnvOptions = {
     min: number;
     max: number;
@@ -43,62 +38,8 @@ function parseNumber(value: string | null | undefined, fallback: number, options
     }
     return parsed;
 }
-function parseBoolean(value: string | null | undefined, fallback: boolean): boolean {
-    const normalized = value?.trim().toLowerCase();
-    if (!normalized) {
-        return fallback;
-    }
-    if (["1", "true", "yes", "on"].includes(normalized)) {
-        return true;
-    }
-    if (["0", "false", "no", "off"].includes(normalized)) {
-        return false;
-    }
-    return fallback;
-}
-function parseRatio(value: string | null | undefined, fallback: number): number {
-    const raw = value?.trim();
-    if (!raw) {
-        return fallback;
-    }
-    const parsed = Number.parseFloat(raw);
-    if (!Number.isFinite(parsed)) {
-        return fallback;
-    }
-    if (parsed < 0 || parsed > 1) {
-        return fallback;
-    }
-    return parsed;
-}
 function parseNumberEnv(envName: string, fallback: number, options: NumberEnvOptions): number {
     return parseNumber(process.env[envName], fallback, options);
-}
-function parseBooleanEnv(envName: string, fallback: boolean): boolean {
-    return parseBoolean(process.env[envName], fallback);
-}
-function parsePatternList(value: string | null | undefined): string[] {
-    return (value ?? "")
-        .split(/[,;\n]/)
-        .map((entry) => entry.trim())
-        .filter(Boolean);
-}
-function parsePatternListEnv(envName: string): string[] {
-    return parsePatternList(process.env[envName]);
-}
-function mergePatternLists(...lists: string[][]): string[] {
-    const seen = new Set<string>();
-    const merged: string[] = [];
-    for (const list of lists) {
-        for (const value of list) {
-            const key = value.toLowerCase();
-            if (seen.has(key)) {
-                continue;
-            }
-            seen.add(key);
-            merged.push(value);
-        }
-    }
-    return merged;
 }
 function extractBearerToken(request: NextRequest): string | null {
     const authHeader = request.headers.get("authorization");
@@ -122,7 +63,7 @@ function isValidCronToken(providedToken: string, expectedToken: string): boolean
     }
     return timingSafeEqual(provided, expected);
 }
-function buildAlertingSignals(result: Awaited<ReturnType<typeof runCatalogRegistrySync>>): AutoSyncAlerting {
+function buildAlertingSignals(result: CatalogSyncResult): AutoSyncAlerting {
     const signals: AutoSyncAlertSignal[] = [];
     if (result.failed > 0) {
         signals.push({
@@ -169,7 +110,7 @@ function buildAlertingSignals(result: Awaited<ReturnType<typeof runCatalogRegist
         signals,
     };
 }
-function logAutoSyncResult(alerting: AutoSyncAlerting, result: Awaited<ReturnType<typeof runCatalogRegistrySync>>) {
+function logAutoSyncResult(alerting: AutoSyncAlerting, result: CatalogSyncResult) {
     const payload = {
         event: "catalog.auto_sync.completed",
         alertStatus: alerting.status,
@@ -204,48 +145,17 @@ async function runCatalogAutoSync(request: NextRequest) {
     if (!providedToken || !isValidCronToken(providedToken, expectedToken)) {
         return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
     }
-    const envPageLimit = parseNumberEnv("CATALOG_AUTOSYNC_PAGE_LIMIT", DEFAULT_PAGE_LIMIT, {
-        min: 1,
-        max: 100,
-    });
     const envMaxPages = parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_MAX_PAGES, {
         min: 1,
         max: 200,
-    });
-    const envCleanupStale = parseBooleanEnv("CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED", DEFAULT_STALE_CLEANUP_ENABLED);
-    const envMinStaleBaselineRatio = parseRatio(process.env.CATALOG_AUTOSYNC_MIN_STALE_BASELINE_RATIO, DEFAULT_MIN_STALE_BASELINE_RATIO);
-    const envMaxStaleMarkRatio = parseRatio(process.env.CATALOG_AUTOSYNC_MAX_STALE_MARK_RATIO, DEFAULT_MAX_STALE_MARK_RATIO);
-    const envQualityFilter = parseBooleanEnv("CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED", DEFAULT_QUALITY_FILTER_ENABLED);
-    const envAllowlistPatterns = parsePatternListEnv("CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS");
-    const envDenylistPatterns = parsePatternListEnv("CATALOG_AUTOSYNC_DENYLIST_PATTERNS");
-    const pageLimit = parseNumber(request.nextUrl.searchParams.get("limit"), envPageLimit, {
-        min: 1,
-        max: 100,
     });
     const maxPages = parseNumber(request.nextUrl.searchParams.get("pages"), envMaxPages, {
         min: 1,
         max: 200,
     });
-    const cleanupStale = parseBoolean(request.nextUrl.searchParams.get("cleanupStale"), envCleanupStale);
-    const minStaleBaselineRatio = parseRatio(request.nextUrl.searchParams.get("minStaleBaselineRatio"), envMinStaleBaselineRatio);
-    const maxStaleMarkRatio = parseRatio(request.nextUrl.searchParams.get("maxStaleMarkRatio"), envMaxStaleMarkRatio);
-    const qualityFilter = parseBoolean(request.nextUrl.searchParams.get("qualityFilter"), envQualityFilter);
-    const allowlistPatterns = mergePatternLists(envAllowlistPatterns, parsePatternList(request.nextUrl.searchParams.get("allowlist")));
-    const denylistPatterns = mergePatternLists(envDenylistPatterns, parsePatternList(request.nextUrl.searchParams.get("denylist")));
-    const registryUrl = process.env.CATALOG_AUTOSYNC_REGISTRY_URL?.trim();
-    let result: Awaited<ReturnType<typeof runCatalogRegistrySync>>;
+    let result: CatalogSyncResult;
     try {
-        result = await runCatalogRegistrySync({
-            registryUrl,
-            pageLimit,
-            maxPages,
-            cleanupStale,
-            minStaleBaselineRatio,
-            maxStaleMarkRatio,
-            qualityFilter,
-            allowlistPatterns,
-            denylistPatterns,
-        });
+        result = await runCatalogGithubSync({ maxPages });
     }
     catch (error) {
         console.error({
@@ -302,14 +212,8 @@ async function runCatalogAutoSync(request: NextRequest) {
             },
         },
         settings: {
-            pageLimit,
+            source: "github",
             maxPages,
-            cleanupStale,
-            minStaleBaselineRatio,
-            maxStaleMarkRatio,
-            qualityFilter,
-            allowlistPatternCount: allowlistPatterns.length,
-            denylistPatternCount: denylistPatterns.length,
         },
     }, { status: alerting.status === "error" ? 207 : 200 });
 }

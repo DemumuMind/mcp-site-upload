@@ -44,33 +44,14 @@ Scaffold command:
 npm run blog:new -- --slug my-post --title-en "My Post" --tags "ai,workflow"
 ```
 
-## 3) Catalog content (disk source)
+## 3) Catalog content (GitHub + Supabase source)
 
-Catalog supports optional disk entries:
+Catalog now uses:
 
-- `content/catalog/entries/*.json`
-- loader: `lib/catalog/disk-content.ts`
-- merge point: `lib/servers.ts`
+1. GitHub sync pipeline (`lib/catalog/github-sync.ts`) -> writes to Supabase `servers`
+2. Runtime reads from Supabase via `lib/servers.ts`
 
-Priority rule:
-
-1. Supabase (if available)
-2. Disk overrides by matching `slug`
-3. Mock servers fallback
-
-Scaffold command:
-
-```bash
-npm run catalog:new -- --slug my-server --name "My Server" --auth oauth --category "Developer Tools" --tags "official" --tools "list_items,create_item"
-```
-
-Current real infrastructure entries included in this repo:
-
-- `content/catalog/entries/openai-developer-docs.json`
-- `content/catalog/entries/exa-search.json`
-- `content/catalog/entries/playwright-browser-automation.json`
-- `content/catalog/entries/chrome-devtools-inspector.json`
-- `content/catalog/entries/local-filesystem-ops.json`
+Local disk entries and mock fallback are removed from the active architecture.
 
 ## 4) How-to-use content (structured page copy)
 

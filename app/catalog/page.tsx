@@ -20,9 +20,14 @@ export default async function CatalogPage() {
     const locale = await getLocale();
     const sectionCopy = getSectionLocaleCopy(getSectionIndex("catalog"), locale);
     const catalogSnapshot = await getCatalogSnapshot();
+    const githubCoverageClassName = catalogSnapshot.githubLinkedPercent >= 70
+        ? "text-emerald-400"
+        : catalogSnapshot.githubLinkedPercent >= 40
+            ? "text-primary"
+            : "text-amber-400";
     return (<PageFrame variant="directory">
       <div className="section-shell flex flex-col gap-5 py-8 sm:py-12">
-        <PageHero className="space-y-4 p-5 sm:p-7" badgeTone="cyan" eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Directory Control Center")} title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Find Trusted MCP Servers Faster")} description={sectionCopy?.heroDescription ??
+        <PageHero animated={false} className="space-y-4 p-5 sm:p-7" badgeTone="cyan" eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Directory Control Center")} title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Find Trusted MCP Servers Faster")} description={sectionCopy?.heroDescription ??
             tr(locale, "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.", "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.")} actions={<>
             <Button asChild className="h-10 rounded-lg px-5">
                 <Link href="/submit-server">{tr(locale, "Submit server", "Submit server")}</Link>
@@ -31,10 +36,12 @@ export default async function CatalogPage() {
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
               </Button>
             </>} metrics={<>
-              <PageMetric label={tr(locale, "Active servers", "Active servers")} value={catalogSnapshot.totalServers}/>
-              <PageMetric label={tr(locale, "Published tools", "Published tools")} value={catalogSnapshot.totalTools}/>
-              <PageMetric label={tr(locale, "Categories", "Categories")} value={catalogSnapshot.totalCategories}/>
-              <PageMetric label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-primary"/>
+              <PageMetric animated={false} label={tr(locale, "Active servers", "Active servers")} value={catalogSnapshot.totalServers}/>
+              <PageMetric animated={false} label={tr(locale, "Published tools", "Published tools")} value={catalogSnapshot.totalTools}/>
+              <PageMetric animated={false} label={tr(locale, "Categories", "Categories")} value={catalogSnapshot.totalCategories}/>
+              <PageMetric animated={false} label={tr(locale, "GitHub linked", "GitHub linked")} value={catalogSnapshot.totalGithubLinked}/>
+              <PageMetric animated={false} label={tr(locale, "GitHub coverage", "GitHub coverage")} value={`${catalogSnapshot.githubLinkedPercent}%`} valueClassName={githubCoverageClassName}/>
+              <PageMetric animated={false} label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-primary"/>
             </>}/>
         <CatalogSection initialServers={catalogSnapshot.servers}/>
       </div>

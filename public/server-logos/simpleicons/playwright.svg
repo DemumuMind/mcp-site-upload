@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="playwright logo"><rect width="128" height="128" rx="22" fill="#16A34A"/><text x="64" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="0">PW</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="playwright logo">
+  <rect width="128" height="128" rx="22" fill="#0F172A"/>
+  <path d="M36 32c17 0 30 13 30 30v34c0 12-10 22-22 22S22 108 22 96V46c0-8 6-14 14-14z" fill="#16A34A"/>
+  <path d="M92 10c17 0 30 13 30 30v34c0 12-10 22-22 22S78 86 78 74V24c0-8 6-14 14-14z" transform="translate(-10 18)" fill="#22C55E"/>
+  <circle cx="51" cy="56" r="8" fill="#E5FBEF"/>
+  <circle cx="87" cy="60" r="8" fill="#E5FBEF"/>
+</svg>

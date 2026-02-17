@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Anime.js Hero</title>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <style>
+    /* =========================
+       CSS: Modern Reset
+    ========================== */
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; }
+    html, body { height: 100%; }
+    img, picture, svg, video, canvas { display: block; max-width: 100%; }
+    input, button, textarea, select { font: inherit; }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow: hidden;
+      color: #f8faff;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(111, 154, 255, 0.35), transparent 60%),
+        radial-gradient(900px 500px at 80% 120%, rgba(149, 120, 255, 0.25), transparent 60%),
+        #070a13;
+    }
+
+    /* =========================
+       CSS: Layout
+    ========================== */
+    .scene {
+      min-height: 100dvh;
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding: 24px;
+      isolation: isolate;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      transform: translateY(-16px);
+      will-change: transform, opacity;
+    }
+
+    .brand {
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: #d8e4ff;
+    }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      gap: 14px;
+      color: #a6b4d8;
+    }
+
+    .menu li {
+      opacity: 0;
+      transform: translateY(-8px);
+      will-change: transform, opacity;
+      cursor: pointer;
+    }
+
+    .hero {
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 8vw, 5rem);
+      line-height: .98;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .08em;
+      max-width: 12ch;
+      margin-inline: auto;
+    }
+
+    .char {
+      opacity: 0;
+      transform: translateY(24px) scale(.95) rotate(2deg);
+      will-change: transform, opacity;
+    }
+
+    .hero-subtitle {
+      max-width: 62ch;
+      color: #adbadb;
+      opacity: 0;
+      transform: translateY(12px);
+      will-change: transform, opacity;
+    }
+
+    .cta {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #0b1328;
+      background: linear-gradient(135deg, #92bcff, #d5e2ff);
+      box-shadow: 0 14px 32px rgba(114, 154, 255, .35);
+      opacity: 0;
+      transform: translateY(10px) scale(.96);
+      will-change: transform, opacity;
+    }
+
+    .fx {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .stroke {
+      fill: none;
+      stroke: rgba(182, 205, 255, .8);
+      stroke-width: 2;
+      stroke-linecap: round;
+      will-change: transform, opacity;
+    }
+
+    .panel {
+      z-index: 3;
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: #8f9cc0;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+  </style>
+</head>
+<body>
+  <!-- =========================
+       HTML
+  ========================== -->
+  <div class="scene">
+    <header class="nav">
+      <div class="brand">DemumuMind Motion</div>
+      <ul class="menu">
+        <li>Overview</li>
+        <li>Catalog</li>
+        <li>Setup</li>
+        <li>Pricing</li>
+      </ul>
+    </header>
+
+    <main class="hero">
+      <h1 class="hero-title" id="heroTitle">Ship Premium Motion Fast</h1>
+      <p class="hero-subtitle">Интерактивный главный экран: последовательное появление контента, прорисовка SVG-path и управляемая физика hover/click.</p>
+      <button class="cta" id="heroCta">Start Exploring</button>
+    </main>
+
+    <svg class="fx" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path id="orbit" class="stroke" d="M180,510 C360,210 980,230 1240,520" />
+      <path id="blobA" class="stroke" d="M440,390 C530,250 720,275 760,410 C790,540 660,640 520,610 C385,580 335,470 440,390Z" />
+      <path id="blobB" class="stroke" d="M820,320 C915,240 1055,275 1085,390 C1120,520 970,620 850,570 C720,510 700,390 820,320Z" />
+    </svg>
+
+    <div id="panel" class="panel">Hover: текущая анимация прерывается и мягко перетекает в новую.</div>
+  </div>
+
+  <script>
+    /* =========================
+       JS: Pure JS + Anime.js
+    ========================== */
+    const MOTION = {
+      duration: { fast: 360, base: 480, soft: 560, draw: 1200 },
+      easing: {
+        expoOut: "easeOutExpo",
+        elastic: "easeOutElastic(1, .5)",
+        cubic: "cubicBezier(.22,.61,.36,1)"
+      },
+      stagger: {
+        menu: anime.stagger(55),
+        chars: anime.stagger(26, { start: 110 })
+      }
+    };
+
+    const nodes = {
+      nav: document.querySelector(".nav"),
+      menu: document.querySelectorAll(".menu li"),
+      title: document.getElementById("heroTitle"),
+      subtitle: document.querySelector(".hero-subtitle"),
+      cta: document.getElementById("heroCta"),
+      panel: document.getElementById("panel"),
+      orbit: document.getElementById("orbit"),
+      blobA: document.getElementById("blobA"),
+      blobB: document.getElementById("blobB")
+    };
+
+    // Split heading into characters for sequential staggering
+    nodes.title.innerHTML = nodes.title.textContent
+      .split("")
+      .map(ch => `<span class="char">${ch === " " ? "&nbsp;" : ch}</span>`)
+      .join("");
+    nodes.chars = document.querySelectorAll(".char");
+
+    // SVG path draw setup
+    [nodes.orbit, nodes.blobA, nodes.blobB].forEach(path => {
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = `${len}`;
+      path.style.strokeDashoffset = `${len}`;
+      path.style.opacity = "0";
+    });
+
+    let hoverAnimation = null;
+
+    const timeline = anime.timeline({
+      autoplay: true,
+      begin: () => { document.body.dataset.state = "intro-begin"; },
+      update: (anim) => {
+        if (anim.progress > 80) nodes.panel.style.opacity = "1";
+      },
+      complete: () => { document.body.dataset.state = "intro-complete"; }
+    })
+    .add({
+      targets: nodes.nav,
+      opacity: [0, 1],
+      translateY: [-16, 0],
+      duration: MOTION.duration.base,
+      easing: MOTION.easing.expoOut
+    })
+    .add({
+      targets: nodes.menu,
+      opacity: [0, 1],
+      translateY: [-8, 0],
+      delay: MOTION.stagger.menu,
+      duration: MOTION.duration.fast,
+      easing: MOTION.easing.cubic
+    }, "-=320")
+    .add({
+      targets: [nodes.orbit, nodes.blobA, nodes.blobB],
+      opacity: [0, 1],
+      strokeDashoffset: [anime.setDashoffset, 0],
+      delay: anime.stagger(130),
+      duration: MOTION.duration.draw,
+      easing: MOTION.easing.expoOut
+    }, "-=220")
+    .add({
+      targets: nodes.chars,
+      opacity: [0, 1],
+      translateY: [24, 0],
+      scale: [.95, 1],
+      rotate: [2, 0],
+      delay: MOTION.stagger.chars,
+      duration: MOTION.duration.soft,
+      easing: MOTION.easing.elastic
+    }, "-=860")
+    .add({
+      targets: [nodes.subtitle, nodes.cta, nodes.panel],
+      opacity: [0, 1],
+      translateY: [12, 0],
+      scale: target => target === nodes.cta ? [.96, 1] : [1, 1],
+      delay: anime.stagger(95),
+      duration: MOTION.duration.base,
+      easing: MOTION.easing.cubic
+    }, "-=340");
+
+    // Ambient floating transforms only (GPU-friendly)
+    anime({
+      targets: [nodes.blobA, nodes.blobB],
+      translateY: (_, i) => i ? [0, -16, 0] : [0, 12, 0],
+      translateX: (_, i) => i ? [0, -10, 0] : [0, 8, 0],
+      rotate: (_, i) => i ? [0, -1.5, 0] : [0, 1.2, 0],
+      duration: 3600,
+      easing: "easeInOutSine",
+      direction: "alternate",
+      loop: true
+    });
+
+    // Interactivity: interrupt and smooth transition
+    nodes.cta.addEventListener("mouseenter", () => {
+      timeline.pause();
+      if (hoverAnimation) hoverAnimation.pause();
+
+      hoverAnimation = anime({
+        targets: nodes.cta,
+        scale: [1, 1.08, 1.03],
+        rotate: [0, -1.2, 0],
+        duration: 420,
+        easing: MOTION.easing.elastic,
+        complete: () => {
+          if (timeline.progress < 100) timeline.play();
+        }
+      });
+    });
+
+    nodes.cta.addEventListener("mouseleave", () => {
+      if (hoverAnimation) hoverAnimation.pause();
+      anime({
+        targets: nodes.cta,
+        scale: 1,
+        rotate: 0,
+        duration: 320,
+        easing: MOTION.easing.cubic
+      });
+    });
+
+    nodes.cta.addEventListener("click", () => {
+      anime({
+        targets: [nodes.orbit, nodes.blobA, nodes.blobB],
+        scale: [1, 1.04, 1],
+        opacity: [1, .82, 1],
+        duration: 520,
+        easing: MOTION.easing.elastic
+      });
+    });
+  </script>
+</body>
+</html>

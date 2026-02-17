@@ -14,6 +14,8 @@ export type CatalogSnapshot = {
     totalServers: number;
     totalTools: number;
     totalCategories: number;
+    totalGithubLinked: number;
+    githubLinkedPercent: number;
     categoryEntries: Array<[
         string,
         number
@@ -54,11 +56,24 @@ const getCachedActiveServers = unstable_cache(async () => getActiveServers(), ["
     revalidate: CATALOG_SERVERS_REVALIDATE_SECONDS,
     tags: [CATALOG_SERVERS_CACHE_TAG],
 });
+function isGithubRepoUrl(repoUrl?: string): boolean {
+    if (!repoUrl)
+        return false;
+    try {
+        const parsed = new URL(repoUrl);
+        return parsed.hostname === "github.com" || parsed.hostname.endsWith(".github.com");
+    }
+    catch {
+        return repoUrl.toLowerCase().includes("github.com/");
+    }
+}
 export function buildCatalogSnapshot(servers: McpServer[], options: CatalogSnapshotOptions = {}): CatalogSnapshot {
     const featuredLimit = options.featuredLimit ?? 4;
     const featuredServers = servers.slice(0, featuredLimit);
     const categoryEntries = getCategoryEntries(servers);
     const languageEntries = getLanguageEntries(servers);
+    const totalGithubLinked = servers.reduce((total, mcpServer) => total + (isGithubRepoUrl(mcpServer.repoUrl) ? 1 : 0), 0);
+    const githubLinkedPercent = servers.length > 0 ? Math.round((totalGithubLinked / servers.length) * 100) : 0;
     return {
         servers,
         featuredServers,
@@ -66,6 +81,8 @@ export function buildCatalogSnapshot(servers: McpServer[], options: CatalogSnaps
         totalServers: servers.length,
         totalTools: servers.reduce((total, mcpServer) => total + mcpServer.tools.length, 0),
         totalCategories: categoryEntries.length,
+        totalGithubLinked,
+        githubLinkedPercent,
         categoryEntries,
         languageEntries,
     };

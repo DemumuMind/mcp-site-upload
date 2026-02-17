@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="exa logo"><rect width="128" height="128" rx="22" fill="#1D4ED8"/><text x="64" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="0">EXA</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="exa logo">
+  <rect width="128" height="128" rx="22" fill="#0B1220"/>
+  <rect x="24" y="24" width="80" height="80" rx="18" fill="#2563EB"/>
+  <path d="M42 44l20 20-20 20h14l20-20-20-20H42zm44 0L66 64l20 20h-14L52 64l20-20h14z" fill="#EAF2FF"/>
+</svg>

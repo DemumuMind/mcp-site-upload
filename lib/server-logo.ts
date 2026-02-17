@@ -83,9 +83,11 @@ const simpleIconSlugByAlias: Record<string, string> = {
     asana: "asana",
     brave: "brave",
     chrome: "googlechrome",
+    devtools: "googlechrome",
     discord: "discord",
     exa: "exa",
     filesystem: "files",
+    files: "files",
     figma: "figma",
     github: "github",
     gitlab: "gitlab",
@@ -97,6 +99,7 @@ const simpleIconSlugByAlias: Record<string, string> = {
     notion: "notion",
     openai: "openai",
     playwright: "playwright",
+    postgres: "postgresql",
     postgresql: "postgresql",
     sentry: "sentry",
     shopify: "shopify",
@@ -200,6 +203,9 @@ export function getServerLogoCandidates(mcpServer: LogoSourceServer): string[] {
         for (const candidate of getDomainLogoCandidates(host)) {
             candidates.add(candidate);
         }
+    }
+    if (candidates.size === 0) {
+        candidates.add(createLocalSimpleIconCandidate("modelcontextprotocol"));
     }
     return [...candidates];
 }

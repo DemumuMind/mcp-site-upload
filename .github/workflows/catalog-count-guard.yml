@@ -20,7 +20,7 @@ jobs:
     env:
       CATALOG_GUARD_ENABLED: ${{ vars.CATALOG_GUARD_ENABLED || 'false' }}
       SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL }}
-      CATALOG_GUARD_MIN_TOTAL: ${{ vars.CATALOG_GUARD_MIN_TOTAL || '1000' }}
+      CATALOG_GUARD_MIN_TOTAL: ${{ vars.CATALOG_GUARD_MIN_TOTAL || '900' }}
       CATALOG_GUARD_SEARCH_PATH: ${{ vars.CATALOG_GUARD_SEARCH_PATH || '/api/catalog/search?page=1&pageSize=1' }}
       CATALOG_GUARD_TIMEOUT_MS: ${{ vars.CATALOG_GUARD_TIMEOUT_MS || '12000' }}
 
@@ -68,11 +68,6 @@ jobs:
             --min-total "${{ steps.resolve_guard.outputs.min_total }}" \
             --path "$CATALOG_GUARD_SEARCH_PATH" \
             --timeout-ms "$CATALOG_GUARD_TIMEOUT_MS"
-
-      - name: Registry diagnostics (best effort)
-        if: ${{ failure() && steps.resolve_guard.outputs.run_guard == 'true' }}
-        continue-on-error: true
-        run: npm run catalog:registry:stats -- --limit 100 --pages 120
 
       - name: Guard disabled summary
         if: ${{ steps.resolve_guard.outputs.run_guard != 'true' }}

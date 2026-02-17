@@ -29,6 +29,7 @@ type PageHeroProps = {
   metrics?: ReactNode;
   badgeTone?: "cyan" | "emerald" | "amber" | "violet";
   className?: string;
+  animated?: boolean;
 };
 
 const badgeToneClassName: Record<NonNullable<PageHeroProps["badgeTone"]>, string> = {
@@ -38,9 +39,9 @@ const badgeToneClassName: Record<NonNullable<PageHeroProps["badgeTone"]>, string
   violet: "border-primary/40 bg-primary/10 text-primary",
 };
 
-export function PageHero({ eyebrow, title, description, actions, metrics, badgeTone = "cyan", className }: PageHeroProps) {
+export function PageHero({ eyebrow, title, description, actions, metrics, badgeTone = "cyan", className, animated = true }: PageHeroProps) {
   return (
-    <section data-anime="reveal" data-anime-delay="40" className={cn("space-y-5 rounded-3xl border border-blacksmith bg-black/35 p-6 sm:p-8", className)}>
+    <section data-anime={animated ? "reveal" : undefined} data-anime-delay={animated ? "40" : undefined} className={cn("space-y-5 rounded-3xl border border-blacksmith bg-black/35 p-6 sm:p-8", className)}>
       {eyebrow ? (
         <div className={cn("inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] uppercase", badgeToneClassName[badgeTone])}>
           {eyebrow}
@@ -63,11 +64,12 @@ type PageMetricProps = {
   value: ReactNode;
   valueClassName?: string;
   className?: string;
+  animated?: boolean;
 };
 
-export function PageMetric({ label, value, valueClassName, className }: PageMetricProps) {
+export function PageMetric({ label, value, valueClassName, className, animated = true }: PageMetricProps) {
   return (
-    <div data-anime="reveal" data-anime-delay="90" className={cn("rounded-2xl border border-blacksmith bg-card p-4 transition-transform duration-300 hover:-translate-y-0.5", className)}>
+    <div data-anime={animated ? "reveal" : undefined} data-anime-delay={animated ? "90" : undefined} className={cn("rounded-2xl border border-blacksmith bg-card p-4 transition-transform duration-300 hover:-translate-y-0.5", className)}>
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className={cn("mt-1 text-2xl font-semibold text-foreground", valueClassName)}>{value}</p>
     </div>

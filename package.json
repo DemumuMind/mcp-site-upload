@@ -14,8 +14,6 @@
     "lint": "eslint .",
     "blog:new": "node scripts/blog-new-post.mjs",
     "blog:migrate-mdx": "node scripts/blog-migrate-json-to-mdx.mjs",
-    "catalog:new": "node scripts/catalog-new-entry.mjs",
-    "catalog:registry:stats": "node scripts/catalog-registry-stats.mjs",
     "catalog:count:guard": "node scripts/catalog-count-guard.mjs",
     "verify:dashboard:metrics": "node scripts/verify-dashboard-metrics.mjs",
     "profile:multi-agent": "node scripts/profile-multi-agent.mjs",
@@ -31,7 +29,9 @@
     "logs:tail": "node scripts/tail-logs.mjs",
     "ops:health-report": "node scripts/ops-health-report.mjs",
     "ops:backup-verify": "node scripts/backup-verify.mjs",
-    "ops:backup-verify-remote": "node scripts/backup-verify-remote.mjs"
+    "ops:backup-verify-remote": "node scripts/backup-verify-remote.mjs",
+    "py:catalog:enrich": "cd tools/python && uv run python scripts/catalog_enrich.py --dry-run",
+    "py:ops:report": "cd tools/python && uv run python scripts/ops_report.py --output ../../docs/python-ops-report.md"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

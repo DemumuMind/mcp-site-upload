@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-blacksmith-gold hover:-translate-y-0.5 hover:brightness-105",
+          "bg-primary text-primary-foreground shadow-cosmic-glow hover:-translate-y-0.5 hover:brightness-105",
         destructive:
           "bg-destructive text-white shadow-[0_0_0_1px_rgba(255,98,128,0.42),0_0_26px_rgba(255,93,122,0.32)] hover:brightness-110 focus-visible:ring-destructive/25",
         outline: "border-blacksmith bg-card text-foreground hover:bg-accent hover:text-accent-foreground",

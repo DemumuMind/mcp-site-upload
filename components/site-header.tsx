@@ -61,7 +61,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         isScrolled ? "shadow-[0_6px_24px_rgba(0,0,0,0.35)]" : ""
       }`}
     >
-      <div className={`section-shell flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-200 ${isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"}`}>
+      <div data-anime="home-nav" className={`section-shell flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-200 ${isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"}`}>
         <Link
           className="inline-flex min-h-11 items-center rounded-md text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           href="/"
@@ -74,6 +74,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
             <Link
               key={link.href}
               href={link.href}
+              data-anime="home-nav-item"
               className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs tracking-wide text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <link.icon aria-hidden className="size-3.5 opacity-85" />

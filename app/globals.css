@@ -55,88 +55,75 @@
 }
 
 :root {
-  --font-geist-sans: "Space Grotesk", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-geist-sans: "Inter", "Space Grotesk", "Segoe UI", system-ui, sans-serif;
   --font-geist-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, monospace;
 
   --radius: 0.75rem;
 
-  --blacksmith-char: #090909;
-  --blacksmith-panel: #111111;
-  --blacksmith-card: #171717;
-  --blacksmith-ink: #f6f6f6;
-  --blacksmith-gold: #f7c948;
-  --blacksmith-gold-strong: #ffd94e;
-  --blacksmith-line: rgba(255, 255, 255, 0.14);
+  /* Cosmic Palette */
+  --cosmic-void: #05050b;
+  --cosmic-indigo: #10163d;
+  --cosmic-blue: #3b82f6;
+  --cosmic-violet: #7a4dff;
+  --cosmic-lilac: #e2b6ff;
+  --cosmic-white: #f5f7ff;
+  --cosmic-fog: #bec7ff;
 
-  --background: #090909;
-  --foreground: #f6f6f6;
-  --card: #171717;
-  --card-foreground: #f6f6f6;
-  --popover: #141414;
-  --popover-foreground: #f6f6f6;
-  --primary: #f7c948;
-  --primary-foreground: #101010;
-  --secondary: #1f1f1f;
+  --background: #05050b;
+  --foreground: #f5f7ff;
+  --card: #0d122b;
+  --card-foreground: #f5f7ff;
+  --popover: #0a0e24;
+  --popover-foreground: #f5f7ff;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
   --secondary-foreground: #f3f3f3;
-  --muted: #1a1a1a;
-  --muted-foreground: #bbbbbb;
-  --accent: #232323;
-  --accent-foreground: #f8f8f8;
-  --destructive: #ff5d7a;
-  --border: rgba(255, 255, 255, 0.14);
-  --input: #151515;
-  --ring: rgba(247, 201, 72, 0.45);
+  --muted: #161b33;
+  --muted-foreground: #bec7ff;
+  --accent: #7a4dff;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4d4d;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #0d122b;
+  --ring: rgba(59, 130, 246, 0.5);
 
-  --chart-1: #f7c948;
-  --chart-2: #f3b811;
-  --chart-3: #e3aa17;
-  --chart-4: #d09300;
-  --chart-5: #bf7f00;
+  --chart-1: #3b82f6;
+  --chart-2: #7a4dff;
+  --chart-3: #e2b6ff;
+  --chart-4: #2e5bff;
+  --chart-5: #6366f1;
 
-  --sidebar: #111111;
-  --sidebar-foreground: #f6f6f6;
-  --sidebar-primary: #f7c948;
-  --sidebar-primary-foreground: #101010;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #f6f6f6;
-  --sidebar-border: rgba(255, 255, 255, 0.14);
-  --sidebar-ring: rgba(247, 201, 72, 0.45);
+  --sidebar: #0a0e24;
+  --sidebar-foreground: #f5f7ff;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #161b33;
+  --sidebar-accent-foreground: #f5f7ff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(59, 130, 246, 0.5);
 }
 
 .dark {
-  --background: #090909;
-  --foreground: #f6f6f6;
-  --card: #171717;
-  --card-foreground: #f6f6f6;
-  --popover: #141414;
-  --popover-foreground: #f6f6f6;
-  --primary: #f7c948;
-  --primary-foreground: #101010;
-  --secondary: #1f1f1f;
+  /* Same for dark as the base is already dark */
+  --background: #05050b;
+  --foreground: #f5f7ff;
+  --card: #0d122b;
+  --card-foreground: #f5f7ff;
+  --popover: #0a0e24;
+  --popover-foreground: #f5f7ff;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
   --secondary-foreground: #f3f3f3;
-  --muted: #1a1a1a;
-  --muted-foreground: #bbbbbb;
-  --accent: #232323;
-  --accent-foreground: #f8f8f8;
-  --destructive: #ff5d7a;
-  --border: rgba(255, 255, 255, 0.14);
-  --input: #151515;
-  --ring: rgba(247, 201, 72, 0.45);
-
-  --chart-1: #f7c948;
-  --chart-2: #f3b811;
-  --chart-3: #e3aa17;
-  --chart-4: #d09300;
-  --chart-5: #bf7f00;
-
-  --sidebar: #111111;
-  --sidebar-foreground: #f6f6f6;
-  --sidebar-primary: #f7c948;
-  --sidebar-primary-foreground: #101010;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #f6f6f6;
-  --sidebar-border: rgba(255, 255, 255, 0.14);
-  --sidebar-ring: rgba(247, 201, 72, 0.45);
+  --muted: #161b33;
+  --muted-foreground: #bec7ff;
+  --accent: #7a4dff;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4d4d;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #0d122b;
+  --ring: rgba(59, 130, 246, 0.5);
 }
 
 @layer base {
@@ -152,35 +139,39 @@
   body {
     @apply min-h-screen bg-background text-foreground antialiased;
     font-family: var(--font-geist-sans);
+    background-image: 
+      radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15), transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(122, 77, 255, 0.05), transparent 30%);
+    background-attachment: fixed;
   }
 }
 
 @layer utilities {
-  .bg-blacksmith-foundation {
+  .bg-cosmic-foundation {
     background:
-      radial-gradient(circle at 50% -10%, rgba(247, 201, 72, 0.24), transparent 42%),
-      radial-gradient(circle at 18% 0%, rgba(247, 201, 72, 0.11), transparent 28%),
-      linear-gradient(180deg, #090909 0%, #090909 100%);
+      radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.2), transparent 45%),
+      radial-gradient(circle at 15% 0%, rgba(122, 77, 255, 0.1), transparent 30%),
+      linear-gradient(180deg, #05050b 0%, #080a1a 100%);
   }
 
-  .bg-blacksmith-panel {
-    background-image: linear-gradient(180deg, rgba(18, 18, 18, 0.96) 0%, rgba(14, 14, 14, 0.96) 100%);
+  .bg-cosmic-panel {
+    @apply bg-card/60 backdrop-blur-xl border border-white/5;
   }
 
-  .text-blacksmith-muted {
-    color: #bababa;
+  .text-cosmic-muted {
+    color: #bec7ff;
   }
 
-  .border-blacksmith {
-    border-color: rgba(255, 255, 255, 0.14);
+  .border-cosmic {
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
-  .shadow-blacksmith {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 14px 42px rgba(0, 0, 0, 0.5);
+  .shadow-cosmic {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 50px -12px rgba(0, 0, 0, 0.5);
   }
 
-  .shadow-blacksmith-gold {
-    box-shadow: 0 0 0 1px rgba(247, 201, 72, 0.32), 0 10px 34px rgba(247, 201, 72, 0.22);
+  .shadow-cosmic-glow {
+    box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.3), 0 0 40px -10px rgba(122, 77, 255, 0.2);
   }
 
   .section-shell {
@@ -189,45 +180,17 @@
 
   .hero-grid {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
     background-position: center top;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
   }
 
-  .proof-strip {
-    @apply rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm;
+  .glass-card {
+    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:bg-white/10 hover:border-white/20;
   }
-
-  .border-cosmic {
-    border-color: rgba(255, 255, 255, 0.14);
-  }
-
-  .text-cosmic-muted {
-    color: #bababa;
-  }
-
-  .bg-cosmic-burst {
-    background:
-      radial-gradient(circle at 50% -10%, rgba(247, 201, 72, 0.24), transparent 42%),
-      radial-gradient(circle at 18% 0%, rgba(247, 201, 72, 0.11), transparent 28%),
-      linear-gradient(180deg, #090909 0%, #090909 100%);
-  }
-
-  .bg-cosmic-surface,
-  .bg-cosmic-panel {
-    background-image: linear-gradient(180deg, rgba(18, 18, 18, 0.96) 0%, rgba(14, 14, 14, 0.96) 100%);
-  }
-
-  .glow-cosmic-sm,
-  .glow-cosmic-md {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 14px 42px rgba(0, 0, 0, 0.5);
-  }
-
-  .glow-cosmic-lg {
-    box-shadow: 0 0 0 1px rgba(247, 201, 72, 0.32), 0 10px 34px rgba(247, 201, 72, 0.22);
-  }
-
 }
+
 
 

@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="apify logo"><rect width="128" height="128" rx="22" fill="#0F172A"/><text x="64" y="72" text-anchor="middle" fill="#FFFFFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="0">AP</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="apify logo">
+  <rect width="128" height="128" rx="22" fill="#0F172A"/>
+  <path d="M64 20l36 64H28l36-64z" fill="#22D3EE"/>
+  <path d="M64 36l22 40H42l22-40z" fill="#0F172A"/>
+  <circle cx="64" cy="92" r="10" fill="#22D3EE"/>
+</svg>
