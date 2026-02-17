@@ -193,6 +193,34 @@ function getNameBasedLogoCandidates(mcpServer: LogoSourceServer): string[] {
     }
     return [...candidates];
 }
+
+function createGeneratedLogoDataUrl(seedValue: string): string {
+    const seed = hashString(seedValue || "mcp");
+    const hueA = seed % 360;
+    const hueB = (seed * 7) % 360;
+    const hueC = (seed * 13) % 360;
+    const rotation = seed % 360;
+    const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="MCP generated logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="hsl(${hueA} 78% 55%)"/>
+      <stop offset="100%" stop-color="hsl(${hueB} 78% 45%)"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="hsl(${hueC} 90% 70% / .95)"/>
+      <stop offset="100%" stop-color="white"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <g transform="translate(64 64) rotate(${rotation}) translate(-64 -64)">
+    <path d="M22 76 L64 20 L106 76 L64 108 Z" fill="url(#accent)" opacity=".95"/>
+    <circle cx="64" cy="64" r="18" fill="hsl(224 32% 12% / .82)"/>
+  </g>
+</svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg.trim())}`;
+}
+
 export function getServerLogoCandidates(mcpServer: LogoSourceServer): string[] {
     const candidates = new Set<string>();
     for (const candidate of getNameBasedLogoCandidates(mcpServer)) {
@@ -207,5 +235,6 @@ export function getServerLogoCandidates(mcpServer: LogoSourceServer): string[] {
     if (candidates.size === 0) {
         candidates.add(createLocalSimpleIconCandidate("modelcontextprotocol"));
     }
+    candidates.add(createGeneratedLogoDataUrl(`${mcpServer.slug}|${mcpServer.name}`));
     return [...candidates];
 }
