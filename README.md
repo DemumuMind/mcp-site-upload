@@ -381,7 +381,12 @@ npm run build
   - Verifies that the required Supabase variables are present before running the rest of the suite
 - `npm run test:e2e:auth` (relies on Playwright building and running the app)
 - `npm run profile:multi-agent`
-  - Runs multi-agent load profile summary (configure rounds via `MULTI_AGENT_PROFILE_ROUNDS`)
+  - Runs multi-agent load profile summary.
+  - Config:
+    - `MULTI_AGENT_PROFILE_ROUNDS` (default `30`)
+    - `MULTI_AGENT_PROFILE_BASE_URL` (single URL or comma-separated fallback list)
+  - Optional CLI override:
+    - `npm run profile:multi-agent -- --base-url=http://127.0.0.1:3000`
 
 ### Running Auth E2E Locally
 
