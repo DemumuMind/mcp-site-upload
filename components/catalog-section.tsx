@@ -9,7 +9,7 @@ import { ServerCard } from "@/components/server-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { areCatalogQueriesEqual, buildCatalogQueryV2SearchParams, parseCatalogQueryV2, serializeCatalogQueryV2, } from "@/lib/catalog/query-v2";
-import { getServerScore } from "@/lib/catalog/sorting";
+import { getServerScore, getServerTrustScore } from "@/lib/catalog/sorting";
 import { runCatalogSearch } from "@/lib/catalog/server-search";
 import { tr } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
@@ -267,6 +267,26 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
             toolsMax: null,
         });
     }
+    function applyQuickFilter(type: "official" | "healthy" | "free") {
+        if (type === "official") {
+            commitQuery({
+                page: 1,
+                verification: queryState.verification.includes("official") ? [] : ["official"],
+            });
+            return;
+        }
+        if (type === "healthy") {
+            commitQuery({
+                page: 1,
+                health: queryState.health.includes("healthy") ? [] : ["healthy"],
+            });
+            return;
+        }
+        commitQuery({
+            page: 1,
+            pricing: queryState.pricing.includes("none") ? [] : ["none"],
+        });
+    }
     function setCatalogPage(pageNumber: number) {
         const normalizedPage = Math.min(Math.max(pageNumber, 1), result.totalPages);
         if (normalizedPage === result.page) {
@@ -434,6 +454,19 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
           </div>
         </div>) : null}
 
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-xs text-muted-foreground">{tr(locale, "Quick filters:", "Quick filters:")}</p>
+        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("official")}>
+          {tr(locale, "Official only", "Official only")}
+        </Button>
+        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("healthy")}>
+          {tr(locale, "Healthy only", "Healthy only")}
+        </Button>
+        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("free")}>
+          {tr(locale, "Free only", "Free only")}
+        </Button>
+      </div>
+
       <div className="space-y-1 text-sm text-foreground">
         <p>
           {tr(locale, `${result.total} tools found`, `${result.total} tools found`)}
@@ -447,7 +480,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
           </p>) : null}
         {requestError ? (<p className="inline-flex items-center gap-1.5 text-xs text-rose-200">
             <AlertCircle className="size-3.5"/>
-            {tr(locale, "Could not sync latest catalog results.", "Could not sync latest catalog results.")}
+            {tr(locale, "Could not sync latest catalog results. Showing the latest available snapshot.", "Could not sync latest catalog results. Showing the latest available snapshot.")}
           </p>) : null}
       </div>
 
@@ -462,9 +495,17 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.pricing} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters}/>
 
         <div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blacksmith bg-card p-2.5">
+            <p className="text-xs text-muted-foreground">
+              {tr(locale, "Can't find your MCP server?", "Can't find your MCP server?")}
+            </p>
+            <Button asChild size="sm" className="h-8 rounded-lg px-3">
+              <a href="/submit-server">{tr(locale, "Submit server", "Submit server")}</a>
+            </Button>
+          </div>
           {result.total > 0 ? (<div className="space-y-5">
               <div className={queryState.layout === "grid" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
-                {result.items.map((mcpServer) => (<ServerCard key={mcpServer.id} mcpServer={mcpServer} viewMode={queryState.layout} score={getServerScore(mcpServer)}/>))}
+                {result.items.map((mcpServer) => (<ServerCard key={mcpServer.id} mcpServer={mcpServer} viewMode={queryState.layout} score={getServerScore(mcpServer, queryState.query)} trustScore={getServerTrustScore(mcpServer)}/>))}
               </div>
 
               {result.totalPages > 1 ? (<div className="flex flex-wrap items-center justify-center gap-1" role="navigation" aria-label="Catalog pagination">
@@ -493,6 +534,14 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
               </CardHeader>
               <CardContent className="text-sm text-foreground">
                 {tr(locale, "Try another search query or reset categories/tags/access filters.", "Try another search query or reset categories/tags/access filters.")}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button type="button" size="xs" variant="outline" className="border-blacksmith bg-card" onClick={handleClearAllFilters}>
+                    {tr(locale, "Reset all filters", "Reset all filters")}
+                  </Button>
+                  <Button asChild size="xs">
+                    <a href="/submit-server">{tr(locale, "Submit server", "Submit server")}</a>
+                  </Button>
+                </div>
               </CardContent>
             </Card>)}
         </div>

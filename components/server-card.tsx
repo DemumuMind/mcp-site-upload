@@ -19,6 +19,7 @@ type ServerCardProps = {
   mcpServer: McpServer;
   viewMode?: ServerCardViewMode;
   score?: number;
+  trustScore?: number;
 };
 
 const verificationLabelByLevel: Record<VerificationLevel, string> = {
@@ -45,7 +46,7 @@ function getRatingValue(mcpServer: McpServer, score?: number): number {
   return Math.max(1, Math.min(5, Number(normalized.toFixed(1))));
 }
 
-export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardProps) {
+export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: ServerCardProps) {
   const locale = useLocale();
   const [saved, setSaved] = useState(false);
   const rating = useMemo(() => getRatingValue(mcpServer, score), [mcpServer, score]);
@@ -122,6 +123,9 @@ export function ServerCard({ mcpServer, viewMode = "grid", score }: ServerCardPr
               <Star className="size-3.5 fill-current" />
               {rating.toFixed(1)}
             </div>
+            <span className="inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-1 text-[11px] font-medium text-emerald-200">
+              {tr(locale, "Trust", "Trust")} {typeof trustScore === "number" ? trustScore.toFixed(1) : "--"}
+            </span>
 
             <Badge variant="secondary" className="border border-blue-400/30 bg-blue-500/15 text-[11px] font-semibold text-blue-200">
               {tr(locale, accessLabel, accessLabel)}

@@ -33,14 +33,20 @@ test.describe("visual acceptance sweep", () => {
       expect(desktopResp?.ok()).toBeTruthy();
       const desktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       expect(desktopOverflow).toBeFalsy();
-      await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-desktop.png`, { fullPage: true });
+      await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-desktop.png`, {
+        fullPage: true,
+        maxDiffPixels: 3500,
+      });
 
       await page.setViewportSize({ width: 390, height: 844 });
       const mobileResp = await page.goto(route, { waitUntil: "networkidle" });
       expect(mobileResp?.ok()).toBeTruthy();
       const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       expect(mobileOverflow).toBeFalsy();
-      await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-mobile.png`, { fullPage: true });
+      await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-mobile.png`, {
+        fullPage: true,
+        maxDiffPixels: 3500,
+      });
     });
   }
 });

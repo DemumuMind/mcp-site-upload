@@ -24,9 +24,9 @@ test.describe("Homepage refactor", () => {
     await page.goto("/");
     const main = page.getByRole("main");
 
-    await expect(main.getByRole("heading", { level: 1, name: /Ship MCP Integrations/i })).toBeVisible();
-    await expect(main.getByRole("link", { name: "Open Catalog" }).first()).toBeVisible();
-    await expect(main.getByRole("link", { name: "Submit Server" }).first()).toBeVisible();
+    await expect(main.getByText("Community-Curated MCP Directory")).toBeVisible();
+    await expect(main.getByRole("link", { name: "Start Exploring Servers" }).first()).toBeVisible();
+    await expect(main.getByRole("link", { name: "Submit Your Server" }).first()).toBeVisible();
 
     await expect(main.getByRole("heading", { name: "MCP catalog at a glance" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "The MCP delivery workflow" })).toBeVisible();
@@ -47,8 +47,8 @@ test.describe("Homepage refactor", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { level: 1, name: /Ship MCP Integrations/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open Catalog" }).first()).toBeVisible();
+    await expect(page.getByText("Community-Curated MCP Directory", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Start Exploring Servers" }).first()).toBeVisible();
 
     const hasHorizontalOverflow = await page.evaluate(() => {
       const root = document.documentElement;

@@ -95,4 +95,79 @@ test.describe("Catalog query v2 filters", () => {
     await page.locator("#catalog-mobile-filters").getByRole("button", { name: "Close filters" }).click();
     await expect(page.locator("#catalog-mobile-filters")).not.toBeVisible();
   });
+
+  test("applies quick filters and syncs URL chips", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    await page.getByRole("button", { name: "Official only" }).click();
+    await expect.poll(() => page.url()).toContain("verification=official");
+    await expect(page.getByRole("button", { name: /Verification: Official/i })).toBeVisible();
+
+    await page.getByRole("button", { name: "Healthy only" }).click();
+    await expect.poll(() => page.url()).toContain("health=healthy");
+    await expect(page.getByRole("button", { name: /Health: Healthy/i })).toBeVisible();
+
+    await page.getByRole("button", { name: "Free only" }).click();
+    await expect.poll(() => page.url()).toContain("pricing=none");
+    await expect(page.getByRole("button", { name: /Pricing: Free/i })).toBeVisible();
+  });
+
+  test("shows submit server CTA in result area", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    const submitCta = page
+      .getByText("Can't find your MCP server?")
+      .locator("xpath=ancestor::div[1]")
+      .getByRole("link", { name: "Submit server" })
+      .first();
+    await expect(submitCta).toBeVisible();
+    await expect(submitCta).toHaveAttribute("href", "/submit-server");
+  });
+
+  test("empty state offers reset and submit actions", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.route("**/api/catalog/search**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [],
+          total: 0,
+          page: 1,
+          pageSize: 12,
+          totalPages: 1,
+          facets: {
+            categoryEntries: [],
+            tagEntries: [],
+            authTypeCounts: { none: 0, oauth: 0, api_key: 0 },
+            verificationCounts: { community: 0, partner: 0, official: 0 },
+            healthCounts: { unknown: 0, healthy: 0, degraded: 0, down: 0 },
+            toolsRange: { min: 0, max: 0 },
+          },
+          appliedFilters: {
+            page: 1,
+            pageSize: 12,
+            query: "",
+            categories: [],
+            pricing: [],
+            tags: [],
+            verification: [],
+            health: [],
+            toolsMin: null,
+            toolsMax: null,
+            sortBy: "rating",
+            sortDir: "desc",
+            layout: "grid",
+          },
+        }),
+      });
+    });
+    await page.goto("/catalog");
+
+    await expect(page.getByText("No tools found")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reset all filters" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Submit server" }).last()).toHaveAttribute("href", "/submit-server");
+  });
 });

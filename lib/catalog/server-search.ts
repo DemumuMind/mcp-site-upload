@@ -19,7 +19,7 @@ export function runCatalogSearch(servers: McpServer[], queryInput: Partial<Catal
     const sortedServers = sortCatalogServers(filteredServers, {
         field: query.sortBy,
         direction: query.sortDir,
-    });
+    }, query.query);
     const total = sortedServers.length;
     const totalPages = Math.max(1, Math.ceil(total / query.pageSize));
     const page = Math.min(query.page, totalPages);

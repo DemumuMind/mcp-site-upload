@@ -36,7 +36,7 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
         </SelectTrigger>
         <SelectContent className="border-blacksmith bg-card text-foreground">
           <SelectItem value="rating" className="focus:bg-card focus:text-foreground">
-            {tr(locale, "Rating", "Rating")}
+            {tr(locale, "Best match", "Best match")}
           </SelectItem>
           <SelectItem value="name" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Name", "Name")}

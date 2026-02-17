@@ -1,4 +1,29 @@
-﻿## Latest Update (2026-02-15, Parallel #17 + #18 Implementation)
+## Latest Update (2026-02-17, Catalog Balanced MVP A - Search/Trust/Conversion/UX)
+- Objective: implement first-pass Balanced MVP improvements for catalog discoverability, trust signaling, conversion CTA, and quick filter UX.
+- Status: completed (implementation + build verification).
+- Touched files:
+  - `components/catalog-filter-bar.tsx`
+  - `components/catalog-section.tsx`
+  - `components/server-card.tsx`
+  - `lib/catalog/server-search.ts`
+  - `lib/catalog/sorting.ts`
+  - `docs/catalog-improvement-brainstorming-2026-02-17.md`
+- Implemented:
+  - Renamed default sort label to `Best match` and wired ranking to query-aware scoring.
+  - Added intent-aware ranking factors (name/description/category/maintainer/tags/tools) and trust-aware scoring (verification/health/repo presence).
+  - Added visible `Trust` badge on server cards.
+  - Added quick filters (`Official only`, `Healthy only`, `Free only`) for faster narrowing.
+  - Added contextual `Submit server` CTA near results and in empty state.
+  - Improved fail-soft message when live sync fails (explicit snapshot fallback notice).
+  - Documented brainstorming/design decisions in durable markdown artifact.
+- Verification commands and outcomes:
+  - `npm run check:utf8:strict` -> pass
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+- Open risks:
+  - Ranking weights are heuristic and likely need tuning using real click-through telemetry.
+  - Trust badge currently emphasizes transparency but does not expose full score breakdown UX yet.
+## Latest Update (2026-02-15, Parallel #17 + #18 Implementation)
 - Objective: execute Phase 2 in parallel for catalog auto-sync observability/alerts (#17) and admin moderation queue UX (#18).
 - Status: completed.
 - Touched files:
@@ -202,7 +227,7 @@
 - Open risks:
   - Local environment may keep occupied ports from background Next processes; use alternate port for manual verification.
 ## Latest Update (2026-02-12, Lint/Build Pipeline Stabilization Follow-up)
-- Objective: finalize вЂњРџРѕС‡РёРЅРёвЂќ follow-up by ensuring lint/build are stable after security hardening pass.
+- Objective: finalize “Почини” follow-up by ensuring lint/build are stable after security hardening pass.
 - Status: completed.
 - Touched files:
   - `eslint.config.mjs`
@@ -2836,3 +2861,4 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - `npm run check:utf8:strict` -> pass
   - `npm run build` -> pass
   - `npm run test:e2e -- tests/multi-agent-demo.spec.ts` -> pass
+

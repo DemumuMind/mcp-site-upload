@@ -23,7 +23,7 @@ test.describe("How-to-use page", () => {
     await setLocaleCookies(page, "en");
     await page.goto("/how-to-use");
 
-    await expect(page.getByRole("heading", { name: "Setup Guide", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Setup Guide/i, level: 1 })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Choose your setup path", level: 2 })).toBeVisible();
     await expect(page.getByRole("button", { name: "Use this path" }).first()).toBeVisible();
 
@@ -32,7 +32,7 @@ test.describe("How-to-use page", () => {
       page.getByText("Add MCP server in local config, restart agent session, and re-open tool list."),
     ).toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Open Catalog", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Browse MCP servers" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Open the Catalog|Open Catalog/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Choose a server in catalog|Review trusted servers/i }).first()).toBeVisible();
   });
 });
