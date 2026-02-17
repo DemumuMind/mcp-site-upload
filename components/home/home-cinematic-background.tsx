@@ -50,13 +50,13 @@ const intensityPresets: Record<"low" | "medium" | "epic", IntensityPreset> = {
     wrapperHeightClass: "h-[900px]",
   },
   epic: {
-    fps: 45,
-    sparkDivisor: 14,
-    minSparks: 70,
+    fps: 60,
+    sparkDivisor: 10,
+    minSparks: 120,
     maxDpr: 1.6,
-    ribbons: 4,
-    beamSpeed: 170,
-    wrapperHeightClass: "h-[980px]",
+    ribbons: 6,
+    beamSpeed: 240,
+    wrapperHeightClass: "h-[1120px]",
   },
 };
 

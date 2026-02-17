@@ -30,10 +30,11 @@ export function AnimeRuntimeEffects() {
           anime({
             targets: el,
             opacity: [0, 1],
-            translateY: [16, 0],
+            translateY: [28, 0],
+            scale: [0.96, 1],
             delay,
-            duration: 620,
-            easing: "easeOutExpo",
+            duration: 520,
+            easing: "easeOutQuart",
           });
 
           observer.unobserve(el);
@@ -58,10 +59,11 @@ export function AnimeRuntimeEffects() {
         anime.remove(card);
         anime({
           targets: card,
-          translateY: -6,
-          scale: 1.008,
-          duration: 280,
-          easing: "easeOutQuad",
+          translateY: -12,
+          scale: 1.02,
+          rotateZ: 0.25,
+          duration: 220,
+          easing: "easeOutExpo",
         });
       };
 
@@ -71,8 +73,9 @@ export function AnimeRuntimeEffects() {
           targets: card,
           translateY: 0,
           scale: 1,
-          duration: 260,
-          easing: "easeOutQuad",
+          rotateZ: 0,
+          duration: 220,
+          easing: "easeOutExpo",
         });
       };
 
@@ -96,10 +99,11 @@ export function AnimeRuntimeEffects() {
     anime.remove(routeContainer);
     anime({
       targets: routeContainer,
-      opacity: [0.76, 1],
-      translateY: [10, 0],
-      duration: 320,
-      easing: "easeOutExpo",
+      opacity: [0.58, 1],
+      translateY: [24, 0],
+      scale: [0.985, 1],
+      duration: 260,
+      easing: "easeOutQuart",
     });
   }, [pathname]);
 
@@ -114,21 +118,21 @@ export function AnimeRuntimeEffects() {
 
     const loops = [
       ...pulseTargets.map((el) =>
-        anime({ targets: el, opacity: [0.82, 1, 0.82], duration: 3200, easing: "easeInOutSine", loop: true }),
+        anime({ targets: el, opacity: [0.7, 1, 0.7], duration: 1800, easing: "easeInOutQuad", loop: true }),
       ),
       ...driftTargets.map((el) =>
-        anime({ targets: el, backgroundPosition: ["0px 0px, 0px 0px", "0px 34px, 34px 0px"], duration: 20000, easing: "linear", loop: true }),
+        anime({ targets: el, backgroundPosition: ["0px 0px, 0px 0px", "0px 40px, 40px 0px"], duration: 9000, easing: "linear", loop: true }),
       ),
       ...panTargets.map((el) =>
-        anime({ targets: el, translateX: [-8, 10, -8], opacity: [0.3, 0.5, 0.3], duration: 11000, easing: "easeInOutSine", loop: true }),
+        anime({ targets: el, translateX: [-28, 28, -28], opacity: [0.22, 0.62, 0.22], duration: 5200, easing: "easeInOutSine", loop: true }),
       ),
       ...shimmerTargets.map((el) => {
         el.style.backgroundImage = "linear-gradient(110deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 65%)";
         el.style.backgroundSize = "220% 100%";
-        return anime({ targets: el, backgroundPosition: ["-220% 0", "220% 0"], duration: 4800, easing: "linear", loop: true });
+        return anime({ targets: el, backgroundPosition: ["-220% 0", "220% 0"], duration: 1800, easing: "linear", loop: true });
       }),
       ...floatTargets.map((el) =>
-        anime({ targets: el, translateY: [0, -6, 0], duration: 8400, easing: "easeInOutSine", loop: true }),
+        anime({ targets: el, translateY: [0, -16, 0], duration: 2600, easing: "easeInOutSine", loop: true }),
       ),
     ];
 
