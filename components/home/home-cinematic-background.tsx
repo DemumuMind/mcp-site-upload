@@ -1,13 +1,22 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef } from "react";
 
-type Particle = {
+type Spark = {
   x: number;
   y: number;
   vx: number;
   vy: number;
   r: number;
+  alpha: number;
+};
+
+type Ribbon = {
+  baseY: number;
+  amplitude: number;
+  speed: number;
+  phase: number;
+  thickness: number;
   alpha: number;
 };
 
@@ -20,94 +29,174 @@ export function HomeCinematicBackground() {
     const element = canvas;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
     const context = ctx;
 
-    const particles: Particle[] = [];
+    const sparks: Spark[] = [];
+    const ribbons: Ribbon[] = [];
+
     let raf = 0;
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let running = true;
+    let prevTs = 0;
+    let elapsed = 0;
+
+    const targetFps = 45;
+    const frameStep = 1000 / targetFps;
+
+    function resetScene() {
+      sparks.length = 0;
+      ribbons.length = 0;
+
+      const sparkCount = Math.max(70, Math.floor(width / 14));
+      for (let i = 0; i < sparkCount; i += 1) {
+        sparks.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.28,
+          vy: -0.12 - Math.random() * 0.34,
+          r: 0.7 + Math.random() * 2.8,
+          alpha: 0.14 + Math.random() * 0.4,
+        });
+      }
+
+      for (let i = 0; i < 4; i += 1) {
+        ribbons.push({
+          baseY: height * (0.22 + i * 0.15),
+          amplitude: 18 + i * 8,
+          speed: 0.28 + i * 0.06,
+          phase: Math.random() * Math.PI * 2,
+          thickness: 1.2 + i * 0.4,
+          alpha: 0.08 + i * 0.02,
+        });
+      }
+    }
 
     function resize() {
       const rect = element.getBoundingClientRect();
-      width = Math.floor(rect.width);
-      height = Math.floor(rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      dpr = Math.min(window.devicePixelRatio || 1, 1.6);
 
       element.width = Math.max(1, Math.floor(width * dpr));
       element.height = Math.max(1, Math.floor(height * dpr));
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const targetCount = Math.max(30, Math.floor(width / 36));
-      particles.length = 0;
-      for (let i = 0; i < targetCount; i += 1) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.22,
-          vy: -0.1 - Math.random() * 0.24,
-          r: 0.7 + Math.random() * 1.9,
-          alpha: 0.12 + Math.random() * 0.42,
-        });
-      }
+      resetScene();
     }
 
-    const start = performance.now();
-
-    function draw(now: number) {
-      const t = (now - start) / 1000;
-      context.clearRect(0, 0, width, height);
-
-      const grad = context.createLinearGradient(0, 0, width, height);
-      grad.addColorStop(0, "rgba(247,201,72,0.14)");
-      grad.addColorStop(0.45, "rgba(247,201,72,0.03)");
+    function drawBackdrop(timeSec: number) {
+      const grad = context.createRadialGradient(width * 0.5, height * 0.22, 40, width * 0.5, height * 0.22, width * 0.65);
+      grad.addColorStop(0, "rgba(247,201,72,0.26)");
+      grad.addColorStop(0.5, "rgba(247,201,72,0.08)");
       grad.addColorStop(1, "rgba(247,201,72,0)");
       context.fillStyle = grad;
       context.fillRect(0, 0, width, height);
 
-      const sweepX = ((t * 90) % (width + 260)) - 130;
-      const sweep = context.createLinearGradient(sweepX - 140, 0, sweepX + 140, 0);
-      sweep.addColorStop(0, "rgba(247,201,72,0)");
-      sweep.addColorStop(0.5, "rgba(247,201,72,0.09)");
-      sweep.addColorStop(1, "rgba(247,201,72,0)");
-      context.fillStyle = sweep;
+      const beamX = ((timeSec * 170) % (width + 520)) - 260;
+      const beam = context.createLinearGradient(beamX - 200, 0, beamX + 200, 0);
+      beam.addColorStop(0, "rgba(247,201,72,0)");
+      beam.addColorStop(0.48, "rgba(247,201,72,0.14)");
+      beam.addColorStop(0.52, "rgba(255,230,150,0.2)");
+      beam.addColorStop(1, "rgba(247,201,72,0)");
+      context.fillStyle = beam;
       context.fillRect(0, 0, width, height);
+    }
 
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.y < -10) {
-          p.y = height + 6;
-          p.x = Math.random() * width;
-        }
-        if (p.x < -10) p.x = width + 10;
-        if (p.x > width + 10) p.x = -10;
-
+    function drawRibbons(timeSec: number) {
+      for (const ribbon of ribbons) {
         context.beginPath();
-        context.fillStyle = `rgba(247,201,72,${p.alpha})`;
-        context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        context.fill();
+        for (let x = 0; x <= width; x += 10) {
+          const wave = Math.sin(x * 0.008 + timeSec * ribbon.speed + ribbon.phase) * ribbon.amplitude;
+          const y = ribbon.baseY + wave;
+          if (x === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+
+        context.strokeStyle = `rgba(247,201,72,${ribbon.alpha})`;
+        context.lineWidth = ribbon.thickness;
+        context.shadowBlur = 14;
+        context.shadowColor = "rgba(247,201,72,0.2)";
+        context.stroke();
       }
 
-      raf = window.requestAnimationFrame(draw);
+      context.shadowBlur = 0;
+    }
+
+    function drawSparks() {
+      for (const spark of sparks) {
+        spark.x += spark.vx;
+        spark.y += spark.vy;
+
+        if (spark.y < -12) {
+          spark.y = height + 8;
+          spark.x = Math.random() * width;
+        }
+        if (spark.x < -12) spark.x = width + 12;
+        if (spark.x > width + 12) spark.x = -12;
+
+        context.beginPath();
+        context.fillStyle = `rgba(247,201,72,${spark.alpha})`;
+        context.arc(spark.x, spark.y, spark.r, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+
+    function drawFrame(ts: number) {
+      if (!running) return;
+      if (!prevTs) prevTs = ts;
+
+      const delta = ts - prevTs;
+      if (delta < frameStep) {
+        raf = window.requestAnimationFrame(drawFrame);
+        return;
+      }
+
+      prevTs = ts;
+      elapsed += delta;
+      const timeSec = elapsed / 1000;
+
+      context.clearRect(0, 0, width, height);
+      drawBackdrop(timeSec);
+
+      context.globalCompositeOperation = "screen";
+      drawRibbons(timeSec);
+      drawSparks();
+      context.globalCompositeOperation = "source-over";
+
+      raf = window.requestAnimationFrame(drawFrame);
+    }
+
+    function onVisibilityChange() {
+      running = !document.hidden;
+      if (running) {
+        prevTs = 0;
+        raf = window.requestAnimationFrame(drawFrame);
+      } else if (raf) {
+        window.cancelAnimationFrame(raf);
+      }
     }
 
     resize();
-    raf = window.requestAnimationFrame(draw);
+    raf = window.requestAnimationFrame(drawFrame);
+
     window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      window.removeEventListener("resize", resize);
+      running = false;
       if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[760px] overflow-hidden">
-      <canvas ref={canvasRef} className="h-full w-full opacity-90" aria-hidden />
+    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[980px] overflow-hidden">
+      <canvas ref={canvasRef} className="h-full w-full opacity-[0.96] mix-blend-screen" aria-hidden />
     </div>
   );
 }
