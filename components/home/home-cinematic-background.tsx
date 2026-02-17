@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 type Spark = {
   x: number;
@@ -20,8 +20,56 @@ type Ribbon = {
   alpha: number;
 };
 
+type IntensityPreset = {
+  fps: number;
+  sparkDivisor: number;
+  minSparks: number;
+  maxDpr: number;
+  ribbons: number;
+  beamSpeed: number;
+  wrapperHeightClass: string;
+};
+
+const intensityPresets: Record<"low" | "medium" | "epic", IntensityPreset> = {
+  low: {
+    fps: 30,
+    sparkDivisor: 22,
+    minSparks: 34,
+    maxDpr: 1.2,
+    ribbons: 2,
+    beamSpeed: 120,
+    wrapperHeightClass: "h-[820px]",
+  },
+  medium: {
+    fps: 36,
+    sparkDivisor: 18,
+    minSparks: 48,
+    maxDpr: 1.4,
+    ribbons: 3,
+    beamSpeed: 145,
+    wrapperHeightClass: "h-[900px]",
+  },
+  epic: {
+    fps: 45,
+    sparkDivisor: 14,
+    minSparks: 70,
+    maxDpr: 1.6,
+    ribbons: 4,
+    beamSpeed: 170,
+    wrapperHeightClass: "h-[980px]",
+  },
+};
+
+function getIntensityPreset(value?: string): IntensityPreset {
+  if (value === "low" || value === "medium" || value === "epic") {
+    return intensityPresets[value];
+  }
+  return intensityPresets.epic;
+}
+
 export function HomeCinematicBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const preset = useMemo(() => getIntensityPreset(process.env.NEXT_PUBLIC_HERO_ANIMATION_INTENSITY), []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,14 +92,13 @@ export function HomeCinematicBackground() {
     let prevTs = 0;
     let elapsed = 0;
 
-    const targetFps = 45;
-    const frameStep = 1000 / targetFps;
+    const frameStep = 1000 / preset.fps;
 
     function resetScene() {
       sparks.length = 0;
       ribbons.length = 0;
 
-      const sparkCount = Math.max(70, Math.floor(width / 14));
+      const sparkCount = Math.max(preset.minSparks, Math.floor(width / preset.sparkDivisor));
       for (let i = 0; i < sparkCount; i += 1) {
         sparks.push({
           x: Math.random() * width,
@@ -63,7 +110,7 @@ export function HomeCinematicBackground() {
         });
       }
 
-      for (let i = 0; i < 4; i += 1) {
+      for (let i = 0; i < preset.ribbons; i += 1) {
         ribbons.push({
           baseY: height * (0.22 + i * 0.15),
           amplitude: 18 + i * 8,
@@ -79,7 +126,7 @@ export function HomeCinematicBackground() {
       const rect = element.getBoundingClientRect();
       width = Math.max(1, Math.floor(rect.width));
       height = Math.max(1, Math.floor(rect.height));
-      dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+      dpr = Math.min(window.devicePixelRatio || 1, preset.maxDpr);
 
       element.width = Math.max(1, Math.floor(width * dpr));
       element.height = Math.max(1, Math.floor(height * dpr));
@@ -96,7 +143,7 @@ export function HomeCinematicBackground() {
       context.fillStyle = grad;
       context.fillRect(0, 0, width, height);
 
-      const beamX = ((timeSec * 170) % (width + 520)) - 260;
+      const beamX = ((timeSec * preset.beamSpeed) % (width + 520)) - 260;
       const beam = context.createLinearGradient(beamX - 200, 0, beamX + 200, 0);
       beam.addColorStop(0, "rgba(247,201,72,0)");
       beam.addColorStop(0.48, "rgba(247,201,72,0.14)");
@@ -192,10 +239,10 @@ export function HomeCinematicBackground() {
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, []);
+  }, [preset]);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[980px] overflow-hidden">
+    <div className={`pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden ${preset.wrapperHeightClass}`}>
       <canvas ref={canvasRef} className="h-full w-full opacity-[0.96] mix-blend-screen" aria-hidden />
     </div>
   );
