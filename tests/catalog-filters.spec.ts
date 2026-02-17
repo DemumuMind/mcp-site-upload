@@ -45,7 +45,7 @@ test.describe("Catalog query v2 filters", () => {
 
   test("preserves deep-link filter state and sort after reload", async ({ page }) => {
     await setLocaleCookies(page, "en");
-    await page.goto("/catalog?query=github&pricing=oauth&sortBy=name&sortDir=asc&pageSize=24&layout=list");
+    await page.goto("/catalog?query=github&auth=oauth&sortBy=name&sortDir=asc&pageSize=24&layout=list");
 
     await expect(page.getByRole("button", { name: /Search: github/i })).toBeVisible();
     await expect.poll(() => page.url()).toContain("sortBy=name");
@@ -88,7 +88,7 @@ test.describe("Catalog query v2 filters", () => {
   test("canonicalizes malformed query params", async ({ page }) => {
     await setLocaleCookies(page, "en");
     await page.goto(
-      "/catalog?sortBy=bad&page=-4&pageSize=13&layout=table&pricing=foo&toolsMin=9&toolsMax=2&category=Search&category=Search",
+      "/catalog?sortBy=bad&page=-4&pageSize=13&layout=table&auth=foo&toolsMin=9&toolsMax=2&category=Search&category=Search",
     );
 
     await expect.poll(() => page.url()).toContain("category=Search");
@@ -101,7 +101,7 @@ test.describe("Catalog query v2 filters", () => {
     expect(parsed.searchParams.get("layout")).toBeNull();
     expect(parsed.searchParams.get("page")).toBeNull();
     expect(parsed.searchParams.get("pageSize")).toBeNull();
-    expect(parsed.searchParams.getAll("pricing")).toHaveLength(0);
+    expect(parsed.searchParams.getAll("auth")).toHaveLength(0);
   });
 
   test("opens and closes mobile filter drawer", async ({ page }) => {
@@ -128,9 +128,17 @@ test.describe("Catalog query v2 filters", () => {
     await expect.poll(() => page.url()).toContain("health=healthy");
     await expect(page.getByRole("button", { name: /Health: Healthy/i })).toBeVisible();
 
-    await page.getByRole("button", { name: "Free only" }).click();
-    await expect.poll(() => page.url()).toContain("pricing=none");
-    await expect(page.getByRole("button", { name: /Pricing: Free/i })).toBeVisible();
+    await page.getByRole("button", { name: "No auth only" }).click();
+    await expect.poll(() => page.url()).toContain("auth=none");
+    await expect(page.getByRole("button", { name: /Auth: No auth/i })).toBeVisible();
+  });
+
+  test("catalog hero does not show github coverage metrics", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    await expect(page.getByText("GitHub coverage")).toHaveCount(0);
+    await expect(page.getByText("GitHub linked")).toHaveCount(0);
   });
 
   test("shows submit server CTA in result area", async ({ page }) => {
@@ -183,7 +191,7 @@ test.describe("Catalog query v2 filters", () => {
             pageSize: 12,
             query: "",
             categories: [],
-            pricing: [],
+            auth: [],
             tags: [],
             verification: [],
             health: [],
