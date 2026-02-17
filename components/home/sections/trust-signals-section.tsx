@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,9 @@ type TrustSignalsSectionProps = {
 export function TrustSignalsSection({ content, featuredServers, topCategories, topLanguages }: TrustSignalsSectionProps) {
   return (
     <section className="relative overflow-hidden border-y border-blacksmith bg-black/20">
-      <div className="section-pan pointer-events-none absolute -left-16 bottom-12 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+      <div data-anime="pan" className="pointer-events-none absolute -left-16 bottom-12 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.05fr]">
-        <div className="space-y-6">
+        <div data-anime="reveal" data-anime-delay="60" className="space-y-6">
           <h3 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">{content.heading}</h3>
           <p className="max-w-xl text-lg text-muted-foreground">{content.description}</p>
 
@@ -63,7 +63,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
           </Button>
         </div>
 
-        <Card className="border-primary/20 shadow-blacksmith-gold">
+        <Card data-anime="reveal" data-anime-delay="130" className="border-primary/20 shadow-blacksmith-gold">
           <CardHeader>
             <CardTitle className="text-xs tracking-[0.18em] text-muted-foreground uppercase">{content.featuredLabel}</CardTitle>
           </CardHeader>
@@ -90,5 +90,6 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
     </section>
   );
 }
+
 
 

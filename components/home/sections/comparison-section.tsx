@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,9 +21,9 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
 
   return (
     <section className="relative overflow-hidden border-y border-blacksmith bg-background">
-      <div className="section-pan pointer-events-none absolute -left-20 top-12 h-52 w-52 rounded-full bg-primary/10 blur-3xl" />
+      <div data-anime="pan" className="pointer-events-none absolute -left-20 top-12 h-52 w-52 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.15fr] lg:items-center">
-        <div className="home-reveal home-delay-0 space-y-4">
+        <div data-anime="reveal" data-anime-delay="40" className="space-y-4">
           <h2 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
           <p className="max-w-xl leading-relaxed text-muted-foreground">{content.description}</p>
 
@@ -44,8 +44,8 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
           </div>
         </div>
 
-        <div className="home-reveal home-delay-1 grid gap-4 sm:grid-cols-2">
-          <Card className="border-blacksmith bg-black/30 transition-transform duration-300 hover:-translate-y-0.5">
+        <div data-anime="reveal" data-anime-delay="110" className="grid gap-4 sm:grid-cols-2">
+          <Card data-anime-hover="card" className="border-blacksmith bg-black/30 transition-transform duration-300 hover:-translate-y-0.5">
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">Legacy process</CardTitle>
             </CardHeader>
@@ -54,7 +54,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
               <p><span className="text-muted-foreground">Effort:</span> {selectedStack.legacyCost}</p>
             </CardContent>
           </Card>
-          <Card className="border-primary/40 bg-primary/10 shadow-blacksmith-gold transition-transform duration-300 hover:-translate-y-0.5">
+          <Card data-anime-hover="card" className="border-primary/40 bg-primary/10 shadow-blacksmith-gold transition-transform duration-300 hover:-translate-y-0.5">
             <CardHeader>
               <CardTitle className="text-sm text-primary">DemumuMind flow</CardTitle>
             </CardHeader>
@@ -69,3 +69,4 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
     </section>
   );
 }
+

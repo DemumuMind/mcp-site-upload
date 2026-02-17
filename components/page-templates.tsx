@@ -40,7 +40,7 @@ const badgeToneClassName: Record<NonNullable<PageHeroProps["badgeTone"]>, string
 
 export function PageHero({ eyebrow, title, description, actions, metrics, badgeTone = "cyan", className }: PageHeroProps) {
   return (
-    <section data-anime="reveal" data-anime-delay="40" className={cn("home-reveal home-delay-0 space-y-5 rounded-3xl border border-blacksmith bg-black/35 p-6 sm:p-8", className)}>
+    <section data-anime="reveal" data-anime-delay="40" className={cn("space-y-5 rounded-3xl border border-blacksmith bg-black/35 p-6 sm:p-8", className)}>
       {eyebrow ? (
         <div className={cn("inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] uppercase", badgeToneClassName[badgeTone])}>
           {eyebrow}
@@ -67,7 +67,7 @@ type PageMetricProps = {
 
 export function PageMetric({ label, value, valueClassName, className }: PageMetricProps) {
   return (
-    <div data-anime="reveal" data-anime-delay="90" className={cn("home-reveal rounded-2xl border border-blacksmith bg-card p-4 transition-transform duration-300 hover:-translate-y-0.5", className)}>
+    <div data-anime="reveal" data-anime-delay="90" className={cn("rounded-2xl border border-blacksmith bg-card p-4 transition-transform duration-300 hover:-translate-y-0.5", className)}>
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className={cn("mt-1 text-2xl font-semibold text-foreground", valueClassName)}>{value}</p>
     </div>
@@ -80,6 +80,7 @@ type PageSectionProps = {
 };
 
 export function PageSection({ children, className }: PageSectionProps) {
-  return <section data-anime="reveal" data-anime-delay="120" className={cn("home-reveal home-delay-1 rounded-2xl border border-blacksmith bg-card/90 p-5 sm:p-6", className)}>{children}</section>;
+  return <section data-anime="reveal" data-anime-delay="120" className={cn("rounded-2xl border border-blacksmith bg-card/90 p-5 sm:p-6", className)}>{children}</section>;
 }
+
 

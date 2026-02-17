@@ -10,7 +10,7 @@ export function AnimeRuntimeEffects() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const revealTargets = Array.from(document.querySelectorAll<HTMLElement>(".home-reveal, [data-anime='reveal']"));
+    const revealTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='reveal'], .anime-intro"));
     if (revealTargets.length === 0) return;
 
     for (const node of revealTargets) {
@@ -26,6 +26,7 @@ export function AnimeRuntimeEffects() {
           const el = entry.target as HTMLElement;
           const delay = Number(el.dataset.animeDelay || 0);
 
+          anime.remove(el);
           anime({
             targets: el,
             opacity: [0, 1],
@@ -38,7 +39,7 @@ export function AnimeRuntimeEffects() {
           observer.unobserve(el);
         }
       },
-      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
     );
 
     for (const node of revealTargets) observer.observe(node);
@@ -100,6 +101,38 @@ export function AnimeRuntimeEffects() {
       duration: 320,
       easing: "easeOutExpo",
     });
+  }, [pathname]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const pulseTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='pulse']"));
+    const driftTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='grid-drift']"));
+    const panTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='pan']"));
+    const shimmerTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='shimmer']"));
+    const floatTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-anime='float']"));
+
+    const loops = [
+      ...pulseTargets.map((el) =>
+        anime({ targets: el, opacity: [0.82, 1, 0.82], duration: 3200, easing: "easeInOutSine", loop: true }),
+      ),
+      ...driftTargets.map((el) =>
+        anime({ targets: el, backgroundPosition: ["0px 0px, 0px 0px", "0px 34px, 34px 0px"], duration: 20000, easing: "linear", loop: true }),
+      ),
+      ...panTargets.map((el) =>
+        anime({ targets: el, translateX: [-8, 10, -8], opacity: [0.3, 0.5, 0.3], duration: 11000, easing: "easeInOutSine", loop: true }),
+      ),
+      ...shimmerTargets.map((el) => {
+        el.style.backgroundImage = "linear-gradient(110deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 65%)";
+        el.style.backgroundSize = "220% 100%";
+        return anime({ targets: el, backgroundPosition: ["-220% 0", "220% 0"], duration: 4800, easing: "linear", loop: true });
+      }),
+      ...floatTargets.map((el) =>
+        anime({ targets: el, translateY: [0, -6, 0], duration: 8400, easing: "easeInOutSine", loop: true }),
+      ),
+    ];
+
+    return () => loops.forEach((instance) => instance.pause());
   }, [pathname]);
 
   return null;

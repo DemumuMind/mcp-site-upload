@@ -26,7 +26,7 @@ export function HeroSection({ content }: HeroSectionProps) {
       <div className="anime-intro flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
         <Button asChild size="lg" className="anime-cta-primary relative h-12 w-full overflow-hidden rounded-lg px-7 text-sm font-semibold sm:w-auto">
           <Link href="/catalog">
-            <span className="pointer-events-none absolute inset-0 cta-shimmer opacity-70" aria-hidden />
+            <span data-anime="shimmer" className="pointer-events-none absolute inset-0 opacity-70" aria-hidden />
             {content.primaryCta}
             <ArrowRight className="size-4" />
           </Link>
@@ -36,7 +36,10 @@ export function HeroSection({ content }: HeroSectionProps) {
         </Button>
       </div>
 
-      <div className="anime-intro home-float-slow mx-auto inline-flex max-w-full items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 text-xs text-foreground sm:text-sm shadow-[0_0_0_1px_rgba(247,201,72,0.16)]">
+      <div
+        data-anime="float"
+        className="anime-intro mx-auto inline-flex max-w-full items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 text-xs text-foreground sm:text-sm shadow-[0_0_0_1px_rgba(247,201,72,0.16)]"
+      >
         <Sparkles className="size-3.5 text-primary" />
         <span className="font-semibold">{content.pulseLabel}</span>
         <span className="text-muted-foreground">— {content.pulseText}</span>

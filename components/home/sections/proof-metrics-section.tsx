@@ -24,11 +24,11 @@ function getMetricLabel(metric: HomeMetric, content: HomeContent["metrics"]): st
 export function ProofMetricsSection({ content, metrics }: ProofMetricsSectionProps) {
   return (
     <section className="relative overflow-hidden border-y border-blacksmith bg-black/35">
-      <div className="pointer-events-none absolute -left-16 top-8 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-12 bottom-6 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+      <div data-anime="pan" className="pointer-events-none absolute -left-16 top-8 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+      <div data-anime="pan" className="pointer-events-none absolute -right-12 bottom-6 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="section-shell relative flex flex-col gap-8 py-14">
-        <div className="space-y-2 text-center">
+        <div data-anime="reveal" data-anime-delay="50" className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
           <p className="mx-auto max-w-3xl text-muted-foreground">{content.description}</p>
         </div>
@@ -37,8 +37,10 @@ export function ProofMetricsSection({ content, metrics }: ProofMetricsSectionPro
           {metrics.map((metric, index) => (
             <Card
               key={metric.id}
-              className="home-reveal bg-card transition-transform duration-300 hover:-translate-y-0.5"
-              style={{ animationDelay: `${80 + index * 70}ms` }}
+              data-anime="reveal"
+              data-anime-delay={String(80 + index * 70)}
+              data-anime-hover="card"
+              className="bg-card transition-transform duration-300 hover:-translate-y-0.5"
             >
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs tracking-[0.18em] text-muted-foreground uppercase">{getMetricLabel(metric, content)}</CardTitle>
@@ -53,3 +55,4 @@ export function ProofMetricsSection({ content, metrics }: ProofMetricsSectionPro
     </section>
   );
 }
+

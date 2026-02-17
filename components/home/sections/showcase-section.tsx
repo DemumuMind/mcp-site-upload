@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 
 type ShowcaseSectionProps = {
@@ -8,9 +8,9 @@ type ShowcaseSectionProps = {
 export function ShowcaseSection({ content }: ShowcaseSectionProps) {
   return (
     <section className="relative overflow-hidden border-y border-blacksmith bg-black/20">
-      <div className="section-pan pointer-events-none absolute -right-20 top-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+      <div data-anime="pan" className="pointer-events-none absolute -right-20 top-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
       <div className="section-shell space-y-8 py-20">
-        <div className="home-reveal home-delay-0 space-y-2 text-center">
+        <div data-anime="reveal" data-anime-delay="40" className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
           <p className="mx-auto max-w-3xl leading-relaxed text-muted-foreground">{content.description}</p>
         </div>
@@ -19,8 +19,10 @@ export function ShowcaseSection({ content }: ShowcaseSectionProps) {
           {content.cards.map((item, index) => (
             <Card
               key={item.title}
-              className="home-reveal bg-card transition-transform duration-300 hover:-translate-y-0.5"
-              style={{ animationDelay: `${110 + index * 70}ms` }}
+              data-anime="reveal"
+              data-anime-delay={String(110 + index * 70)}
+              data-anime-hover="card"
+              className="bg-card transition-transform duration-300 hover:-translate-y-0.5"
             >
               <CardHeader className="space-y-2">
                 <CardTitle className="text-sm text-muted-foreground">{item.title}</CardTitle>
@@ -34,3 +36,4 @@ export function ShowcaseSection({ content }: ShowcaseSectionProps) {
     </section>
   );
 }
+

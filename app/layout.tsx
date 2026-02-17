@@ -101,12 +101,15 @@ export default async function RootLayout({
         <LocaleProvider locale={locale}>
           <div className="relative flex min-h-screen flex-col overflow-hidden">
             <div className="pointer-events-none absolute inset-0 -z-30 bg-blacksmith-foundation" />
-            <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.18),transparent_42%)] animate-blacksmith-pulse" />
+            <div
+              data-anime="pulse"
+              className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.18),transparent_42%)]"
+            />
             <div className="pointer-events-none absolute inset-0 -z-10 hero-grid opacity-50" />
 
             <SiteHeader locale={locale} />
             <AuthHashRedirector />
-            <main data-route-container="true" className="page-enter relative z-10 flex-1">{children}</main>
+            <main data-route-container="true" className="relative z-10 flex-1">{children}</main>
             <AnimeRuntimeEffects />
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
