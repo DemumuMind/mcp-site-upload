@@ -345,7 +345,7 @@ export async function runCatalogGithubSync(options: { maxPages?: number } = {}):
     throw new Error("Supabase admin credentials are not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
   }
 
-  const githubToken = process.env.GITHUB_TOKEN?.trim() || null;
+  const githubToken = process.env.GH_API_TOKEN?.trim() || process.env.GITHUB_TOKEN?.trim() || null;
   const repos = await fetchGithubRepos(maxPages, githubToken);
   result.fetchedPages = Math.ceil(repos.length / DEFAULT_PER_PAGE);
   result.fetchedRecords = repos.length;
