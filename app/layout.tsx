@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { ConsentAnalytics } from "@/components/consent-analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { AuthHashRedirector } from "@/components/auth-hash-redirector";
+import { AnimeRuntimeEffects } from "@/components/anime-runtime-effects";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -105,7 +106,8 @@ export default async function RootLayout({
 
             <SiteHeader locale={locale} />
             <AuthHashRedirector />
-            <main className="page-enter relative z-10 flex-1">{children}</main>
+            <main data-route-container="true" className="page-enter relative z-10 flex-1">{children}</main>
+            <AnimeRuntimeEffects />
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
             <Toaster richColors position="top-right" />
