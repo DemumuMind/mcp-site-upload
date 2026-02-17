@@ -2807,3 +2807,32 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
 - Notes:
   - `.env` was normalized to UTF-8 without BOM to unblock Supabase CLI parsing.
   - Profile baseline was taken against local server `http://127.0.0.1:3101`.
+
+## Latest Update (2026-02-17, Multi-agent Phase 4: auto alerts + weekly export)
+- Objective: complete Phase 4 by adding dashboard auto-alert synthesis and weekly report export flow.
+- Status: completed.
+- Touched files:
+  - `lib/admin-dashboard.ts`
+  - `app/admin/page.tsx`
+  - `app/api/admin/multi-agent/weekly-export/route.ts` (new)
+- Implemented:
+  - Added multi-agent alert synthesis in admin snapshot:
+    - no-runs info alert
+    - p95 latency warning/error tiers
+    - budget-miss warning/error tiers
+  - Added weekly KPIs to dashboard snapshot:
+    - weekly run count
+    - weekly average duration
+    - weekly budget misses
+  - Added admin UI section for:
+    - alert list rendering
+    - weekly KPIs
+    - one-click weekly CSV export
+  - Added secure admin CSV route:
+    - `GET /api/admin/multi-agent/weekly-export`
+    - guarded by admin access, exports last 7 days of telemetry rows.
+- Verification commands and outcomes:
+  - `npm run lint` -> pass
+  - `npm run check:utf8:strict` -> pass
+  - `npm run build` -> pass
+  - `npm run test:e2e -- tests/multi-agent-demo.spec.ts` -> pass

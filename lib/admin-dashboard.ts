@@ -69,10 +69,18 @@ export type AdminDashboardSnapshot = {
         totalRuns24h: number;
         budgetMisses24h: number;
         p95DurationMs24h: number;
+        weeklyRunCount: number;
+        weeklyAvgDurationMs: number;
+        weeklyBudgetMisses: number;
         modeSplit24h: {
             fullMesh: number;
             ring: number;
         };
+        alerts: Array<{
+            id: string;
+            level: "info" | "warning" | "error";
+            message: string;
+        }>;
         recentRuns: Array<{
             id: string;
             timeLabel: string;
@@ -308,6 +316,7 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
     let rateLimitedLast24h = 0;
     let totalSecurityEvents = 0;
     let multiAgentRuns24h: MultiAgentRunRow[] = [];
+    let multiAgentRuns7d: MultiAgentRunRow[] = [];
     const securityPageSize = Math.max(10, Math.min(filters?.pageSize ?? 50, 200));
     const securityPage = Math.max(filters?.page ?? 1, 1);
     const securitySortBy = filters?.sortBy ?? "created_at";
@@ -464,6 +473,18 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
         if (multiAgentData?.length) {
             multiAgentRuns24h = multiAgentData;
         }
+
+        const since7dIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: multiAgentWeeklyData } = await adminClient
+            .from("multi_agent_pipeline_runs")
+            .select("id, created_at, coordination_mode, duration_ms, estimated_tokens, within_budget")
+            .gte("created_at", since7dIso)
+            .order("created_at", { ascending: false })
+            .limit(1000)
+            .returns<MultiAgentRunRow[]>();
+        if (multiAgentWeeklyData?.length) {
+            multiAgentRuns7d = multiAgentWeeklyData;
+        }
     }
     if (requestDistribution.length === 0) {
         const fallbackTotal = DEFAULT_DISTRIBUTION_BASE.reduce((accumulator, row) => accumulator + row.requestCount, 0);
@@ -500,6 +521,42 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
     const fullMeshCount = multiAgentRuns24h.filter((row) => row.coordination_mode === "full-mesh").length;
     const ringCount = multiAgentRuns24h.filter((row) => row.coordination_mode === "ring").length;
     const budgetMisses24h = multiAgentRuns24h.filter((row) => row.within_budget === false).length;
+    const weeklyDurations = multiAgentRuns7d
+        .map((row) => toFiniteNonNegativeInt(row.duration_ms, 0))
+        .filter((value) => value > 0);
+    const weeklyAvgDurationMs = weeklyDurations.length === 0
+        ? 0
+        : Math.round(weeklyDurations.reduce((acc, value) => acc + value, 0) / weeklyDurations.length);
+    const weeklyBudgetMisses = multiAgentRuns7d.filter((row) => row.within_budget === false).length;
+    const alerts: Array<{ id: string; level: "info" | "warning" | "error"; message: string }> = [];
+    if (multiAgentRuns24h.length === 0) {
+        alerts.push({
+            id: "multi-agent-no-runs",
+            level: "info",
+            message: "No multi-agent runs in the last 24h.",
+        });
+    }
+    if (p95DurationMs24h > 1200) {
+        alerts.push({
+            id: "multi-agent-p95-high",
+            level: p95DurationMs24h > 2500 ? "error" : "warning",
+            message: `p95 latency is high (${p95DurationMs24h}ms).`,
+        });
+    }
+    if (budgetMisses24h > 0) {
+        alerts.push({
+            id: "multi-agent-budget-miss",
+            level: budgetMisses24h > 5 ? "error" : "warning",
+            message: `Budget misses in 24h: ${budgetMisses24h}.`,
+        });
+    }
+    if (alerts.length === 0) {
+        alerts.push({
+            id: "multi-agent-healthy",
+            level: "info",
+            message: "Multi-agent pipeline is within current thresholds.",
+        });
+    }
     const recentRuns = multiAgentRuns24h.slice(0, 8).map((row, index) => ({
         id: row.id || `multi-agent-${index + 1}`,
         timeLabel: toTimeLabel(row.created_at),
@@ -539,10 +596,14 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
             totalRuns24h: multiAgentRuns24h.length,
             budgetMisses24h,
             p95DurationMs24h,
+            weeklyRunCount: multiAgentRuns7d.length,
+            weeklyAvgDurationMs,
+            weeklyBudgetMisses,
             modeSplit24h: {
                 fullMesh: fullMeshCount,
                 ring: ringCount,
             },
+            alerts,
             recentRuns,
         },
     };

@@ -364,6 +364,26 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     full-mesh: {dashboardSnapshot.multiAgent.modeSplit24h.fullMesh} · ring: {dashboardSnapshot.multiAgent.modeSplit24h.ring}
                   </p>
                 </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly runs", "Weekly runs")}</p>
+                  <p className="text-lg font-semibold text-violet-50">{dashboardSnapshot.multiAgent.weeklyRunCount}</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly avg latency", "Weekly avg latency")}</p>
+                  <p className="text-lg font-semibold text-cyan-200">{dashboardSnapshot.multiAgent.weeklyAvgDurationMs}ms</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly budget misses", "Weekly budget misses")}</p>
+                  <p className="text-lg font-semibold text-amber-200">{dashboardSnapshot.multiAgent.weeklyBudgetMisses}</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Report", "Report")}</p>
+                  <Button asChild variant="outline" className="mt-1 h-8 border-white/15 bg-white/[0.02] text-xs hover:bg-white/[0.06]">
+                    <Link href="/api/admin/multi-agent/weekly-export">
+                      {tr(locale, "Export weekly CSV", "Export weekly CSV")}
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -392,6 +412,29 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardContent>
             </Card>
           </div>
+          <Card className="mt-4 border-white/10 bg-indigo-900/70">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base text-violet-50">
+                {tr(locale, "Auto alerts", "Auto alerts")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {dashboardSnapshot.multiAgent.alerts.map((alert) => (
+                <div
+                  key={alert.id}
+                  className={`rounded-md border px-3 py-2 text-sm ${
+                    alert.level === "error"
+                      ? "border-rose-400/35 bg-rose-500/10 text-rose-200"
+                      : alert.level === "warning"
+                        ? "border-amber-400/35 bg-amber-500/10 text-amber-200"
+                        : "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
+                  }`}
+                >
+                  {tr(locale, alert.message, alert.message)}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </PageSection>
 
         <PageSection>
