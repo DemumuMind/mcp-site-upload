@@ -158,7 +158,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
 
         <div className="border-t border-blacksmith px-4 py-4">
           <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Auth type", "Auth type")}
+            {tr(localeFromContext, "Auth model", "Auth model")}
           </h3>
           <div className="space-y-1">
             {props.authTypeOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">

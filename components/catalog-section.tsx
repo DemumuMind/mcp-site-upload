@@ -84,17 +84,17 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
     const authTypeOptions = useMemo<AuthTypeOption[]>(() => [
         {
             value: "none",
-            label: tr(locale, "Free", "Free"),
+            label: tr(locale, "No auth", "No auth"),
             count: result.facets.authTypeCounts.none,
         },
         {
             value: "oauth",
-            label: tr(locale, "Freemium", "Freemium"),
+            label: tr(locale, "OAuth", "OAuth"),
             count: result.facets.authTypeCounts.oauth,
         },
         {
             value: "api_key",
-            label: tr(locale, "Paid", "Paid"),
+            label: tr(locale, "API key", "API key"),
             count: result.facets.authTypeCounts.api_key,
         },
     ], [locale, result.facets.authTypeCounts.api_key, result.facets.authTypeCounts.none, result.facets.authTypeCounts.oauth]);
@@ -149,7 +149,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         result.facets.healthCounts.unknown,
     ]);
     const activeFilterCount = queryState.categories.length +
-        queryState.pricing.length +
+        queryState.auth.length +
         queryState.tags.length +
         queryState.verification.length +
         queryState.health.length +
@@ -220,7 +220,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
     function handleToggleAuthType(authType: AuthType) {
         commitQuery({
             page: 1,
-            pricing: toggleListValue(queryState.pricing, authType),
+            auth: toggleListValue(queryState.auth, authType),
         });
     }
     function handleToggleVerificationLevel(value: VerificationLevel) {
@@ -259,7 +259,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
             page: 1,
             query: "",
             categories: [],
-            pricing: [],
+            auth: [],
             tags: [],
             verification: [],
             health: [],
@@ -267,7 +267,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
             toolsMax: null,
         });
     }
-    function applyQuickFilter(type: "official" | "healthy" | "free") {
+    function applyQuickFilter(type: "official" | "healthy" | "no_auth") {
         if (type === "official") {
             commitQuery({
                 page: 1,
@@ -284,7 +284,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         }
         commitQuery({
             page: 1,
-            pricing: queryState.pricing.includes("none") ? [] : ["none"],
+            auth: queryState.auth.includes("none") ? [] : ["none"],
         });
     }
     function setCatalogPage(pageNumber: number) {
@@ -309,12 +309,12 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
             onRemove: () => handleToggleCategory(category),
         });
     });
-    queryState.pricing.forEach((pricing) => {
-        const option = authTypeOptions.find((item) => item.value === pricing);
+    queryState.auth.forEach((authType) => {
+        const option = authTypeOptions.find((item) => item.value === authType);
         activeFilterChips.push({
-            key: `pricing-${pricing}`,
-            label: `${tr(locale, "Pricing", "Pricing")}: ${option?.label ?? pricing}`,
-            onRemove: () => handleToggleAuthType(pricing),
+            key: `auth-${authType}`,
+            label: `${tr(locale, "Auth", "Auth")}: ${option?.label ?? authType}`,
+            onRemove: () => handleToggleAuthType(authType),
         });
     });
     queryState.verification.forEach((verification) => {
@@ -462,8 +462,8 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("healthy")}>
           {tr(locale, "Healthy only", "Healthy only")}
         </Button>
-        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("free")}>
-          {tr(locale, "Free only", "Free only")}
+        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("no_auth")}>
+          {tr(locale, "No auth only", "No auth only")}
         </Button>
       </div>
 
@@ -487,12 +487,12 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       {isMobileFiltersOpen ? (<>
           <button type="button" className="fixed inset-0 z-40 bg-card backdrop-blur-[1.5px] lg:hidden" onClick={() => setIsMobileFiltersOpen(false)} aria-label={tr(locale, "Close filters", "Close filters")}/>
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm p-3 lg:hidden">
-            <CatalogTaxonomyPanel mode="filters" panelId="catalog-mobile-filters" className="h-full overflow-y-auto" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.pricing} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters} onRequestClose={() => setIsMobileFiltersOpen(false)}/>
+            <CatalogTaxonomyPanel mode="filters" panelId="catalog-mobile-filters" className="h-full overflow-y-auto" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.auth} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters} onRequestClose={() => setIsMobileFiltersOpen(false)}/>
           </div>
         </>) : null}
 
       <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-        <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.pricing} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters}/>
+        <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.auth} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters}/>
 
         <div>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blacksmith bg-card p-2.5">

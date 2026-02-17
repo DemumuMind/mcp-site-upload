@@ -40,7 +40,7 @@ export type CatalogQueryV2 = {
     pageSize: number;
     query: string;
     categories: string[];
-    pricing: AuthType[];
+    auth: AuthType[];
     tags: string[];
     verification: VerificationLevel[];
     health: HealthStatus[];

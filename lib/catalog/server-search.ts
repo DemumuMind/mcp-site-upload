@@ -9,7 +9,7 @@ export function runCatalogSearch(servers: McpServer[], queryInput: Partial<Catal
     const filteredServers = filterCatalogServers(servers, {
         searchQuery: query.query,
         selectedCategories: query.categories,
-        selectedAuthTypes: query.pricing,
+        selectedAuthTypes: query.auth,
         selectedTags: query.tags,
         selectedVerificationLevels: query.verification,
         selectedHealthStatuses: query.health,

@@ -91,7 +91,7 @@ export function normalizeCatalogQueryV2(value: Partial<CatalogQueryV2>): Catalog
         : defaultPageSize;
     const query = (value.query ?? "").trim();
     const categories = uniqueSorted(value.categories ?? []);
-    const pricing = parseAuthTypes(value.pricing ?? []);
+    const auth = parseAuthTypes(value.auth ?? []);
     const tags = uniqueSorted(value.tags ?? []);
     const verification = parseVerificationLevels(value.verification ?? []);
     const health = parseHealthStatuses(value.health ?? []);
@@ -109,7 +109,7 @@ export function normalizeCatalogQueryV2(value: Partial<CatalogQueryV2>): Catalog
         pageSize,
         query,
         categories,
-        pricing,
+        auth,
         tags,
         verification,
         health,
@@ -126,7 +126,10 @@ export function parseCatalogQueryV2(params: QueryParamsReader): CatalogQueryV2 {
         pageSize: parsePageSize(params.get("pageSize")),
         query: params.get("query") ?? "",
         categories: parseArrayParam(params, "category"),
-        pricing: parseAuthTypes(parseArrayParam(params, "pricing")),
+        auth: parseAuthTypes([
+            ...parseArrayParam(params, "auth"),
+            ...parseArrayParam(params, "pricing"),
+        ]),
         tags: parseArrayParam(params, "tag"),
         verification: parseVerificationLevels(parseArrayParam(params, "verification")),
         health: parseHealthStatuses(parseArrayParam(params, "health")),
@@ -152,8 +155,8 @@ export function buildCatalogQueryV2SearchParams(value: CatalogQueryV2): URLSearc
     query.categories.forEach((category) => {
         params.append("category", category);
     });
-    query.pricing.forEach((pricing) => {
-        params.append("pricing", pricing);
+    query.auth.forEach((authType) => {
+        params.append("auth", authType);
     });
     query.tags.forEach((tag) => {
         params.append("tag", tag);
