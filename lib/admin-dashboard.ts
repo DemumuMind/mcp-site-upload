@@ -65,6 +65,24 @@ export type AdminDashboardSnapshot = {
         sortBy: "created_at" | "event_type" | "email" | "ip_address";
         sortOrder: "asc" | "desc";
     };
+    multiAgent: {
+        totalRuns24h: number;
+        budgetMisses24h: number;
+        p95DurationMs24h: number;
+        modeSplit24h: {
+            fullMesh: number;
+            ring: number;
+        };
+        recentRuns: Array<{
+            id: string;
+            timeLabel: string;
+            occurredAt?: string;
+            coordinationMode: "full-mesh" | "ring";
+            durationMs: number;
+            estimatedTokens: number;
+            withinBudget: boolean;
+        }>;
+    };
 };
 export type AdminSecurityFilters = {
     eventType?: string;
@@ -119,6 +137,14 @@ type AuthSecurityEventRow = {
     user_id: string | null;
     email: string | null;
     ip_address: string | null;
+};
+type MultiAgentRunRow = {
+    id: string;
+    created_at: string | null;
+    coordination_mode: string | null;
+    duration_ms: number | null;
+    estimated_tokens: number | null;
+    within_budget: boolean | null;
 };
 const DEFAULT_SETTINGS: AdminDashboardSettings = {
     statusUpdateIntervalSec: 5,
@@ -281,6 +307,7 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
     let failedLast24h = 0;
     let rateLimitedLast24h = 0;
     let totalSecurityEvents = 0;
+    let multiAgentRuns24h: MultiAgentRunRow[] = [];
     const securityPageSize = Math.max(10, Math.min(filters?.pageSize ?? 50, 200));
     const securityPage = Math.max(filters?.page ?? 1, 1);
     const securitySortBy = filters?.sortBy ?? "created_at";
@@ -424,6 +451,20 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
             rateLimitedLast24h = rateLimitedCountResult.count ?? 0;
         }
     }
+    // Pull multi-agent rows separately to keep compatibility when the table is absent on older envs.
+    if (adminClient) {
+        const since24hIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data: multiAgentData } = await adminClient
+            .from("multi_agent_pipeline_runs")
+            .select("id, created_at, coordination_mode, duration_ms, estimated_tokens, within_budget")
+            .gte("created_at", since24hIso)
+            .order("created_at", { ascending: false })
+            .limit(50)
+            .returns<MultiAgentRunRow[]>();
+        if (multiAgentData?.length) {
+            multiAgentRuns24h = multiAgentData;
+        }
+    }
     if (requestDistribution.length === 0) {
         const fallbackTotal = DEFAULT_DISTRIBUTION_BASE.reduce((accumulator, row) => accumulator + row.requestCount, 0);
         requestDistribution = DEFAULT_DISTRIBUTION_BASE.map((row) => ({
@@ -449,6 +490,25 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
         }));
         latestEvents = generatedEvents.length > 0 ? generatedEvents : DEFAULT_EVENTS_BASE;
     }
+    const runDurations = multiAgentRuns24h
+        .map((row) => toFiniteNonNegativeInt(row.duration_ms, 0))
+        .filter((value) => value > 0)
+        .sort((left, right) => left - right);
+    const p95DurationMs24h = runDurations.length === 0
+        ? 0
+        : runDurations[Math.min(runDurations.length - 1, Math.floor(runDurations.length * 0.95))];
+    const fullMeshCount = multiAgentRuns24h.filter((row) => row.coordination_mode === "full-mesh").length;
+    const ringCount = multiAgentRuns24h.filter((row) => row.coordination_mode === "ring").length;
+    const budgetMisses24h = multiAgentRuns24h.filter((row) => row.within_budget === false).length;
+    const recentRuns = multiAgentRuns24h.slice(0, 8).map((row, index) => ({
+        id: row.id || `multi-agent-${index + 1}`,
+        timeLabel: toTimeLabel(row.created_at),
+        occurredAt: row.created_at ?? undefined,
+        coordinationMode: (row.coordination_mode === "ring" ? "ring" : "full-mesh") as "full-mesh" | "ring",
+        durationMs: toFiniteNonNegativeInt(row.duration_ms, 0),
+        estimatedTokens: toFiniteNonNegativeInt(row.estimated_tokens, 0),
+        withinBudget: row.within_budget !== false,
+    }));
     return {
         overview: {
             activeServers: activeServerCount,
@@ -474,6 +534,16 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
             totalPages: Math.max(1, Math.ceil(totalSecurityEvents / securityPageSize)),
             sortBy: securitySortBy,
             sortOrder: securitySortOrder,
+        },
+        multiAgent: {
+            totalRuns24h: multiAgentRuns24h.length,
+            budgetMisses24h,
+            p95DurationMs24h,
+            modeSplit24h: {
+                fullMesh: fullMeshCount,
+                ring: ringCount,
+            },
+            recentRuns,
         },
     };
 }

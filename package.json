@@ -17,6 +17,8 @@
     "catalog:new": "node scripts/catalog-new-entry.mjs",
     "catalog:registry:stats": "node scripts/catalog-registry-stats.mjs",
     "catalog:count:guard": "node scripts/catalog-count-guard.mjs",
+    "verify:dashboard:metrics": "node scripts/verify-dashboard-metrics.mjs",
+    "profile:multi-agent": "node scripts/profile-multi-agent.mjs",
     "git:scope-status": "node scripts/git-scope-status.mjs",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "test": "node scripts/run-playwright.mjs",

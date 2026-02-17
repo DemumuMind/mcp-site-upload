@@ -44,7 +44,14 @@ export type PipelineLogEntry = z.infer<typeof pipelineLogEntrySchema>;
 
 export const pipelineResultSchema = z.object({
   input: pipelineInputSchema,
-  initialOutputs: z.record(workerRoleSchema, agentMessageSchema),
+  initialOutputs: z
+    .record(z.string(), agentMessageSchema)
+    .refine((value) => Object.keys(value).length > 0, {
+      message: "initialOutputs must include at least one worker output",
+    })
+    .refine((value) => Object.keys(value).every((key) => workerRoleSchema.options.includes(key as WorkerRole)), {
+      message: "initialOutputs keys must be valid worker roles",
+    }),
   feedback: z.array(feedbackMessageSchema),
   coordinatorSummary: z.string().trim().min(1),
   logs: z.array(pipelineLogEntrySchema),

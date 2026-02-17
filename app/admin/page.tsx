@@ -342,6 +342,63 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <Card className="border-white/10 bg-indigo-900/70">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base text-violet-50">
+                  {tr(locale, "Multi-agent performance (24h)", "Multi-agent performance (24h)")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Runs", "Runs")}</p>
+                  <p className="text-lg font-semibold text-violet-50">{dashboardSnapshot.multiAgent.totalRuns24h}</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">p95</p>
+                  <p className="text-lg font-semibold text-cyan-200">{dashboardSnapshot.multiAgent.p95DurationMs24h}ms</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Budget misses", "Budget misses")}</p>
+                  <p className="text-lg font-semibold text-amber-200">{dashboardSnapshot.multiAgent.budgetMisses24h}</p>
+                </div>
+                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Mode split", "Mode split")}</p>
+                  <p className="text-sm font-medium text-violet-100">
+                    full-mesh: {dashboardSnapshot.multiAgent.modeSplit24h.fullMesh} · ring: {dashboardSnapshot.multiAgent.modeSplit24h.ring}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-white/10 bg-indigo-900/70">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-violet-50">
+                  {tr(locale, "Recent multi-agent runs", "Recent multi-agent runs")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {dashboardSnapshot.multiAgent.recentRuns.length === 0 ? (
+                  <p className="text-sm text-violet-300">{tr(locale, "No recent runs yet.", "No recent runs yet.")}</p>
+                ) : (
+                  dashboardSnapshot.multiAgent.recentRuns.map((run) => (
+                    <div key={run.id} className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2 text-xs">
+                      <span className="font-mono text-violet-300">{run.timeLabel}</span>
+                      <span className="text-violet-100">{run.coordinationMode}</span>
+                      <span className="text-cyan-200">{run.durationMs}ms</span>
+                      <span className="text-violet-200">{run.estimatedTokens} tok</span>
+                      <span className={run.withinBudget ? "text-emerald-200" : "text-amber-200"}>
+                        {run.withinBudget ? tr(locale, "within budget", "within budget") : tr(locale, "over budget", "over budget")}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </PageSection>
+
+        <PageSection>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="border-white/10 bg-indigo-900/70">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-violet-50">
                   {tr(locale, "Request distribution by servers", "Request distribution by servers")}
                 </CardTitle>
               </CardHeader>

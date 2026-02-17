@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { runMultiAgentPipeline } from "@/lib/multi-agent/pipeline";
+import { persistMultiAgentTelemetry } from "@/lib/multi-agent/telemetry";
+import type { MultiAgentPipelineResult } from "@/lib/multi-agent/types";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +38,13 @@ function isAuthorized(request: NextRequest): boolean {
   return auth === `Bearer ${secret}`;
 }
 
+function isPipelineResult(value: unknown): value is MultiAgentPipelineResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  return "metrics" in value && "budget" in value;
+}
+
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const startedAt = Date.now();
@@ -69,13 +78,31 @@ export async function POST(request: NextRequest) {
           ? result.logs
           : [];
 
+    const durationMs = Date.now() - startedAt;
+
+    if (isPipelineResult(result)) {
+      try {
+        await persistMultiAgentTelemetry({
+          requestId,
+          durationMs,
+          pipeline: result,
+        });
+      } catch (telemetryError) {
+        const telemetryMessage = telemetryError instanceof Error ? telemetryError.message : "Unknown telemetry error";
+        console.error("multi_agent.demo.telemetry_error", {
+          requestId,
+          message: telemetryMessage,
+        });
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       result,
       log,
       requestId,
       meta: {
-        durationMs: Date.now() - startedAt,
+        durationMs,
       },
     });
   } catch (error) {

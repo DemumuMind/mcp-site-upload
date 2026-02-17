@@ -2773,3 +2773,37 @@ ext.config with llowedDevOrigins if warning suppression is desired for dev-mode
   - Repository currently contains many pre-existing unrelated modified/untracked files; commit should be scoped carefully to redesign files only.
 - Follow-up (2026-02-16): extended Blacksmith-style pass across remaining public-facing routes/components (about/contact/discord/submit-server/terms/mcp/categories/not-found/error/server page/legacy blog + blog topic filter + auth panels) by replacing legacy indigo-violet utility usage with the new blacksmith tokenized classes.
 - Re-verified after this pass: `npm run check:utf8:strict` -> pass, `npm run lint` -> pass, `npm run build` -> pass.
+
+## Latest Update (2026-02-17, Multi-agent Phase 3 complete: telemetry + SLO + soak + admin view)
+- Objective: complete Phase 3 end-to-end (persistent telemetry, alert routing, load soak baseline, admin dashboard visibility, rollout execution).
+- Status: completed.
+- Touched files:
+  - `supabase/migrations/20260217120000_multi_agent_pipeline_runs.sql`
+  - `lib/multi-agent/telemetry.ts` (new)
+  - `app/api/multi-agent/demo/route.ts`
+  - `lib/multi-agent/pipeline.ts`
+  - `lib/multi-agent/types.ts`
+  - `scripts/profile-multi-agent.mjs` (new)
+  - `package.json`
+  - `lib/admin-dashboard.ts`
+  - `app/admin/page.tsx`
+  - `.env.example`
+  - `README.md`
+- Implemented:
+  - Added durable telemetry table `public.multi_agent_pipeline_runs` with indices + RLS policy.
+  - Persisted multi-agent run metrics from `/api/multi-agent/demo` to Supabase.
+  - Added SLO warning logic (duration/retries/budget) into `admin_system_events`.
+  - Added optional webhook fanout for SLO warnings via `MULTI_AGENT_ALERT_WEBHOOK_URL`.
+  - Added adaptive orchestration feature flag `MULTI_AGENT_ADAPTIVE_ENABLED`.
+  - Added load profile runner `npm run profile:multi-agent`.
+  - Added admin dashboard section for multi-agent trends (24h runs, p95, budget misses, mode split, recent runs list).
+- Executed rollout command:
+  - `supabase db push --linked --yes` -> pass (remote migration applied, including `20260217120000_multi_agent_pipeline_runs.sql`).
+- Verification commands and outcomes:
+  - `npm run lint` -> pass
+  - `npm run build` -> pass
+  - `npm run test:e2e -- tests/multi-agent-demo.spec.ts` -> pass
+  - `MULTI_AGENT_PROFILE_ROUNDS=120 npm run profile:multi-agent` -> pass (`failures=0`, `p50=132ms`, `p95=296ms`, `p99=485ms`)
+- Notes:
+  - `.env` was normalized to UTF-8 without BOM to unblock Supabase CLI parsing.
+  - Profile baseline was taken against local server `http://127.0.0.1:3101`.

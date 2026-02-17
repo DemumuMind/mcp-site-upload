@@ -12,6 +12,9 @@ Community-curated catalog of MCP (Model Context Protocol) servers with:
 - server detail pages with SEO metadata
 - scheduled health checks and status indicators
 
+## Engineering Policies
+- Branch protection policy: [`docs/branch-protection.md`](docs/branch-protection.md)
+
 ## Tech Stack
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS + shadcn/ui + Lucide icons
@@ -75,6 +78,10 @@ Detailed env management guide: [`docs/environment-variables.md`](docs/environmen
 | `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
 | `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to auto-reject noisy entries |
 | `MULTI_AGENT_DEMO_SECRET` | optional (recommended in production) | bearer token for `/api/multi-agent/demo`; if unset, endpoint stays open (use only in trusted environments) |
+| `MULTI_AGENT_ADAPTIVE_ENABLED` | optional | enable adaptive worker/mode selection (`1` default, set `0` for fixed full-mesh) |
+| `MULTI_AGENT_SLO_DURATION_MS` | optional | SLO threshold for total request duration before warning event (default `2500`) |
+| `MULTI_AGENT_SLO_MAX_RETRIES` | optional | max allowed initial-stage retries before warning event (default `0`) |
+| `MULTI_AGENT_ALERT_WEBHOOK_URL` | optional | webhook endpoint for multi-agent SLO warning fanout |
 
 Notes:
 - If Supabase env vars are missing, app falls back to local mock data for public catalog.
@@ -93,6 +100,7 @@ Current key migrations:
 - `20260208194500_user_owned_submissions.sql` - user-owned submissions (`owner_user_id`) + stricter auth submit/read policies
 - `20260210220000_admin_dashboard_analytics.sql` - admin dashboard analytics/settings tables
 - `20260212190000_admin_auth_audit_blog_runs.sql` - admin roles, audit log, blog automation run history
+- `20260217120000_multi_agent_pipeline_runs.sql` - persistent multi-agent telemetry runs table
 
 Apply migrations via Supabase CLI in your environment.
 
@@ -372,6 +380,8 @@ npm run build
 - `npm run check:env:supabase`
   - Verifies that the required Supabase variables are present before running the rest of the suite
 - `npm run test:e2e:auth` (relies on Playwright building and running the app)
+- `npm run profile:multi-agent`
+  - Runs multi-agent load profile summary (configure rounds via `MULTI_AGENT_PROFILE_ROUNDS`)
 
 ### Running Auth E2E Locally
 

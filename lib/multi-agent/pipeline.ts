@@ -15,6 +15,7 @@ const ESTIMATED_COST_PER_1K_TOKENS_USD = 0.0025;
 const MAX_ESTIMATED_TOKENS_BUDGET = 4000;
 const MAX_INITIAL_RETRIES = 2;
 const RETRY_BACKOFF_MS = 40;
+const ADAPTIVE_ORCHESTRATION_ENABLED = process.env.MULTI_AGENT_ADAPTIVE_ENABLED !== "0";
 
 type InitialOutputMap = Record<WorkerRole, { role: WorkerRole; content: string }>;
 
@@ -95,10 +96,10 @@ const createInitialOutputWithRetry = async (
 export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): Promise<MultiAgentPipelineResult> => {
   const pipelineStartedAt = Date.now();
   const input = pipelineInputSchema.parse(rawInput);
-  const activeWorkers = selectActiveWorkers(input);
+  const activeWorkers = ADAPTIVE_ORCHESTRATION_ENABLED ? selectActiveWorkers(input) : [...WORKER_ROLES];
   const plannedFullMeshTokens = estimatePipelineTokens(input, activeWorkers, "full-mesh");
   const coordinationMode: "full-mesh" | "ring" =
-    plannedFullMeshTokens <= MAX_ESTIMATED_TOKENS_BUDGET ? "full-mesh" : "ring";
+    !ADAPTIVE_ORCHESTRATION_ENABLED || plannedFullMeshTokens <= MAX_ESTIMATED_TOKENS_BUDGET ? "full-mesh" : "ring";
   const logs: PipelineLogEntry[] = [];
   const indexRef = { value: 0 };
   const stageDurationsMs = {
