@@ -1,75 +1,47 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-type Spark = {
+type Comet = {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  r: number;
+  len: number;
   alpha: number;
 };
 
-type Ribbon = {
-  baseY: number;
-  amplitude: number;
+type Orb = {
+  radius: number;
   speed: number;
   phase: number;
-  thickness: number;
+  size: number;
   alpha: number;
 };
 
 type IntensityPreset = {
   fps: number;
-  sparkDivisor: number;
-  minSparks: number;
+  comets: number;
+  orbs: number;
   maxDpr: number;
-  ribbons: number;
-  beamSpeed: number;
+  glow: number;
   wrapperHeightClass: string;
 };
 
 const intensityPresets: Record<"low" | "medium" | "epic", IntensityPreset> = {
-  low: {
-    fps: 30,
-    sparkDivisor: 22,
-    minSparks: 34,
-    maxDpr: 1.2,
-    ribbons: 2,
-    beamSpeed: 120,
-    wrapperHeightClass: "h-[820px]",
-  },
-  medium: {
-    fps: 36,
-    sparkDivisor: 18,
-    minSparks: 48,
-    maxDpr: 1.4,
-    ribbons: 3,
-    beamSpeed: 145,
-    wrapperHeightClass: "h-[900px]",
-  },
-  epic: {
-    fps: 60,
-    sparkDivisor: 10,
-    minSparks: 120,
-    maxDpr: 1.6,
-    ribbons: 6,
-    beamSpeed: 240,
-    wrapperHeightClass: "h-[1120px]",
-  },
+  low: { fps: 28, comets: 20, orbs: 3, maxDpr: 1.1, glow: 0.14, wrapperHeightClass: "h-[760px]" },
+  medium: { fps: 36, comets: 32, orbs: 4, maxDpr: 1.35, glow: 0.2, wrapperHeightClass: "h-[900px]" },
+  epic: { fps: 48, comets: 46, orbs: 5, maxDpr: 1.55, glow: 0.26, wrapperHeightClass: "h-[1080px]" },
 };
 
 function getIntensityPreset(value?: string): IntensityPreset {
-  if (value === "low" || value === "medium" || value === "epic") {
-    return intensityPresets[value];
-  }
+  if (value === "low" || value === "medium" || value === "epic") return intensityPresets[value];
   return intensityPresets.epic;
 }
 
 export function HomeCinematicBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const preset = useMemo(() => getIntensityPreset(process.env.NEXT_PUBLIC_HERO_ANIMATION_INTENSITY), []);
+  const preset = getIntensityPreset(process.env.NEXT_PUBLIC_HERO_ANIMATION_INTENSITY);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -77,47 +49,45 @@ export function HomeCinematicBackground() {
     const element = canvas;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
-    const context = ctx;
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+    const ctx = context;
 
-    const sparks: Spark[] = [];
-    const ribbons: Ribbon[] = [];
+    const comets: Comet[] = [];
+    const orbs: Orb[] = [];
 
     let raf = 0;
     let width = 0;
     let height = 0;
     let dpr = 1;
-    let running = true;
     let prevTs = 0;
     let elapsed = 0;
+    let running = true;
 
     const frameStep = 1000 / preset.fps;
 
     function resetScene() {
-      sparks.length = 0;
-      ribbons.length = 0;
+      comets.length = 0;
+      orbs.length = 0;
 
-      const sparkCount = Math.max(preset.minSparks, Math.floor(width / preset.sparkDivisor));
-      for (let i = 0; i < sparkCount; i += 1) {
-        sparks.push({
+      for (let i = 0; i < preset.comets; i += 1) {
+        comets.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.28,
-          vy: -0.12 - Math.random() * 0.34,
-          r: 0.7 + Math.random() * 2.8,
-          alpha: 0.14 + Math.random() * 0.4,
+          vx: 0.2 + Math.random() * 0.55,
+          vy: -0.04 - Math.random() * 0.22,
+          len: 18 + Math.random() * 52,
+          alpha: 0.08 + Math.random() * 0.22,
         });
       }
 
-      for (let i = 0; i < preset.ribbons; i += 1) {
-        ribbons.push({
-          baseY: height * (0.22 + i * 0.15),
-          amplitude: 18 + i * 8,
-          speed: 0.28 + i * 0.06,
+      for (let i = 0; i < preset.orbs; i += 1) {
+        orbs.push({
+          radius: width * (0.14 + i * 0.07),
+          speed: 0.18 + i * 0.06,
           phase: Math.random() * Math.PI * 2,
-          thickness: 1.2 + i * 0.4,
-          alpha: 0.08 + i * 0.02,
+          size: 26 + i * 7,
+          alpha: 0.14 + i * 0.03,
         });
       }
     }
@@ -130,65 +100,69 @@ export function HomeCinematicBackground() {
 
       element.width = Math.max(1, Math.floor(width * dpr));
       element.height = Math.max(1, Math.floor(height * dpr));
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       resetScene();
     }
 
     function drawBackdrop(timeSec: number) {
-      const grad = context.createRadialGradient(width * 0.5, height * 0.22, 40, width * 0.5, height * 0.22, width * 0.65);
-      grad.addColorStop(0, "rgba(247,201,72,0.26)");
-      grad.addColorStop(0.5, "rgba(247,201,72,0.08)");
-      grad.addColorStop(1, "rgba(247,201,72,0)");
-      context.fillStyle = grad;
-      context.fillRect(0, 0, width, height);
+      const horizon = ctx.createLinearGradient(0, 0, 0, height);
+      horizon.addColorStop(0, "rgba(247,201,72,0.35)");
+      horizon.addColorStop(0.44, "rgba(247,201,72,0.09)");
+      horizon.addColorStop(1, "rgba(247,201,72,0)");
+      ctx.fillStyle = horizon;
+      ctx.fillRect(0, 0, width, height);
 
-      const beamX = ((timeSec * preset.beamSpeed) % (width + 520)) - 260;
-      const beam = context.createLinearGradient(beamX - 200, 0, beamX + 200, 0);
-      beam.addColorStop(0, "rgba(247,201,72,0)");
-      beam.addColorStop(0.48, "rgba(247,201,72,0.14)");
-      beam.addColorStop(0.52, "rgba(255,230,150,0.2)");
-      beam.addColorStop(1, "rgba(247,201,72,0)");
-      context.fillStyle = beam;
-      context.fillRect(0, 0, width, height);
+      const pulse = 0.5 + Math.sin(timeSec * 1.4) * 0.5;
+      const halo = ctx.createRadialGradient(width * 0.5, height * 0.26, 10, width * 0.5, height * 0.26, width * 0.62);
+      halo.addColorStop(0, `rgba(255,220,110,${preset.glow * (0.9 + pulse * 0.4)})`);
+      halo.addColorStop(1, "rgba(247,201,72,0)");
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, width, height);
     }
 
-    function drawRibbons(timeSec: number) {
-      for (const ribbon of ribbons) {
-        context.beginPath();
-        for (let x = 0; x <= width; x += 10) {
-          const wave = Math.sin(x * 0.008 + timeSec * ribbon.speed + ribbon.phase) * ribbon.amplitude;
-          const y = ribbon.baseY + wave;
-          if (x === 0) context.moveTo(x, y);
-          else context.lineTo(x, y);
-        }
+    function drawOrbiters(timeSec: number) {
+      const cx = width * 0.5;
+      const cy = height * 0.36;
 
-        context.strokeStyle = `rgba(247,201,72,${ribbon.alpha})`;
-        context.lineWidth = ribbon.thickness;
-        context.shadowBlur = 14;
-        context.shadowColor = "rgba(247,201,72,0.2)";
-        context.stroke();
+      for (const orb of orbs) {
+        const x = cx + Math.cos(timeSec * orb.speed + orb.phase) * orb.radius;
+        const y = cy + Math.sin(timeSec * orb.speed * 1.1 + orb.phase) * (orb.radius * 0.24);
+
+        const g = ctx.createRadialGradient(x, y, 0, x, y, orb.size);
+        g.addColorStop(0, `rgba(255,225,128,${orb.alpha})`);
+        g.addColorStop(1, "rgba(255,225,128,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, orb.size, 0, Math.PI * 2);
+        ctx.fill();
       }
-
-      context.shadowBlur = 0;
     }
 
-    function drawSparks() {
-      for (const spark of sparks) {
-        spark.x += spark.vx;
-        spark.y += spark.vy;
+    function drawComets() {
+      for (const c of comets) {
+        c.x += c.vx;
+        c.y += c.vy;
 
-        if (spark.y < -12) {
-          spark.y = height + 8;
-          spark.x = Math.random() * width;
+        if (c.x > width + c.len) {
+          c.x = -c.len;
+          c.y = Math.random() * height;
         }
-        if (spark.x < -12) spark.x = width + 12;
-        if (spark.x > width + 12) spark.x = -12;
+        if (c.y < -30) c.y = height + 20;
 
-        context.beginPath();
-        context.fillStyle = `rgba(247,201,72,${spark.alpha})`;
-        context.arc(spark.x, spark.y, spark.r, 0, Math.PI * 2);
-        context.fill();
+        const x2 = c.x - c.len;
+        const y2 = c.y + c.len * 0.18;
+
+        const streak = ctx.createLinearGradient(c.x, c.y, x2, y2);
+        streak.addColorStop(0, `rgba(255,226,132,${c.alpha})`);
+        streak.addColorStop(1, "rgba(255,226,132,0)");
+
+        ctx.strokeStyle = streak;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
       }
     }
 
@@ -206,13 +180,13 @@ export function HomeCinematicBackground() {
       elapsed += delta;
       const timeSec = elapsed / 1000;
 
-      context.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
       drawBackdrop(timeSec);
 
-      context.globalCompositeOperation = "screen";
-      drawRibbons(timeSec);
-      drawSparks();
-      context.globalCompositeOperation = "source-over";
+      ctx.globalCompositeOperation = "screen";
+      drawOrbiters(timeSec);
+      drawComets();
+      ctx.globalCompositeOperation = "source-over";
 
       raf = window.requestAnimationFrame(drawFrame);
     }
@@ -243,7 +217,7 @@ export function HomeCinematicBackground() {
 
   return (
     <div className={`pointer-events-none absolute inset-x-0 top-0 -z-10 overflow-hidden ${preset.wrapperHeightClass}`}>
-      <canvas ref={canvasRef} className="h-full w-full opacity-[0.96] mix-blend-screen" aria-hidden />
+      <canvas ref={canvasRef} className="h-full w-full opacity-[0.98]" aria-hidden />
     </div>
   );
 }
