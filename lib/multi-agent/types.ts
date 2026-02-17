@@ -48,5 +48,21 @@ export const pipelineResultSchema = z.object({
   feedback: z.array(feedbackMessageSchema),
   coordinatorSummary: z.string().trim().min(1),
   logs: z.array(pipelineLogEntrySchema),
+  metrics: z.object({
+    stageDurationsMs: z.object({
+      initial: z.number().nonnegative(),
+      exchange: z.number().nonnegative(),
+      final: z.number().nonnegative(),
+    }),
+    totalDurationMs: z.number().nonnegative(),
+    estimatedTokens: z.number().int().nonnegative(),
+    estimatedCostUsd: z.number().nonnegative(),
+    logEntries: z.number().int().nonnegative(),
+    feedbackCount: z.number().int().nonnegative(),
+  }),
+  budget: z.object({
+    maxEstimatedTokens: z.number().int().positive(),
+    withinBudget: z.boolean(),
+  }),
 });
 export type MultiAgentPipelineResult = z.infer<typeof pipelineResultSchema>;

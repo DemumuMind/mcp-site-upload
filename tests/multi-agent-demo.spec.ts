@@ -41,6 +41,16 @@ test.describe("POST /api/multi-agent/demo", () => {
 
     expect(typeof body.result?.coordinatorSummary).toBe("string");
     expect(body.result.coordinatorSummary.trim().length).toBeGreaterThan(0);
+    expect(body.result?.metrics).toBeTruthy();
+    expect(body.result.metrics.totalDurationMs).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.stageDurationsMs.initial).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.stageDurationsMs.exchange).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.stageDurationsMs.final).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.estimatedTokens).toBeGreaterThan(0);
+    expect(body.result.metrics.estimatedCostUsd).toBeGreaterThanOrEqual(0);
+    expect(body.result?.budget).toBeTruthy();
+    expect(typeof body.result.budget.withinBudget).toBe("boolean");
+    expect(body.result.budget.maxEstimatedTokens).toBeGreaterThan(0);
 
     const coordinatorFinalLog = body.log.find(
       (entry: { from?: string; stage?: string; status?: string; message?: string }) =>

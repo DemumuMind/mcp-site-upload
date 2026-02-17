@@ -6,6 +6,9 @@ const args = ["playwright", "test", ...process.argv.slice(2)];
 
 const env = { ...process.env };
 delete env.NO_COLOR;
+if (env.PLAYWRIGHT_ALLOW_REMOTE !== "1") {
+  delete env.PLAYWRIGHT_BASE_URL;
+}
 
 const child = spawn(command, args, {
   stdio: "inherit",
