@@ -11,11 +11,11 @@ type HeroSectionProps = {
 export function HeroSection({ content }: HeroSectionProps) {
   return (
     <section className="section-shell flex flex-col items-center gap-8 pb-16 pt-18 text-center sm:pb-20 sm:pt-24 lg:pt-28">
-      <Badge className="home-reveal home-delay-0 mx-auto w-fit border-primary/35 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-primary uppercase">
+      <Badge className="anime-intro mx-auto w-fit border-primary/35 bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-primary uppercase">
         {content.eyebrow}
       </Badge>
 
-      <div className="home-reveal home-delay-1 max-w-5xl space-y-6">
+      <div className="anime-intro max-w-5xl space-y-6">
         <h1 className="text-4xl leading-[0.92] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
           {content.titleLead}
           <span className="block text-primary">{content.titleAccent}</span>
@@ -23,8 +23,8 @@ export function HeroSection({ content }: HeroSectionProps) {
         <p className="mx-auto max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl">{content.description}</p>
       </div>
 
-      <div className="home-reveal home-delay-2 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
-        <Button asChild size="lg" className="relative h-12 w-full overflow-hidden rounded-lg px-7 text-sm font-semibold sm:w-auto">
+      <div className="anime-intro flex w-full max-w-xl flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
+        <Button asChild size="lg" className="anime-cta-primary relative h-12 w-full overflow-hidden rounded-lg px-7 text-sm font-semibold sm:w-auto">
           <Link href="/catalog">
             <span className="pointer-events-none absolute inset-0 cta-shimmer opacity-70" aria-hidden />
             {content.primaryCta}
@@ -36,7 +36,7 @@ export function HeroSection({ content }: HeroSectionProps) {
         </Button>
       </div>
 
-      <div className="home-reveal home-delay-3 home-float-slow mx-auto inline-flex max-w-full items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 text-xs text-foreground sm:text-sm shadow-[0_0_0_1px_rgba(247,201,72,0.16)]">
+      <div className="anime-intro home-float-slow mx-auto inline-flex max-w-full items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 text-xs text-foreground sm:text-sm shadow-[0_0_0_1px_rgba(247,201,72,0.16)]">
         <Sparkles className="size-3.5 text-primary" />
         <span className="font-semibold">{content.pulseLabel}</span>
         <span className="text-muted-foreground">— {content.pulseText}</span>
