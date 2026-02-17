@@ -59,6 +59,9 @@ export const pipelineResultSchema = z.object({
     estimatedCostUsd: z.number().nonnegative(),
     logEntries: z.number().int().nonnegative(),
     feedbackCount: z.number().int().nonnegative(),
+    initialRetries: z.number().int().nonnegative(),
+    activeWorkers: z.array(workerRoleSchema).min(1),
+    coordinationMode: z.enum(["full-mesh", "ring"]),
   }),
   budget: z.object({
     maxEstimatedTokens: z.number().int().positive(),

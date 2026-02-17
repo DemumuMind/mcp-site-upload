@@ -48,6 +48,10 @@ test.describe("POST /api/multi-agent/demo", () => {
     expect(body.result.metrics.stageDurationsMs.final).toBeGreaterThanOrEqual(0);
     expect(body.result.metrics.estimatedTokens).toBeGreaterThan(0);
     expect(body.result.metrics.estimatedCostUsd).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.initialRetries).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(body.result.metrics.activeWorkers)).toBe(true);
+    expect(body.result.metrics.activeWorkers.length).toBeGreaterThan(0);
+    expect(["full-mesh", "ring"]).toContain(body.result.metrics.coordinationMode);
     expect(body.result?.budget).toBeTruthy();
     expect(typeof body.result.budget.withinBudget).toBe("boolean");
     expect(body.result.budget.maxEstimatedTokens).toBeGreaterThan(0);
