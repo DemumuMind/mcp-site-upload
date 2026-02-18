@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
-import { getPasswordChecklistItems, getPasswordStrengthColorClass, getPasswordStrengthLabel, getPasswordStrengthTextClass, } from "@/lib/auth/password-ui";
+import { getPasswordChecklistItems, getPasswordStrengthLabel, getPasswordStrengthSegmentClass, getPasswordStrengthTextClass, } from "@/lib/auth/password-ui";
 import { tr, type Locale } from "@/lib/i18n";
 import { getPasswordStrengthScore, PASSWORD_MIN_LENGTH } from "@/lib/password-strength";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -232,9 +232,7 @@ export function AuthResetPasswordPanel() {
             <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             <div className="space-y-1.5">
               <div className="grid grid-cols-4 gap-1">
-              {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < passwordStrengthScore
-                ? getPasswordStrengthColorClass(passwordStrengthScore)
-                : "bg-card"}`}/>))}
+              {[0, 1, 2, 3].map((index) => (<span key={index} className={getPasswordStrengthSegmentClass(passwordStrengthScore, index)}/>))}
             </div>
               <p className={`text-xs ${getPasswordStrengthTextClass(passwordStrengthScore)}`}>
                 {getPasswordStrengthLabel(locale, passwordStrengthScore)}

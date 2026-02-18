@@ -431,6 +431,28 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
             document.body.style.overflow = previousOverflow;
         };
     }, [isMobileFiltersOpen]);
+    const taxonomyPanelCommonProps = {
+        categoryEntries: result.facets.categoryEntries,
+        selectedCategories: queryState.categories,
+        authTypeOptions,
+        selectedAuthTypes: queryState.auth,
+        verificationOptions,
+        selectedVerificationLevels: queryState.verification,
+        healthOptions,
+        selectedHealthStatuses: queryState.health,
+        toolsMin: queryState.toolsMin,
+        toolsMax: queryState.toolsMax,
+        tagEntries: result.facets.tagEntries,
+        selectedTags: queryState.tags,
+        onToggleCategory: handleToggleCategory,
+        onToggleAuthType: handleToggleAuthType,
+        onToggleVerificationLevel: handleToggleVerificationLevel,
+        onToggleHealthStatus: handleToggleHealthStatus,
+        onToolsMinChange: handleToolsMinChange,
+        onToolsMaxChange: handleToolsMaxChange,
+        onToggleTag: handleToggleTag,
+        onClearAll: handleClearAllFilters,
+    };
     return (<div className="space-y-4">
       <div className="sticky top-14 z-30 rounded-2xl border border-blacksmith bg-card/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
         <CatalogFilterBar searchQuery={searchInputValue} sortField={queryState.sortBy} sortDirection={queryState.sortDir} pageSize={queryState.pageSize} viewMode={queryState.layout} activeFilterCount={activeFilterCount} isMobileFiltersOpen={isMobileFiltersOpen} onSearchQueryChange={setSearchInputValue} onSortFieldChange={handleSortFieldChange} onSortDirectionChange={handleSortDirectionChange} onPageSizeChange={handlePageSizeChange} onViewModeChange={handleViewModeChange} onToggleMobileFilters={() => setIsMobileFiltersOpen((current) => !current)}/>
@@ -487,12 +509,12 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
       {isMobileFiltersOpen ? (<>
           <button type="button" className="fixed inset-0 z-40 bg-card backdrop-blur-[1.5px] lg:hidden" onClick={() => setIsMobileFiltersOpen(false)} aria-label={tr(locale, "Close filters", "Close filters")}/>
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm p-3 lg:hidden">
-            <CatalogTaxonomyPanel mode="filters" panelId="catalog-mobile-filters" className="h-full overflow-y-auto" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.auth} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters} onRequestClose={() => setIsMobileFiltersOpen(false)}/>
+            <CatalogTaxonomyPanel mode="filters" panelId="catalog-mobile-filters" className="h-full overflow-y-auto" {...taxonomyPanelCommonProps} onRequestClose={() => setIsMobileFiltersOpen(false)}/>
           </div>
         </>) : null}
 
       <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-        <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" categoryEntries={result.facets.categoryEntries} selectedCategories={queryState.categories} authTypeOptions={authTypeOptions} selectedAuthTypes={queryState.auth} verificationOptions={verificationOptions} selectedVerificationLevels={queryState.verification} healthOptions={healthOptions} selectedHealthStatuses={queryState.health} toolsMin={queryState.toolsMin} toolsMax={queryState.toolsMax} tagEntries={result.facets.tagEntries} selectedTags={queryState.tags} onToggleCategory={handleToggleCategory} onToggleAuthType={handleToggleAuthType} onToggleVerificationLevel={handleToggleVerificationLevel} onToggleHealthStatus={handleToggleHealthStatus} onToolsMinChange={handleToolsMinChange} onToolsMaxChange={handleToolsMaxChange} onToggleTag={handleToggleTag} onClearAll={handleClearAllFilters}/>
+        <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" {...taxonomyPanelCommonProps}/>
 
         <div>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blacksmith bg-card p-2.5">

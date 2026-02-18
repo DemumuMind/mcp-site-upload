@@ -40,6 +40,10 @@ export function getPasswordStrengthTextClass(score: PasswordStrengthScore): stri
   return "text-primary";
 }
 
+export function getPasswordStrengthSegmentClass(score: PasswordStrengthScore, index: number): string {
+  return `h-1.5 rounded-full ${index < score ? getPasswordStrengthColorClass(score) : "bg-card"}`;
+}
+
 export function getPasswordChecklistItems(locale: Locale, password: string) {
   const checks = getPasswordRuleChecks(password);
   return [
