@@ -16,15 +16,14 @@ type SiteFooterProps = {
 };
 
 const footerLinkClass =
-  "inline-flex min-h-11 min-w-11 items-center rounded-sm py-1 text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:min-h-0 sm:py-0";
+  "inline-flex min-h-11 min-w-11 items-center rounded-sm py-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0 sm:py-0";
 
 export function SiteFooter({ locale }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden border-t border-blacksmith bg-[linear-gradient(180deg,rgba(15,18,24,0.97)_0%,rgba(9,11,15,0.99)_100%)]">
-      <div className="pointer-events-none absolute inset-y-0 left-6 w-px bg-gradient-to-b from-transparent via-slate-300/25 to-transparent" aria-hidden />
-      <div className="section-shell relative grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="border-t bg-background">
+      <div className="section-shell grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-5">
           <Link
             href="/"
@@ -46,7 +45,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith bg-[linear-gradient(180deg,rgba(28,32,40,0.82)_0%,rgba(15,17,22,0.92)_100%)] text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border bg-background text-muted-foreground transition-colors hover:text-foreground"
                 aria-label={item.label}
               >
                 <item.icon className="size-4" />
@@ -87,7 +86,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="section-shell relative flex flex-wrap items-center justify-between gap-3 border-t border-blacksmith py-4 text-xs text-muted-foreground before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/10">
+      <div className="section-shell flex flex-wrap items-center justify-between gap-3 border-t py-4 text-xs text-muted-foreground">
         <p>{tr(locale, `(c) ${year} DemumuMind. All rights reserved.`, `(c) ${year} DemumuMind. All rights reserved.`)}</p>
         <p>{tr(locale, "Built for modern AI agent workflows.", "Built for modern AI agent workflows.")}</p>
       </div>

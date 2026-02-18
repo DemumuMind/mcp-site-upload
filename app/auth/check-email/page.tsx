@@ -29,10 +29,11 @@ export default async function AuthCheckEmailPage({ searchParams }: AuthCheckEmai
     const normalizedEmail = typeof email === "string" ? email.trim().slice(0, 254) : "";
     return (<PageFrame variant="content">
       <PageShell className="max-w-5xl px-4 sm:px-6">
-        <PageHero surface="calm" animated={false} badgeTone="violet" eyebrow={tr(locale, "Authentication", "Authentication")} title={tr(locale, "Check your email", "Check your email")} description={tr(locale, "Use the link sent to your inbox to continue.", "Use the link sent to your inbox to continue.")}/>
-        <PageSection surface="calm" className="min-h-[40vh]">
+        <PageHero surface="plain" animated={false} badgeTone="violet" eyebrow={tr(locale, "Authentication", "Authentication")} title={tr(locale, "Check your email", "Check your email")} description={tr(locale, "Use the link sent to your inbox to continue.", "Use the link sent to your inbox to continue.")}/>
+        <PageSection surface="plain" className="min-h-[40vh]">
           <AuthCheckEmailPanel flow={parsedFlow} email={normalizedEmail} nextPath={safeNextPath}/>
         </PageSection>
       </PageShell>
     </PageFrame>);
 }
+

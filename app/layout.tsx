@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { ConsentAnalytics } from "@/components/consent-analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { AuthHashRedirector } from "@/components/auth-hash-redirector";
-import { AnimeRuntimeEffects } from "@/components/anime-runtime-effects";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -16,7 +15,6 @@ import {
   parseCookieConsent,
   parseCookieConsentProfile,
 } from "@/lib/cookie-consent";
-import { isRedesignV2Enabled, isRedesignV3Enabled } from "@/lib/design-flags";
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
 import "./globals.css";
@@ -78,9 +76,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const redesignV3Enabled = isRedesignV3Enabled();
-  const redesignV2Enabled = isRedesignV2Enabled();
-  const theme = redesignV3Enabled ? "industrial-neo" : redesignV2Enabled ? "blacksmith-v2" : "cosmic-burst";
   const locale = await getServerLocale();
   const cookieStore = await cookies();
 
@@ -92,33 +87,13 @@ export default async function RootLayout({
   const initialAnalyticsAllowed = initialProfile?.analytics ?? false;
 
   return (
-    <html lang="en" suppressHydrationWarning className="dark" data-theme={theme} data-scroll-behavior="smooth">
-      <body className="min-h-screen bg-background text-foreground antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body>
         <LocaleProvider locale={locale}>
-          <div className="relative flex min-h-screen flex-col overflow-hidden">
-            {redesignV3Enabled ? (
-              <>
-                <div className="pointer-events-none absolute inset-0 -z-30 bg-industrial-foundation" />
-                <div className="pointer-events-none absolute inset-0 -z-20 industrial-grid" />
-                <div className="pointer-events-none absolute inset-0 -z-10 industrial-vignette" />
-              </>
-            ) : (
-              <>
-                <div className="pointer-events-none absolute inset-0 -z-30 bg-blacksmith-foundation" />
-                <div
-                  data-anime="pulse"
-                  className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(247,201,72,0.18),transparent_42%)]"
-                />
-                <div className="pointer-events-none absolute inset-0 -z-10 hero-grid opacity-50" />
-              </>
-            )}
-
+          <div className="flex min-h-screen flex-col">
             <SiteHeader locale={locale} />
             <AuthHashRedirector />
-            <main data-route-container="true" className="relative z-10 flex-1">
-              {children}
-            </main>
-            <AnimeRuntimeEffects />
+            <main className="flex-1">{children}</main>
             <SiteFooter locale={locale} />
             <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
             <Toaster richColors position="top-right" />

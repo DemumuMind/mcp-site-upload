@@ -8,9 +8,9 @@ function parseEnvBoolean(raw: string | undefined): boolean {
 }
 
 export function isRedesignV2Enabled(): boolean {
-  return parseEnvBoolean(process.env.NEXT_PUBLIC_REDESIGN_V2);
+  return parseEnvBoolean(undefined);
 }
 
 export function isRedesignV3Enabled(): boolean {
-  return parseEnvBoolean(process.env.NEXT_PUBLIC_REDESIGN_V3);
+  return parseEnvBoolean(undefined);
 }

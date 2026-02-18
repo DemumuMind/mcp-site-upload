@@ -1,4 +1,4 @@
-﻿import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 
@@ -8,7 +8,7 @@ type IcpSectionProps = {
 
 export function IcpSection({ content }: IcpSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-black/35">
+    <section className="border-y border-blacksmith bg-background">
       <div className="section-shell flex flex-col gap-8 py-14">
         <div className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
@@ -38,4 +38,5 @@ export function IcpSection({ content }: IcpSectionProps) {
     </section>
   );
 }
+
 

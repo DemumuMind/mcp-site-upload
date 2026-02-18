@@ -41,7 +41,7 @@ export default async function CookieSettingsRoute() {
     <PageFrame variant="content">
       <PageShell className="max-w-7xl gap-6 px-4 sm:px-6 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
         <section className="space-y-4">
-          <PageHero surface="editorial"
+          <PageHero surface="rail"
             animated={false}
             badgeTone="violet"
             eyebrow={tr(locale, "Privacy controls", "Privacy controls")}
@@ -53,7 +53,7 @@ export default async function CookieSettingsRoute() {
             )}
           />
 
-          <PageSection surface="editorial">
+          <PageSection surface="rail">
             <CookieSettingsPage />
           </PageSection>
         </section>
@@ -89,3 +89,4 @@ export default async function CookieSettingsRoute() {
     </PageFrame>
   );
 }
+

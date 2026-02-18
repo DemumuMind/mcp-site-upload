@@ -10,18 +10,18 @@ type PageFrameProps = {
 };
 
 const frameVariantClassName: Record<PageVariant, string> = {
-  default: "bg-transparent",
-  directory: "bg-transparent",
-  ops: "bg-transparent",
-  content: "bg-transparent",
-  marketing: "bg-transparent",
+  default: "",
+  directory: "",
+  ops: "",
+  content: "",
+  marketing: "",
 };
 
 export function PageFrame({ children, variant = "default", className }: PageFrameProps) {
   return (
     <div
       className={cn(
-        "relative min-h-screen overflow-hidden border-t border-blacksmith bg-[radial-gradient(120%_90%_at_100%_-10%,rgba(91,151,255,0.12)_0%,rgba(9,10,13,0)_52%),linear-gradient(180deg,rgba(12,13,17,0.96)_0%,rgba(8,9,12,0.98)_100%)] text-foreground before:pointer-events-none before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-gradient-to-b before:from-transparent before:via-slate-400/25 before:to-transparent after:pointer-events-none after:absolute after:inset-y-0 after:right-4 after:w-px after:bg-gradient-to-b after:from-transparent after:via-slate-400/20 after:to-transparent",
+        "min-h-screen border-t bg-background text-foreground",
         frameVariantClassName[variant],
         className,
       )}
@@ -44,21 +44,17 @@ type PageHeroProps = {
 };
 
 const badgeToneClassName: Record<NonNullable<PageHeroProps["badgeTone"]>, string> = {
-  cyan: "border-primary/40 bg-primary/10 text-primary",
-  emerald: "border-primary/40 bg-primary/10 text-primary",
-  amber: "border-primary/40 bg-primary/10 text-primary",
-  violet: "border-primary/40 bg-primary/10 text-primary",
+  cyan: "border-border bg-muted text-foreground",
+  emerald: "border-border bg-muted text-foreground",
+  amber: "border-border bg-muted text-foreground",
+  violet: "border-border bg-muted text-foreground",
 };
 
 const heroSurfaceClassName: Record<NonNullable<PageHeroProps["surface"]>, string> = {
-  steel:
-    "border-blacksmith bg-[linear-gradient(160deg,rgba(20,24,32,0.95)_0%,rgba(12,14,19,0.98)_100%)] before:bg-gradient-to-b before:via-slate-400/30 after:bg-white/12",
-  mesh:
-    "border-blue-400/25 bg-[radial-gradient(circle_at_12%_18%,rgba(56,189,248,0.18),transparent_35%),linear-gradient(155deg,rgba(13,18,28,0.95)_0%,rgba(9,12,20,0.98)_100%)] before:bg-gradient-to-b before:via-blue-300/40 after:bg-blue-200/20",
-  rail:
-    "border-violet-300/30 bg-[linear-gradient(132deg,rgba(26,20,44,0.88)_0%,rgba(12,14,24,0.97)_52%,rgba(8,9,15,0.99)_100%)] before:bg-gradient-to-b before:via-violet-300/40 after:bg-violet-200/18",
-  plain:
-    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,17,22,0.95)_0%,rgba(10,11,15,0.98)_100%)] before:bg-gradient-to-b before:via-slate-500/20 after:bg-white/8",
+  steel: "border-border bg-card",
+  mesh: "border-border bg-card",
+  rail: "border-border bg-card",
+  plain: "border-border bg-card",
 };
 
 export function PageHero({
@@ -77,7 +73,7 @@ export function PageHero({
       data-anime={animated ? "reveal" : undefined}
       data-anime-delay={animated ? "40" : undefined}
       className={cn(
-        "relative space-y-5 overflow-hidden rounded-3xl border p-6 shadow-[0_30px_60px_-40px_rgba(4,10,21,0.95)] before:pointer-events-none before:absolute before:inset-y-0 before:left-5 before:w-px before:from-transparent before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-px sm:p-8",
+        "space-y-5 rounded-xl border p-6 sm:p-8",
         heroSurfaceClassName[surface],
         className,
       )}
@@ -109,14 +105,10 @@ type PageMetricProps = {
 };
 
 const metricSurfaceClassName: Record<NonNullable<PageMetricProps["surface"]>, string> = {
-  steel:
-    "border-blacksmith bg-[linear-gradient(180deg,rgba(18,21,27,0.95)_0%,rgba(11,13,18,0.97)_100%)] before:bg-gradient-to-b before:via-slate-400/30",
-  mesh:
-    "border-cyan-300/25 bg-[radial-gradient(circle_at_14%_12%,rgba(56,189,248,0.16),transparent_40%),linear-gradient(180deg,rgba(13,18,24,0.95)_0%,rgba(10,12,18,0.97)_100%)] before:bg-gradient-to-b before:via-cyan-200/35",
-  rail:
-    "border-violet-300/25 bg-[linear-gradient(180deg,rgba(22,17,36,0.9)_0%,rgba(11,12,20,0.97)_100%)] before:bg-gradient-to-b before:via-violet-200/35",
-  plain:
-    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,16,21,0.92)_0%,rgba(10,11,16,0.96)_100%)] before:bg-gradient-to-b before:via-slate-500/20",
+  steel: "border-border bg-card",
+  mesh: "border-border bg-card",
+  rail: "border-border bg-card",
+  plain: "border-border bg-card",
 };
 
 export function PageMetric({ label, value, valueClassName, surface = "steel", className, animated = true }: PageMetricProps) {
@@ -125,7 +117,7 @@ export function PageMetric({ label, value, valueClassName, surface = "steel", cl
       data-anime={animated ? "reveal" : undefined}
       data-anime-delay={animated ? "90" : undefined}
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-4 transition-transform duration-300 hover:-translate-y-0.5 before:pointer-events-none before:absolute before:inset-y-0 before:left-3 before:w-px before:from-transparent before:to-transparent",
+        "rounded-lg border p-4",
         metricSurfaceClassName[surface],
         className,
       )}
@@ -143,14 +135,10 @@ type PageSectionProps = {
 };
 
 const sectionSurfaceClassName: Record<NonNullable<PageSectionProps["surface"]>, string> = {
-  steel:
-    "border-blacksmith bg-[linear-gradient(180deg,rgba(17,20,26,0.94)_0%,rgba(10,12,17,0.97)_100%)] before:bg-white/12",
-  mesh:
-    "border-blue-400/25 bg-[radial-gradient(circle_at_86%_18%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(180deg,rgba(13,18,27,0.94)_0%,rgba(9,12,19,0.97)_100%)] before:bg-blue-200/22",
-  rail:
-    "border-violet-300/25 bg-[linear-gradient(180deg,rgba(20,16,34,0.92)_0%,rgba(10,11,19,0.97)_100%)] before:bg-violet-200/20",
-  plain:
-    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,17,22,0.92)_0%,rgba(10,11,16,0.96)_100%)] before:bg-white/8",
+  steel: "border-border bg-card",
+  mesh: "border-border bg-card",
+  rail: "border-border bg-card",
+  plain: "border-border bg-card",
 };
 
 export function PageSection({ children, surface = "steel", className }: PageSectionProps) {
@@ -159,7 +147,7 @@ export function PageSection({ children, surface = "steel", className }: PageSect
       data-anime="reveal"
       data-anime-delay="120"
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px sm:p-6",
+        "rounded-lg border p-5 sm:p-6",
         sectionSurfaceClassName[surface],
         className,
       )}
@@ -184,7 +172,7 @@ type PageActionZoneProps = {
 };
 
 export function PageActionZone({ children, className }: PageActionZoneProps) {
-  return <section className={cn("rounded-2xl border border-primary/30 bg-primary/10 p-4 sm:p-5", className)}>{children}</section>;
+  return <section className={cn("rounded-lg border border-border bg-card p-4 sm:p-5", className)}>{children}</section>;
 }
 
 

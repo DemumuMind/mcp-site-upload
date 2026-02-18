@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { HomeContent } from "@/lib/home/content";
@@ -18,9 +18,8 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
         </h3>
         <p className="max-w-2xl text-lg text-muted-foreground">{content.description}</p>
         <div className="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-          <Button asChild size="lg" className="relative h-12 w-full overflow-hidden rounded-lg px-8 sm:w-auto">
+          <Button asChild size="lg" className="h-12 w-full rounded-lg px-8 sm:w-auto">
             <Link href="/catalog">
-              <span data-anime="shimmer" className="pointer-events-none absolute inset-0 opacity-70" aria-hidden />
               {content.primaryCta}
             </Link>
           </Button>
@@ -32,4 +31,6 @@ export function FinalCtaSection({ content }: FinalCtaSectionProps) {
     </section>
   );
 }
+
+
 

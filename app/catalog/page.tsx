@@ -22,7 +22,7 @@ export default async function CatalogPage() {
     const catalogSnapshot = await getCatalogSnapshot();
     return (<PageFrame variant="directory">
       <div className="section-shell flex flex-col gap-5 py-8 sm:py-12">
-        <PageHero surface="mixed" animated={false} className="space-y-4 p-5 sm:p-7" badgeTone="cyan" eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Directory Control Center")} title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Find Trusted MCP Servers Faster")} description={sectionCopy?.heroDescription ??
+        <PageHero surface="mesh" animated={false} className="space-y-4 p-5 sm:p-7" badgeTone="cyan" eyebrow={sectionCopy?.eyebrow ?? tr(locale, "Directory Control Center", "Directory Control Center")} title={sectionCopy?.heroTitle ?? tr(locale, "Find Trusted MCP Servers Faster", "Find Trusted MCP Servers Faster")} description={sectionCopy?.heroDescription ??
             tr(locale, "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.", "Search by category, auth model, and capability tags. Compare candidates side-by-side and move to integration with less rework.")} actions={<>
             <Button asChild className="h-10 rounded-lg px-5">
                 <Link href="/submit-server">{tr(locale, "Submit server", "Submit server")}</Link>
@@ -31,12 +31,13 @@ export default async function CatalogPage() {
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
               </Button>
             </>} metrics={<>
-              <PageMetric surface="mixed" animated={false} label={tr(locale, "Active servers", "Active servers")} value={catalogSnapshot.totalServers}/>
-              <PageMetric surface="mixed" animated={false} label={tr(locale, "Published tools", "Published tools")} value={catalogSnapshot.totalTools}/>
-              <PageMetric surface="mixed" animated={false} label={tr(locale, "Categories", "Categories")} value={catalogSnapshot.totalCategories}/>
-              <PageMetric surface="mixed" animated={false} label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-primary"/>
+              <PageMetric surface="mesh" animated={false} label={tr(locale, "Active servers", "Active servers")} value={catalogSnapshot.totalServers}/>
+              <PageMetric surface="mesh" animated={false} label={tr(locale, "Published tools", "Published tools")} value={catalogSnapshot.totalTools}/>
+              <PageMetric surface="mesh" animated={false} label={tr(locale, "Categories", "Categories")} value={catalogSnapshot.totalCategories}/>
+              <PageMetric surface="mesh" animated={false} label={tr(locale, "Featured", "Featured")} value={catalogSnapshot.featuredServers.length} valueClassName="text-primary"/>
             </>}/>
         <CatalogSection initialServers={catalogSnapshot.servers}/>
       </div>
     </PageFrame>);
 }
+

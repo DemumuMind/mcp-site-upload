@@ -45,8 +45,8 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
             : tr(locale, "Current mode: token only.", "Current mode: token only.");
     return (<PageFrame variant="ops">
       <PageShell className="max-w-md px-4">
-        <PageHero surface="strict" animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Admin access", "Admin access")} description={tr(locale, "Use your admin role or emergency token to open moderation dashboard.", "Use your admin role or emergency token to open moderation dashboard.")}/>
-        <PageSection surface="strict" className="bg-indigo-900/70">
+        <PageHero surface="plain" animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Admin access", "Admin access")} description={tr(locale, "Use your admin role or emergency token to open moderation dashboard.", "Use your admin role or emergency token to open moderation dashboard.")}/>
+        <PageSection surface="plain" className="bg-indigo-900/70">
         <h1 className="text-xl font-semibold text-violet-50">
           {tr(locale, "Admin access", "Admin access")}
         </h1>
@@ -97,3 +97,4 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
       </PageShell>
     </PageFrame>);
 }
+

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
@@ -18,7 +18,7 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
 
         <div className="grid gap-4 md:grid-cols-2">
           {content.cards.map((item) => (
-            <Card key={item.title} className="group transition hover:-translate-y-0.5 hover:border-primary/35">
+            <Card key={item.title}>
               <CardHeader className="space-y-4 pb-3">
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
@@ -29,7 +29,7 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
                 <p>{item.description}</p>
-                <Link href={item.href} className={`inline-flex items-center gap-2 text-sm font-medium ${item.accentClass} transition group-hover:translate-x-0.5`}>
+                <Link href={item.href} className={`inline-flex items-center gap-2 text-sm font-medium ${item.accentClass}`}>
                   {item.cta}
                   <ArrowRight className="size-4" />
                 </Link>
@@ -41,4 +41,5 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
     </section>
   );
 }
+
 
