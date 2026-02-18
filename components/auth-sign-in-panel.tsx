@@ -130,6 +130,23 @@ function OAuthProviderButton({ provider, pendingOAuthProvider, isEmailPending, o
       <span>{label}</span>
     </Button>);
 }
+function AuthHeroIntro({ locale, description }: {
+    locale: Locale;
+    description: string;
+}) {
+    return (<>
+      <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
+        {tr(locale, "Secure access", "Secure access")}
+      </span>
+
+      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
+      </h1>
+      <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
+        {description}
+      </p>
+    </>);
+}
 async function runLoginSecurityPrecheck(email: string): Promise<SecurityPrecheckResult | null> {
     try {
         const response = await fetch("/api/auth/security", {
@@ -413,15 +430,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
         return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
-          <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
-            {tr(locale, "Secure access", "Secure access")}
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
-            {tr(locale, "Loading sign-in panelвЂ¦", "Loading sign-in panelвЂ¦")}
-          </p>
+          <AuthHeroIntro locale={locale} description={tr(locale, "Loading sign-in panelвЂ¦", "Loading sign-in panelвЂ¦")}/>
         </div>
       </section>);
     }
@@ -461,16 +470,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
     return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
-        <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
-          {tr(locale, "Secure access", "Secure access")}
-        </span>
-
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          {tr(locale, "Welcome to DemumuMind MCP", "Welcome to DemumuMind MCP")}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/85 sm:text-base">
-          {tr(locale, "Sign in to submit MCP servers and manage your integrations.", "Sign in to submit MCP servers and manage your integrations.")}
-        </p>
+        <AuthHeroIntro locale={locale} description={tr(locale, "Sign in to submit MCP servers and manage your integrations.", "Sign in to submit MCP servers and manage your integrations.")}/>
 
         {callbackErrorMessage ? (<p className="mt-5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100">
             {callbackErrorMessage}
