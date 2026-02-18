@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
+import { AuthStatusCard } from "@/components/auth-status-card";
 import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -149,40 +150,17 @@ export function AuthResetPasswordPanel() {
         toast.success(tr(locale, "Password updated.", "Password updated."));
     }
     if (!isConfigured) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-card p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent"/>
-        <div className="relative">
-          <h1 className="text-2xl font-semibold text-amber-100">
-            {tr(locale, "Auth is not configured", "Auth is not configured")}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-amber-50/85">
-            {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.")}
-          </p>
-          <Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-primary-foreground hover:bg-amber-200">
-            <Link href="/auth">{tr(locale, "Open login page", "Open login page")}</Link>
-          </Button>
-        </div>
-      </div>);
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-amber-300/35 bg-card shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)]" topBorderClassName="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" title={tr(locale, "Auth is not configured", "Auth is not configured")} titleClassName="text-2xl font-semibold text-amber-100" message={tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to reset passwords.")} messageClassName="mt-2 max-w-2xl text-sm text-amber-50/85" action={<Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-primary-foreground hover:bg-amber-200">
+              <Link href="/auth">{tr(locale, "Open login page", "Open login page")}</Link>
+            </Button>}/>);
     }
     if (isLoading || isRecoveryInitializing) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
-        <p className="text-sm text-muted-foreground">
-          {tr(locale, "Checking recovery session...", "Checking recovery session...")}
-        </p>
-      </div>);
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-blacksmith bg-card shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)]" title={tr(locale, "Checking recovery session...", "Checking recovery session...")} titleClassName="text-sm font-normal text-muted-foreground"/>);
     }
     if (!user) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
-        <h1 className="text-2xl font-semibold text-foreground">
-          {tr(locale, "Recovery session is missing", "Recovery session is missing")}
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {tr(locale, "Open the reset link from your email first, or request a new reset email on the login page.", "Open the reset link from your email first, or request a new reset email on the login page.")}
-        </p>
-        <Button asChild className="mt-6 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
-          <Link href="/auth">{tr(locale, "Back to login", "Back to login")}</Link>
-        </Button>
-      </div>);
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-blacksmith bg-card shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)]" title={tr(locale, "Recovery session is missing", "Recovery session is missing")} message={tr(locale, "Open the reset link from your email first, or request a new reset email on the login page.", "Open the reset link from your email first, or request a new reset email on the login page.")} messageClassName="mt-3 text-sm text-muted-foreground" action={<Button asChild className="mt-6 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
+              <Link href="/auth">{tr(locale, "Back to login", "Back to login")}</Link>
+            </Button>}/>);
     }
     if (isCompleted) {
         return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
@@ -256,4 +234,3 @@ export function AuthResetPasswordPanel() {
       </div>
     </section>);
 }
-

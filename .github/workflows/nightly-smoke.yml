@@ -18,6 +18,11 @@ jobs:
       runAuthE2E: false
       runCatalogHydrationGuard: false
 
+  remote-backup-check:
+    uses: ./.github/workflows/reusable-remote-backup-check.yml
+    needs: quality
+    secrets: inherit
+
   smoke:
     runs-on: ubuntu-latest
     needs: quality
@@ -59,17 +64,6 @@ jobs:
       - name: Run smoke check
         if: ${{ steps.resolve_smoke.outputs.run_smoke == 'true' }}
         run: npm run smoke:check -- "$SMOKE_BASE_URL"
-
-      - name: Remote backup artifact check
-        if: ${{ vars.BACKUP_REMOTE_CHECK_ENABLED == 'true' }}
-        env:
-          BACKUP_REMOTE_CHECK_URL: ${{ vars.BACKUP_REMOTE_CHECK_URL }}
-          BACKUP_REMOTE_CHECK_METHOD: ${{ vars.BACKUP_REMOTE_CHECK_METHOD || 'auto' }}
-          BACKUP_REMOTE_S3_REGION: ${{ vars.BACKUP_REMOTE_S3_REGION || 'us-east-1' }}
-          BACKUP_REMOTE_AUTH_HEADER: ${{ secrets.BACKUP_REMOTE_AUTH_HEADER }}
-          BACKUP_REMOTE_BEARER_TOKEN: ${{ secrets.BACKUP_REMOTE_BEARER_TOKEN }}
-          BACKUP_MAX_AGE_HOURS: ${{ vars.BACKUP_MAX_AGE_HOURS || '26' }}
-        run: npm run ops:backup-verify-remote
 
       - name: Smoke disabled summary
         if: ${{ steps.resolve_smoke.outputs.run_smoke != 'true' }}

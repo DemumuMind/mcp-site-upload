@@ -4,6 +4,7 @@ import { type FormEvent, useMemo, useState, useSyncExternalStore } from "react";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useLocale } from "@/components/locale-provider";
+import { AuthStatusCard } from "@/components/auth-status-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,6 +112,24 @@ type SecurityLoginResult = {
         threshold: number;
     } | null;
 };
+type OAuthProviderButtonProps = {
+    provider: "google" | "github";
+    pendingOAuthProvider: "google" | "github" | null;
+    isEmailPending: boolean;
+    onSignIn: (provider: "google" | "github") => void;
+    buttonClassName: string;
+    label: string;
+    icon: string;
+    iconClassName?: string;
+};
+function OAuthProviderButton({ provider, pendingOAuthProvider, isEmailPending, onSignIn, buttonClassName, label, icon, iconClassName, }: OAuthProviderButtonProps) {
+    return (<Button type="button" variant="outline" onClick={() => onSignIn(provider)} disabled={pendingOAuthProvider !== null || isEmailPending} className={buttonClassName}>
+      {pendingOAuthProvider === provider ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className={`inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card font-bold text-foreground ${iconClassName ?? "text-xs"}`}>
+          {icon}
+        </span>)}
+      <span>{label}</span>
+    </Button>);
+}
 async function runLoginSecurityPrecheck(email: string): Promise<SecurityPrecheckResult | null> {
     try {
         const response = await fetch("/api/auth/security", {
@@ -407,20 +426,9 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
       </section>);
     }
     if (!isConfigured) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-amber-300/35 bg-card p-6 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)] sm:p-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent"/>
-        <div className="relative">
-          <h1 className="text-2xl font-semibold text-amber-100">
-            {tr(locale, "Auth is not configured", "Auth is not configured")}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-amber-50/85">
-            {tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.")}
-          </p>
-          <Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-primary-foreground hover:bg-amber-200">
-            <Link href="/">{tr(locale, "Back to catalog", "Back to catalog")}</Link>
-          </Button>
-        </div>
-      </div>);
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-amber-300/35 bg-card shadow-[0_20px_45px_-30px_rgba(251,191,36,0.7)]" topBorderClassName="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" title={tr(locale, "Auth is not configured", "Auth is not configured")} titleClassName="text-2xl font-semibold text-amber-100" message={tr(locale, "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.", "Set NEXT_PUBLIC_SUPABASE_URL and a Supabase publishable key (NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) to enable login.")} messageClassName="mt-2 max-w-2xl text-sm text-amber-50/85" action={<Button asChild className="mt-6 h-10 rounded-xl bg-amber-300 text-primary-foreground hover:bg-amber-200">
+              <Link href="/">{tr(locale, "Back to catalog", "Back to catalog")}</Link>
+            </Button>}/>);
     }
     if (user) {
         return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
@@ -492,23 +500,13 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
           </p>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <Button type="button" variant="outline" onClick={() => {
-            void signInWithProvider("google");
-        }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "google" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card text-xs font-bold text-foreground">
-                  G
-                </span>)}
-              <span>{tr(locale, "Continue with Google", "Continue with Google")}</span>
-            </Button>
+            <OAuthProviderButton provider="google" pendingOAuthProvider={pendingOAuthProvider} isEmailPending={isEmailPending} onSignIn={(provider) => {
+            void signInWithProvider(provider);
+        }} buttonClassName={oauthButtonClass} label={tr(locale, "Continue with Google", "Continue with Google")} icon="G"/>
 
-            <Button type="button" variant="outline" onClick={() => {
-            void signInWithProvider("github");
-        }} disabled={pendingOAuthProvider !== null || isEmailPending} className={oauthButtonClass}>
-              {pendingOAuthProvider === "github" ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className="inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card text-[10px] font-bold text-foreground">
-                  GH
-                </span>)}
-              <span>{tr(locale, "Continue with GitHub", "Continue with GitHub")}</span>
-            </Button>
+            <OAuthProviderButton provider="github" pendingOAuthProvider={pendingOAuthProvider} isEmailPending={isEmailPending} onSignIn={(provider) => {
+            void signInWithProvider(provider);
+        }} buttonClassName={oauthButtonClass} label={tr(locale, "Continue with GitHub", "Continue with GitHub")} icon="GH" iconClassName="text-[10px]"/>
           </div>
         </div>
 
@@ -599,4 +597,3 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
       </div>
     </section>);
 }
-
