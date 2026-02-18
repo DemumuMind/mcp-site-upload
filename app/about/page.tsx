@@ -1,9 +1,8 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Brain, Compass, Rocket, ShieldCheck, Workflow } from "lucide-react";
-import { PageActionZone, PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -71,88 +70,127 @@ export default async function AboutPage() {
 
   return (
     <PageFrame variant="marketing">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02070f_0%,#050b1c_50%,#06091b_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(circle_at_18%_7%,rgba(56,189,248,0.22),transparent_40%),radial-gradient(circle_at_82%_8%,rgba(129,140,248,0.2),transparent_42%)]" />
+      <main>
+        <section className="border-b border-blacksmith bg-background" aria-labelledby="about-hero-title">
+          <div className="section-shell py-14 sm:py-20 lg:py-24">
+            <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+              <header className="space-y-6">
+                <p className="inline-flex w-fit items-center gap-2 rounded-full border border-blacksmith bg-card px-3 py-1 text-xs font-semibold tracking-[0.12em] text-foreground uppercase">
+                  <Brain className="size-3" aria-hidden="true" />
+                  {tr(locale, "About DemumuMind", "About DemumuMind")}
+                </p>
 
-      <PageShell className="max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <PageHero surface="mesh" className="rounded-3xl border-primary/30 bg-card p-6 sm:p-10" badgeTone="cyan" eyebrow={<><Brain className="size-3" />{tr(locale, "About DemumuMind", "About DemumuMind")}</>} title={tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")} description={tr(
-              locale,
-              "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
-              "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
-            )} actions={<>
-            <Button asChild className="bg-blue-500 hover:bg-blue-400">
-              <Link href="/catalog">
-                {tr(locale, "Explore catalog", "Explore catalog")}
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
-              <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
-            </Button>
-          </>}/>
+                <h1
+                  id="about-hero-title"
+                  className="max-w-4xl font-serif text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-6xl"
+                >
+                  {tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")}
+                </h1>
 
-        <PageSection surface="rail" className="grid gap-4 lg:grid-cols-3">
-          {pillars.map((pillar) => (
-            <Card key={pillar.title} className="border-blacksmith bg-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg text-foreground">
-                  <pillar.icon className="size-4 text-primary" />
-                  {pillar.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm leading-7 text-muted-foreground">{pillar.description}</CardContent>
-            </Card>
-          ))}
-        </PageSection>
+                <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  {tr(
+                    locale,
+                    "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
+                    "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
+                  )}
+                </p>
 
-        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <Card className="border-blacksmith bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-foreground">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Button asChild size="lg" className="h-11 rounded-md px-6">
+                    <Link href="/catalog">
+                      {tr(locale, "Explore catalog", "Explore catalog")}
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="h-11 rounded-md px-6">
+                    <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
+                  </Button>
+                </div>
+              </header>
+
+              <aside className="rounded-md border border-blacksmith bg-card p-5 sm:p-6" aria-labelledby="about-mission-title">
+                <h2 id="about-mission-title" className="font-serif text-2xl leading-tight font-semibold tracking-tight text-foreground">
+                  {tr(locale, "Our mission: make high-quality agentic engineering repeatable for every product team.", "Our mission: make high-quality agentic engineering repeatable for every product team.")}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  {tr(
+                    locale,
+                    "How DemumuMind builds and ships MCP workflows with a human-led, agent-accelerated delivery model.",
+                    "How DemumuMind builds and ships MCP workflows with a human-led, agent-accelerated delivery model.",
+                  )}
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-blacksmith bg-background" aria-labelledby="about-pillars-title">
+          <div className="section-shell py-14">
+            <header className="mb-6 space-y-3">
+              <h2 id="about-pillars-title" className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">
                 {tr(locale, "How we deliver", "How we deliver")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {timeline.map((item, index) => (
-                <div key={item.stage} className="rounded-xl border border-blacksmith bg-card px-4 py-3">
-                  <p className="text-xs tracking-[0.15em] text-primary uppercase">
-                    {tr(locale, `Stage ${index + 1}`, `Stage ${index + 1}`)} В· {item.stage}
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.details}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+              </h2>
+            </header>
 
-          <Card className="border-blacksmith bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-2xl text-foreground">
-                <Rocket className="size-5 text-primary" />
-                {tr(locale, "Operating principles", "Operating principles")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-              {principles.map((principle) => (
-                <div key={principle} className="rounded-xl border border-blacksmith bg-card px-4 py-2.5">
-                  {principle}
-                </div>
+            <div className="grid gap-4 lg:grid-cols-3" role="list" aria-label={tr(locale, "Delivery pillars", "Delivery pillars")}>
+              {pillars.map((pillar) => (
+                <article key={pillar.title} role="listitem" className="rounded-md border border-blacksmith bg-card p-5">
+                  <div className="mb-3 inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
+                    <pillar.icon className="size-4 text-primary" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">{pillar.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-muted-foreground">{pillar.description}</p>
+                </article>
               ))}
-              <p className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary">
-                {tr(
-                  locale,
-                  "Our mission: make high-quality agentic engineering repeatable for every product team.",
-                  "Our mission: make high-quality agentic engineering repeatable for every product team.",
-                )}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        <PageActionZone>
-          <p className="text-sm text-primary">{tr(locale, "Our mission: make high-quality agentic engineering repeatable for every product team.", "Our mission: make high-quality agentic engineering repeatable for every product team.")}</p>
-        </PageActionZone>
-      </PageShell>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-blacksmith bg-background" aria-labelledby="about-operating-title">
+          <div className="section-shell py-14">
+            <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+              <section className="rounded-md border border-blacksmith bg-card p-5 sm:p-6" aria-labelledby="about-timeline-title">
+                <h2 id="about-timeline-title" className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground">
+                  {tr(locale, "How we deliver", "How we deliver")}
+                </h2>
+                <ol className="mt-4 space-y-3" aria-label={tr(locale, "Delivery stages", "Delivery stages")}>
+                  {timeline.map((item, index) => (
+                    <li key={item.stage} className="rounded-md border border-blacksmith bg-background px-4 py-3">
+                      <p className="text-xs tracking-[0.15em] text-primary uppercase">
+                        {tr(locale, `Stage ${index + 1}`, `Stage ${index + 1}`)} - {item.stage}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">{item.details}</p>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+
+              <aside className="rounded-md border border-blacksmith bg-card p-5 sm:p-6" aria-labelledby="about-operating-title">
+                <h2 id="about-operating-title" className="flex items-center gap-2 font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground">
+                  <Rocket className="size-5 text-primary" aria-hidden="true" />
+                  {tr(locale, "Operating principles", "Operating principles")}
+                </h2>
+
+                <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground" aria-label={tr(locale, "Operating principles list", "Operating principles list")}>
+                  {principles.map((principle) => (
+                    <li key={principle} className="rounded-md border border-blacksmith bg-background px-4 py-2.5">
+                      {principle}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="mt-4 rounded-md border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
+                  {tr(
+                    locale,
+                    "Our mission: make high-quality agentic engineering repeatable for every product team.",
+                    "Our mission: make high-quality agentic engineering repeatable for every product team.",
+                  )}
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </main>
     </PageFrame>
   );
 }
-
-

@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
-import { PageActionZone, PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -67,42 +66,61 @@ export default async function PricingPage() {
 
   return (
     <PageFrame variant="marketing">
-      <PageShell className="max-w-6xl">
-      <PageHero surface="plain" animated={false} badgeTone="cyan" eyebrow={tr(locale, "Pricing", "Pricing")} title={tr(locale, "Two simple plans", "Two simple plans")} description={tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}/>
+      <main className="w-full bg-background">
+        <section className="border-b border-blacksmith" aria-labelledby="pricing-page-heading">
+          <div className="section-shell space-y-5 py-14 sm:py-20">
+            <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">{tr(locale, "Pricing", "Pricing")}</p>
+            <h1 id="pricing-page-heading" className="max-w-4xl font-serif text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-6xl">
+              {tr(locale, "Two simple plans", "Two simple plans")}
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}
+            </p>
+          </div>
+        </section>
 
-      <PageSection surface="rail" className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
-        {plans.map((plan) => (
-          <Card key={plan.id} className={plan.highlighted ? "border-primary/40 bg-card" : "bg-card"}>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-foreground">{tr(locale, plan.name.en, plan.name.en)}</CardTitle>
-              <p className="text-xl font-semibold text-primary">{tr(locale, plan.price.en, plan.price.en)}</p>
-              <p className="text-sm text-muted-foreground">{tr(locale, plan.description.en, plan.description.en)}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2 text-sm text-muted-foreground">
-                {plan.features.map((feature) => (
-                  <div key={feature.en} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <p>{tr(locale, feature.en, feature.en)}</p>
+        <section className="border-b border-blacksmith" aria-label={tr(locale, "Plans", "Plans")}>
+          <div className="section-shell py-10 sm:py-14">
+            <div className="grid gap-5 lg:grid-cols-2">
+              {plans.map((plan) => (
+                <article
+                  key={plan.id}
+                  className={plan.highlighted ? "rounded-md border border-primary/40 bg-card p-6" : "rounded-md border border-blacksmith bg-card p-6"}
+                >
+                  <p className="font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">{`$ plan --tier ${plan.id}`}</p>
+                  <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground">{tr(locale, plan.name.en, plan.name.en)}</h2>
+                  <p className="mt-1 text-2xl font-semibold text-primary">{tr(locale, plan.price.en, plan.price.en)}</p>
+                  <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">{tr(locale, plan.description.en, plan.description.en)}</p>
+
+                  <ul className="mt-5 space-y-2" aria-label={`${tr(locale, plan.name.en, plan.name.en)} features`}>
+                    {plan.features.map((feature) => (
+                      <li key={feature.en} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{tr(locale, feature.en, feature.en)}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-6">
+                    <Button asChild className="w-full gap-1 sm:w-auto" variant={plan.highlighted ? "default" : "outline"}>
+                      <Link href={plan.ctaHref}>
+                        {tr(locale, plan.ctaLabel.en, plan.ctaLabel.en)}
+                        <ArrowRight className="size-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
                   </div>
-                ))}
-              </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
 
-              <Button asChild className="w-full gap-1">
-                <Link href={plan.ctaHref}>
-                  {tr(locale, plan.ctaLabel.en, plan.ctaLabel.en)}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </PageSection>
-
-      <PageActionZone className="text-center">
-        <p className="text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
-      </PageActionZone>
-      </PageShell>
+        <section className="border-b border-blacksmith" aria-label="Pricing footnote">
+          <div className="section-shell py-6">
+            <p className="text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
+          </div>
+        </section>
+      </main>
     </PageFrame>
   );
 }

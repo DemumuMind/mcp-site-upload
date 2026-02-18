@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { ConsentAnalytics } from "@/components/consent-analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { AuthHashRedirector } from "@/components/auth-hash-redirector";
@@ -18,6 +19,25 @@ import {
 import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
 import "./globals.css";
+
+const fontSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const fontSerif = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const fontMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500"],
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const isVercelDeployment = process.env.VERCEL === "1" || process.env.VERCEL === "true";
@@ -88,7 +108,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} bg-background text-foreground antialiased`}>
         <LocaleProvider locale={locale}>
           <div className="flex min-h-screen flex-col">
             <SiteHeader locale={locale} />
