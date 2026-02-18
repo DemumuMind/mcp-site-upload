@@ -62,6 +62,7 @@ export default async function ContactPage() {
     <PageFrame>
       <PageShell>
         <PageHero
+          surface="steel"
           eyebrow={
             <Badge className="border-primary/35 bg-primary/10 text-primary">
               <Clock3 className="size-3" />
@@ -89,7 +90,7 @@ export default async function ContactPage() {
           }
         />
 
-        <PageSection className="grid gap-4 lg:grid-cols-3">
+        <PageSection surface="mesh" className="grid gap-4 lg:grid-cols-3">
           {channels.map((channel) => (
             <Card key={channel.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-3">
@@ -112,7 +113,7 @@ export default async function ContactPage() {
           ))}
         </PageSection>
 
-        <PageSection className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <PageSection surface="plain" className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="border-blacksmith bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl text-foreground">{tr(locale, "High-signal request template", "High-signal request template")}</CardTitle>

@@ -18,7 +18,7 @@ export default async function PrivacyPage() {
   return (
     <PageFrame variant="content">
       <PageShell className="max-w-4xl px-4 sm:px-6">
-        <PageHero
+        <PageHero surface="editorial"
           animated={false}
           badgeTone="violet"
           eyebrow={tr(locale, "Legal", "Legal")}
@@ -27,7 +27,7 @@ export default async function PrivacyPage() {
         />
 
         {privacySections.map((section) => (
-          <PageSection key={section.id} className="space-y-3">
+          <PageSection surface="editorial" key={section.id} className="space-y-3">
             <h2 className="text-2xl font-semibold text-foreground">{tr(locale, section.title.en, section.title.en)}</h2>
 
             {section.paragraph ? (

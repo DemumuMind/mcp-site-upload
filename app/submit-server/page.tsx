@@ -46,6 +46,7 @@ export default async function SubmitServerPage() {
     <PageFrame>
       <PageShell>
         <PageHero
+          surface="mesh"
           eyebrow={
             <Badge className="border-fuchsia-400/35 bg-fuchsia-500/10 text-fuchsia-200">
               <Sparkles className="size-3" />
@@ -73,7 +74,7 @@ export default async function SubmitServerPage() {
           }
         />
 
-        <PageSection className="grid gap-4 lg:grid-cols-3">
+        <PageSection surface="steel" className="grid gap-4 lg:grid-cols-3">
           {highlights.map((item) => (
             <Card key={item.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-3">
@@ -87,7 +88,7 @@ export default async function SubmitServerPage() {
           ))}
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="rail">
           <h2 className="mb-3 text-2xl font-semibold tracking-tight text-foreground">{tr(locale, "Submission flow", "Submission flow")}</h2>
           <p className="mb-5 text-sm leading-7 text-muted-foreground">
             {tr(

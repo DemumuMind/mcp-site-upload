@@ -68,9 +68,9 @@ export default async function PricingPage() {
   return (
     <PageFrame variant="marketing">
       <PageShell className="max-w-6xl">
-      <PageHero animated={false} badgeTone="cyan" eyebrow={tr(locale, "Pricing", "Pricing")} title={tr(locale, "Two simple plans", "Two simple plans")} description={tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}/>
+      <PageHero surface="plain" animated={false} badgeTone="cyan" eyebrow={tr(locale, "Pricing", "Pricing")} title={tr(locale, "Two simple plans", "Two simple plans")} description={tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}/>
 
-      <PageSection className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
+      <PageSection surface="rail" className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
         {plans.map((plan) => (
           <Card key={plan.id} className={plan.highlighted ? "border-primary/40 bg-card" : "bg-card"}>
             <CardHeader className="space-y-1">

@@ -81,6 +81,7 @@ export default async function SitemapPage() {
     <PageFrame>
       <PageShell>
         <PageHero
+          surface="plain"
           eyebrow={
             <Badge className="border-primary/35 bg-primary/10 text-primary">
               <Compass className="size-3" />
@@ -95,7 +96,7 @@ export default async function SitemapPage() {
           )}
         />
 
-        <PageSection className="grid gap-4 lg:grid-cols-2">
+        <PageSection surface="mesh" className="grid gap-4 lg:grid-cols-2">
           {sitemapGroups.map((group) => (
             <Card key={group.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">

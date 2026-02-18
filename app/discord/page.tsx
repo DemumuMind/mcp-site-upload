@@ -76,6 +76,7 @@ export default async function DiscordPage() {
     <PageFrame>
       <PageShell className="max-w-6xl gap-8">
         <PageHero
+          surface="rail"
           eyebrow={<Badge className="w-fit border-indigo-400/35 bg-primary/10 text-primary">{tr(locale, "Community", "Community")}</Badge>}
           title={tr(locale, "BridgeMind Discord", "BridgeMind Discord")}
           description={tr(
@@ -98,7 +99,7 @@ export default async function DiscordPage() {
           }
         />
 
-        <PageSection className="grid gap-4 md:grid-cols-3" aria-label={tr(locale, "Discord channels", "Discord channels")}>
+        <PageSection surface="mesh" className="grid gap-4 md:grid-cols-3" aria-label={tr(locale, "Discord channels", "Discord channels")}>
           {communityChannels.map((channel) => (
             <Card key={channel.name} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
@@ -112,7 +113,7 @@ export default async function DiscordPage() {
           ))}
         </PageSection>
 
-        <PageSection className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <PageSection surface="plain" className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
           <Card className="border-blacksmith bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl text-foreground">

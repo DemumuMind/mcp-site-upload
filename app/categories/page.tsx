@@ -26,6 +26,7 @@ export default async function CategoriesPage() {
     <PageFrame>
       <PageShell className="max-w-6xl">
         <PageHero
+          surface="rail"
           eyebrow={sectionCopy?.eyebrow}
           title={sectionCopy?.heroTitle ?? tr(locale, "Categories", "Categories")}
           description={
@@ -34,7 +35,7 @@ export default async function CategoriesPage() {
           }
         />
 
-        <PageSection className="grid gap-4 md:grid-cols-2">
+        <PageSection surface="plain" className="grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-blacksmith bg-card p-4">
             <p className="text-xs text-muted-foreground">{tr(locale, "Category options", "Category options")}</p>
             <p className="text-2xl font-semibold text-foreground">{catalogSnapshot.categoryEntries.length}</p>
@@ -45,7 +46,7 @@ export default async function CategoriesPage() {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="steel">
           <CatalogTaxonomyPanel locale={locale} categoryEntries={catalogSnapshot.categoryEntries} languageEntries={catalogSnapshot.languageEntries} />
         </PageSection>
       </PageShell>

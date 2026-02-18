@@ -59,7 +59,7 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
     const errorMessage = error ? tr(locale, formatError(error) ?? error, formatError(error) ?? error) : null;
     return (<PageFrame variant="ops">
       <PageShell className="max-w-6xl px-4 sm:px-6">
-        <PageHero animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Blog automation studio", "Blog automation studio")} description={tr(locale, "Every article is generated only after deep research and multi-step verification.", "Every article is generated only after deep research and multi-step verification.")} actions={<div className="flex flex-wrap items-center gap-2">
+        <PageHero surface="strict" animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Blog automation studio", "Blog automation studio")} description={tr(locale, "Every article is generated only after deep research and multi-step verification.", "Every article is generated only after deep research and multi-step verification.")} actions={<div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
             <Link href={backHref}>
               <ArrowLeft className="size-4"/>

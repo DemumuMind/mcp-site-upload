@@ -75,7 +75,7 @@ export default async function AboutPage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(circle_at_18%_7%,rgba(56,189,248,0.22),transparent_40%),radial-gradient(circle_at_82%_8%,rgba(129,140,248,0.2),transparent_42%)]" />
 
       <PageShell className="max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <PageHero className="rounded-3xl border-primary/30 bg-card p-6 sm:p-10" badgeTone="cyan" eyebrow={<><Brain className="size-3" />{tr(locale, "About DemumuMind", "About DemumuMind")}</>} title={tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")} description={tr(
+        <PageHero surface="mesh" className="rounded-3xl border-primary/30 bg-card p-6 sm:p-10" badgeTone="cyan" eyebrow={<><Brain className="size-3" />{tr(locale, "About DemumuMind", "About DemumuMind")}</>} title={tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")} description={tr(
               locale,
               "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
               "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
@@ -91,7 +91,7 @@ export default async function AboutPage() {
             </Button>
           </>}/>
 
-        <PageSection className="grid gap-4 lg:grid-cols-3">
+        <PageSection surface="rail" className="grid gap-4 lg:grid-cols-3">
           {pillars.map((pillar) => (
             <Card key={pillar.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-3">

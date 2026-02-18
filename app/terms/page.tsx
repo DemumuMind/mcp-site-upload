@@ -36,14 +36,14 @@ export default async function TermsPage() {
     <PageFrame variant="content">
       <PageShell className="max-w-7xl gap-8 px-4 sm:px-6 lg:grid lg:grid-cols-[280px_1fr] lg:px-8">
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <PageHero
+          <PageHero surface="editorial"
             animated={false}
             badgeTone="violet"
             eyebrow={tr(locale, "Legal", "Legal")}
             title={tr(locale, "Terms of Service", "Terms of Service")}
             description={`${tr(locale, "Last updated", "Last updated")}: ${updatedLabel}`}
           />
-          <PageSection>
+          <PageSection surface="editorial">
             <h2 className="text-sm tracking-[0.13em] text-muted-foreground uppercase">{tr(locale, "Contents", "Contents")}</h2>
             <div className="mt-2 space-y-2 text-sm">
               {termsV2Sections.map((section) => (
@@ -60,7 +60,7 @@ export default async function TermsPage() {
         </div>
 
         <section className="space-y-6">
-          <PageSection>
+          <PageSection surface="editorial">
             <p className="text-sm leading-7 text-muted-foreground">
               {tr(
                 locale,

@@ -27,8 +27,8 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
     const authErrorDescription = typeof error_description === "string" ? error_description : undefined;
     return (<PageFrame variant="content">
       <PageShell className="max-w-5xl px-4 sm:px-6">
-        <PageHero animated={false} badgeTone="violet" eyebrow={tr(locale, "Access", "Access")} title={tr(locale, "Sign in", "Sign in")} description={tr(locale, "Sign in to submit MCP servers and manage your account.", "Sign in to submit MCP servers and manage your account.")}/>
-        <PageSection className="min-h-[40vh]">
+        <PageHero surface="calm" animated={false} badgeTone="violet" eyebrow={tr(locale, "Access", "Access")} title={tr(locale, "Sign in", "Sign in")} description={tr(locale, "Sign in to submit MCP servers and manage your account.", "Sign in to submit MCP servers and manage your account.")}/>
+        <PageSection surface="calm" className="min-h-[40vh]">
           <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} authErrorCode={authErrorCode} authErrorDescription={authErrorDescription}/>
         </PageSection>
       </PageShell>

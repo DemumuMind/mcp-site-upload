@@ -44,6 +44,7 @@ export default async function MCPPage() {
     <PageFrame>
       <PageShell className="max-w-6xl gap-8">
         <PageHero
+          surface="mesh"
           eyebrow={sectionCopy?.eyebrow}
           title={sectionCopy?.heroTitle ?? "MCP"}
           description={
@@ -69,7 +70,7 @@ export default async function MCPPage() {
           }
         />
 
-        <PageSection className="grid gap-4 md:grid-cols-3" aria-label="MCP highlights">
+        <PageSection surface="steel" className="grid gap-4 md:grid-cols-3" aria-label="MCP highlights">
           {highlights.map((item) => (
             <Card key={item.title} className="border-blacksmith bg-card shadow-[0_0_0_1px_rgba(148,163,184,0.07)] backdrop-blur">
               <CardHeader className="pb-2">

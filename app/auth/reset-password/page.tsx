@@ -14,8 +14,8 @@ export default async function AuthResetPasswordPage() {
     const locale = await getLocale();
     return (<PageFrame variant="content">
       <PageShell className="max-w-5xl px-4 sm:px-6">
-        <PageHero animated={false} badgeTone="violet" eyebrow={tr(locale, "Recovery", "Recovery")} title={tr(locale, "Reset password", "Reset password")} description={tr(locale, "Create a new password to regain access to your account.", "Create a new password to regain access to your account.")}/>
-        <PageSection className="min-h-[40vh]">
+        <PageHero surface="calm" animated={false} badgeTone="violet" eyebrow={tr(locale, "Recovery", "Recovery")} title={tr(locale, "Reset password", "Reset password")} description={tr(locale, "Create a new password to regain access to your account.", "Create a new password to regain access to your account.")}/>
+        <PageSection surface="calm" className="min-h-[40vh]">
           <AuthResetPasswordPanel />
         </PageSection>
       </PageShell>

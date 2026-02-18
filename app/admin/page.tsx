@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import { createAdminSystemEventAction, deleteAdminSystemEventAction, logoutAdminAction, moderateServerStatusAction, saveAdminDashboardMetricsAction, saveAdminDashboardSettingsAction, } from "@/app/admin/actions";
@@ -229,7 +229,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     const stickyAdminHref = `/admin${stickyQueryString ? `?${stickyQueryString}` : ""}`;
     return (<PageFrame variant="ops">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
-        <PageHero badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Moderation Dashboard", "Moderation Dashboard")} description={tr(locale, "Review pending MCP submissions, manage analytics, and keep catalog quality high.", "Review pending MCP submissions, manage analytics, and keep catalog quality high.")} actions={<div className="flex flex-wrap items-center gap-2">
+        <PageHero surface="mixed" badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Moderation Dashboard", "Moderation Dashboard")} description={tr(locale, "Review pending MCP submissions, manage analytics, and keep catalog quality high.", "Review pending MCP submissions, manage analytics, and keep catalog quality high.")} actions={<div className="flex flex-wrap items-center gap-2">
               <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
                 <Link href={`/admin/blog?from=${encodeURIComponent(stickyAdminHref)}`}>
                   <FileText className="size-4"/>
@@ -242,7 +242,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   {tr(locale, "Logout", "Logout")}
                 </Button>
               </form>
-            </div>} metrics={<PageMetric label={tr(locale, "Pending queue", "Pending queue")} value={pendingCount} valueClassName={pendingCount > 0 ? "text-amber-200" : "text-emerald-200"}/>}/>
+            </div>} metrics={<PageMetric surface="mixed" label={tr(locale, "Pending queue", "Pending queue")} value={pendingCount} valueClassName={pendingCount > 0 ? "text-amber-200" : "text-emerald-200"}/>}/>
 
         {feedback ? (<div className={`rounded-md border px-3 py-2 text-sm ${feedback.tone === "success"
                 ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
@@ -256,7 +256,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             lastUpdated: tr(locale, "Last updated", "Last updated"),
         }}/>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-violet-50">
               {tr(locale, "System overview", "System overview")}
@@ -308,7 +308,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="border-white/10 bg-indigo-900/70">
               <CardHeader className="pb-3">
@@ -408,7 +408,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </Card>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="border-white/10 bg-indigo-900/70">
               <CardHeader className="pb-3">
@@ -452,7 +452,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-violet-50">
               {tr(locale, "Dashboard settings", "Dashboard settings")}
@@ -512,7 +512,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-violet-50">
               {tr(locale, "Metrics editor", "Metrics editor")}
@@ -544,7 +544,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="border-white/10 bg-indigo-900/70">
               <CardHeader className="pb-3">
@@ -609,7 +609,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <Card className="border-white/10 bg-indigo-900/70">
             <CardHeader className="space-y-2">
               <CardTitle className="text-base text-violet-50">
@@ -737,7 +737,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </Card>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <Card className="border-white/10 bg-indigo-900/70">
             <CardHeader className="pb-3">
               <CardTitle className="text-base text-violet-50">
@@ -760,7 +760,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </Card>
         </PageSection>
 
-        <PageSection>
+        <PageSection surface="mixed">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-violet-50">

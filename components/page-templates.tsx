@@ -38,6 +38,7 @@ type PageHeroProps = {
   actions?: ReactNode;
   metrics?: ReactNode;
   badgeTone?: "cyan" | "emerald" | "amber" | "violet";
+  surface?: "steel" | "mesh" | "rail" | "plain";
   className?: string;
   animated?: boolean;
 };
@@ -49,13 +50,35 @@ const badgeToneClassName: Record<NonNullable<PageHeroProps["badgeTone"]>, string
   violet: "border-primary/40 bg-primary/10 text-primary",
 };
 
-export function PageHero({ eyebrow, title, description, actions, metrics, badgeTone = "cyan", className, animated = true }: PageHeroProps) {
+const heroSurfaceClassName: Record<NonNullable<PageHeroProps["surface"]>, string> = {
+  steel:
+    "border-blacksmith bg-[linear-gradient(160deg,rgba(20,24,32,0.95)_0%,rgba(12,14,19,0.98)_100%)] before:bg-gradient-to-b before:via-slate-400/30 after:bg-white/12",
+  mesh:
+    "border-blue-400/25 bg-[radial-gradient(circle_at_12%_18%,rgba(56,189,248,0.18),transparent_35%),linear-gradient(155deg,rgba(13,18,28,0.95)_0%,rgba(9,12,20,0.98)_100%)] before:bg-gradient-to-b before:via-blue-300/40 after:bg-blue-200/20",
+  rail:
+    "border-violet-300/30 bg-[linear-gradient(132deg,rgba(26,20,44,0.88)_0%,rgba(12,14,24,0.97)_52%,rgba(8,9,15,0.99)_100%)] before:bg-gradient-to-b before:via-violet-300/40 after:bg-violet-200/18",
+  plain:
+    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,17,22,0.95)_0%,rgba(10,11,15,0.98)_100%)] before:bg-gradient-to-b before:via-slate-500/20 after:bg-white/8",
+};
+
+export function PageHero({
+  eyebrow,
+  title,
+  description,
+  actions,
+  metrics,
+  badgeTone = "cyan",
+  surface = "steel",
+  className,
+  animated = true,
+}: PageHeroProps) {
   return (
     <section
       data-anime={animated ? "reveal" : undefined}
       data-anime-delay={animated ? "40" : undefined}
       className={cn(
-        "relative space-y-5 overflow-hidden rounded-3xl border border-blacksmith bg-[linear-gradient(160deg,rgba(20,24,32,0.95)_0%,rgba(12,14,19,0.98)_100%)] p-6 shadow-[0_30px_60px_-40px_rgba(4,10,21,0.95)] before:pointer-events-none before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-gradient-to-b before:from-transparent before:via-slate-400/30 before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-px after:bg-white/12 sm:p-8",
+        "relative space-y-5 overflow-hidden rounded-3xl border p-6 shadow-[0_30px_60px_-40px_rgba(4,10,21,0.95)] before:pointer-events-none before:absolute before:inset-y-0 before:left-5 before:w-px before:from-transparent before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-px sm:p-8",
+        heroSurfaceClassName[surface],
         className,
       )}
     >
@@ -80,17 +103,30 @@ type PageMetricProps = {
   label: ReactNode;
   value: ReactNode;
   valueClassName?: string;
+  surface?: "steel" | "mesh" | "rail" | "plain";
   className?: string;
   animated?: boolean;
 };
 
-export function PageMetric({ label, value, valueClassName, className, animated = true }: PageMetricProps) {
+const metricSurfaceClassName: Record<NonNullable<PageMetricProps["surface"]>, string> = {
+  steel:
+    "border-blacksmith bg-[linear-gradient(180deg,rgba(18,21,27,0.95)_0%,rgba(11,13,18,0.97)_100%)] before:bg-gradient-to-b before:via-slate-400/30",
+  mesh:
+    "border-cyan-300/25 bg-[radial-gradient(circle_at_14%_12%,rgba(56,189,248,0.16),transparent_40%),linear-gradient(180deg,rgba(13,18,24,0.95)_0%,rgba(10,12,18,0.97)_100%)] before:bg-gradient-to-b before:via-cyan-200/35",
+  rail:
+    "border-violet-300/25 bg-[linear-gradient(180deg,rgba(22,17,36,0.9)_0%,rgba(11,12,20,0.97)_100%)] before:bg-gradient-to-b before:via-violet-200/35",
+  plain:
+    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,16,21,0.92)_0%,rgba(10,11,16,0.96)_100%)] before:bg-gradient-to-b before:via-slate-500/20",
+};
+
+export function PageMetric({ label, value, valueClassName, surface = "steel", className, animated = true }: PageMetricProps) {
   return (
     <div
       data-anime={animated ? "reveal" : undefined}
       data-anime-delay={animated ? "90" : undefined}
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-blacksmith bg-[linear-gradient(180deg,rgba(18,21,27,0.95)_0%,rgba(11,13,18,0.97)_100%)] p-4 transition-transform duration-300 hover:-translate-y-0.5 before:pointer-events-none before:absolute before:inset-y-0 before:left-3 before:w-px before:bg-gradient-to-b before:from-transparent before:via-slate-400/30 before:to-transparent",
+        "relative overflow-hidden rounded-2xl border p-4 transition-transform duration-300 hover:-translate-y-0.5 before:pointer-events-none before:absolute before:inset-y-0 before:left-3 before:w-px before:from-transparent before:to-transparent",
+        metricSurfaceClassName[surface],
         className,
       )}
     >
@@ -102,16 +138,29 @@ export function PageMetric({ label, value, valueClassName, className, animated =
 
 type PageSectionProps = {
   children: ReactNode;
+  surface?: "steel" | "mesh" | "rail" | "plain";
   className?: string;
 };
 
-export function PageSection({ children, className }: PageSectionProps) {
+const sectionSurfaceClassName: Record<NonNullable<PageSectionProps["surface"]>, string> = {
+  steel:
+    "border-blacksmith bg-[linear-gradient(180deg,rgba(17,20,26,0.94)_0%,rgba(10,12,17,0.97)_100%)] before:bg-white/12",
+  mesh:
+    "border-blue-400/25 bg-[radial-gradient(circle_at_86%_18%,rgba(56,189,248,0.14),transparent_42%),linear-gradient(180deg,rgba(13,18,27,0.94)_0%,rgba(9,12,19,0.97)_100%)] before:bg-blue-200/22",
+  rail:
+    "border-violet-300/25 bg-[linear-gradient(180deg,rgba(20,16,34,0.92)_0%,rgba(10,11,19,0.97)_100%)] before:bg-violet-200/20",
+  plain:
+    "border-blacksmith/80 bg-[linear-gradient(180deg,rgba(15,17,22,0.92)_0%,rgba(10,11,16,0.96)_100%)] before:bg-white/8",
+};
+
+export function PageSection({ children, surface = "steel", className }: PageSectionProps) {
   return (
     <section
       data-anime="reveal"
       data-anime-delay="120"
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-blacksmith bg-[linear-gradient(180deg,rgba(17,20,26,0.94)_0%,rgba(10,12,17,0.97)_100%)] p-5 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/12 sm:p-6",
+        "relative overflow-hidden rounded-2xl border p-5 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px sm:p-6",
+        sectionSurfaceClassName[surface],
         className,
       )}
     >
