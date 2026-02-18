@@ -1,4 +1,4 @@
-# Catalog Improvement — Brainstorming Outcome (v1)
+# Catalog Improvement â€” Brainstorming Outcome (v1)
 
 Date: 2026-02-17  
 Mode: Brainstorming (design-only, no implementation)
@@ -35,14 +35,14 @@ Mode: Brainstorming (design-only, no implementation)
 
 ### Conversion design
 - Stronger primary CTA on cards.
-- Contextual “Submit server” CTA in result and empty-state paths.
+- Contextual â€œSubmit serverâ€ CTA in result and empty-state paths.
 
 ### Reliability behavior
 - On live-search/API failure, show latest valid snapshot.
 - Show clear non-blocking degradation banner.
 
 ### Edge cases
-- Zero-result state: guided “remove restrictive filters” actions.
+- Zero-result state: guided â€œremove restrictive filtersâ€ actions.
 - High-query + narrow filters: related suggestions.
 - Low-trust but relevant records: visible, downgraded rank, explicit label.
 

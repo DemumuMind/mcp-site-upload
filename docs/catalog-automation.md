@@ -82,8 +82,8 @@ Use:
 - `GET /api/catalog/automation-status`
 
 Response includes:
-1. `checks.cronConfigured` — cron schedule exists for `/api/catalog/auto-sync`
-2. `checks.secretConfigured` — `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` is set
-3. `checks.runtimeReady` — Supabase/runtime check passes
+1. `checks.cronConfigured` â€” cron schedule exists for `/api/catalog/auto-sync`
+2. `checks.secretConfigured` â€” `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` is set
+3. `checks.runtimeReady` â€” Supabase/runtime check passes
 
 If all three are `true`, auto-fill is configured and operational.
