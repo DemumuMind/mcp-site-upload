@@ -1,22 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-
-async function setLocaleCookies(page: Page, locale: "en") {
-  const urls = ["http://127.0.0.1:3101", "http://localhost:3000"] as const;
-  const cookies = urls.flatMap((url) => [
-    {
-      name: "demumumind_locale",
-      value: locale,
-      url,
-    },
-    {
-      name: "demumumind_cookie_consent",
-      value: "all",
-      url,
-    },
-  ]);
-
-  await page.context().addCookies(cookies);
-}
+import { setLocaleCookies } from "./helpers/locale-cookies";
 
 async function getVisibleCardCount(page: Page): Promise<number> {
   return page.getByRole("link", { name: "View details" }).count();

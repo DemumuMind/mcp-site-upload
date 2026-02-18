@@ -3,6 +3,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createReporter } from "./_shared/reporting.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -79,20 +80,11 @@ const healthToken =
   getEnvValue("HEALTH_CHECK_CRON_SECRET") ||
   getEnvValue("CRON_SECRET");
 
-const failures = [];
+const { failures, pass: logPass, fail: logFail } = createReporter("smoke");
 const protectedStatusAllowed = allowProtectedMode ? [200, 401] : [200];
 
 function buildUrl(pathname) {
   return `${baseUrl}${pathname}`;
-}
-
-function logPass(message) {
-  console.log(`PASS: ${message}`);
-}
-
-function logFail(message) {
-  console.error(`FAIL: ${message}`);
-  failures.push(message);
 }
 
 async function request(pathname, options = {}) {

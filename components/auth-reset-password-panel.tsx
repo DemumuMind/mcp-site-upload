@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
+import { getPasswordChecklistItems, getPasswordStrengthColorClass, getPasswordStrengthLabel, getPasswordStrengthTextClass, } from "@/lib/auth/password-ui";
 import { tr, type Locale } from "@/lib/i18n";
-import { getPasswordRuleChecks, getPasswordStrengthScore, PASSWORD_MIN_LENGTH, type PasswordStrengthScore, } from "@/lib/password-strength";
+import { getPasswordStrengthScore, PASSWORD_MIN_LENGTH } from "@/lib/password-strength";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 const REDIRECT_DELAY_SECONDS = 5;
 type ResetValues = {
@@ -36,72 +37,6 @@ function validateResetValues(locale: Locale, values: ResetValues): ResetErrors {
 }
 function hasValidationErrors(errors: ResetErrors): boolean {
     return Object.values(errors).some(Boolean);
-}
-function getStrengthLabel(locale: Locale, score: PasswordStrengthScore): string {
-    if (score <= 1) {
-        return tr(locale, "Weak password", "Weak password");
-    }
-    if (score === 2) {
-        return tr(locale, "Medium password", "Medium password");
-    }
-    if (score === 3) {
-        return tr(locale, "Good password", "Good password");
-    }
-    return tr(locale, "Strong password", "Strong password");
-}
-function getStrengthColorClass(score: PasswordStrengthScore): string {
-    if (score <= 1) {
-        return "bg-rose-400/90";
-    }
-    if (score === 2) {
-        return "bg-amber-400/90";
-    }
-    if (score === 3) {
-        return "bg-sky-400/90";
-    }
-    return "bg-emerald-400/90";
-}
-function getStrengthTextClass(score: PasswordStrengthScore): string {
-    if (score <= 1) {
-        return "text-rose-300";
-    }
-    if (score === 2) {
-        return "text-amber-300";
-    }
-    if (score === 3) {
-        return "text-primary";
-    }
-    return "text-primary";
-}
-function getPasswordChecklistItems(locale: Locale, password: string) {
-    const checks = getPasswordRuleChecks(password);
-    return [
-        {
-            key: "length",
-            passed: checks.minLength,
-            label: tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`),
-        },
-        {
-            key: "lowercase",
-            passed: checks.hasLowercase,
-            label: tr(locale, "At least one lowercase letter", "At least one lowercase letter"),
-        },
-        {
-            key: "uppercase",
-            passed: checks.hasUppercase,
-            label: tr(locale, "At least one uppercase letter", "At least one uppercase letter"),
-        },
-        {
-            key: "number",
-            passed: checks.hasNumber,
-            label: tr(locale, "At least one number", "At least one number"),
-        },
-        {
-            key: "symbol",
-            passed: checks.hasSymbol,
-            label: tr(locale, "At least one symbol", "At least one symbol"),
-        },
-    ] as const;
 }
 export function AuthResetPasswordPanel() {
     const router = useRouter();
@@ -297,12 +232,12 @@ export function AuthResetPasswordPanel() {
             <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             <div className="space-y-1.5">
               <div className="grid grid-cols-4 gap-1">
-                {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < passwordStrengthScore
-                ? getStrengthColorClass(passwordStrengthScore)
+              {[0, 1, 2, 3].map((index) => (<span key={index} className={`h-1.5 rounded-full ${index < passwordStrengthScore
+                ? getPasswordStrengthColorClass(passwordStrengthScore)
                 : "bg-card"}`}/>))}
-              </div>
-              <p className={`text-xs ${getStrengthTextClass(passwordStrengthScore)}`}>
-                {getStrengthLabel(locale, passwordStrengthScore)}
+            </div>
+              <p className={`text-xs ${getPasswordStrengthTextClass(passwordStrengthScore)}`}>
+                {getPasswordStrengthLabel(locale, passwordStrengthScore)}
               </p>
               <ul className="space-y-1 text-xs">
                 {passwordChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AccountProfileInput } from "@/lib/account-profile-schema";
+import { getSecurityEventBadgeClass, getSecurityEventLabel } from "@/lib/auth/security-event-ui";
 import { tr, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/auth-server";
@@ -116,36 +117,6 @@ function getShortUserId(userId: string): string {
         return userId;
     }
     return `${userId.slice(0, 8)}...${userId.slice(-4)}`;
-}
-function getAuthEventLabel(locale: Locale, eventType: string): string {
-    if (eventType === "login_success") {
-        return tr(locale, "Successful login", "Successful login");
-    }
-    if (eventType === "login_failure") {
-        return tr(locale, "Failed login", "Failed login");
-    }
-    if (eventType === "login_rate_limited") {
-        return tr(locale, "Rate limit triggered", "Rate limit triggered");
-    }
-    if (eventType === "password_reset_request") {
-        return tr(locale, "Password reset requested", "Password reset requested");
-    }
-    if (eventType === "password_reset_success") {
-        return tr(locale, "Password reset completed", "Password reset completed");
-    }
-    if (eventType === "logout") {
-        return tr(locale, "Sign out", "Sign out");
-    }
-    return eventType;
-}
-function getAuthEventClass(eventType: string): string {
-    if (eventType === "login_success" || eventType === "password_reset_success") {
-        return "border-emerald-400/35 bg-emerald-500/10 text-emerald-200";
-    }
-    if (eventType === "login_failure" || eventType === "login_rate_limited") {
-        return "border-rose-400/35 bg-rose-500/10 text-rose-200";
-    }
-    return "border-violet-300/25 bg-indigo-900/60 text-violet-200";
 }
 export async function generateMetadata(): Promise<Metadata> {
     const locale = await getLocale();
@@ -339,7 +310,7 @@ export default async function AccountPage() {
                   {tr(locale, "No security events yet.", "No security events yet.")}
                 </div>) : (authEvents.map((event) => (<div key={event.id} className="rounded-lg border border-white/10 bg-indigo-950/60 px-3 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge className={getAuthEventClass(event.event_type)}>{getAuthEventLabel(locale, event.event_type)}</Badge>
+                      <Badge className={getSecurityEventBadgeClass(event.event_type)}>{getSecurityEventLabel(locale, event.event_type)}</Badge>
                       <span className="text-xs text-violet-300">{formatDate(event.created_at, locale)}</span>
                     </div>
                     {event.ip_address ? (<p className="mt-1 text-xs text-violet-300">

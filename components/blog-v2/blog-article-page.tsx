@@ -6,20 +6,13 @@ import { BlogReadingProgress } from "@/components/blog-v2/blog-reading-progress"
 import { BlogTrackedLink } from "@/components/blog-v2/blog-tracked-link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatBlogDate } from "@/lib/blog/date-format";
 import { getRelatedBlogV2Posts } from "@/lib/blog-v2/contentlayer";
 import type { BlogV2Post } from "@/lib/blog-v2/types";
 
 type BlogArticlePageProps = {
   post: BlogV2Post;
 };
-
-function formatDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
-}
 
 export function BlogArticlePage({ post }: BlogArticlePageProps) {
   const related = getRelatedBlogV2Posts(post.slug, 3);
@@ -58,13 +51,13 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
             <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.12em] text-slate-400 uppercase">
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="size-3.5" />
-                {formatDate(post.publishedAt)}
+                {formatBlogDate(post.publishedAt)}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Clock3 className="size-3.5" />
                 {post.readingTimeMinutes} min read
               </span>
-              {post.updatedAt ? <span>Updated: {formatDate(post.updatedAt)}</span> : null}
+              {post.updatedAt ? <span>Updated: {formatBlogDate(post.updatedAt)}</span> : null}
             </div>
           </header>
 

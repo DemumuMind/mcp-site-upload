@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { chromium } from "@playwright/test";
+import { createReporter } from "./_shared/reporting.mjs";
 
 const localeCookieName = "demumumind_locale";
 const defaultBaseUrl = "http://localhost:3000";
@@ -115,16 +116,7 @@ function normalizeText(value) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-const failures = [];
-
-function logPass(message) {
-  console.log(`PASS: ${message}`);
-}
-
-function logFail(message) {
-  console.error(`FAIL: ${message}`);
-  failures.push(message);
-}
+const { failures, pass: logPass, fail: logFail } = createReporter("i18n-smoke");
 
 async function runLocaleChecks(browser, locale) {
   const context = await browser.newContext();
