@@ -105,25 +105,7 @@
 }
 
 .dark {
-  /* Same for dark as the base is already dark */
-  --background: #05050b;
-  --foreground: #f5f7ff;
-  --card: #0d122b;
-  --card-foreground: #f5f7ff;
-  --popover: #0a0e24;
-  --popover-foreground: #f5f7ff;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f3f3f3;
-  --muted: #161b33;
-  --muted-foreground: #bec7ff;
-  --accent: #7a4dff;
-  --accent-foreground: #ffffff;
-  --destructive: #ff4d4d;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: #0d122b;
-  --ring: rgba(59, 130, 246, 0.5);
+  /* Intentionally empty: base theme is already dark */
 }
 
 @layer base {

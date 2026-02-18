@@ -23,8 +23,17 @@ permissions:
   contents: read
 
 jobs:
+  quality-gates:
+    uses: ./.github/workflows/reusable-node-quality.yml
+    with:
+      runLint: true
+      runBuild: true
+      runPlaywrightInstall: true
+      runAuthE2E: true
+
   deploy:
     if: ${{ vars.VERCEL_DEPLOY_ENABLED == 'true' }}
+    needs: quality-gates
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -56,24 +65,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: UTF-8 check
-        run: npm run check:utf8:strict
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
-
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
-
-      - name: Auth E2E (Playwright)
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
-        run: npm run test:e2e:auth
 
       - name: Resolve deployment mode
         id: deploy_mode

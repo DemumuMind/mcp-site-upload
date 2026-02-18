@@ -1,0 +1,72 @@
+name: Reusable Node Quality
+
+on:
+  workflow_call:
+    inputs:
+      runLint:
+        required: false
+        type: boolean
+        default: false
+      runBuild:
+        required: false
+        type: boolean
+        default: false
+      runPlaywrightInstall:
+        required: false
+        type: boolean
+        default: false
+      runAuthE2E:
+        required: false
+        type: boolean
+        default: false
+      runCatalogHydrationGuard:
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: UTF-8 check
+        run: npm run check:utf8:strict
+
+      - name: Lint
+        if: ${{ inputs.runLint }}
+        run: npm run lint
+
+      - name: Build
+        if: ${{ inputs.runBuild }}
+        run: npm run build
+
+      - name: Install Playwright browser
+        if: ${{ inputs.runPlaywrightInstall }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Auth E2E (Playwright)
+        if: ${{ inputs.runAuthE2E }}
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+        run: npm run test:e2e:auth
+
+      - name: Catalog hydration guard (Playwright)
+        if: ${{ inputs.runCatalogHydrationGuard }}
+        run: npx playwright test tests/catalog-filters.spec.ts --grep "hydration mismatch"

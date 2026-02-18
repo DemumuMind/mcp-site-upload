@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,11 @@ import type { AuthType, HealthStatus, VerificationLevel } from "@/lib/types";
 type TaxonomyEntry = {
     label: string;
     count?: number;
+};
+type FilterOption<TValue extends string> = {
+    value: TValue;
+    label: string;
+    count: number;
 };
 function TaxonomyList({ title, items, }: {
     title: string;
@@ -111,6 +116,28 @@ function parseToolsBound(rawValue: string): number | null {
     }
     return Math.max(0, parsed);
 }
+function FilterOptionsSection<TValue extends string>({ title, options, selectedValues, onToggle, className, renderLabelPrefix, }: {
+    title: string;
+    options: readonly FilterOption<TValue>[];
+    selectedValues: readonly TValue[];
+    onToggle: (value: TValue) => void;
+    className?: string;
+    renderLabelPrefix?: (option: FilterOption<TValue>) => ReactNode;
+}) {
+    return (<div className={cn("border-t border-blacksmith px-4 py-4", className)}>
+      <h3 className="mb-2 text-sm font-semibold text-foreground">{title}</h3>
+      <div className="space-y-1">
+        {options.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
+            <span className="inline-flex items-center gap-2">
+              <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={selectedValues.includes(option.value)} onChange={() => onToggle(option.value)}/>
+              {renderLabelPrefix ? renderLabelPrefix(option) : null}
+              <span className="text-sm text-muted-foreground">{option.label}</span>
+            </span>
+            <span className="text-xs text-muted-foreground">{option.count}</span>
+          </label>))}
+      </div>
+    </div>);
+}
 export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
     const localeFromContext = useLocale();
     const [showAllTags, setShowAllTags] = useState(false);
@@ -126,6 +153,16 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
     if (isFilterMode(props)) {
         const hasAdditionalTags = props.tagEntries.length > CATALOG_VISIBLE_TAG_LIMIT;
         const hiddenTagsCount = Math.max(0, props.tagEntries.length - CATALOG_VISIBLE_TAG_LIMIT);
+        const categoryOptions: FilterOption<string>[] = props.categoryEntries.map(([categoryName, count]) => ({
+            value: categoryName,
+            label: categoryName,
+            count,
+        }));
+        const tagOptions: FilterOption<string>[] = visibleTagEntries.map(([tag, count]) => ({
+            value: tag,
+            label: tag,
+            count,
+        }));
         return (<aside id={props.panelId} className={cn("h-fit overflow-hidden rounded-2xl border border-blacksmith bg-card shadow-[0_18px_38px_-26px_rgba(15,23,42,0.95)] backdrop-blur lg:sticky lg:top-24", props.className)}>
         <div className="flex items-center justify-between gap-3 px-4 py-4">
           <h2 className="text-lg font-semibold text-foreground">{tr(localeFromContext, "Filters", "Filters")}</h2>
@@ -141,65 +178,13 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
           </div>
         </div>
 
-        <div className="border-t border-blacksmith px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Categories", "Categories")}
-          </h3>
-          <div className="max-h-52 space-y-1 overflow-y-auto pr-1">
-            {props.categoryEntries.map(([categoryName, count]) => (<label key={categoryName} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
-                <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedCategories.includes(categoryName)} onChange={() => props.onToggleCategory(categoryName)}/>
-                  <span className="text-sm text-muted-foreground">{categoryName}</span>
-                </span>
-                <span className="text-xs text-muted-foreground">{count}</span>
-              </label>))}
-          </div>
-        </div>
+        <FilterOptionsSection title={tr(localeFromContext, "Categories", "Categories")} options={categoryOptions} selectedValues={props.selectedCategories} onToggle={props.onToggleCategory} className="[&>div]:max-h-52 [&>div]:overflow-y-auto [&>div]:pr-1"/>
 
-        <div className="border-t border-blacksmith px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Auth model", "Auth model")}
-          </h3>
-          <div className="space-y-1">
-            {props.authTypeOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
-                <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedAuthTypes.includes(option.value)} onChange={() => props.onToggleAuthType(option.value)}/>
-                  <span className="text-sm text-muted-foreground">{option.label}</span>
-                </span>
-                <span className="text-xs text-muted-foreground">{option.count}</span>
-              </label>))}
-          </div>
-        </div>
+        <FilterOptionsSection title={tr(localeFromContext, "Auth model", "Auth model")} options={props.authTypeOptions} selectedValues={props.selectedAuthTypes} onToggle={props.onToggleAuthType}/>
 
-        <div className="border-t border-blacksmith px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Verification", "Verification")}
-          </h3>
-          <div className="space-y-1">
-            {props.verificationOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
-                <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedVerificationLevels.includes(option.value)} onChange={() => props.onToggleVerificationLevel(option.value)}/>
-                  <span className="text-sm text-muted-foreground">{option.label}</span>
-                </span>
-                <span className="text-xs text-muted-foreground">{option.count}</span>
-              </label>))}
-          </div>
-        </div>
+        <FilterOptionsSection title={tr(localeFromContext, "Verification", "Verification")} options={props.verificationOptions} selectedValues={props.selectedVerificationLevels} onToggle={props.onToggleVerificationLevel}/>
 
-        <div className="border-t border-blacksmith px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Health status", "Health status")}
-          </h3>
-          <div className="space-y-1">
-            {props.healthOptions.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
-                <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedHealthStatuses.includes(option.value)} onChange={() => props.onToggleHealthStatus(option.value)}/>
-                  <span className="text-sm text-muted-foreground">{option.label}</span>
-                </span>
-                <span className="text-xs text-muted-foreground">{option.count}</span>
-              </label>))}
-          </div>
-        </div>
+        <FilterOptionsSection title={tr(localeFromContext, "Health status", "Health status")} options={props.healthOptions} selectedValues={props.selectedHealthStatuses} onToggle={props.onToggleHealthStatus}/>
 
         <div className="border-t border-blacksmith px-4 py-4">
           <h3 className="mb-2 text-sm font-semibold text-foreground">
@@ -218,19 +203,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
         </div>
 
         <div className="border-t border-blacksmith px-4 py-4">
-          <h3 className="mb-2 text-sm font-semibold text-foreground">
-            {tr(localeFromContext, "Tags", "Tags")}
-          </h3>
-          <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
-            {visibleTagEntries.map(([tag, count]) => (<label key={tag} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
-                <span className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={props.selectedTags.includes(tag)} onChange={() => props.onToggleTag(tag)}/>
-                  <span className={cn("inline-block size-2 rounded-full", getTagDotClass(tag))}/>
-                  <span className="text-sm text-muted-foreground">{tag}</span>
-                </span>
-                <span className="text-xs text-muted-foreground">{count}</span>
-              </label>))}
-          </div>
+          <FilterOptionsSection title={tr(localeFromContext, "Tags", "Tags")} options={tagOptions} selectedValues={props.selectedTags} onToggle={props.onToggleTag} className="border-t-0 p-0 [&>div]:max-h-56 [&>div]:overflow-y-auto [&>div]:pr-1" renderLabelPrefix={(option) => (<span className={cn("inline-block size-2 rounded-full", getTagDotClass(option.value))}/>)} />
 
           {hasAdditionalTags ? (<button type="button" className="mt-3 text-xs font-medium text-blue-300 transition hover:text-blue-200" onClick={() => setShowAllTags((current) => !current)}>
               {showAllTags
