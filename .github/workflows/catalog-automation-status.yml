@@ -1,0 +1,21 @@
+name: Catalog Automation Status
+
+on:
+  schedule:
+    - cron: "20 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  check-catalog-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check /api/catalog/automation-status
+        env:
+          BASE_URL: ${{ vars.SMOKE_BASE_URL || 'https://mcp-site-silk.vercel.app' }}
+        run: |
+          set -euo pipefail
+          URL="${BASE_URL%/}/api/catalog/automation-status"
+          echo "Checking $URL"
+          RESPONSE=$(curl -fsSL "$URL")
+          echo "$RESPONSE" > response.json
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('response.json','utf8')); const checks=r.checks||{}; const pass=Boolean(r.ok)&&Boolean(checks.cronConfigured)&&Boolean(checks.secretConfigured)&&Boolean(checks.runtimeReady); console.log('ok=',r.ok,'checks=',checks); if(!pass){console.error('Catalog automation status failed'); process.exit(1);}"

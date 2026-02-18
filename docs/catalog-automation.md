@@ -12,7 +12,7 @@ Keep the MCP catalog auto-filled from GitHub MCP repositories with zero local fi
 - Source is fixed to GitHub in current architecture.
 
 ## Runtime settings
-- `CATALOG_AUTOSYNC_MAX_PAGES` (default `120`, max `200`)
+- `CATALOG_AUTOSYNC_MAX_PAGES` (default `10`, max `10`)
 - `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` (required)
 - `GITHUB_TOKEN` (optional but recommended for higher GitHub API limits)
 
@@ -76,3 +76,14 @@ HTTP status:
 4. Optional data rollback in Supabase:
    - filter rows with tag `registry-auto`
    - restore status for required rows manually.
+
+## Quick status (checks 1/2/3)
+Use:
+- `GET /api/catalog/automation-status`
+
+Response includes:
+1. `checks.cronConfigured` — cron schedule exists for `/api/catalog/auto-sync`
+2. `checks.secretConfigured` — `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` is set
+3. `checks.runtimeReady` — Supabase/runtime check passes
+
+If all three are `true`, auto-fill is configured and operational.
