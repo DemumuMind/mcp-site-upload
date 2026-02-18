@@ -1,5 +1,12 @@
+import { createElement } from "react";
 import { tr, type Locale } from "@/lib/i18n";
 import { getPasswordRuleChecks, PASSWORD_MIN_LENGTH, type PasswordStrengthScore } from "@/lib/password-strength";
+
+type PasswordChecklistItem = {
+  key: string;
+  passed: boolean;
+  label: string;
+};
 
 export function getPasswordStrengthLabel(locale: Locale, score: PasswordStrengthScore): string {
   if (score <= 1) {
@@ -73,4 +80,45 @@ export function getPasswordChecklistItems(locale: Locale, password: string) {
       label: tr(locale, "At least one symbol", "At least one symbol"),
     },
   ] as const;
+}
+
+function getPasswordChecklistIconClass(passed: boolean): string {
+  return `inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${passed
+    ? "border-emerald-400/60 bg-emerald-400/20"
+    : "border-blacksmith/80 bg-card"}`;
+}
+
+function getPasswordChecklistItemClass(passed: boolean): string {
+  return `flex items-center gap-2 ${passed ? "text-primary" : "text-muted-foreground"}`;
+}
+
+type PasswordStrengthChecklistProps = {
+  score: PasswordStrengthScore;
+  strengthLabel: string;
+  checklistItems: readonly PasswordChecklistItem[];
+};
+
+export function PasswordStrengthChecklist({ score, strengthLabel, checklistItems }: PasswordStrengthChecklistProps) {
+  return createElement(
+    "div",
+    { className: "space-y-1.5" },
+    createElement(
+      "div",
+      { className: "grid grid-cols-4 gap-1" },
+      ...[0, 1, 2, 3].map((index) => createElement("span", { key: index, className: getPasswordStrengthSegmentClass(score, index) })),
+    ),
+    createElement("p", { className: `text-xs ${getPasswordStrengthTextClass(score)}` }, strengthLabel),
+    createElement(
+      "ul",
+      { className: "space-y-1 text-xs" },
+      ...checklistItems.map((item) =>
+        createElement(
+          "li",
+          { key: item.key, className: getPasswordChecklistItemClass(item.passed) },
+          createElement("span", { className: getPasswordChecklistIconClass(item.passed) }, item.passed ? "✓" : "•"),
+          createElement("span", null, item.label),
+        ),
+      ),
+    ),
+  );
 }

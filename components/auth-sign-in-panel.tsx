@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
-import { getPasswordChecklistItems, getPasswordStrengthLabel, getPasswordStrengthSegmentClass, getPasswordStrengthTextClass, } from "@/lib/auth/password-ui";
+import { getPasswordChecklistItems, getPasswordStrengthLabel, PasswordStrengthChecklist, } from "@/lib/auth/password-ui";
 import { buildAuthCallbackRedirect, buildCheckEmailPath, buildResetPasswordRedirect, normalizeInternalPath, } from "@/lib/auth-redirects";
 import { tr, type Locale } from "@/lib/i18n";
 import { getPasswordStrengthScore, PASSWORD_MIN_LENGTH } from "@/lib/password-strength";
@@ -539,24 +539,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                 : "Enter your password", isSignUpMode
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
                 : "Enter your password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
-                {isSignUpMode ? (<div className="space-y-1.5">
-                    <div className="grid grid-cols-4 gap-1">
-                      {[0, 1, 2, 3].map((index) => (<span key={index} className={getPasswordStrengthSegmentClass(emailPasswordStrengthScore, index)}/>))}
-                    </div>
-                    <p className={`text-xs ${getPasswordStrengthTextClass(emailPasswordStrengthScore)}`}>
-                      {getPasswordStrengthLabel(locale, emailPasswordStrengthScore)}
-                    </p>
-                    <ul className="space-y-1 text-xs">
-                      {signupChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>
-                          <span className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${item.passed
-                        ? "border-emerald-400/60 bg-emerald-400/20"
-                        : "border-blacksmith/80 bg-card"}`}>
-                            {item.passed ? "вњ“" : "вЂў"}
-                          </span>
-                          <span>{item.label}</span>
-                        </li>))}
-                    </ul>
-                  </div>) : null}
+                {isSignUpMode ? (<PasswordStrengthChecklist score={emailPasswordStrengthScore} strengthLabel={getPasswordStrengthLabel(locale, emailPasswordStrengthScore)} checklistItems={signupChecklistItems}/>) : null}
                 {emailAuthErrors.password ? (<p className="text-xs text-rose-300">{emailAuthErrors.password}</p>) : null}
               </div>) : null}
 
@@ -616,5 +599,4 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
       </div>
     </section>);
 }
-
 

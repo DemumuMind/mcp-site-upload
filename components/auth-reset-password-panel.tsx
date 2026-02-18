@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
-import { getPasswordChecklistItems, getPasswordStrengthLabel, getPasswordStrengthSegmentClass, getPasswordStrengthTextClass, } from "@/lib/auth/password-ui";
+import { getPasswordChecklistItems, getPasswordStrengthLabel, PasswordStrengthChecklist, } from "@/lib/auth/password-ui";
 import { tr, type Locale } from "@/lib/i18n";
 import { getPasswordStrengthScore, PASSWORD_MIN_LENGTH } from "@/lib/password-strength";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -230,24 +230,7 @@ export function AuthResetPasswordPanel() {
               {tr(locale, "New password", "New password")}
             </Label>
             <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
-            <div className="space-y-1.5">
-              <div className="grid grid-cols-4 gap-1">
-              {[0, 1, 2, 3].map((index) => (<span key={index} className={getPasswordStrengthSegmentClass(passwordStrengthScore, index)}/>))}
-            </div>
-              <p className={`text-xs ${getPasswordStrengthTextClass(passwordStrengthScore)}`}>
-                {getPasswordStrengthLabel(locale, passwordStrengthScore)}
-              </p>
-              <ul className="space-y-1 text-xs">
-                {passwordChecklistItems.map((item) => (<li key={item.key} className={`flex items-center gap-2 ${item.passed ? "text-primary" : "text-muted-foreground"}`}>
-                    <span className={`inline-flex size-4 items-center justify-center rounded-full border text-[10px] ${item.passed
-                ? "border-emerald-400/60 bg-emerald-400/20"
-                : "border-blacksmith/80 bg-card"}`}>
-                      {item.passed ? "вњ“" : "вЂў"}
-                    </span>
-                    <span>{item.label}</span>
-                  </li>))}
-              </ul>
-            </div>
+            <PasswordStrengthChecklist score={passwordStrengthScore} strengthLabel={getPasswordStrengthLabel(locale, passwordStrengthScore)} checklistItems={passwordChecklistItems}/>
             {errors.newPassword ? <p className="text-xs text-rose-300">{errors.newPassword}</p> : null}
           </div>
 
@@ -273,5 +256,4 @@ export function AuthResetPasswordPanel() {
       </div>
     </section>);
 }
-
 
