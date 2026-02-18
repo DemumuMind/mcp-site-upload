@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HowToUsePageContent } from "@/components/how-to-use/how-to-use-page-content";
+import { PageFrame } from "@/components/page-templates";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { getHowToUseLocaleContent } from "@/lib/content/how-to-use";
 import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
@@ -20,5 +21,7 @@ export default async function HowToUsePage() {
     const howToUseContent = getHowToUseLocaleContent(locale);
     const catalogSnapshot = await getCatalogSnapshot({ featuredLimit: 1 });
     const sampleServer = catalogSnapshot.sampleServer;
-    return (<HowToUsePageContent locale={locale} sectionCopy={sectionCopy} content={howToUseContent} sampleServerName={sampleServer?.name || "MCP Server"} sampleServerUrl={sampleServer?.serverUrl || "https://example-mcp-server.dev/sse"}/>);
+    return (<PageFrame variant="content">
+      <HowToUsePageContent locale={locale} sectionCopy={sectionCopy} content={howToUseContent} sampleServerName={sampleServer?.name || "MCP Server"} sampleServerUrl={sampleServer?.serverUrl || "https://example-mcp-server.dev/sse"}/>
+    </PageFrame>);
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageFrame, PageShell, PageHero, PageSection } from "@/components/page-templates";
 import { AuthSignInPanel } from "@/components/auth-sign-in-panel";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -18,12 +19,18 @@ type AuthPageProps = {
     }>;
 };
 export default async function AuthPage({ searchParams }: AuthPageProps) {
+    const locale = await getLocale();
     const { next, error, error_code, error_description } = await searchParams;
     const nextPath = typeof next === "string" ? next : "/";
     const errorCode = typeof error === "string" ? error : undefined;
     const authErrorCode = typeof error_code === "string" ? error_code : undefined;
     const authErrorDescription = typeof error_description === "string" ? error_description : undefined;
-    return (<div className="mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col justify-center px-4 py-12 sm:px-6">
-      <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} authErrorCode={authErrorCode} authErrorDescription={authErrorDescription}/>
-    </div>);
+    return (<PageFrame variant="content">
+      <PageShell className="max-w-5xl px-4 sm:px-6">
+        <PageHero animated={false} badgeTone="violet" eyebrow={tr(locale, "Access", "Access")} title={tr(locale, "Sign in", "Sign in")} description={tr(locale, "Sign in to submit MCP servers and manage your account.", "Sign in to submit MCP servers and manage your account.")}/>
+        <PageSection className="min-h-[40vh]">
+          <AuthSignInPanel nextPath={nextPath} errorCode={errorCode} authErrorCode={authErrorCode} authErrorDescription={authErrorDescription}/>
+        </PageSection>
+      </PageShell>
+    </PageFrame>);
 }

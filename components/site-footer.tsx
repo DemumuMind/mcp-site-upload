@@ -22,8 +22,9 @@ export function SiteFooter({ locale }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-blacksmith bg-background">
-      <div className="section-shell grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="relative overflow-hidden border-t border-blacksmith bg-[linear-gradient(180deg,rgba(15,18,24,0.97)_0%,rgba(9,11,15,0.99)_100%)]">
+      <div className="pointer-events-none absolute inset-y-0 left-6 w-px bg-gradient-to-b from-transparent via-slate-300/25 to-transparent" aria-hidden />
+      <div className="section-shell relative grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-5">
           <Link
             href="/"
@@ -45,7 +46,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith bg-[linear-gradient(180deg,rgba(28,32,40,0.82)_0%,rgba(15,17,22,0.92)_100%)] text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                 aria-label={item.label}
               >
                 <item.icon className="size-4" />
@@ -86,7 +87,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="section-shell flex flex-wrap items-center justify-between gap-3 border-t border-blacksmith py-4 text-xs text-muted-foreground">
+      <div className="section-shell relative flex flex-wrap items-center justify-between gap-3 border-t border-blacksmith py-4 text-xs text-muted-foreground before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/10">
         <p>{tr(locale, `(c) ${year} DemumuMind. All rights reserved.`, `(c) ${year} DemumuMind. All rights reserved.`)}</p>
         <p>{tr(locale, "Built for modern AI agent workflows.", "Built for modern AI agent workflows.")}</p>
       </div>

@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -57,18 +57,71 @@
 :root {
   --font-geist-sans: "Inter", "Space Grotesk", "Segoe UI", system-ui, sans-serif;
   --font-geist-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, monospace;
-
   --radius: 0.75rem;
 
-  /* Cosmic Palette */
-  --cosmic-void: #05050b;
-  --cosmic-indigo: #10163d;
-  --cosmic-blue: #3b82f6;
-  --cosmic-violet: #7a4dff;
-  --cosmic-lilac: #e2b6ff;
-  --cosmic-white: #f5f7ff;
-  --cosmic-fog: #bec7ff;
+  /* Industrial Neo core */
+  --industrial-coal: #080909;
+  --industrial-cinder: #121414;
+  --industrial-iron: #1f2527;
+  --industrial-steel: #2f383b;
+  --industrial-zinc: #5a6a70;
+  --industrial-smoke: #aab6ba;
+  --industrial-ivory: #f3f6f7;
+  --industrial-ember: #f6a623;
+  --industrial-ember-strong: #ffcc4d;
+  --industrial-danger: #ff5757;
 
+  --industrial-border-soft: rgba(255, 255, 255, 0.11);
+  --industrial-border-strong: rgba(255, 255, 255, 0.2);
+  --industrial-elev-1: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 28px -18px rgba(0, 0, 0, 0.8);
+  --industrial-elev-2: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+  --industrial-focus-ring: 0 0 0 2px rgba(255, 204, 77, 0.45), 0 0 0 4px rgba(8, 9, 9, 0.9);
+
+  /* Blacksmith aliases now point to Industrial Neo tokens */
+  --blacksmith-char: var(--industrial-coal);
+  --blacksmith-panel: var(--industrial-cinder);
+  --blacksmith-card: var(--industrial-iron);
+  --blacksmith-ink: var(--industrial-ivory);
+  --blacksmith-gold: var(--industrial-ember);
+  --blacksmith-gold-strong: var(--industrial-ember-strong);
+  --blacksmith-line: var(--industrial-border-soft);
+
+  --background: var(--industrial-coal);
+  --foreground: var(--industrial-ivory);
+  --card: var(--industrial-cinder);
+  --card-foreground: var(--industrial-ivory);
+  --popover: var(--industrial-cinder);
+  --popover-foreground: var(--industrial-ivory);
+  --primary: var(--industrial-ember);
+  --primary-foreground: #1b1200;
+  --secondary: var(--industrial-iron);
+  --secondary-foreground: var(--industrial-ivory);
+  --muted: var(--industrial-steel);
+  --muted-foreground: var(--industrial-smoke);
+  --accent: var(--industrial-ember-strong);
+  --accent-foreground: #1b1200;
+  --destructive: var(--industrial-danger);
+  --border: var(--industrial-border-soft);
+  --input: var(--industrial-cinder);
+  --ring: rgba(255, 204, 77, 0.45);
+
+  --chart-1: #ffcc4d;
+  --chart-2: #f6a623;
+  --chart-3: #7f8f95;
+  --chart-4: #2f383b;
+  --chart-5: #aab6ba;
+
+  --sidebar: var(--industrial-cinder);
+  --sidebar-foreground: var(--industrial-ivory);
+  --sidebar-primary: var(--industrial-ember);
+  --sidebar-primary-foreground: #1b1200;
+  --sidebar-accent: var(--industrial-iron);
+  --sidebar-accent-foreground: var(--industrial-ivory);
+  --sidebar-border: var(--industrial-border-soft);
+  --sidebar-ring: rgba(255, 204, 77, 0.45);
+}
+
+:root[data-theme="cosmic-burst"] {
   --background: #05050b;
   --foreground: #f5f7ff;
   --card: #0d122b;
@@ -87,21 +140,6 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: #0d122b;
   --ring: rgba(59, 130, 246, 0.5);
-
-  --chart-1: #3b82f6;
-  --chart-2: #7a4dff;
-  --chart-3: #e2b6ff;
-  --chart-4: #2e5bff;
-  --chart-5: #6366f1;
-
-  --sidebar: #0a0e24;
-  --sidebar-foreground: #f5f7ff;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #161b33;
-  --sidebar-accent-foreground: #f5f7ff;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: rgba(59, 130, 246, 0.5);
 }
 
 .dark {
@@ -121,58 +159,91 @@
   body {
     @apply min-h-screen bg-background text-foreground antialiased;
     font-family: var(--font-geist-sans);
-    background-image: 
-      radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15), transparent 50%),
-      radial-gradient(circle at 0% 0%, rgba(122, 77, 255, 0.05), transparent 30%);
+    background-image:
+      radial-gradient(circle at 50% -20%, rgba(255, 204, 77, 0.12), transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.04), transparent 30%);
     background-attachment: fixed;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--industrial-focus-ring);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
-  .bg-cosmic-foundation {
+  .bg-industrial-foundation,
+  .bg-blacksmith-foundation {
     background:
-      radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.2), transparent 45%),
-      radial-gradient(circle at 15% 0%, rgba(122, 77, 255, 0.1), transparent 30%),
-      linear-gradient(180deg, #05050b 0%, #080a1a 100%);
+      radial-gradient(circle at 50% -12%, rgba(255, 204, 77, 0.18), transparent 42%),
+      linear-gradient(180deg, var(--industrial-coal) 0%, #0b0d0e 55%, #111618 100%);
   }
 
+  .industrial-grid,
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(circle at center, black, transparent 84%);
+  }
+
+  .industrial-vignette {
+    background: radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.06), transparent 58%);
+  }
+
+  .bg-blacksmith-panel,
   .bg-cosmic-panel {
-    @apply bg-card/60 backdrop-blur-xl border border-white/5;
+    @apply border border-white/10 bg-card/75 backdrop-blur-md;
+    box-shadow: var(--industrial-elev-1);
   }
 
+  .text-blacksmith-muted,
   .text-cosmic-muted {
-    color: #bec7ff;
+    color: var(--muted-foreground);
   }
 
+  .border-blacksmith,
   .border-cosmic {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--blacksmith-line);
   }
 
+  .shadow-blacksmith,
   .shadow-cosmic {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--industrial-elev-1);
   }
 
+  .shadow-blacksmith-glow,
   .shadow-cosmic-glow {
-    box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.3), 0 0 40px -10px rgba(122, 77, 255, 0.2);
+    box-shadow: 0 0 0 1px rgba(255, 204, 77, 0.25), 0 24px 60px -26px rgba(0, 0, 0, 0.85);
   }
 
   .section-shell {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  .hero-grid {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    background-position: center top;
-    mask-image: radial-gradient(circle at center, black, transparent 80%);
+  .glass-card {
+    @apply rounded-2xl border bg-card/75 backdrop-blur-md transition-all duration-300;
+    border-color: var(--blacksmith-line);
+    box-shadow: var(--industrial-elev-1);
   }
 
-  .glass-card {
-    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:bg-white/10 hover:border-white/20;
+  .glass-card:hover {
+    border-color: var(--industrial-border-strong);
+    box-shadow: var(--industrial-elev-2);
   }
 }
-
-
-

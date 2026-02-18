@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loginAdminAction } from "@/app/admin/actions";
+import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +43,10 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
         : authMode === "supabase"
             ? tr(locale, "Current mode: Supabase admin-role only.", "Current mode: Supabase admin-role only.")
             : tr(locale, "Current mode: token only.", "Current mode: token only.");
-    return (<div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col justify-center px-4 py-12">
-      <div className="rounded-2xl border border-white/10 bg-indigo-900/70 p-6">
+    return (<PageFrame variant="ops">
+      <PageShell className="max-w-md px-4">
+        <PageHero animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Admin access", "Admin access")} description={tr(locale, "Use your admin role or emergency token to open moderation dashboard.", "Use your admin role or emergency token to open moderation dashboard.")}/>
+        <PageSection className="bg-indigo-900/70">
         <h1 className="text-xl font-semibold text-violet-50">
           {tr(locale, "Admin access", "Admin access")}
         </h1>
@@ -90,6 +93,7 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
         {!supabaseLoginEnabled && !tokenLoginEnabled ? (<p className="mt-4 rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
             {tr(locale, "No admin auth method is enabled. Configure ADMIN_AUTH_MODE and credentials.", "No admin auth method is enabled. Configure ADMIN_AUTH_MODE and credentials.")}
           </p>) : null}
-      </div>
-    </div>);
+        </PageSection>
+      </PageShell>
+    </PageFrame>);
 }

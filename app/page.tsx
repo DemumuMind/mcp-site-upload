@@ -1,4 +1,5 @@
 import { HomePageContent } from "@/components/home/home-page-content";
+import { PageFrame } from "@/components/page-templates";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { getHomeContent } from "@/lib/home/content";
 import { buildHomePageViewModel } from "@/lib/home/view-model";
@@ -16,5 +17,9 @@ export default async function HomePage() {
     snapshot,
   });
 
-  return <HomePageContent content={content} viewModel={viewModel} />;
+  return (
+    <PageFrame variant="marketing">
+      <HomePageContent content={content} viewModel={viewModel} />
+    </PageFrame>
+  );
 }

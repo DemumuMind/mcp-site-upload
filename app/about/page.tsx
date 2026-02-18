@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Brain, Compass, Rocket, ShieldCheck, Workflow } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { PageActionZone, PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
@@ -70,27 +70,16 @@ export default async function AboutPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-blacksmith">
+    <PageFrame variant="marketing">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02070f_0%,#050b1c_50%,#06091b_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(circle_at_18%_7%,rgba(56,189,248,0.22),transparent_40%),radial-gradient(circle_at_82%_8%,rgba(129,140,248,0.2),transparent_42%)]" />
 
-      <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <section className="rounded-3xl border border-primary/30 bg-card p-6 sm:p-10">
-          <Badge className="mb-4 border-primary/35 bg-primary/10 text-primary">
-            <Brain className="size-3" />
-            {tr(locale, "About DemumuMind", "About DemumuMind")}
-          </Badge>
-          <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-            {tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")}
-          </h1>
-          <p className="mt-5 max-w-4xl text-sm leading-8 text-muted-foreground sm:text-lg">
-            {tr(
+      <PageShell className="max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+        <PageHero className="rounded-3xl border-primary/30 bg-card p-6 sm:p-10" badgeTone="cyan" eyebrow={<><Brain className="size-3" />{tr(locale, "About DemumuMind", "About DemumuMind")}</>} title={tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")} description={tr(
               locale,
               "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
               "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
-            )}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+            )} actions={<>
             <Button asChild className="bg-blue-500 hover:bg-blue-400">
               <Link href="/catalog">
                 {tr(locale, "Explore catalog", "Explore catalog")}
@@ -100,10 +89,9 @@ export default async function AboutPage() {
             <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
               <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
             </Button>
-          </div>
-        </section>
+          </>}/>
 
-        <section className="grid gap-4 lg:grid-cols-3">
+        <PageSection className="grid gap-4 lg:grid-cols-3">
           {pillars.map((pillar) => (
             <Card key={pillar.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-3">
@@ -115,9 +103,9 @@ export default async function AboutPage() {
               <CardContent className="text-sm leading-7 text-muted-foreground">{pillar.description}</CardContent>
             </Card>
           ))}
-        </section>
+        </PageSection>
 
-        <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
           <Card className="border-blacksmith bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl text-foreground">
@@ -158,9 +146,12 @@ export default async function AboutPage() {
               </p>
             </CardContent>
           </Card>
-        </section>
-      </div>
-    </div>
+        </div>
+        <PageActionZone>
+          <p className="text-sm text-primary">{tr(locale, "Our mission: make high-quality agentic engineering repeatable for every product team.", "Our mission: make high-quality agentic engineering repeatable for every product team.")}</p>
+        </PageActionZone>
+      </PageShell>
+    </PageFrame>
   );
 }
 

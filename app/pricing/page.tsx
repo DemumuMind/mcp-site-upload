@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
+import { PageActionZone, PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
@@ -65,16 +66,11 @@ export default async function PricingPage() {
   ];
 
   return (
-    <div className="section-shell flex max-w-6xl flex-col gap-6 py-10 sm:py-14">
-      <section className="space-y-3 rounded-2xl border border-blacksmith bg-card p-6 sm:p-8">
-        <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{tr(locale, "Pricing", "Pricing")}</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{tr(locale, "Two simple plans", "Two simple plans")}</h1>
-        <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-          {tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}
-        </p>
-      </section>
+    <PageFrame variant="marketing">
+      <PageShell className="max-w-6xl">
+      <PageHero animated={false} badgeTone="cyan" eyebrow={tr(locale, "Pricing", "Pricing")} title={tr(locale, "Two simple plans", "Two simple plans")} description={tr(locale, "Start for free or choose Pro for $3/month.", "Start for free or choose Pro for $3/month.")}/>
 
-      <section className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
+      <PageSection className="grid gap-4 md:grid-cols-2" aria-label={tr(locale, "Plans", "Plans")}>
         {plans.map((plan) => (
           <Card key={plan.id} className={plan.highlighted ? "border-primary/40 bg-card" : "bg-card"}>
             <CardHeader className="space-y-1">
@@ -101,9 +97,12 @@ export default async function PricingPage() {
             </CardContent>
           </Card>
         ))}
-      </section>
+      </PageSection>
 
-      <p className="text-center text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
-    </div>
+      <PageActionZone className="text-center">
+        <p className="text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
+      </PageActionZone>
+      </PageShell>
+    </PageFrame>
   );
 }

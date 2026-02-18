@@ -1,59 +1,63 @@
-﻿# Design System: DemumuMind MCP — Cosmic Burst
+# Design System: DemumuMind MCP - Industrial Neo
 **Project ID:** local-repo:mcp-site
 
 ## 1. Visual Theme & Atmosphere
-The interface uses a **Cosmic Burst** language: deep void-like backgrounds, kinetic radial energy, and neon plasma accents. The mood is cinematic, high-contrast, and futuristic, while keeping content readability above visual spectacle.
+The interface now follows **Industrial Neo**: forged-metal depth, controlled amber energy, and clean machine-grid structure. It is dark, technical, and premium, with clarity-first content hierarchy.
 
 Design intent:
-- Feel like motion through a nebula core (burst center + directional streaks).
-- Keep UI surfaces legible through translucent indigo panels.
-- Use glow as hierarchy, not decoration noise.
+- Establish a high-contrast, industrial control-room baseline.
+- Replace neon-plasma surfaces with metal + ember accents.
+- Keep visual power without sacrificing readability or focus cues.
 
 ## 2. Color Palette & Roles
-- **Void Black** (`#05050B`) — global base background and depth anchor.
-- **Deep Indigo Field** (`#10163D`) — primary panel/surface mass.
-- **Electric Blue** (`#2E5BFF`) — primary actions, key interactive emphasis.
-- **Plasma Violet** (`#7A4DFF`) — secondary accents, badges, active states.
-- **Neon Lilac** (`#E2B6FF`) — highlight glow, high-energy decorative accents.
-- **Photon White** (`#F5F7FF`) — primary typography and high-priority labels.
-- **Cosmic Fog** (`#BEC7FF`) — secondary text and muted supporting copy.
+- **Coal Black** (`#080909`) - global foundation and deep backdrop.
+- **Cinder Surface** (`#121414`) - primary surface and shell.
+- **Forged Iron** (`#1F2527`) - secondary surfaces, controls, and blocks.
+- **Steel Midtone** (`#2F383B`) - muted surfaces and separators.
+- **Smoke Text** (`#AAB6BA`) - supporting copy.
+- **Ivory Ink** (`#F3F6F7`) - primary content text.
+- **Forge Ember** (`#F6A623`) - primary action and signal.
+- **Hot Ember** (`#FFCC4D`) - focus, active glow, and highlight edge.
 
 Functional usage:
-- Main CTA = Electric Blue with controlled glow halo.
-- Secondary/outline controls = Deep Indigo + border-cosmic stroke.
-- Cards/forms = translucent indigo glass with low-noise blur.
-- Dividers = soft periwinkle border opacity, never pure gray.
+- CTA and interactive emphasis use ember with dark foreground text.
+- Panels and cards use cinder/iron surfaces with soft white border contrast.
+- Dividers and strokes are semi-opaque whites tuned for dark metal surfaces.
+- Alert/destructive actions remain red for semantic clarity.
 
 ## 3. Typography Rules
-- **Primary family:** Space Grotesk / Inter system stack.
-- **Body text:** medium contrast (`Cosmic Fog`) for long reading comfort.
-- **Headlines:** Photon White with tight tracking and occasional gradient emphasis.
-- **Emphasis:** short gradient spans (Electric Blue -> Neon Lilac), never full paragraph gradients.
+- **Primary family:** Inter / Space Grotesk stack.
+- **Headlines:** Ivory, crisp, compact.
+- **Body text:** Ivory and Smoke mix for hierarchy.
+- **Emphasis:** short amber highlight spans only; avoid full gradient body text.
 
 ## 4. Component Stylings
-- **Buttons:** Rounded-xl to pill-adjacent geometry, luminous edge ring, energetic hover brightening.
-- **Cards/Containers:** Softly rounded (`2xl`) translucent indigo surfaces with atmospheric blur and subtle ambient glow.
-- **Inputs/Forms:** Glass-like dark input wells, periwinkle outline on focus, readable placeholder contrast.
-- **Badges:** Compact rounded chips, high chroma accents for taxonomy/status signaling.
-- **Navigation:** Frosted cosmic strip with restrained glow and clear focus states.
+- **Buttons:** Dense industrial geometry (rounded-lg/xl), ember emphasis for primary.
+- **Cards/Containers:** Dark forged panels, subtle blur, restrained elevation.
+- **Inputs/Forms:** High-contrast text, clear border states, strong focus ring.
+- **Badges:** Compact metal chips with amber highlights for status.
+- **Navigation:** Structural dark strip with visible keyboard focus and contrast-safe links.
 
 ## 5. Layout Principles
-- Layering model:
-  1. Void base,
-  2. radial burst field,
-  3. conic/radial energy texture,
-  4. content surfaces.
-- Keep long-form sections on calmer surfaces; reserve highest-intensity visuals for hero/transition zones.
-- Use broad spacing and breathing room around dense data blocks.
-- Preserve accessibility: maintain high text contrast and reduced-motion fallback for animated glow/pulse effects.
+Layer order:
+1. Coal foundation,
+2. ember radial wash,
+3. machine-grid texture,
+4. foreground content.
 
-## 6. Motion & Interaction Guidelines
-- Motion style: slow pulse and soft drift, not fast jitter.
-- Hover behavior: brightness and glow increase, no hard movement jumps.
-- Reduced motion: disable pulse/floating animation when `prefers-reduced-motion: reduce` is enabled.
+Guidelines:
+- Keep intense visual effects in hero/backdrop layers only.
+- Preserve spacing around dense content blocks.
+- Avoid decorative noise inside data-heavy modules.
+
+## 6. Accessibility & Motion
+- Maintain high contrast on all semantic roles.
+- Visible keyboard focus is mandatory (`:focus-visible` ring with dual contrast layers).
+- Respect `prefers-reduced-motion: reduce` by minimizing animations/transitions.
 
 ## 7. Implementation Notes (Current Repo)
-- Theme contract centralized in `app/globals.css` via semantic tokens (`--background`, `--primary`, etc.).
-- Global atmospheric layers are mounted in `app/layout.tsx`.
-- Reusable primitives (`Button`, `Card`, `Input`, `Textarea`, `Select`, `Badge`) carry the cosmic surface language.
-- Route/page-specific color classes are remapped from neutral slate tones to indigo/violet-biased tones for coherent site-wide visual identity.
+- Feature flag: `NEXT_PUBLIC_REDESIGN_V3`.
+- Theme switch priority: `industrial-neo` (v3) -> `blacksmith-v2` (v2) -> `cosmic-burst` (fallback).
+- Token contract and compatibility aliases live in `app/globals.css`.
+- Flag parsing and helpers live in `lib/design-flags.ts`.
+- Global background layers are chosen in `app/layout.tsx` by active theme.

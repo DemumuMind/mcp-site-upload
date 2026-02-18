@@ -1,6 +1,7 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, Compass } from "lucide-react";
+import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
@@ -77,29 +78,24 @@ export default async function SitemapPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-blacksmith">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#030711_0%,#060d1f_48%,#07091b_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-[radial-gradient(circle_at_18%_9%,rgba(56,189,248,0.2),transparent_40%),radial-gradient(circle_at_82%_8%,rgba(129,140,248,0.18),transparent_42%)]" />
+    <PageFrame>
+      <PageShell>
+        <PageHero
+          eyebrow={
+            <Badge className="border-primary/35 bg-primary/10 text-primary">
+              <Compass className="size-3" />
+              {tr(locale, "Navigation", "Navigation")}
+            </Badge>
+          }
+          title={tr(locale, "DemumuMind Sitemap", "DemumuMind Sitemap")}
+          description={tr(
+            locale,
+            "A full route index of the platform, grouped by product, company, account workflows, and legal pages.",
+            "A full route index of the platform, grouped by product, company, account workflows, and legal pages.",
+          )}
+        />
 
-      <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <section className="rounded-3xl border border-primary/30 bg-card p-6 sm:p-10">
-          <Badge className="mb-4 border-primary/35 bg-primary/10 text-primary">
-            <Compass className="size-3" />
-            {tr(locale, "Navigation", "Navigation")}
-          </Badge>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-            {tr(locale, "DemumuMind Sitemap", "DemumuMind Sitemap")}
-          </h1>
-          <p className="mt-4 max-w-4xl text-sm leading-8 text-muted-foreground sm:text-lg">
-            {tr(
-              locale,
-              "A full route index of the platform, grouped by product, company, account workflows, and legal pages.",
-              "A full route index of the platform, grouped by product, company, account workflows, and legal pages.",
-            )}
-          </p>
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
+        <PageSection className="grid gap-4 lg:grid-cols-2">
           {sitemapGroups.map((group) => (
             <Card key={group.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-2">
@@ -123,9 +119,8 @@ export default async function SitemapPage() {
               </CardContent>
             </Card>
           ))}
-        </section>
-      </div>
-    </div>
+        </PageSection>
+      </PageShell>
+    </PageFrame>
   );
 }
-

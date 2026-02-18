@@ -57,11 +57,16 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-blacksmith bg-[rgba(9,9,9,0.88)] backdrop-blur-xl transition-all duration-200 ${
+      className={`sticky top-0 z-40 border-b border-blacksmith bg-[linear-gradient(180deg,rgba(18,21,29,0.92)_0%,rgba(10,12,16,0.88)_100%)] backdrop-blur-xl transition-all duration-200 ${
         isScrolled ? "shadow-[0_6px_24px_rgba(0,0,0,0.35)]" : ""
       }`}
     >
-      <div data-anime="home-nav" className={`section-shell flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-200 ${isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"}`}>
+      <div
+        data-anime="home-nav"
+        className={`section-shell relative flex flex-wrap items-center justify-between gap-2 py-2 transition-all duration-200 before:pointer-events-none before:absolute before:inset-y-2 before:left-5 before:w-px before:bg-gradient-to-b before:from-transparent before:via-slate-300/30 before:to-transparent ${
+          isScrolled ? "min-h-12 sm:min-h-14" : "min-h-14 sm:min-h-16"
+        }`}
+      >
         <Link
           className="inline-flex min-h-11 items-center rounded-md text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           href="/"
@@ -87,7 +92,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         <div className="flex shrink-0 items-center gap-2 lg:hidden">
           <button
             type="button"
-            className="inline-flex h-11 min-w-11 items-center justify-center rounded-full border border-blacksmith bg-card px-3 text-foreground transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="inline-flex h-11 min-w-11 items-center justify-center rounded-full border border-blacksmith bg-[linear-gradient(180deg,rgba(30,35,43,0.82)_0%,rgba(16,18,23,0.9)_100%)] px-3 text-foreground transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             onClick={() => setIsMobileMenuOpen((current) => !current)}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-site-nav"
@@ -100,7 +105,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
       </div>
 
       {isMobileMenuOpen ? (
-        <nav id="mobile-site-nav" className="border-t border-blacksmith bg-background px-4 py-3 sm:px-6 lg:hidden" aria-label="Mobile navigation">
+        <nav id="mobile-site-nav" className="border-t border-blacksmith bg-[linear-gradient(180deg,rgba(19,22,29,0.97)_0%,rgba(10,12,16,0.98)_100%)] px-4 py-3 sm:px-6 lg:hidden" aria-label="Mobile navigation">
           <div className="mx-auto grid w-full max-w-7xl gap-2">
             {navLinks.map((link) => (
               <Link

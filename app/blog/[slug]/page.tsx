@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogArticlePage } from "@/components/blog-v2/blog-article-page";
+import { PageFrame } from "@/components/page-templates";
 import { getAllBlogV2ListItems, getBlogV2PostBySlug } from "@/lib/blog-v2/contentlayer";
-import { isBlogV2Enabled } from "@/lib/blog-v2/flags";
-import {
-  LegacyBlogArticlePage,
-  generateLegacyArticleMetadata,
-  generateLegacyStaticParams,
-} from "./legacy-page";
 
 export const dynamic = "force-dynamic";
 
@@ -18,20 +13,12 @@ type BlogArticlePageProps = {
 };
 
 export async function generateStaticParams() {
-  if (!isBlogV2Enabled()) {
-    return generateLegacyStaticParams();
-  }
-
   return getAllBlogV2ListItems().map((post) => ({
     slug: post.slug,
   }));
 }
 
 export async function generateMetadata({ params }: BlogArticlePageProps): Promise<Metadata> {
-  if (!isBlogV2Enabled()) {
-    return generateLegacyArticleMetadata({ params });
-  }
-
   const { slug } = await params;
   const post = getBlogV2PostBySlug(slug);
 
@@ -67,10 +54,6 @@ export async function generateMetadata({ params }: BlogArticlePageProps): Promis
 }
 
 export default async function BlogArticleRoute({ params }: BlogArticlePageProps) {
-  if (!isBlogV2Enabled()) {
-    return <LegacyBlogArticlePage params={params} />;
-  }
-
   const { slug } = await params;
   const post = getBlogV2PostBySlug(slug);
   if (!post) {
@@ -99,9 +82,9 @@ export default async function BlogArticleRoute({ params }: BlogArticlePageProps)
   };
 
   return (
-    <>
+    <PageFrame variant="content">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <BlogArticlePage post={post} />
-    </>
+    </PageFrame>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { AuthCheckEmailPanel } from "@/components/auth-check-email-panel";
 import { normalizeInternalPath, type AuthCheckEmailFlow } from "@/lib/auth-redirects";
 import { tr } from "@/lib/i18n";
@@ -21,11 +22,17 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 export default async function AuthCheckEmailPage({ searchParams }: AuthCheckEmailPageProps) {
+    const locale = await getLocale();
     const { flow, email, next } = await searchParams;
     const parsedFlow = parseFlow(flow);
     const safeNextPath = normalizeInternalPath(next);
     const normalizedEmail = typeof email === "string" ? email.trim().slice(0, 254) : "";
-    return (<div className="mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col justify-center px-4 py-12 sm:px-6">
-      <AuthCheckEmailPanel flow={parsedFlow} email={normalizedEmail} nextPath={safeNextPath}/>
-    </div>);
+    return (<PageFrame variant="content">
+      <PageShell className="max-w-5xl px-4 sm:px-6">
+        <PageHero animated={false} badgeTone="violet" eyebrow={tr(locale, "Authentication", "Authentication")} title={tr(locale, "Check your email", "Check your email")} description={tr(locale, "Use the link sent to your inbox to continue.", "Use the link sent to your inbox to continue.")}/>
+        <PageSection className="min-h-[40vh]">
+          <AuthCheckEmailPanel flow={parsedFlow} email={normalizedEmail} nextPath={safeNextPath}/>
+        </PageSection>
+      </PageShell>
+    </PageFrame>);
 }

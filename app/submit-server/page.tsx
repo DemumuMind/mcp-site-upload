@@ -1,6 +1,7 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ClipboardCheck, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
 import { SubmitServerWizard } from "@/components/submit-server-wizard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ const highlights = [
   {
     icon: Workflow,
     title: "3-step workflow",
-    description: "Basics в†’ Technical details в†’ Review and submit.",
+    description: "Basics → Technical details → Review and submit.",
   },
   {
     icon: ShieldCheck,
@@ -42,40 +43,37 @@ export default async function SubmitServerPage() {
   const locale = await getLocale();
 
   return (
-    <div className="relative overflow-hidden border-t border-blacksmith">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#02050f_0%,#050a18_45%,#090816_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[480px] bg-[radial-gradient(circle_at_16%_8%,rgba(217,70,239,0.2),transparent_42%),radial-gradient(circle_at_84%_10%,rgba(59,130,246,0.18),transparent_40%)]" />
+    <PageFrame>
+      <PageShell>
+        <PageHero
+          eyebrow={
+            <Badge className="border-fuchsia-400/35 bg-fuchsia-500/10 text-fuchsia-200">
+              <Sparkles className="size-3" />
+              {tr(locale, "Server Submission", "Server Submission")}
+            </Badge>
+          }
+          title={tr(locale, "Submit your MCP server", "Submit your MCP server")}
+          description={tr(
+            locale,
+            "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
+            "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
+          )}
+          actions={
+            <>
+              <Button asChild className="bg-blue-500 hover:bg-blue-400">
+                <Link href="/catalog">
+                  {tr(locale, "Open catalog", "Open catalog")}
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
+                <Link href="/account">{tr(locale, "View my account", "View my account")}</Link>
+              </Button>
+            </>
+          }
+        />
 
-      <section className="mx-auto w-full max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <div className="rounded-3xl border border-fuchsia-400/20 bg-card p-6 sm:p-10">
-          <Badge className="mb-4 border-fuchsia-400/35 bg-fuchsia-500/10 text-fuchsia-200">
-            <Sparkles className="size-3" />
-            {tr(locale, "Server Submission", "Server Submission")}
-          </Badge>
-          <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-            {tr(locale, "Submit your MCP server", "Submit your MCP server")}
-          </h1>
-          <p className="mt-5 max-w-4xl text-sm leading-8 text-muted-foreground sm:text-lg">
-            {tr(
-              locale,
-              "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
-              "Use the guided flow to prepare a high-signal submission for moderation. Submission access is limited to authenticated users.",
-            )}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className="bg-blue-500 hover:bg-blue-400">
-              <Link href="/catalog">
-                {tr(locale, "Open catalog", "Open catalog")}
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
-              <Link href="/account">{tr(locale, "View my account", "View my account")}</Link>
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-3">
+        <PageSection className="grid gap-4 lg:grid-cols-3">
           {highlights.map((item) => (
             <Card key={item.title} className="border-blacksmith bg-card">
               <CardHeader className="pb-3">
@@ -87,9 +85,9 @@ export default async function SubmitServerPage() {
               <CardContent className="text-sm leading-7 text-muted-foreground">{item.description}</CardContent>
             </Card>
           ))}
-        </div>
+        </PageSection>
 
-        <div className="rounded-2xl border border-blacksmith bg-card p-4 sm:p-6">
+        <PageSection>
           <h2 className="mb-3 text-2xl font-semibold tracking-tight text-foreground">{tr(locale, "Submission flow", "Submission flow")}</h2>
           <p className="mb-5 text-sm leading-7 text-muted-foreground">
             {tr(
@@ -99,10 +97,8 @@ export default async function SubmitServerPage() {
             )}
           </p>
           <SubmitServerWizard />
-        </div>
-      </section>
-    </div>
+        </PageSection>
+      </PageShell>
+    </PageFrame>
   );
 }
-
-

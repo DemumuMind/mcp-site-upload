@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { BlogListPage } from "@/components/blog-v2/blog-list-page";
+import { PageFrame } from "@/components/page-templates";
 import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
-import { isBlogV2Enabled } from "@/lib/blog-v2/flags";
 import { getLocale } from "@/lib/i18n-server";
 import { tr } from "@/lib/i18n";
-import { generateLegacyBlogMetadata, LegacyBlogPage } from "@/app/blog/legacy-page";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +15,6 @@ type BlogPageProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  if (!isBlogV2Enabled()) {
-    return generateLegacyBlogMetadata();
-  }
-
   const locale = await getLocale();
   const sectionCopy = getSectionLocaleCopy(getSectionIndex("blog"), locale);
   const pageTitle = sectionCopy?.title ?? tr(locale, "Blog", "Blog");
@@ -57,17 +52,13 @@ function normalizeTopic(input: string | undefined): string | null {
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  if (!isBlogV2Enabled()) {
-    return <LegacyBlogPage searchParams={searchParams} />;
-  }
-
   const params = await searchParams;
   const selectedTopic = normalizeTopic(
-    typeof params.topic === "string"
-      ? params.topic
-      : typeof params.tag === "string"
-        ? params.tag
-        : undefined,
+    typeof params.topic === "string" ? params.topic : typeof params.tag === "string" ? params.tag : undefined,
   );
-  return <BlogListPage selectedTopic={selectedTopic} />;
+  return (
+    <PageFrame variant="content">
+      <BlogListPage selectedTopic={selectedTopic} />
+    </PageFrame>
+  );
 }
