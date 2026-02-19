@@ -14,8 +14,8 @@ const handlers = withCronAuth(
       const result = await runCatalogNpmSync();
 
       // Сброс кэша для обновления данных на сайте
-      revalidatePath("/");
-      revalidatePath("/catalog");
+      revalidatePath("/", "layout");
+      revalidatePath("/catalog", "page");
       revalidateTag(CATALOG_SERVERS_CACHE_TAG);
 
       for (const slug of result.changedSlugs.slice(0, 100)) {

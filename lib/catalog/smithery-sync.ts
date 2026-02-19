@@ -134,6 +134,22 @@ export async function runCatalogSmitherySync(): Promise<CatalogSyncResult> {
     result.candidates = payloads.length;
     result.queuedForUpsert = payloads.length;
 
+    // 1. Дедупликация по repo_url
+    const { data: existingServers } = await adminClient
+      .from("servers")
+      .select("slug, repo_url, tags")
+      .not("repo_url", "is", null);
+
+    const repoUrlToSlug = new Map(existingServers?.map(s => [s.repo_url?.toLowerCase(), s.slug]) || []);
+
+    // Переназначаем слаги для тех, у кого совпадает repo_url
+    payloads.forEach(p => {
+      const existingSlug = repoUrlToSlug.get(p.repo_url?.toLowerCase());
+      if (existingSlug && existingSlug !== p.slug) {
+        p.slug = existingSlug;
+      }
+    });
+
     // Массовая вставка/обновление
     for (const chunk of chunkArray(payloads, 50)) {
       const { error, data: upsertData } = await adminClient

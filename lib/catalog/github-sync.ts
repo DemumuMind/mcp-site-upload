@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { withRetry } from "@/lib/api/fetch-with-retry";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { AuthType, ServerStatus, VerificationLevel } from "@/lib/types";
+import { getGithubReadme } from "@/lib/github-server-details";
 
 export type CatalogSyncFailure = {
   slug: string;
@@ -107,6 +109,7 @@ type SyncRowPayload = {
   };
   status: ServerStatus;
   verification_level: VerificationLevel;
+  tools: string[];
 };
 
 function normalizeWhitespace(value: string): string {
@@ -159,7 +162,7 @@ function inferCategory(source: string): string {
   return "Other Tools and Integrations";
 }
 
-function buildPayload(repo: GitHubRepository): SyncRowPayload | null {
+async function buildPayload(repo: GitHubRepository): Promise<SyncRowPayload | null> {
   if (repo.archived) return null;
   const fullName = normalizeWhitespace(repo.full_name ?? "");
   const repoName = normalizeWhitespace(repo.name ?? "");
@@ -187,11 +190,15 @@ function buildPayload(repo: GitHubRepository): SyncRowPayload | null {
     if (normalized) tags.add(normalized);
   }
 
+  // Fetch README and extract tools
+  const readmeData = await getGithubReadme(repoUrl);
+  const tools = readmeData?.tools || [];
+
   return {
     name: displayName || repoName,
     slug,
     description: (description || `Imported from GitHub repository ${fullName}.`).slice(0, 800),
-    server_url: normalizeWhitespace(repo.homepage ?? "") || null,
+    server_url: normalizeWhitespace(repo.homepage ?? "") || repoUrl,
     category: inferCategory(sourceText),
     auth_type: toAuthType(sourceText),
     tags: [...tags].slice(0, 12),
@@ -201,6 +208,7 @@ function buildPayload(repo: GitHubRepository): SyncRowPayload | null {
     },
     status: AUTO_STATUS,
     verification_level: AUTO_VERIFICATION_LEVEL,
+    tools,
   };
 }
 
@@ -217,16 +225,40 @@ async function fetchGithubRepos(maxPages: number, token: string | null): Promise
   const query = encodeURIComponent("topic:mcp-server archived:false");
 
   for (let page = 1; page <= maxPages; page += 1) {
-    const response = await fetch(
-      `https://api.github.com/search/repositories?q=${query}&sort=updated&order=desc&per_page=${DEFAULT_PER_PAGE}&page=${page}`,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        cache: "no-store",
-      },
-    );
+    const currentPage = page;
+    let response: Response;
+    try {
+      response = await withRetry(
+        () =>
+          fetch(
+            `https://api.github.com/search/repositories?q=${query}&sort=updated&order=desc&per_page=${DEFAULT_PER_PAGE}&page=${currentPage}`,
+            {
+              headers: {
+                Accept: "application/vnd.github+json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              cache: "no-store",
+            },
+          ),
+        { maxRetries: 2, baseDelayMs: 1000 },
+      );
+    } catch (error) {
+      const cause = error instanceof Error && "cause" in error ? (error as { cause?: unknown }).cause : undefined;
+      const causeObject = (cause && typeof cause === "object") ? (cause as Record<string, unknown>) : undefined;
+      const causeCode = typeof causeObject?.code === "string" ? causeObject.code : "unknown";
+      const causeMessage = cause instanceof Error
+        ? cause.message
+        : typeof causeObject?.message === "string"
+          ? causeObject.message
+          : error instanceof Error
+            ? error.message
+            : "fetch failed";
+
+      throw new Error(
+        `GitHub fetch failed on page=${currentPage}: ${causeMessage} (code=${causeCode})`,
+        { cause: error },
+      );
+    }
 
     if (!response.ok) {
       throw new Error(`GitHub search failed (${response.status})`);
@@ -352,7 +384,7 @@ export async function runCatalogGithubSync(options: { maxPages?: number } = {}):
 
   const payloadBySlug = new Map<string, SyncRowPayload>();
   for (const repo of repos) {
-    const payload = buildPayload(repo);
+    const payload = await buildPayload(repo);
     if (!payload) {
       result.skippedInvalid += 1;
       continue;

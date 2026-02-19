@@ -165,6 +165,22 @@ export async function runCatalogNpmSync(): Promise<CatalogSyncResult> {
     result.candidates = payloads.length;
     result.queuedForUpsert = payloads.length;
 
+    // 1. Дедупликация по repo_url
+    const { data: allActiveServers } = await adminClient
+      .from("servers")
+      .select("slug, repo_url")
+      .not("repo_url", "is", null);
+
+    const repoUrlToSlug = new Map(allActiveServers?.map(s => [s.repo_url?.toLowerCase(), s.slug]) || []);
+
+    // Переназначаем слаги для тех, у кого совпадает repo_url
+    payloads.forEach(p => {
+      const existingSlug = repoUrlToSlug.get(p.repo_url?.toLowerCase());
+      if (existingSlug && existingSlug !== p.slug) {
+        p.slug = existingSlug;
+      }
+    });
+
     // Получаем текущие слаги для разделения created/updated
     const { data: existingServers } = await adminClient
       .from("servers")

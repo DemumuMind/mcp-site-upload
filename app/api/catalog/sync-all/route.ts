@@ -4,6 +4,7 @@ import { withCronAuth } from "@/lib/api/with-auth";
 import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
 import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
 import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
+import { runFullHealthCheck } from "@/lib/catalog/health";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,14 @@ const handlers = withCronAuth(
       results.npm = { error: (error as Error).message };
     }
 
+    // 4. Health Check
+    try {
+      logger.info("catalog.unified_sync.health_check.start");
+      await runFullHealthCheck();
+    } catch (error) {
+      logger.error("catalog.unified_sync.health_check.error", { message: (error as Error).message });
+    }
+
     // Подсчет итогов
     const summary = {
       totalCreated: (results.github?.created || 0) + (results.smithery?.created || 0) + (results.npm?.created || 0),
@@ -75,15 +84,15 @@ const handlers = withCronAuth(
 
     // Инвалидация кэша
     if (changedSlugs.size > 0) {
-      revalidatePath("/");
-      revalidatePath("/catalog");
-      revalidatePath("/categories");
+      revalidatePath("/", "layout");
+      revalidatePath("/catalog", "page");
+      revalidatePath("/categories", "page");
       revalidateTag(CATALOG_SERVERS_CACHE_TAG);
 
       // Ограничиваем количество ревалидаций путей серверов для производительности
       const slugsToRevalidate = Array.from(changedSlugs).slice(0, 100);
       for (const slug of slugsToRevalidate) {
-        revalidatePath(`/server/${slug}`);
+        revalidatePath(`/server/${slug}`, "page");
       }
     }
 
