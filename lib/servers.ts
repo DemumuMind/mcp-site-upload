@@ -85,7 +85,8 @@ export async function getActiveServers(): Promise<McpServer[]> {
             .from("servers")
             .select("id, created_at, name, slug, description, server_url, category, auth_type, tags, repo_url, maintainer, status, verification_level, health_status, health_checked_at, health_error")
             .eq("status", "active")
-            .order("created_at", { ascending: false });
+            .order("created_at", { ascending: false })
+            .range(0, 4999);
         if (error || !data) {
             return [];
         }
