@@ -1,14 +1,18 @@
-import { timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
+import { withCronAuth } from "@/lib/api/with-auth";
 import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
+
 export const dynamic = "force-dynamic";
+
 const DEFAULT_MAX_PAGES = 120;
-type NumberEnvOptions = {
-    min: number;
-    max: number;
-};
+const MAX_GITHUB_SEARCH_PAGES = 200;
+const NETWORK_RETRY_ATTEMPTS = 3;
+const NETWORK_RETRY_DELAY_MS = 1500;
+
 type AlertSeverity = "info" | "warning" | "error";
 type AutoSyncAlertSignal = {
     code: string;
@@ -24,45 +28,33 @@ type AutoSyncAlerting = {
     signalCount: number;
     signals: AutoSyncAlertSignal[];
 };
-function parseNumber(value: string | null | undefined, fallback: number, options: NumberEnvOptions): number {
-    const raw = value?.trim();
-    if (!raw) {
-        return fallback;
+
+function toErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+        return error.message;
     }
-    const parsed = Number.parseInt(raw, 10);
-    if (!Number.isFinite(parsed)) {
-        return fallback;
-    }
-    if (parsed < options.min || parsed > options.max) {
-        return fallback;
-    }
-    return parsed;
+    return "Unexpected auto-sync error";
 }
-function parseNumberEnv(envName: string, fallback: number, options: NumberEnvOptions): number {
-    return parseNumber(process.env[envName], fallback, options);
-}
-function extractBearerToken(request: NextRequest): string | null {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-        return null;
+
+function isNetworkFetchFailure(error: unknown): boolean {
+    const message = toErrorMessage(error).toLowerCase();
+    if (message.includes("fetch failed") || message.includes("econn") || message.includes("etimedout")) {
+        return true;
     }
-    const [scheme, token] = authHeader.split(" ");
-    if (scheme?.toLowerCase() !== "bearer" || !token) {
-        return null;
+    if (error instanceof Error && "cause" in error) {
+        const cause = (error as { cause?: unknown }).cause;
+        if (cause && typeof cause === "object") {
+            const causeCode = String((cause as { code?: unknown }).code ?? "").toUpperCase();
+            return causeCode.startsWith("ECONN") || causeCode === "ETIMEDOUT" || causeCode === "ENOTFOUND";
+        }
     }
-    return token;
+    return false;
 }
-function getExpectedCronToken(): string | null {
-    return process.env.CATALOG_AUTOSYNC_CRON_SECRET || process.env.CRON_SECRET || null;
+
+async function delay(ms: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, ms));
 }
-function isValidCronToken(providedToken: string, expectedToken: string): boolean {
-    const provided = Buffer.from(providedToken);
-    const expected = Buffer.from(expectedToken);
-    if (provided.length !== expected.length) {
-        return false;
-    }
-    return timingSafeEqual(provided, expected);
-}
+
 function buildAlertingSignals(result: CatalogSyncResult): AutoSyncAlerting {
     const signals: AutoSyncAlertSignal[] = [];
     if (result.failed > 0) {
@@ -110,116 +102,151 @@ function buildAlertingSignals(result: CatalogSyncResult): AutoSyncAlerting {
         signals,
     };
 }
-function logAutoSyncResult(alerting: AutoSyncAlerting, result: CatalogSyncResult) {
-    const payload = {
-        event: "catalog.auto_sync.completed",
-        alertStatus: alerting.status,
-        shouldWarn: alerting.shouldWarn,
-        shouldPage: alerting.shouldPage,
-        failed: result.failed,
-        staleFailed: result.staleFailed,
-        staleCleanupApplied: result.staleCleanupApplied,
-        staleCleanupReason: result.staleCleanupReason,
-        staleCappedCount: result.staleCappedCount,
-        fetchedPages: result.fetchedPages,
-        fetchedRecords: result.fetchedRecords,
-        signals: alerting.signals,
-    };
-    if (alerting.shouldPage) {
-        console.error(payload);
-        return;
-    }
-    if (alerting.shouldWarn) {
-        console.warn(payload);
-    }
-}
-async function runCatalogAutoSync(request: NextRequest) {
-    const expectedToken = getExpectedCronToken();
-    if (!expectedToken) {
-        return NextResponse.json({
-            ok: false,
-            message: "Missing cron secret. Set CATALOG_AUTOSYNC_CRON_SECRET or CRON_SECRET.",
-        }, { status: 500 });
-    }
-    const providedToken = extractBearerToken(request);
-    if (!providedToken || !isValidCronToken(providedToken, expectedToken)) {
-        return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
-    }
-    const envMaxPages = parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_MAX_PAGES, {
-        min: 1,
-        max: 200,
-    });
-    const maxPages = parseNumber(request.nextUrl.searchParams.get("pages"), envMaxPages, {
-        min: 1,
-        max: 200,
-    });
-    let result: CatalogSyncResult;
-    try {
-        result = await runCatalogGithubSync({ maxPages });
-    }
-    catch (error) {
-        console.error({
-            event: "catalog.auto_sync.unhandled_error",
-            message: error instanceof Error ? error.message : "Unexpected auto-sync error",
+
+const handlers = withCronAuth(
+    async (request: NextRequest, { logger }) => {
+        const envMaxPages = parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_MAX_PAGES, {
+            min: 1,
+            max: MAX_GITHUB_SEARCH_PAGES,
         });
+        const maxPages = parseNumber(request.nextUrl.searchParams.get("pages"), envMaxPages, {
+            min: 1,
+            max: MAX_GITHUB_SEARCH_PAGES,
+        });
+
+        let result: CatalogSyncResult | null = null;
+        let lastError: unknown = null;
+        for (let attempt = 1; attempt <= NETWORK_RETRY_ATTEMPTS; attempt += 1) {
+            try {
+                result = await runCatalogGithubSync({ maxPages });
+                lastError = null;
+                break;
+            } catch (error) {
+                lastError = error;
+                const retryable = isNetworkFetchFailure(error);
+                logger.warn("catalog.auto_sync.retry", {
+                    attempt,
+                    maxAttempts: NETWORK_RETRY_ATTEMPTS,
+                    retryable,
+                    message: toErrorMessage(error),
+                });
+                if (!retryable || attempt >= NETWORK_RETRY_ATTEMPTS) {
+                    break;
+                }
+                await delay(NETWORK_RETRY_DELAY_MS * attempt);
+            }
+        }
+
+        if (!result) {
+            const error = lastError ?? new Error("Catalog auto-sync failed before completion.");
+            const errorMessage = toErrorMessage(error);
+            logger.error("catalog.auto_sync.unhandled_error", {
+                message: errorMessage,
+            });
+            const debug =
+                process.env.NODE_ENV === "production"
+                    ? undefined
+                    : {
+                          message: errorMessage,
+                          stack: error instanceof Error ? error.stack : undefined,
+                      };
+
+            if (isNetworkFetchFailure(error)) {
+                return NextResponse.json({
+                    ok: false,
+                    error: "Catalog auto-sync partially unavailable due to GitHub network failure.",
+                    debug,
+                    alerting: {
+                        status: "partial",
+                        shouldWarn: true,
+                        shouldPage: false,
+                        signalCount: 1,
+                        signals: [
+                            {
+                                code: "SYNC_NETWORK_FAILURE",
+                                severity: "warning",
+                                message: errorMessage,
+                            },
+                        ],
+                    } satisfies AutoSyncAlerting,
+                }, { status: 207 });
+            }
+
+            return NextResponse.json({
+                ok: false,
+                error: "Catalog auto-sync failed before completion.",
+                debug,
+                alerting: {
+                    status: "error",
+                    shouldWarn: true,
+                    shouldPage: true,
+                    signalCount: 1,
+                    signals: [
+                        {
+                            code: "SYNC_UNHANDLED_ERROR",
+                            severity: "error",
+                            message: "Catalog auto-sync failed before completion.",
+                        },
+                    ],
+                } satisfies AutoSyncAlerting,
+            }, { status: 500 });
+        }
+
+        const alerting = buildAlertingSignals(result);
+
+        if (alerting.shouldPage) {
+            logger.error("catalog.auto_sync.completed", {
+                alertStatus: alerting.status,
+                failed: result.failed,
+                signals: alerting.signals,
+            });
+        } else if (alerting.shouldWarn) {
+            logger.warn("catalog.auto_sync.completed", {
+                alertStatus: alerting.status,
+                failed: result.failed,
+                signals: alerting.signals,
+            });
+        }
+
+        revalidatePath("/");
+        revalidatePath("/catalog");
+        revalidatePath("/categories");
+        revalidatePath("/sitemap.xml");
+        for (const slug of result.changedSlugs.slice(0, 400)) {
+            revalidatePath(`/server/${slug}`);
+        }
+        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
+
         return NextResponse.json({
-            ok: false,
-            message: "Catalog auto-sync failed before completion.",
-            alerting: {
-                status: "error",
-                shouldWarn: true,
-                shouldPage: true,
-                signalCount: 1,
-                signals: [
-                    {
-                        code: "SYNC_UNHANDLED_ERROR",
-                        severity: "error",
-                        message: "Catalog auto-sync failed before completion.",
-                    },
-                ],
-            } satisfies AutoSyncAlerting,
-        }, { status: 500 });
-    }
-    const alerting = buildAlertingSignals(result);
-    logAutoSyncResult(alerting, result);
-    revalidatePath("/");
-    revalidatePath("/catalog");
-    revalidatePath("/categories");
-    revalidatePath("/sitemap.xml");
-    for (const slug of result.changedSlugs.slice(0, 400)) {
-        revalidatePath(`/server/${slug}`);
-    }
-    revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
-    return NextResponse.json({
-        ok: alerting.status === "ok",
-        ...result,
-        alerting,
-        safety: {
-            coverage: {
-                ratio: result.staleCoverageRatio,
-                minRequiredRatio: result.minStaleBaselineRatio,
-                baselineCount: result.staleBaselineCount,
+            ok: alerting.status === "ok",
+            ...result,
+            alerting,
+            safety: {
+                coverage: {
+                    ratio: result.staleCoverageRatio,
+                    minRequiredRatio: result.minStaleBaselineRatio,
+                    baselineCount: result.staleBaselineCount,
+                },
+                staleCap: {
+                    maxPerRunRatio: result.maxStaleMarkRatio,
+                    totalCandidates: result.staleCandidates,
+                    deferredCount: result.staleCappedCount,
+                    processedCount: result.staleCandidates - result.staleCappedCount,
+                },
+                graceMode: {
+                    markedAsCandidates: result.staleGraceMarked,
+                    rejectedAfterGrace: result.staleRejectedAfterGrace,
+                },
             },
-            staleCap: {
-                maxPerRunRatio: result.maxStaleMarkRatio,
-                totalCandidates: result.staleCandidates,
-                deferredCount: result.staleCappedCount,
-                processedCount: result.staleCandidates - result.staleCappedCount,
+            settings: {
+                source: "github",
+                maxPages,
             },
-            graceMode: {
-                markedAsCandidates: result.staleGraceMarked,
-                rejectedAfterGrace: result.staleRejectedAfterGrace,
-            },
-        },
-        settings: {
-            source: "github",
-            maxPages,
-        },
-    }, { status: alerting.status === "error" ? 207 : 200 });
-}
-export async function GET(request: NextRequest) {
-    return runCatalogAutoSync(request);
-}
-export async function POST(request: NextRequest) {
-    return runCatalogAutoSync(request);
-}
+        }, { status: alerting.status === "error" ? 207 : 200 });
+    },
+    ["CATALOG_AUTOSYNC_CRON_SECRET"],
+    "catalog.auto_sync",
+);
+
+export const GET = handlers.GET;
+export const POST = handlers.POST;

@@ -82,33 +82,41 @@ async function sendEmailViaResend({ to, subject, html, text, }: {
             reason: "Recipient list is empty.",
         };
     }
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from: fromEmail,
-            to,
-            subject,
-            html,
-            text,
-        }),
-        cache: "no-store",
-    });
-    if (!response.ok) {
-        const errorText = await response.text();
+    try {
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${resendApiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                from: fromEmail,
+                to,
+                subject,
+                html,
+                text,
+            }),
+            cache: "no-store",
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            return {
+                sent: false,
+                skipped: false,
+                reason: `Resend API error (${response.status}): ${errorText}`,
+            };
+        }
+        return {
+            sent: true,
+            skipped: false,
+        };
+    } catch (error) {
         return {
             sent: false,
             skipped: false,
-            reason: `Resend API error (${response.status}): ${errorText}`,
+            reason: `Resend API fetch error: ${error instanceof Error ? error.message : String(error)}`,
         };
     }
-    return {
-        sent: true,
-        skipped: false,
-    };
 }
 async function sendEmailViaSmtp({ to, subject, html, text, }: {
     to: string[];

@@ -66,4 +66,8 @@ CLAUDE.local.md
 
 AGENTS.local.md
 
-AGENTS.local.md
+# MCP memory knowledge graph
+.memory/
+
+# Local Claude/Codex settings
+.claude/

@@ -46,6 +46,8 @@ export const CoolMode: React.FC<{ children: ReactNode; options?: CoolParticleOpt
     const element = ref.current
     const container = getContainer()
     const particles: CoolParticle[] = []
+    let rafId: number | null = null
+    let isRunning = true
     let autoAddParticle = false
     let mouseX = 0
     let mouseY = 0
@@ -92,6 +94,7 @@ export const CoolMode: React.FC<{ children: ReactNode; options?: CoolParticleOpt
     }
 
     function loop() {
+      if (!isRunning) return
       if (autoAddParticle && particles.length < 45) generateParticle()
 
       particles.forEach((p, i) => {
@@ -107,7 +110,7 @@ export const CoolMode: React.FC<{ children: ReactNode; options?: CoolParticleOpt
           p.element.style.transform = `translate3d(${p.left}px, ${p.top}px, 0px) rotate(${p.spinVal}deg)`
         }
       })
-      requestAnimationFrame(loop)
+      rafId = requestAnimationFrame(loop)
     }
 
     const handleMove = (e: MouseEvent | TouchEvent) => {
@@ -132,14 +135,17 @@ export const CoolMode: React.FC<{ children: ReactNode; options?: CoolParticleOpt
     element.addEventListener("mouseup", handleUp)
     element.addEventListener("mouseleave", handleUp)
 
-    const animationId = requestAnimationFrame(loop)
+    rafId = requestAnimationFrame(loop)
 
     return () => {
       element.removeEventListener("mousemove", handleMove)
       element.removeEventListener("mousedown", handleDown)
       element.removeEventListener("mouseup", handleUp)
       element.removeEventListener("mouseleave", handleUp)
-      cancelAnimationFrame(animationId)
+      isRunning = false
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId)
+      }
     }
   }, [options])
 
