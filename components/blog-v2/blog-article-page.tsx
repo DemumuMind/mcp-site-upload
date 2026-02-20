@@ -8,14 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBlogDate } from "@/lib/blog/date-format";
 import { getRelatedBlogV2Posts } from "@/lib/blog-v2/contentlayer";
-import type { BlogV2Post } from "@/lib/blog-v2/types";
+import type { BlogV2ListItem, BlogV2Post } from "@/lib/blog-v2/types";
 
 type BlogArticlePageProps = {
   post: BlogV2Post;
+  relatedPosts?: BlogV2ListItem[];
 };
 
-export function BlogArticlePage({ post }: BlogArticlePageProps) {
-  const related = getRelatedBlogV2Posts(post.slug, 3);
+export function BlogArticlePage({ post, relatedPosts }: BlogArticlePageProps) {
+  const related = relatedPosts ?? getRelatedBlogV2Posts(post.slug, 3);
   const primaryTag = post.tags[0] ?? "general";
 
   return (
@@ -62,7 +63,31 @@ export function BlogArticlePage({ post }: BlogArticlePageProps) {
           </header>
 
           <div className="mt-8 space-y-6">
-            <BlogArticleMdx code={post.bodyCode} />
+            {post.bodyCode.trim().length > 0 ? (
+              <BlogArticleMdx code={post.bodyCode} />
+            ) : post.bodyBlocks && post.bodyBlocks.length > 0 ? (
+              <div className="space-y-8">
+                {post.bodyBlocks.map((block) => (
+                  <section key={block.heading} className="space-y-4">
+                    <h2 className="text-2xl font-semibold tracking-tight text-foreground">{block.heading}</h2>
+                    {block.paragraphs.map((paragraph, index) => (
+                      <p key={`${block.heading}-p-${index}`} className="text-base leading-8 text-slate-200/92">
+                        {paragraph}
+                      </p>
+                    ))}
+                    {block.bullets && block.bullets.length > 0 ? (
+                      <ul className="list-disc space-y-2 pl-6 text-base leading-8 text-slate-200/92">
+                        {block.bullets.map((bullet, index) => (
+                          <li key={`${block.heading}-b-${index}`}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </section>
+                ))}
+              </div>
+            ) : (
+              <p className="text-base leading-8 text-slate-200/92">{post.excerpt}</p>
+            )}
           </div>
         </article>
 

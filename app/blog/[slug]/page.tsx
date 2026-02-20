@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogArticlePage } from "@/components/blog-v2/blog-article-page";
 import { PageFrame } from "@/components/page-templates";
-import { getAllBlogV2ListItems, getBlogV2PostBySlug } from "@/lib/blog-v2/contentlayer";
+import {
+  getAllBlogV2SlugsHybrid,
+  getBlogV2PostBySlugHybrid,
+  getRelatedBlogV2PostsHybrid,
+} from "@/lib/blog-v2/hybrid";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +17,13 @@ type BlogArticlePageProps = {
 };
 
 export async function generateStaticParams() {
-  return getAllBlogV2ListItems().map((post) => ({
-    slug: post.slug,
-  }));
+  const slugs = await getAllBlogV2SlugsHybrid();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: BlogArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogV2PostBySlug(slug);
+  const post = await getBlogV2PostBySlugHybrid(slug);
 
   if (!post) {
     return {
@@ -55,10 +58,11 @@ export async function generateMetadata({ params }: BlogArticlePageProps): Promis
 
 export default async function BlogArticleRoute({ params }: BlogArticlePageProps) {
   const { slug } = await params;
-  const post = getBlogV2PostBySlug(slug);
+  const post = await getBlogV2PostBySlugHybrid(slug);
   if (!post) {
     notFound();
   }
+  const relatedPosts = await getRelatedBlogV2PostsHybrid(post.slug, 3);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -84,7 +88,7 @@ export default async function BlogArticleRoute({ params }: BlogArticlePageProps)
   return (
     <PageFrame variant="content">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <BlogArticlePage post={post} />
+      <BlogArticlePage post={post} relatedPosts={relatedPosts} />
     </PageFrame>
   );
 }

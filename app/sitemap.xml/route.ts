@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllBlogPosts } from "@/lib/blog/service";
-import { getAllBlogV2ListItems } from "@/lib/blog-v2/contentlayer";
-import { isBlogV2Enabled } from "@/lib/blog-v2/flags";
+import { getAllBlogV2SitemapEntriesHybrid } from "@/lib/blog-v2/hybrid";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 type StaticSitemapRoute = {
     path: string;
@@ -57,17 +55,7 @@ export async function GET() {
     const nowIso = new Date().toISOString();
     const catalogSnapshot = await getCatalogSnapshot();
     const activeServers = catalogSnapshot.servers;
-    const blogPosts = isBlogV2Enabled()
-        ? getAllBlogV2ListItems().map((post) => ({
-            slug: post.slug,
-            publishedAt: post.publishedAt,
-            updatedAt: post.updatedAt,
-        }))
-        : (await getAllBlogPosts()).map((post) => ({
-            slug: post.slug,
-            publishedAt: post.publishedAt,
-            updatedAt: post.updatedAt,
-        }));
+    const blogPosts = await getAllBlogV2SitemapEntriesHybrid();
     const staticEntries: SitemapEntry[] = staticRoutes.map((route) => ({
         url: new URL(route.path, siteUrl).toString(),
         lastModified: nowIso,

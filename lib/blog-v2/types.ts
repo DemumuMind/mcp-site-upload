@@ -35,6 +35,11 @@ export type BlogV2Post = {
   readingTimeMinutes: number;
   bodyCode: string;
   bodyRaw: string;
+  bodyBlocks?: Array<{
+    heading: string;
+    paragraphs: string[];
+    bullets?: string[];
+  }>;
   researchPacketId?: string;
   researchProvider?: string;
   researchSourceCount?: number;

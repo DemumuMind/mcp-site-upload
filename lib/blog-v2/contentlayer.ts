@@ -1,5 +1,12 @@
 import { allBlogAuthors, allBlogPosts, allBlogTopics } from "contentlayer/generated";
 import type { BlogV2Author, BlogV2ListItem, BlogV2Post, BlogV2Topic } from "@/lib/blog-v2/types";
+export type BlogV2TagWithCount = {
+  slug: string;
+  name: string;
+  description: string;
+  colorToken?: string;
+  count: number;
+};
 
 function normalizeSlug(value: string): string {
   return value.trim().toLowerCase();
@@ -149,13 +156,7 @@ export function getRelatedBlogV2Posts(slug: string, limit = 3): BlogV2ListItem[]
   return related;
 }
 
-export function getBlogV2TagsWithCounts(): Array<{
-  slug: string;
-  name: string;
-  description: string;
-  colorToken?: string;
-  count: number;
-}> {
+export function getBlogV2TagsWithCounts(): BlogV2TagWithCount[] {
   const posts = getAllBlogV2Posts();
   const topics = getBlogV2Topics();
   const counters = new Map<string, number>();
