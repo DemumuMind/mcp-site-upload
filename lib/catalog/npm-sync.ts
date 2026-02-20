@@ -1,4 +1,3 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { withRetry } from "@/lib/api/fetch-with-retry";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";

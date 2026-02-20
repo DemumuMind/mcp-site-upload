@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createLogger } from "@/lib/api/logger";
 import { runMultiAgentPipeline } from "@/lib/multi-agent/pipeline";
 import { persistMultiAgentTelemetry } from "@/lib/multi-agent/telemetry";
 import type { MultiAgentPipelineResult } from "@/lib/multi-agent/types";
@@ -19,6 +20,8 @@ const requestSchema = z.object({
       message: `context may contain at most ${MAX_CONTEXT_KEYS} keys`,
     }),
 });
+
+const logger = createLogger("multi_agent.demo");
 
 function getRequestId(request: NextRequest): string {
   return (
@@ -89,10 +92,7 @@ export async function POST(request: NextRequest) {
         });
       } catch (telemetryError) {
         const telemetryMessage = telemetryError instanceof Error ? telemetryError.message : "Unknown telemetry error";
-        console.error("multi_agent.demo.telemetry_error", {
-          requestId,
-          message: telemetryMessage,
-        });
+        logger.error("telemetry_error", { requestId, message: telemetryMessage });
       }
     }
 
@@ -107,15 +107,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.warn("multi_agent.demo.validation_error", {
-        requestId,
-        issues: error.issues.length,
-      });
+      logger.warn("validation_error", { requestId, issues: error.issues.length });
       return NextResponse.json(
         {
           ok: false,
           error: "Invalid request body",
-          issues: error.issues,
+          details: error.issues,
           requestId,
         },
         { status: 400 },
@@ -123,10 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("multi_agent.demo.unhandled_error", {
-      requestId,
-      message,
-    });
+    logger.error("unhandled_error", { requestId, message });
 
     return NextResponse.json(
       {

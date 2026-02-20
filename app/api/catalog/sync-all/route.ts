@@ -24,6 +24,19 @@ type UnifiedSyncResult = {
   };
 };
 
+type UnifiedSourceResult = CatalogSyncResult | { error: string };
+
+function getMetricValue(source: UnifiedSourceResult | undefined, metric: "created" | "updated" | "failed"): number {
+  if (!source || "error" in source) {
+    return 0;
+  }
+  return source[metric];
+}
+
+function hasSourceError(source: UnifiedSourceResult | undefined): boolean {
+  return Boolean(source && "error" in source);
+}
+
 const handlers = withCronAuth(
   async (request, { logger }) => {
     logger.info("catalog.unified_sync.start");
@@ -32,7 +45,11 @@ const handlers = withCronAuth(
     const changedSlugs = new Set<string>();
 
     // Результаты по источникам
-    const results: any = {};
+    const results: {
+      github?: UnifiedSourceResult;
+      smithery?: UnifiedSourceResult;
+      npm?: UnifiedSourceResult;
+    } = {};
 
     // 1. GitHub Sync
     try {
@@ -77,9 +94,18 @@ const handlers = withCronAuth(
 
     // Подсчет итогов
     const summary = {
-      totalCreated: (results.github?.created || 0) + (results.smithery?.created || 0) + (results.npm?.created || 0),
-      totalUpdated: (results.github?.updated || 0) + (results.smithery?.updated || 0) + (results.npm?.updated || 0),
-      totalFailed: (results.github?.failed || 0) + (results.smithery?.failed || 0) + (results.npm?.failed || 0),
+      totalCreated:
+        getMetricValue(results.github, "created") +
+        getMetricValue(results.smithery, "created") +
+        getMetricValue(results.npm, "created"),
+      totalUpdated:
+        getMetricValue(results.github, "updated") +
+        getMetricValue(results.smithery, "updated") +
+        getMetricValue(results.npm, "updated"),
+      totalFailed:
+        getMetricValue(results.github, "failed") +
+        getMetricValue(results.smithery, "failed") +
+        getMetricValue(results.npm, "failed"),
     };
 
     // Инвалидация кэша
@@ -87,7 +113,7 @@ const handlers = withCronAuth(
       revalidatePath("/", "layout");
       revalidatePath("/catalog", "page");
       revalidatePath("/categories", "page");
-      revalidateTag(CATALOG_SERVERS_CACHE_TAG);
+      revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
 
       // Ограничиваем количество ревалидаций путей серверов для производительности
       const slugsToRevalidate = Array.from(changedSlugs).slice(0, 100);
@@ -96,7 +122,11 @@ const handlers = withCronAuth(
       }
     }
 
-    const ok = !results.github?.error && !results.smithery?.error && !results.npm?.error && summary.totalFailed === 0;
+    const ok =
+      !hasSourceError(results.github) &&
+      !hasSourceError(results.smithery) &&
+      !hasSourceError(results.npm) &&
+      summary.totalFailed === 0;
 
     logger.info("catalog.unified_sync.completed", summary);
 

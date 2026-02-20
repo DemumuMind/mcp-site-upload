@@ -32,7 +32,7 @@ export async function checkServerHealth(slug: string, repoUrl?: string, serverUr
           status = "degraded";
           errorMsg = `Homepage returned ${res.status}`;
         }
-      } catch (e) {
+      } catch {
         status = "degraded";
         errorMsg = "Homepage timeout or connection error";
       }

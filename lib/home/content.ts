@@ -1,5 +1,3 @@
-import { Activity, Blocks, CheckCircle2, Command, Search, ShieldCheck, Wrench } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { tr, type Locale } from "@/lib/i18n";
 
 export type HomeWorkflowCard = {
@@ -7,7 +5,7 @@ export type HomeWorkflowCard = {
   description: string;
   href: string;
   cta: string;
-  icon: LucideIcon;
+  icon: string;
   accentClass: string;
 };
 
@@ -15,13 +13,13 @@ export type HomeIcpCard = {
   title: string;
   description: string;
   outcome: string;
-  icon: LucideIcon;
+  icon: string;
 };
 
 export type HomeTrustPoint = {
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon: string;
 };
 
 export type HomeContent = {
@@ -158,7 +156,7 @@ export function getHomeContent(locale: Locale): HomeContent {
           ),
           href: "/catalog",
           cta: tr(locale, "Explore catalog", "Explore catalog"),
-          icon: Search,
+          icon: "search",
           accentClass: "text-cyan-300",
         },
         {
@@ -170,7 +168,7 @@ export function getHomeContent(locale: Locale): HomeContent {
           ),
           href: "/submit-server",
           cta: tr(locale, "Submit a server", "Submit a server"),
-          icon: ShieldCheck,
+          icon: "shield-check",
           accentClass: "text-violet-300",
         },
         {
@@ -182,7 +180,7 @@ export function getHomeContent(locale: Locale): HomeContent {
           ),
           href: "/about",
           cta: tr(locale, "How it works", "How it works"),
-          icon: Activity,
+          icon: "activity",
           accentClass: "text-emerald-300",
         },
         {
@@ -194,7 +192,7 @@ export function getHomeContent(locale: Locale): HomeContent {
           ),
           href: "/tools",
           cta: tr(locale, "Open tools", "Open tools"),
-          icon: Wrench,
+          icon: "wrench",
           accentClass: "text-amber-300",
         },
       ],
@@ -244,17 +242,17 @@ export function getHomeContent(locale: Locale): HomeContent {
         {
           title: tr(locale, "Auth clarity", "Auth clarity"),
           description: tr(locale, "Understand OAuth/API key/open requirements before setup.", "Understand OAuth/API key/open requirements before setup."),
-          icon: ShieldCheck,
+          icon: "shield-check",
         },
         {
           title: tr(locale, "Moderated quality", "Moderated quality"),
           description: tr(locale, "Public submissions pass moderation before catalog exposure.", "Public submissions pass moderation before catalog exposure."),
-          icon: CheckCircle2,
+          icon: "check-circle",
         },
         {
           title: tr(locale, "Operational fit", "Operational fit"),
           description: tr(locale, "Assess server category and tool depth against your team use case.", "Assess server category and tool depth against your team use case."),
-          icon: Blocks,
+          icon: "blocks",
         },
       ],
       categoriesLabel: tr(locale, "Top categories", "Top categories"),
@@ -277,19 +275,19 @@ export function getHomeContent(locale: Locale): HomeContent {
           title: tr(locale, "Indie Builders", "Indie Builders"),
           description: tr(locale, "Validate options quickly and avoid dead-end integrations.", "Validate options quickly and avoid dead-end integrations."),
           outcome: tr(locale, "Ship your first working integration in days.", "Ship your first working integration in days."),
-          icon: Command,
+          icon: "command",
         },
         {
           title: tr(locale, "Product Teams", "Product Teams"),
           description: tr(locale, "Standardize discovery and setup notes across squads.", "Standardize discovery and setup notes across squads."),
           outcome: tr(locale, "Reduce integration rework and accelerate releases.", "Reduce integration rework and accelerate releases."),
-          icon: Blocks,
+          icon: "blocks",
         },
         {
           title: tr(locale, "Platform & Security", "Platform & Security"),
           description: tr(locale, "Review auth and verification context before adoption.", "Review auth and verification context before adoption."),
           outcome: tr(locale, "Improve governance without slowing delivery.", "Improve governance without slowing delivery."),
-          icon: ShieldCheck,
+          icon: "shield-check",
         },
       ],
     },

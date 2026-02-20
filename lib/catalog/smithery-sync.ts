@@ -1,9 +1,8 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { withRetry } from "@/lib/api/fetch-with-retry";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { AuthType, ServerStatus, VerificationLevel } from "@/lib/types";
-import { CatalogSyncResult, CatalogSyncFailure } from "./github-sync";
+import { CatalogSyncResult } from "./github-sync";
 
 // Схема ответа Smithery API
 const SmitherServerSchema = z.object({
