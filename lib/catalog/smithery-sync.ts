@@ -37,6 +37,20 @@ function normalizeSlug(value: string): string {
     .slice(0, 90);
 }
 
+function normalizeTag(value: string): string {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+}
+
+function hasTag(tags: string[] | null, expected: string): boolean {
+  return (tags ?? []).some((tag) => normalizeTag(tag) === expected);
+}
+
 function inferCategory(description: string, tags: string[]): string {
   const content = (description + " " + tags.join(" ")).toLowerCase();
   if (/(search|crawler|crawl|retriev)/.test(content)) return "Search";
@@ -131,7 +145,6 @@ export async function runCatalogSmitherySync(): Promise<CatalogSyncResult> {
     result.fetchedRecords = validated.servers.length;
     const payloads = validated.servers.map(mapSmitheryToPayload);
     result.candidates = payloads.length;
-    result.queuedForUpsert = payloads.length;
 
     // 1. Дедупликация по repo_url
     const { data: existingServers } = await adminClient
@@ -149,8 +162,25 @@ export async function runCatalogSmitherySync(): Promise<CatalogSyncResult> {
       }
     });
 
+    const { data: existingServersBySlug } = await adminClient
+      .from("servers")
+      .select("slug, tags")
+      .in("slug", payloads.map((p) => p.slug));
+
+    const existingBySlug = new Map((existingServersBySlug ?? []).map((server) => [server.slug, server]));
+    const upsertQueue = payloads.filter((payload) => {
+      const existing = existingBySlug.get(payload.slug);
+      if (existing && !hasTag(existing.tags ?? null, AUTO_MANAGED_TAG)) {
+        result.skippedManual += 1;
+        return false;
+      }
+      return true;
+    });
+
+    result.queuedForUpsert = upsertQueue.length;
+
     // Массовая вставка/обновление
-    for (const chunk of chunkArray(payloads, 50)) {
+    for (const chunk of chunkArray(upsertQueue, 50)) {
       const { error, data: upsertData } = await adminClient
         .from("servers")
         .upsert(chunk, { onConflict: "slug" })
@@ -162,7 +192,14 @@ export async function runCatalogSmitherySync(): Promise<CatalogSyncResult> {
         continue;
       }
 
-      result.updated += (upsertData?.length || 0);
+      chunk.forEach((row) => {
+        if (existingBySlug.has(row.slug)) {
+          result.updated += 1;
+        } else {
+          result.created += 1;
+        }
+      });
+
       upsertData?.forEach(row => {
         if (!result.changedSlugs.includes(row.slug)) {
           result.changedSlugs.push(row.slug);

@@ -21,19 +21,19 @@
       "schedule": "15 18 * * *"
     },
     {
-      "path": "/api/catalog/auto-sync",
+      "path": "/api/catalog/sync-all",
       "schedule": "45 1 * * *"
     },
     {
-      "path": "/api/catalog/auto-sync",
+      "path": "/api/catalog/sync-all",
       "schedule": "45 7 * * *"
     },
     {
-      "path": "/api/catalog/auto-sync",
+      "path": "/api/catalog/sync-all",
       "schedule": "45 13 * * *"
     },
     {
-      "path": "/api/catalog/auto-sync",
+      "path": "/api/catalog/sync-all",
       "schedule": "45 19 * * *"
     }
   ]

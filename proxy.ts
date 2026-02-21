@@ -60,7 +60,7 @@ function resolveRateLimitConfig(pathname: string): RateLimitConfig {
     return RATE_LIMITS.admin;
   }
 
-  const cronPaths = ["/api/catalog/auto-sync", "/api/blog/auto-publish", "/api/health-check"];
+  const cronPaths = ["/api/catalog/sync-all", "/api/catalog/auto-sync", "/api/blog/auto-publish", "/api/health-check"];
   if (cronPaths.some((p) => pathname.startsWith(p))) {
     return RATE_LIMITS.cron;
   }

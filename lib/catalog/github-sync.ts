@@ -396,10 +396,21 @@ export async function runCatalogGithubSync(options: { maxPages?: number } = {}):
   const payloads = [...payloadBySlug.values()];
 
   result.candidates = payloads.length;
-  result.queuedForUpsert = payloads.length;
   const existingBySlug = await fetchExistingRows(adminClient, payloads.map((p) => p.slug));
+  const upsertQueue: SyncRowPayload[] = [];
 
-  for (const chunk of chunkArray(payloads, 50)) {
+  for (const payload of payloads) {
+    const existing = existingBySlug.get(payload.slug);
+    if (existing && !hasTag(existing.tags, AUTO_MANAGED_TAG)) {
+      result.skippedManual += 1;
+      continue;
+    }
+    upsertQueue.push(payload);
+  }
+
+  result.queuedForUpsert = upsertQueue.length;
+
+  for (const chunk of chunkArray(upsertQueue, 50)) {
     const { error } = await adminClient.from("servers").upsert(chunk, {
       onConflict: "slug",
       ignoreDuplicates: false,

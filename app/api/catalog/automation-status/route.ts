@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { getActiveCatalogSyncLocks, getRecentCatalogSyncRuns } from "@/lib/catalog/sync-run-store";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,11 @@ async function readCatalogCronSchedules(): Promise<string[]> {
     const raw = await fs.readFile(vercelConfigPath, "utf8");
     const parsed = JSON.parse(raw) as VercelConfig;
     return (parsed.crons ?? [])
-      .filter((job) => job.path === "/api/catalog/auto-sync" && typeof job.schedule === "string")
+      .filter(
+        (job) =>
+          (job.path === "/api/catalog/sync-all" || job.path === "/api/catalog/auto-sync") &&
+          typeof job.schedule === "string",
+      )
       .map((job) => job.schedule as string);
   } catch {
     return [];
@@ -33,7 +38,7 @@ function hasCatalogSecret(): boolean {
 }
 
 const handlers = withCronAuth(
-  async () => {
+  async (_request, { logger }) => {
   const cronSchedules = await readCatalogCronSchedules();
   const cronConfigured = cronSchedules.length > 0;
   const secretConfigured = hasCatalogSecret();
@@ -75,6 +80,9 @@ const handlers = withCronAuth(
     }
   }
 
+  const recentRunsResult = await getRecentCatalogSyncRuns(10, { logger });
+  const activeLocksResult = await getActiveCatalogSyncLocks({ logger });
+
   const checks = {
     cronConfigured,
     secretConfigured,
@@ -89,6 +97,14 @@ const handlers = withCronAuth(
         autoManagedActiveCount,
         lastAutoManagedCreatedAt,
         dataCheckError,
+      },
+      recentRuns: {
+        items: recentRunsResult.data,
+        degraded: recentRunsResult.degraded,
+      },
+      activeLocks: {
+        items: activeLocksResult.data,
+        degraded: activeLocksResult.degraded,
       },
       checkedAt: new Date().toISOString(),
     });

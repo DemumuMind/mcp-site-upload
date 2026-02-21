@@ -1,10 +1,18 @@
+import { randomUUID } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
 import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
-import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
+import { CATALOG_SERVERS_CACHE_TAG, clearCatalogSnapshotRedisCache } from "@/lib/catalog/snapshot";
+import {
+    acquireCatalogSyncLock,
+    finishCatalogSyncRun,
+    recordCatalogSyncFailures,
+    releaseCatalogSyncLock,
+    startCatalogSyncRun,
+} from "@/lib/catalog/sync-run-store";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +20,9 @@ const DEFAULT_MAX_PAGES = 120;
 const MAX_GITHUB_SEARCH_PAGES = 200;
 const NETWORK_RETRY_ATTEMPTS = 3;
 const NETWORK_RETRY_DELAY_MS = 1500;
+const AUTO_SYNC_LOCK_KEY = "catalog:auto-sync";
+const AUTO_SYNC_LOCK_TTL_SECONDS = 15 * 60;
+const MAX_RECORDED_FAILURES = 200;
 
 type AlertSeverity = "info" | "warning" | "error";
 type AutoSyncAlertSignal = {
@@ -28,6 +39,8 @@ type AutoSyncAlerting = {
     signalCount: number;
     signals: AutoSyncAlertSignal[];
 };
+
+type AutoSyncFinalStatus = "success" | "partial" | "error";
 
 function toErrorMessage(error: unknown): string {
     if (error instanceof Error) {
@@ -103,8 +116,65 @@ function buildAlertingSignals(result: CatalogSyncResult): AutoSyncAlerting {
     };
 }
 
+function toRunStatus(status: AutoSyncAlerting["status"]): AutoSyncFinalStatus {
+    if (status === "ok") {
+        return "success";
+    }
+    return status;
+}
+
+function toResultCounters(result: CatalogSyncResult): Record<string, number> {
+    return {
+        created: result.created,
+        updated: result.updated,
+        failed: result.failed,
+        fetchedRecords: result.fetchedRecords,
+        fetchedPages: result.fetchedPages,
+        candidates: result.candidates,
+        queuedForUpsert: result.queuedForUpsert,
+        skippedManual: result.skippedManual,
+        skippedInvalid: result.skippedInvalid,
+    };
+}
+
 const handlers = withCronAuth(
     async (request: NextRequest, { logger }) => {
+        const startedAtMs = Date.now();
+        const lockHolderId = randomUUID();
+        const lock = await acquireCatalogSyncLock(
+            {
+                lockKey: AUTO_SYNC_LOCK_KEY,
+                holderId: lockHolderId,
+                ttlSeconds: AUTO_SYNC_LOCK_TTL_SECONDS,
+            },
+            { logger },
+        );
+
+        if (!lock.acquired) {
+            return NextResponse.json({
+                ok: false,
+                error: "Catalog auto-sync is already running.",
+                lock: {
+                    key: AUTO_SYNC_LOCK_KEY,
+                    lockedUntil: lock.lockedUntil ?? null,
+                },
+            }, { status: 409 });
+        }
+
+        const runId = await startCatalogSyncRun(
+            {
+                trigger: "catalog.auto_sync",
+                sourceScope: ["github"],
+            },
+            { logger },
+        );
+
+        let finalStatus: AutoSyncFinalStatus = "error";
+        let finalCounters: Record<string, number> = {};
+        let errorSummary: string | undefined;
+        let failureRows: { slug: string; reason: string }[] = [];
+
+        try {
         const envMaxPages = parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_MAX_PAGES, {
             min: 1,
             max: MAX_GITHUB_SEARCH_PAGES,
@@ -140,6 +210,7 @@ const handlers = withCronAuth(
         if (!result) {
             const error = lastError ?? new Error("Catalog auto-sync failed before completion.");
             const errorMessage = toErrorMessage(error);
+            errorSummary = errorMessage;
             logger.error("catalog.auto_sync.unhandled_error", {
                 message: errorMessage,
             });
@@ -152,6 +223,7 @@ const handlers = withCronAuth(
                       };
 
             if (isNetworkFetchFailure(error)) {
+                finalStatus = "partial";
                 return NextResponse.json({
                     ok: false,
                     error: "Catalog auto-sync partially unavailable due to GitHub network failure.",
@@ -172,6 +244,7 @@ const handlers = withCronAuth(
                 }, { status: 207 });
             }
 
+            finalStatus = "error";
             return NextResponse.json({
                 ok: false,
                 error: "Catalog auto-sync failed before completion.",
@@ -193,6 +266,16 @@ const handlers = withCronAuth(
         }
 
         const alerting = buildAlertingSignals(result);
+        finalStatus = toRunStatus(alerting.status);
+        finalCounters = toResultCounters(result);
+        failureRows = result.failures.map((failure) => ({
+            slug: failure.slug,
+            reason: failure.reason,
+        }));
+
+        if (result.failed > 0) {
+            errorSummary = `Sync completed with ${result.failed} failures.`;
+        }
 
         if (alerting.shouldPage) {
             logger.error("catalog.auto_sync.completed", {
@@ -212,6 +295,7 @@ const handlers = withCronAuth(
         revalidatePath("/catalog");
         revalidatePath("/categories");
         revalidatePath("/sitemap.xml");
+        await clearCatalogSnapshotRedisCache();
         for (const slug of result.changedSlugs.slice(0, 400)) {
             revalidatePath(`/server/${slug}`);
         }
@@ -243,8 +327,50 @@ const handlers = withCronAuth(
                 maxPages,
             },
         }, { status: alerting.status === "error" ? 207 : 200 });
+        } finally {
+            const durationMs = Date.now() - startedAtMs;
+            if (runId) {
+                await finishCatalogSyncRun(
+                    {
+                        runId,
+                        status: finalStatus,
+                        durationMs,
+                        fetched: finalCounters.fetchedRecords,
+                        upserted: (finalCounters.created ?? 0) + (finalCounters.updated ?? 0),
+                        failed: finalCounters.failed,
+                        staleMarked: 0,
+                        errorSummary,
+                    },
+                    { logger },
+                );
+
+                if (failureRows.length > 0) {
+                    await recordCatalogSyncFailures(
+                        {
+                            runId,
+                            failures: failureRows.map((failure) => ({
+                                source: "github",
+                                entityKey: failure.slug,
+                                stage: "upsert",
+                                errorMessageSanitized: failure.reason,
+                            })),
+                            limit: MAX_RECORDED_FAILURES,
+                        },
+                        { logger },
+                    );
+                }
+            }
+
+            await releaseCatalogSyncLock(
+                {
+                    lockKey: AUTO_SYNC_LOCK_KEY,
+                    holderId: lockHolderId,
+                },
+                { logger },
+            );
+        }
     },
-    ["CATALOG_AUTOSYNC_CRON_SECRET"],
+    ["CATALOG_AUTOSYNC_CRON_SECRET", "CRON_SECRET"],
     "catalog.auto_sync",
 );
 
