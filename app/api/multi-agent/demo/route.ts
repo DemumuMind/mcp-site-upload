@@ -34,7 +34,7 @@ function getRequestId(request: NextRequest): string {
 function isAuthorized(request: NextRequest): boolean {
   const secret = process.env.MULTI_AGENT_DEMO_SECRET?.trim();
   if (!secret) {
-    return true;
+    return process.env.NODE_ENV === "development";
   }
 
   const auth = request.headers.get("authorization") ?? "";

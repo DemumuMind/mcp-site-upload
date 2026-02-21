@@ -25,6 +25,14 @@ function toEndOfDayIso(value: string | null): string | null {
   return parsed.toISOString();
 }
 
+function parseIsoTimestamp(value: string): string | null {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString();
+}
+
 export const GET = withAdminAuth(
   async (request) => {
     const adminClient = createSupabaseAdminClient();
@@ -39,8 +47,18 @@ export const GET = withAdminAuth(
     const toDate = url.searchParams.get("to");
     const fromTs = (url.searchParams.get("fromTs") ?? "").trim();
     const toTs = (url.searchParams.get("toTs") ?? "").trim();
-    const fromIso = fromTs || toStartOfDayIso(fromDate);
-    const toIso = toTs || toEndOfDayIso(toDate);
+    const parsedFromTs = fromTs ? parseIsoTimestamp(fromTs) : null;
+    const parsedToTs = toTs ? parseIsoTimestamp(toTs) : null;
+
+    if (fromTs && !parsedFromTs) {
+      return NextResponse.json({ ok: false, error: "Invalid fromTs timestamp." }, { status: 400 });
+    }
+    if (toTs && !parsedToTs) {
+      return NextResponse.json({ ok: false, error: "Invalid toTs timestamp." }, { status: 400 });
+    }
+
+    const fromIso = parsedFromTs || toStartOfDayIso(fromDate);
+    const toIso = parsedToTs || toEndOfDayIso(toDate);
 
     let query = adminClient
       .from("auth_security_events")

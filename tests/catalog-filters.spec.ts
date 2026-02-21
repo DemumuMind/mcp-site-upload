@@ -17,7 +17,7 @@ test.describe("Catalog query v2 filters", () => {
     });
 
     await page.goto("/catalog");
-    await page.waitForTimeout(1200);
+    await page.waitForLoadState("networkidle");
 
     const hydrationErrors = consoleErrors.filter((errorText) =>
       /(hydration|hydrated|didn't match|server rendered html didn't match)/i.test(errorText),
@@ -60,7 +60,8 @@ test.describe("Catalog query v2 filters", () => {
     await setLocaleCookies(page, "en");
     await page.goto("/catalog?verification=official&health=healthy");
     const visibleCount = await getVisibleCardCount(page);
-    expect(visibleCount).toBeGreaterThanOrEqual(0);
+    const showsEmptyState = await page.getByText("No tools found").isVisible();
+    expect(visibleCount > 0 || showsEmptyState).toBeTruthy();
 
     await expect.poll(() => page.url()).toContain("verification=official");
     await expect.poll(() => page.url()).toContain("health=healthy");

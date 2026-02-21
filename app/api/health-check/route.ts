@@ -162,17 +162,45 @@ function parseServerUrl(rawUrl: string): URL | null {
     }
 }
 
-async function fetchProbe(url: string): Promise<Response> {
+async function fetchProbe(url: URL): Promise<Response> {
     const controller = new AbortController();
     const timeoutHandle = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-        return await fetch(url, {
-            method: "GET",
-            redirect: "follow",
-            cache: "no-store",
-            signal: controller.signal,
-            headers: { "user-agent": "demumumind-mcp-health-check/1.0" },
-        });
+        let currentUrl = new URL(url.toString());
+        const maxRedirects = 3;
+        for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
+            const response = await fetch(currentUrl.toString(), {
+                method: "GET",
+                redirect: "manual",
+                cache: "no-store",
+                signal: controller.signal,
+                headers: { "user-agent": "demumumind-mcp-health-check/1.0" },
+            });
+
+            const location = response.headers.get("location");
+            if (!location || response.status < 300 || response.status >= 400) {
+                return response;
+            }
+
+            if (redirectCount >= maxRedirects) {
+                throw new Error("Too many redirects");
+            }
+
+            const nextUrl = new URL(location, currentUrl);
+            if (nextUrl.protocol !== "http:" && nextUrl.protocol !== "https:") {
+                throw new Error("Unsafe redirect protocol");
+            }
+            if (nextUrl.username || nextUrl.password) {
+                throw new Error("Unsafe redirect credentials");
+            }
+            const safeRedirectHostname = await isSafeProbeHostname(nextUrl.hostname);
+            if (!safeRedirectHostname) {
+                throw new Error("Unsafe redirect host");
+            }
+            currentUrl = nextUrl;
+        }
+
+        throw new Error("Probe redirect loop");
     } finally {
         clearTimeout(timeoutHandle);
     }
@@ -220,7 +248,7 @@ async function probeServer(row: ActiveServerRow): Promise<HealthProbe> {
     let lastError: string | null = null;
     for (let attempt = 1; attempt <= MAX_PROBE_ATTEMPTS; attempt += 1) {
         try {
-            const response = await fetchProbe(parsedServerUrl.toString());
+            const response = await fetchProbe(parsedServerUrl);
             if (response.ok) {
                 return { id: row.id, name: row.name, healthStatus: classifyHttpStatus(response.status), healthError: null };
             }

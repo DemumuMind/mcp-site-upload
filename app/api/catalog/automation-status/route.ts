@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { withCronAuth } from "@/lib/api/with-auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,8 @@ function hasCatalogSecret(): boolean {
   return Boolean(process.env.CATALOG_AUTOSYNC_CRON_SECRET || process.env.CRON_SECRET);
 }
 
-export async function GET() {
+const handlers = withCronAuth(
+  async () => {
   const cronSchedules = await readCatalogCronSchedules();
   const cronConfigured = cronSchedules.length > 0;
   const secretConfigured = hasCatalogSecret();
@@ -79,15 +81,20 @@ export async function GET() {
     runtimeReady: supabaseConfigured && dataCheckError === null,
   };
 
-  return NextResponse.json({
-    ok: checks.cronConfigured && checks.secretConfigured && checks.runtimeReady,
-    checks,
-    catalogAutoSync: {
-      cronSchedules,
-      autoManagedActiveCount,
-      lastAutoManagedCreatedAt,
-      dataCheckError,
-    },
-    checkedAt: new Date().toISOString(),
-  });
-}
+    return NextResponse.json({
+      ok: checks.cronConfigured && checks.secretConfigured && checks.runtimeReady,
+      checks,
+      catalogAutoSync: {
+        cronSchedules,
+        autoManagedActiveCount,
+        lastAutoManagedCreatedAt,
+        dataCheckError,
+      },
+      checkedAt: new Date().toISOString(),
+    });
+  },
+  ["CATALOG_AUTOSYNC_CRON_SECRET", "CRON_SECRET"],
+  "catalog_automation_status",
+);
+
+export const GET = handlers.GET;

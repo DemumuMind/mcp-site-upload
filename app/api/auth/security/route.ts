@@ -47,6 +47,7 @@ function getClientIpAddress(request: NextRequest): string | null {
 
 async function getFailedAttemptsInWindow(
   emailHash: string,
+  ipAddress: string | null,
 ): Promise<{ count: number; oldestCreatedAt: string | null }> {
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) {
@@ -55,22 +56,25 @@ async function getFailedAttemptsInWindow(
 
   const sinceIso = new Date(Date.now() - LOGIN_WINDOW_SECONDS * 1000).toISOString();
 
-  const [countResult, oldestResult] = await Promise.all([
-    adminClient
-      .from("auth_security_events")
-      .select("id", { count: "exact", head: true })
-      .eq("event_type", "login_failure")
-      .eq("email_hash", emailHash)
-      .gte("created_at", sinceIso),
-    adminClient
-      .from("auth_security_events")
-      .select("created_at")
-      .eq("event_type", "login_failure")
-      .eq("email_hash", emailHash)
-      .gte("created_at", sinceIso)
-      .order("created_at", { ascending: true })
-      .limit(1),
-  ]);
+  const countQuery = adminClient
+    .from("auth_security_events")
+    .select("id", { count: "exact", head: true })
+    .eq("event_type", "login_failure")
+    .eq("email_hash", emailHash)
+    .gte("created_at", sinceIso);
+  const oldestQuery = adminClient
+    .from("auth_security_events")
+    .select("created_at")
+    .eq("event_type", "login_failure")
+    .eq("email_hash", emailHash)
+    .gte("created_at", sinceIso)
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  const scopedCountQuery = ipAddress ? countQuery.eq("ip_address", ipAddress) : countQuery;
+  const scopedOldestQuery = ipAddress ? oldestQuery.eq("ip_address", ipAddress) : oldestQuery;
+
+  const [countResult, oldestResult] = await Promise.all([scopedCountQuery, scopedOldestQuery]);
 
   const oldestCreatedAt = oldestResult.data?.[0]?.created_at ?? null;
   return {
@@ -121,12 +125,12 @@ export async function POST(request: NextRequest) {
   try {
     payload = (await request.json()) as SecurityPayload;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Invalid JSON payload." }, { status: 400 });
   }
 
   const email = normalizeEmail(payload.email);
   if (!email) {
-    return NextResponse.json({ error: "Email is required." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Email is required." }, { status: 400 });
   }
 
   const emailHash = hashEmail(email);
@@ -134,7 +138,16 @@ export async function POST(request: NextRequest) {
   const userAgent = request.headers.get("user-agent");
 
   if (payload.action === "precheck") {
-    const { count, oldestCreatedAt } = await getFailedAttemptsInWindow(emailHash);
+    if (!ipAddress) {
+      return NextResponse.json({
+        ok: true,
+        failedAttemptsInWindow: 0,
+        maxFailedAttempts: MAX_FAILED_ATTEMPTS,
+        retryAfterSeconds: 0,
+      });
+    }
+
+    const { count, oldestCreatedAt } = await getFailedAttemptsInWindow(emailHash, ipAddress);
     const hasLimit = count >= MAX_FAILED_ATTEMPTS;
 
     let retryAfterSeconds = 0;
@@ -169,7 +182,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (payload.action !== "login-result") {
-    return NextResponse.json({ error: "Unsupported action." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Unsupported action." }, { status: 400 });
   }
 
   const isSuccess = Boolean(payload.success);
@@ -217,7 +230,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, alert: null });
   }
 
-  const { count } = await getFailedAttemptsInWindow(emailHash);
+  const { count } = await getFailedAttemptsInWindow(emailHash, ipAddress);
   if (count === ALERT_FAILED_ATTEMPTS || count === ALERT_FAILED_ATTEMPTS_MAX) {
     await sendSecurityAlertEmail({
       locale: "en",

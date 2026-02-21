@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react"
 
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
 interface MousePosition {
@@ -89,6 +90,7 @@ export const Particles: React.FC<ParticlesProps> = ({
   vy = 0,
   ...props
 }) => {
+  const prefersReducedMotion = usePrefersReducedMotion()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const context = useRef<CanvasRenderingContext2D | null>(null)
@@ -102,7 +104,6 @@ export const Particles: React.FC<ParticlesProps> = ({
 
   function initCanvas() {
     resizeCanvas()
-    drawParticles()
   }
 
   function onMouseMove() {
@@ -128,6 +129,7 @@ export const Particles: React.FC<ParticlesProps> = ({
       canvasRef.current.height = canvasSize.current.h * dpr
       canvasRef.current.style.width = `${canvasSize.current.w}px`
       canvasRef.current.style.height = `${canvasSize.current.h}px`
+      context.current.setTransform(1, 0, 0, 1, 0, 0)
       context.current.scale(dpr, dpr)
 
       circles.current = []
@@ -192,15 +194,6 @@ export const Particles: React.FC<ParticlesProps> = ({
     }
   }
 
-  const drawParticles = () => {
-    clearContext()
-    const particleCount = quantity
-    for (let i = 0; i < particleCount; i++) {
-      const circle = circleParams()
-      drawCircle(circle)
-    }
-  }
-
   const remapValue = (
     value: number,
     start1: number,
@@ -260,6 +253,10 @@ export const Particles: React.FC<ParticlesProps> = ({
   }
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return
+    }
+
     if (canvasRef.current) {
       context.current = canvasRef.current.getContext("2d")
     }
@@ -286,15 +283,25 @@ export const Particles: React.FC<ParticlesProps> = ({
       }
       window.removeEventListener("resize", handleResize)
     }
-  }, [color]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [color, ease, prefersReducedMotion, quantity, size, staticity, vx, vy]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return
+    }
     onMouseMove()
-  }, [mousePosition.x, mousePosition.y]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mousePosition.x, mousePosition.y, prefersReducedMotion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return
+    }
     initCanvas()
-  }, [refresh]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion, refresh]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (prefersReducedMotion) {
+    return null
+  }
 
   return (
     <div

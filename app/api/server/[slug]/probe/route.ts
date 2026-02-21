@@ -1,3 +1,4 @@
+import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { extractBearerToken, validateCronToken } from "@/lib/api/auth-helpers";
 import { NextResponse } from "next/server";
@@ -17,6 +18,25 @@ function isUnsafeHost(hostname: string): boolean {
     return true;
   }
   return false;
+}
+
+async function resolvesToUnsafeAddress(hostname: string): Promise<boolean> {
+  const normalizedHostname = hostname.trim().toLowerCase();
+  if (!normalizedHostname) {
+    return true;
+  }
+  if (isIP(normalizedHostname)) {
+    return isUnsafeHost(normalizedHostname);
+  }
+  try {
+    const records = await lookup(normalizedHostname, { all: true, verbatim: true });
+    if (records.length === 0) {
+      return true;
+    }
+    return records.some((record) => isUnsafeHost(record.address));
+  } catch {
+    return true;
+  }
 }
 
 function isUnsafeIpv4(ipv4: string): boolean {
@@ -56,6 +76,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sl
   if (!["http:", "https:"].includes(parsed.protocol) || isUnsafeHost(parsed.hostname)) {
     return NextResponse.json({ ok: false, error: "Unsafe server URL host" }, { status: 400 });
   }
+  if (await resolvesToUnsafeAddress(parsed.hostname)) {
+    return NextResponse.json({ ok: false, error: "Unsafe server URL host" }, { status: 400 });
+  }
 
   const startedAt = Date.now();
   const controller = new AbortController();
@@ -65,6 +88,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sl
       method: "GET",
       signal: controller.signal,
       cache: "no-store",
+      redirect: "manual",
       headers: { "user-agent": "demumumind-mcp-connection-test/1.0" },
     });
     return NextResponse.json({

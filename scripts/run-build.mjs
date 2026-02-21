@@ -35,6 +35,7 @@ function run(command, label, { retries = 0, retryDelayMs = 1500 } = {}) {
       encoding: "utf8",
       env,
       shell: true,
+      maxBuffer: 20 * 1024 * 1024,
     });
 
     if (result.stdout) {

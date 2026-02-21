@@ -50,6 +50,18 @@ function serializeUrl(entry: SitemapEntry) {
         "</url>",
     ].join("");
 }
+
+function toSafeIso(value: string | null | undefined, fallbackIso: string): string {
+    if (!value) {
+        return fallbackIso;
+    }
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return fallbackIso;
+    }
+    return parsed.toISOString();
+}
+
 export async function GET() {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const nowIso = new Date().toISOString();
@@ -64,13 +76,13 @@ export async function GET() {
     }));
     const serverEntries: SitemapEntry[] = activeServers.map((mcpServer) => ({
         url: new URL(`/server/${mcpServer.slug}`, siteUrl).toString(),
-        lastModified: mcpServer.createdAt ? new Date(mcpServer.createdAt).toISOString() : nowIso,
+        lastModified: toSafeIso(mcpServer.createdAt, nowIso),
         changeFrequency: "weekly",
         priority: 0.8,
     }));
     const blogEntries: SitemapEntry[] = blogPosts.map((post) => ({
         url: new URL(`/blog/${post.slug}`, siteUrl).toString(),
-        lastModified: new Date(post.updatedAt ?? post.publishedAt).toISOString(),
+        lastModified: toSafeIso(post.updatedAt ?? post.publishedAt, nowIso),
         changeFrequency: "weekly",
         priority: 0.7,
     }));

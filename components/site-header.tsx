@@ -112,7 +112,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         <div className="flex shrink-0 items-center gap-3 lg:hidden">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-blacksmith bg-card/50 text-foreground backdrop-blur-sm transition-all hover:border-primary/50 hover:text-primary focus-visible:outline-none"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-blacksmith bg-card/50 text-foreground backdrop-blur-sm transition-all hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             onClick={() => setIsMobileMenuOpen((current) => !current)}
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}

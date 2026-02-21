@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type CountUpValueProps = {
   end: number;
@@ -8,20 +9,17 @@ type CountUpValueProps = {
 };
 
 export function CountUpValue({ end, durationMs = 1200 }: CountUpValueProps) {
-  const [value, setValue] = useState(() => {
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return end;
-    }
-    return 0;
-  });
+  const [value, setValue] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
+    if (prefersReducedMotion) {
+      return;
+    }
 
     let raf = 0;
     let startedAt = 0;
@@ -54,7 +52,9 @@ export function CountUpValue({ end, durationMs = 1200 }: CountUpValueProps) {
       observer.disconnect();
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [durationMs, end]);
+  }, [durationMs, end, prefersReducedMotion]);
 
-  return <span ref={ref}>{value.toLocaleString()}</span>;
+  const renderedValue = prefersReducedMotion ? end : value;
+
+  return <span ref={ref}>{renderedValue.toLocaleString()}</span>;
 }

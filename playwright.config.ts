@@ -20,7 +20,7 @@ export default defineConfig({
     : {
         command: "npm run start -- -p 3101",
         url: baseURL,
-        reuseExistingServer: true,
+        reuseExistingServer: !process.env.CI,
         timeout: 300_000,
       },
 });

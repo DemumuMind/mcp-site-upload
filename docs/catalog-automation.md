@@ -80,6 +80,7 @@ HTTP status:
 ## Quick status (checks 1/2/3)
 Use:
 - `GET /api/catalog/automation-status`
+- Auth header: `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
 
 Response includes:
 1. `checks.cronConfigured` — cron schedule exists for `/api/catalog/auto-sync`
