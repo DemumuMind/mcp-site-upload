@@ -222,7 +222,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           securityPageSize={security.pageSize}
           securitySortBy={security.sortBy}
           securitySortOrder={security.sortOrder}
-          queryState={queryState}
         />
       </div>
     </PageFrame>
