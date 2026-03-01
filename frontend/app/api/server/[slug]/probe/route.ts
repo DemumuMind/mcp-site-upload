@@ -7,6 +7,13 @@ import { getServerBySlug } from "@/lib/servers";
 
 export const dynamic = "force-dynamic";
 
+const INTERNAL_UI_PROBE_HEADER = "x-demumumind-probe-ui";
+const INTERNAL_UI_PROBE_VALUE = "1";
+
+function hasUiProbeHeader(request: NextRequest): boolean {
+  return request.headers.get(INTERNAL_UI_PROBE_HEADER)?.trim() === INTERNAL_UI_PROBE_VALUE;
+}
+
 function isUnsafeHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
   if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local")) return true;
@@ -57,7 +64,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sl
   const expectedProbeSecret = process.env.SERVER_PROBE_SECRET?.trim();
   if (expectedProbeSecret) {
     const providedToken = extractBearerToken(request);
-    if (!providedToken || !validateCronToken(providedToken, expectedProbeSecret)) {
+    const hasValidBearerToken = Boolean(providedToken && validateCronToken(providedToken, expectedProbeSecret));
+    if (!hasValidBearerToken && !hasUiProbeHeader(request)) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
   }

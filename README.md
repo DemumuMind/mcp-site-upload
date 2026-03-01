@@ -77,6 +77,7 @@ Detailed env management guide: [`docs/environment-variables.md`](docs/environmen
 | `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` | optional | filter obvious test/staging/template entries (default `true`) |
 | `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
 | `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to auto-reject noisy entries |
+| `SERVER_PROBE_SECRET` | optional | bearer token for direct calls to `/api/server/[slug]/probe` (UI call includes internal trusted header and remains allowed) |
 | `MULTI_AGENT_DEMO_SECRET` | optional (recommended in production) | bearer token for `/api/multi-agent/demo`; if unset, endpoint stays open (use only in trusted environments) |
 | `MULTI_AGENT_ADAPTIVE_ENABLED` | optional | enable adaptive worker/mode selection (`1` default, set `0` for fixed full-mesh) |
 | `MULTI_AGENT_SLO_DURATION_MS` | optional | SLO threshold for total request duration before warning event (default `2500`) |

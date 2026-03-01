@@ -11,6 +11,9 @@ type ProbeResult = {
   error?: string;
 };
 
+const PROBE_UI_HEADER = "x-demumumind-probe-ui";
+const PROBE_UI_HEADER_VALUE = "1";
+
 export function ConnectionTestButton({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProbeResult | null>(null);
@@ -24,7 +27,12 @@ export function ConnectionTestButton({ slug }: { slug: string }) {
         onClick={async () => {
           setLoading(true);
           try {
-            const response = await fetch(`/api/server/${slug}/probe`, { method: "POST" });
+            const response = await fetch(`/api/server/${slug}/probe`, {
+              method: "POST",
+              headers: {
+                [PROBE_UI_HEADER]: PROBE_UI_HEADER_VALUE,
+              },
+            });
             const responseContentType = response.headers.get("content-type") ?? "";
             if (responseContentType.includes("application/json")) {
               const payload = (await response.json()) as ProbeResult;
