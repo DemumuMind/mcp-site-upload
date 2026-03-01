@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { type LucideIcon, BookOpen, Cpu, House, LayoutGrid, Menu, Newspaper, Wallet, Wrench, X } from "lucide-react";
 import { AuthNavActions } from "@/components/auth-nav-actions";
 import { BrandLockup } from "@/components/brand-lockup";
@@ -32,8 +33,20 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ locale }: SiteHeaderProps) {
   const navLinks = navLinkMap.map((item) => ({ href: item.href, label: item.label[locale], icon: item.icon }));
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isScrolled = useScroll(14);
+
+  function isLinkActive(href: string) {
+    if (!pathname) return false;
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
+  const navLinksWithState = navLinks.map((link) => ({
+    ...link,
+    isActive: isLinkActive(link.href),
+  }));
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -74,15 +87,32 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         </BlurFade>
 
         <div className="hidden items-center gap-1 lg:flex">
-          {navLinks.map((link, idx) => (
+          {navLinksWithState.map((link, idx) => (
             <BlurFade key={link.href} delay={0.1 + idx * 0.05} yOffset={0}>
               <Link
                 href={link.href}
-                className="group relative flex items-center gap-2 rounded-md border border-transparent px-3 py-2 text-[0.78rem] font-medium uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:border-border/70 hover:bg-card/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-current={link.isActive ? "page" : undefined}
+                className={cn(
+                  "group relative flex items-center gap-2 rounded-md border px-3 py-2 text-[0.78rem] font-medium uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  link.isActive
+                    ? "border-border/80 bg-card/80 text-foreground"
+                    : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-card/70 hover:text-foreground"
+                )}
               >
-                <link.icon aria-hidden className="size-3.5 text-muted-foreground transition-colors group-hover:text-primary" />
+                <link.icon
+                  aria-hidden
+                  className={cn(
+                    "size-3.5 transition-colors",
+                    link.isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                  )}
+                />
                 {link.label}
-                <span className="absolute inset-x-3 bottom-[5px] h-px scale-x-0 bg-primary/60 transition-transform duration-200 group-hover:scale-x-100" />
+                <span
+                  className={cn(
+                    "absolute inset-x-3 bottom-[5px] h-px bg-primary/60 transition-transform duration-200",
+                    link.isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
               </Link>
             </BlurFade>
           ))}
@@ -116,14 +146,20 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
           aria-label="Mobile navigation"
         >
           <div className="mx-auto grid w-full max-w-7xl gap-2">
-            {navLinks.map((link) => (
+            {navLinksWithState.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-transparent px-3 text-sm font-medium text-foreground transition-colors hover:border-border/70 hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-current={link.isActive ? "page" : undefined}
+                className={cn(
+                  "inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  link.isActive
+                    ? "border-border/80 bg-card/85 text-foreground"
+                    : "border-transparent text-foreground hover:border-border/70 hover:bg-card/80"
+                )}
               >
-                <link.icon aria-hidden className="size-4 opacity-90" />
+                <link.icon aria-hidden className={cn("size-4 opacity-90", link.isActive ? "text-primary" : undefined)} />
                 {link.label}
               </Link>
             ))}
