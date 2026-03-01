@@ -22,6 +22,7 @@ const frameVariantClassName: Record<PageVariant, string> = {
 export function PageFrame({ children, variant = "default", className }: PageFrameProps) {
   return (
     <div
+      data-page-variant={variant}
       className={cn(
         "min-h-screen bg-background text-foreground",
         frameVariantClassName[variant],
@@ -72,6 +73,7 @@ export function PageHero({
 }: PageHeroProps) {
   const content = (
     <section
+      data-hero-surface={surface}
       className={cn(
         "relative overflow-hidden space-y-5 rounded-2xl border p-6 sm:p-10",
         heroSurfaceClassName[surface],
