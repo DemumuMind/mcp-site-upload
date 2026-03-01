@@ -57,6 +57,15 @@
 - Delayed detection of regressions.
 ### Acceptance Criteria
 - Rollout управляем и обратим.
+### Status
+- State: Completed
+- Updated at: 2026-03-01
+- Evidence: `docs/runbooks/release-rollout-strategy.md`
+- Verification:
+  - utf8: PASS (strict UTF-8 validation command)
+  - lint: PASS (`npm.cmd run lint`)
+  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
+  - tests: FAIL (`spawn EPERM` in Playwright process)
 
 ## Эпик C: SEO/Marketing release control
 - Priority: P1
