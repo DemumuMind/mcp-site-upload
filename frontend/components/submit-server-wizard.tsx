@@ -1,13 +1,8 @@
-﻿"use client";
+"use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, LoaderCircle, LogIn, Send } from "lucide-react";
-import { useWatch, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { submitServerAction } from "@/app/actions";
 import { useLocale } from "@/components/locale-provider";
+import { useSubmitServerWizardController } from "@/components/submit-server-wizard/use-submit-server-wizard-controller";
 import { SubmitStepBasics } from "@/components/submit-server/steps/step-basics";
 import { SubmitStepReview } from "@/components/submit-server/steps/step-review";
 import { SubmitStepTechnical } from "@/components/submit-server/steps/step-technical";
@@ -15,228 +10,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { tr } from "@/lib/i18n";
-import { getSubmissionSchema, type SubmissionInput } from "@/lib/submission-schema";
-
-const defaultFormValues: SubmissionInput = {
-  name: "",
-  serverUrl: "",
-  category: "",
-  authType: "oauth",
-  description: "",
-  maintainerName: "",
-  maintainerEmail: "",
-  repoUrl: "",
-};
-
-const DRAFT_STORAGE_KEY = "demumumind-submit-server-draft-v2";
-
-const wizardSteps = [
-  {
-    title: "Basics",
-    description: "Identity and short product context.",
-  },
-  {
-    title: "Technical",
-    description: "Endpoints, auth model, and maintainer info.",
-  },
-  {
-    title: "Review",
-    description: "Final review and submit to moderation.",
-  },
-] as const;
-
-type WizardDraftState = {
-  step: number;
-  values: SubmissionInput;
-  updatedAt: string;
-};
-
-function clampStep(step: number): 0 | 1 | 2 {
-  if (step <= 0) {
-    return 0;
-  }
-  if (step === 1) {
-    return 1;
-  }
-  return 2;
-}
-
-function parseDraftState(raw: string | null): WizardDraftState | null {
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<WizardDraftState> | null;
-    if (!parsed || typeof parsed !== "object" || !parsed.values) {
-      return null;
-    }
-
-    return {
-      step: Number.isFinite(parsed.step) ? Number(parsed.step) : 0,
-      values: {
-        ...defaultFormValues,
-        ...parsed.values,
-      },
-      updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : new Date().toISOString(),
-    };
-  } catch {
-    return null;
-  }
-}
 
 export function SubmitServerWizard() {
   const locale = useLocale();
-  const router = useRouter();
   const { isConfigured, isLoading, user } = useSupabaseUser();
-  const [step, setStep] = useState<0 | 1 | 2>(0);
-  const [restoredDraftAt, setRestoredDraftAt] = useState<string | null>(null);
-  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [submittedMessage, setSubmittedMessage] = useState<string | null>(null);
-  const [submittedSlug, setSubmittedSlug] = useState<string | null>(null);
-  const submissionSchema = useMemo(() => getSubmissionSchema(locale), [locale]);
 
-  const form = useForm<SubmissionInput>({
-    resolver: zodResolver(submissionSchema),
-    defaultValues: defaultFormValues,
-    mode: "onBlur",
-  });
-
-  const watchedValues = useWatch({ control: form.control });
-  const isAuthenticated = Boolean(user);
-
-  useEffect(() => {
-    const draft = parseDraftState(window.localStorage.getItem(DRAFT_STORAGE_KEY));
-    const applyDraftTimer = window.setTimeout(() => {
-      if (draft) {
-        setStep(clampStep(draft.step));
-        setRestoredDraftAt(new Date(draft.updatedAt).toLocaleString("en-US"));
-        form.reset({
-          ...defaultFormValues,
-          ...draft.values,
-        });
-      }
-      setIsDraftHydrated(true);
-    }, 0);
-    return () => window.clearTimeout(applyDraftTimer);
-  }, [form]);
-
-  useEffect(() => {
-    if (!isDraftHydrated || submittedMessage) {
-      return;
-    }
-
-    const payload: WizardDraftState = {
-      step,
-      values: {
-        ...defaultFormValues,
-        ...watchedValues,
-      },
-      updatedAt: new Date().toISOString(),
-    };
-
-    window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
-  }, [isDraftHydrated, step, submittedMessage, watchedValues]);
-
-  function clearDraft() {
-    window.localStorage.removeItem(DRAFT_STORAGE_KEY);
-    setRestoredDraftAt(null);
-  }
-
-  async function goNext() {
-    if (step === 0) {
-      const isValid = await form.trigger(["name", "category", "description"], { shouldFocus: true });
-      if (!isValid) {
-        return;
-      }
-      setStep(1);
-      return;
-    }
-
-    if (step === 1) {
-      const isValid = await form.trigger(["serverUrl", "authType", "repoUrl", "maintainerName", "maintainerEmail"], {
-        shouldFocus: true,
-      });
-      if (!isValid) {
-        return;
-      }
-      setStep(2);
-    }
-  }
-
-  function goBack() {
-    if (step === 0) {
-      return;
-    }
-
-    setStep((current) => clampStep(current - 1));
-  }
-
-  async function handleFinalSubmit() {
-    const isValid = await form.trigger(undefined, { shouldFocus: true });
-    if (!isValid) {
-      toast.error(tr(locale, "Please complete the highlighted fields first.", "Please complete the highlighted fields first."));
-      return;
-    }
-
-    const values = form.getValues();
-    if (!isConfigured) {
-      toast.error(
-        tr(
-          locale,
-          "Auth is not configured. Set Supabase environment variables before submitting.",
-          "Auth is not configured. Set Supabase environment variables before submitting.",
-        ),
-      );
-      return;
-    }
-
-    if (!user) {
-      window.localStorage.setItem(
-        DRAFT_STORAGE_KEY,
-        JSON.stringify({
-          step: 2,
-          values,
-          updatedAt: new Date().toISOString(),
-        } satisfies WizardDraftState),
-      );
-      toast.message(
-        tr(
-          locale,
-          "Sign in required for final submit. Your draft is saved and will restore after login.",
-          "Sign in required for final submit. Your draft is saved and will restore after login.",
-        ),
-      );
-      router.push(`/auth?next=${encodeURIComponent("/submit-server#submit")}`);
-      return;
-    }
-
-    startTransition(async () => {
-      const result = await submitServerAction(values);
-      if (!result.success) {
-        if (result.fieldErrors) {
-          for (const [fieldName, errorMessage] of Object.entries(result.fieldErrors)) {
-            if (!errorMessage) {
-              continue;
-            }
-
-            form.setError(fieldName as keyof SubmissionInput, { message: errorMessage });
-          }
-        }
-
-        toast.error(result.message);
-        return;
-      }
-
-      toast.success(result.message);
-      setSubmittedMessage(result.message);
-      setSubmittedSlug(result.serverSlug ?? null);
-      clearDraft();
-      form.reset(defaultFormValues);
-      setStep(0);
-    });
-  }
+  const {
+    form,
+    step,
+    restoredDraftAt,
+    isPending,
+    submittedMessage,
+    submittedSlug,
+    isAuthenticated,
+    goNext,
+    goBack,
+    handleFinalSubmit,
+    wizardSteps,
+  } = useSubmitServerWizardController(locale, isConfigured, user ? { id: user.id } : null);
 
   return (
     <div id="submit" className="space-y-5">
@@ -329,12 +120,22 @@ export function SubmitServerWizard() {
         </Button>
 
         {step < 2 ? (
-          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void goNext()} disabled={isPending}>
+          <Button
+            type="button"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => void goNext()}
+            disabled={isPending}
+          >
             {tr(locale, "Continue", "Continue")}
             <ChevronRight className="size-4" />
           </Button>
         ) : (
-          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void handleFinalSubmit()} disabled={isPending}>
+          <Button
+            type="button"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => void handleFinalSubmit()}
+            disabled={isPending}
+          >
             {isPending ? <LoaderCircle className="size-4 animate-spin" /> : isAuthenticated ? <Send className="size-4" /> : <LogIn className="size-4" />}
             {isAuthenticated
               ? tr(locale, "Submit for moderation", "Submit for moderation")
@@ -354,4 +155,3 @@ export function SubmitServerWizard() {
     </div>
   );
 }
-
