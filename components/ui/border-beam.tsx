@@ -1,6 +1,7 @@
 "use client"
 
 import { motion, MotionStyle, Transition } from "motion/react"
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
 interface BorderBeamProps {
@@ -30,6 +31,22 @@ export const BorderBeam = ({
   initialOffset = 0,
   borderWidth = 1,
 }: BorderBeamProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  if (prefersReducedMotion) {
+    return (
+      <div
+        className="pointer-events-none absolute inset-0 rounded-[inherit] border border-transparent [mask-image:linear-gradient(transparent,transparent),linear-gradient(#000,#000)] [mask-clip:padding-box,border-box] [mask-composite:intersect]"
+        style={
+          {
+            borderWidth: `${borderWidth}px`,
+            "--border-beam-width": `${borderWidth}px`,
+          } as React.CSSProperties
+        }
+      />
+    );
+  }
+
   return (
     <div
       className="pointer-events-none absolute inset-0 rounded-[inherit] border border-transparent [mask-image:linear-gradient(transparent,transparent),linear-gradient(#000,#000)] [mask-clip:padding-box,border-box] [mask-composite:intersect]"
