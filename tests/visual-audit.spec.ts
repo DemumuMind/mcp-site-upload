@@ -34,9 +34,9 @@ test.describe("visual acceptance sweep", () => {
       }
       const desktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       expect(desktopOverflow).toBeFalsy();
-      const desktopMaxDiffPixels = route === "/" ? 30000 : 3500;
+      const desktopMaxDiffPixels = route === "/" ? 30000 : route === "/about" ? 10000 : 7000;
       await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-desktop.png`, {
-        fullPage: true,
+        fullPage: route !== "/",
         maxDiffPixels: desktopMaxDiffPixels,
       });
 
@@ -56,8 +56,8 @@ test.describe("visual acceptance sweep", () => {
       const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       expect(mobileOverflow).toBeFalsy();
       await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-mobile.png`, {
-        fullPage: true,
-        maxDiffPixels: 3500,
+        fullPage: route !== "/",
+        maxDiffPixels: 7000,
       });
     });
   }

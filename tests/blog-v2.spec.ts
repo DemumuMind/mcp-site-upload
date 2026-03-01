@@ -23,7 +23,7 @@ test.describe("Blog v2", () => {
     await setConsentCookies(page);
     await page.goto("/blog");
 
-    await expect(page.getByRole("heading", { name: "BridgeMind Blog" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /DemumuMind Blog|BridgeMind Blog/i })).toBeVisible();
     await expect(page.getByText("Featured article")).toBeVisible();
     await expect(page.getByRole("link", { name: "Open article" })).toBeVisible();
   });
