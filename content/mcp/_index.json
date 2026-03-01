@@ -2,11 +2,11 @@
   "section": "mcp",
   "locale": {
     "en": {
-      "title": "MCP Overview",
-      "description": "Overview of DemumuMind MCP and how it helps teams.",
-      "eyebrow": "MCP Foundation",
-      "heroTitle": "One Operating Layer for MCP Delivery",
-      "heroDescription": "Discover verified and community MCP servers, inspect tool capabilities, and connect them to your AI workflows."
+      "title": "MCP Platform for AI Tool Integration",
+      "description": "DemumuMind MCP helps engineering teams discover, evaluate, and run MCP servers with predictable tooling and clear operational controls.",
+      "eyebrow": "Industrial Editorial 2.0",
+      "heroTitle": "MCP Control Surface for Production AI Workflows",
+      "heroDescription": "Find verified and community MCP servers, inspect exposed tools, and ship reliable agent integrations with less operational risk."
     }
   }
 }
