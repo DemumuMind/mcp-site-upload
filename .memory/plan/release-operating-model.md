@@ -33,8 +33,8 @@
 - Verification:
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
-  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
+  - build: PASS (`npm.cmd run build`)
+  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
 
 ## Эпик B: Release rollout strategy
 - Priority: P0
@@ -64,8 +64,8 @@
 - Verification:
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
-  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
+  - build: PASS (`npm.cmd run build`)
+  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
 
 ## Эпик C: SEO/Marketing release control
 - Priority: P1
@@ -95,8 +95,8 @@
 - Verification:
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
-  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
+  - build: PASS (`npm.cmd run build`)
+  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
 
 ## Эпик D: Post-release hypercare
 - Priority: P1
@@ -126,8 +126,8 @@
 - Verification:
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
-  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
+  - build: PASS (`npm.cmd run build`)
+  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
 
 ## Эпик E: Cost/resource optimization in operations
 - Priority: P2
@@ -157,5 +157,6 @@
 - Verification:
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
-  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
+  - build: PASS (`npm.cmd run build`)
+  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+

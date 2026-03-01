@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Blocks, CheckCircle2, ShieldCheck, type LucideIcon } from "lucide-react";
+import { ArrowRight, Blocks, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +14,10 @@ type TrustSignalsSectionProps = {
 };
 
 export function TrustSignalsSection({ content, featuredServers, topCategories, topLanguages }: TrustSignalsSectionProps) {
-  const iconByToken: Record<string, LucideIcon> = {
-    "shield-check": ShieldCheck,
-    "check-circle": CheckCircle2,
-    blocks: Blocks,
+  const renderIcon = (token: string) => {
+    if (token === "shield-check") return <ShieldCheck className="mb-2 size-4 text-primary" aria-hidden="true" />;
+    if (token === "check-circle") return <CheckCircle2 className="mb-2 size-4 text-primary" aria-hidden="true" />;
+    return <Blocks className="mb-2 size-4 text-primary" aria-hidden="true" />;
   };
 
   return (
@@ -28,16 +28,13 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
           <p className="max-w-xl text-lg text-muted-foreground">{content.description}</p>
 
           <div className="grid gap-3 text-sm sm:grid-cols-1">
-            {content.points.map((point) => {
-              const Icon = iconByToken[point.icon] ?? Blocks;
-              return (
-                <div key={point.title} className="rounded-xl border border-blacksmith bg-card p-3">
-                  <Icon className="mb-2 size-4 text-primary" aria-hidden="true" />
-                  <p className="font-medium text-foreground">{point.title}</p>
-                  <p className="text-xs text-muted-foreground">{point.description}</p>
-                </div>
-              );
-            })}
+            {content.points.map((point) => (
+              <div key={point.title} className="rounded-xl border border-blacksmith bg-card p-3">
+                {renderIcon(point.icon)}
+                <p className="font-medium text-foreground">{point.title}</p>
+                <p className="text-xs text-muted-foreground">{point.description}</p>
+              </div>
+            ))}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
