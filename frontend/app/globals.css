@@ -216,6 +216,29 @@ body::after {
   box-shadow: 0 0 0 3px hsl(var(--ring) / 0.22);
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.6rem;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--surface-2));
+  color: hsl(var(--foreground));
+  text-decoration: none;
+  transform: translateY(-140%);
+  opacity: 0;
+  transition:
+    transform var(--motion-fast) var(--motion-ease-standard),
+    opacity var(--motion-fast) var(--motion-ease-standard);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
 @layer utilities {
   .section-shell {
     width: min(var(--section-max-width), 100% - (2 * var(--section-pad-inline)));

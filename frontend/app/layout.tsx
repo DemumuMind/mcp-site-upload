@@ -116,9 +116,15 @@ export default async function RootLayout({
         <ThemeProvider>
           <LocaleProvider locale={locale}>
             <div className="flex min-h-screen flex-col">
+              <a href="#main-content" className="skip-link">
+                Skip to main content
+              </a>
               <SiteHeader locale={locale} />
               <AuthHashRedirector />
-              <main className="relative flex-1 w-full [--page-shell-block:clamp(1.5rem,3vw,2.75rem)] [&>section]:section-shell [&>section]:py-[var(--page-shell-block)]">
+              <main
+                id="main-content"
+                className="relative flex-1 w-full [--page-shell-block:clamp(1.5rem,3vw,2.75rem)] [&>section]:section-shell [&>section]:py-[var(--page-shell-block)]"
+              >
                 {children}
               </main>
               <SiteFooter locale={locale} />
