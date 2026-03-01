@@ -1,12 +1,12 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { ArrowRight, Blocks, CheckCircle2, ShieldCheck, Star } from "lucide-react";
+import { ArrowRight, Blocks, CheckCircle2, ShieldCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { TrustProofFeaturedServerCard } from "@/components/home-v3/sections/trust-proof-featured-server";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { CoolMode } from "@/components/ui/cool-mode";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { GridPattern } from "@/components/ui/grid-pattern";
@@ -19,15 +19,6 @@ const iconMap: Record<string, LucideIcon> = {
   "check-circle": CheckCircle2,
   blocks: Blocks,
 };
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 type TrustProofSectionV3Props = {
   content: HomeContent["trust"];
@@ -142,86 +133,12 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                   <p className="text-sm text-muted-foreground italic">{content.featuredEmptyLabel}</p>
                 ) : (
                   featuredServers.map((server) => (
-                    <Dialog key={server.id}>
-                      <DialogTrigger asChild>
-                        <article
-                          className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-card/30 p-4 backdrop-blur-md transition-all hover:border-primary/40 hover:bg-card/50 shadow-2xl shadow-black"
-                        >
-                          <BorderBeam size={120} duration={10} className="opacity-0 group-hover:opacity-100" />
-
-                          <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-background/80 shadow-inner">
-                                <Star className="size-5 text-primary group-hover:scale-110 transition-transform" />
-                              </div>
-                              <div>
-                                <h3 className="text-sm font-bold tracking-tight text-foreground">{server.name}</h3>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                  <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{server.verificationLabel}</p>
-                                </div>
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-[10px] font-bold">
-                              {server.category}
-                            </Badge>
-                          </div>
-
-                          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3 text-[10px] font-medium tracking-wide text-muted-foreground">
-                            <div className="flex items-center gap-4">
-                              <span className="flex items-center gap-1.5">
-                                <span className="text-primary/70 uppercase">{content.featuredAuthLabel}:</span>
-                                <span className="text-foreground">{server.authLabel}</span>
-                              </span>
-                            </div>
-                            <span className="rounded-full bg-muted/30 px-2 py-0.5 text-foreground/80">
-                              {server.toolsCount} {content.featuredToolsLabel}
-                            </span>
-                          </div>
-                        </article>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                          <DialogTitle className="flex items-center gap-3 text-2xl">
-                            <Star className="size-6 text-primary" />
-                            {server.name}
-                          </DialogTitle>
-                          <DialogDescription className="text-base pt-2">
-                            Detailed information about this trusted MCP server.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="rounded-lg border border-border bg-muted/30 p-4">
-                            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Capabilities</h4>
-                            <p className="text-sm text-foreground">
-                              This server provides {server.toolsCount} specialized tools for agentic workflows, focusing on {server.category}.
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-lg border border-border bg-muted/20 p-3">
-                              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Category</p>
-                              <p className="text-sm font-semibold text-foreground mt-0.5">{server.category}</p>
-                            </div>
-                            <div className="rounded-lg border border-border bg-muted/20 p-3">
-                              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Auth Model</p>
-                              <p className="text-sm font-semibold text-foreground mt-0.5">{server.authLabel}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs font-medium text-emerald-400">
-                            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                            {server.verificationLabel}
-                          </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-2">
-                          <Button asChild variant="outline" className="rounded-md border-border">
-                            <Link href="/catalog">Visit Catalog</Link>
-                          </Button>
-                          <Button asChild className="rounded-md">
-                            <Link href="/submit-server">Integrate Now</Link>
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <TrustProofFeaturedServerCard
+                      key={server.id}
+                      server={server}
+                      featuredAuthLabel={content.featuredAuthLabel}
+                      featuredToolsLabel={content.featuredToolsLabel}
+                    />
                   ))
                 )}
               </div>
