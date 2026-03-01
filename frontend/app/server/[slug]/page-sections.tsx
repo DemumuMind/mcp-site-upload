@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { ConnectionTestButton } from "@/components/server/connection-test-button";
 import { CopyConfigButton } from "@/components/server/copy-config-button";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 
@@ -11,6 +10,7 @@ import { tr, type Locale } from "@/lib/i18n";
 import type { McpServer } from "@/lib/types";
 
 import { formatCheckedAt, type CapabilityGroups } from "./page-view-model";
+import { ExternalTextLink, OutlineBadge, SectionCard, SectionLabel } from "./section-primitives";
 
 type CommonSectionProps = {
   locale: Locale;
@@ -24,12 +24,10 @@ type HealthSectionProps = CommonSectionProps & {
 
 export function ServerUrlSection({ locale, mcpServer }: CommonSectionProps) {
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        {tr(locale, "Server URL", "Server URL")}
-      </p>
+    <SectionCard>
+      <SectionLabel className="mb-2">{tr(locale, "Server URL", "Server URL")}</SectionLabel>
       <p className="break-all text-sm text-foreground">{mcpServer.serverUrl}</p>
-    </div>
+    </SectionCard>
   );
 }
 
@@ -40,9 +38,7 @@ export function AvailableToolsSection({ locale, mcpServer }: CommonSectionProps)
       {mcpServer.tools.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {mcpServer.tools.map((toolName) => (
-            <Badge key={toolName} variant="outline" className="border-border text-muted-foreground">
-              {toolName}
-            </Badge>
+            <OutlineBadge key={toolName}>{toolName}</OutlineBadge>
           ))}
         </div>
       ) : (
@@ -64,8 +60,8 @@ export function CapabilityGroupsSection({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Tool capabilities</p>
+    <SectionCard>
+      <SectionLabel>Tool capabilities</SectionLabel>
       <div className="grid gap-3 sm:grid-cols-2">
         {Object.entries(capabilityGroups).map(([key, tools]) =>
           tools.length > 0 ? (
@@ -73,16 +69,14 @@ export function CapabilityGroupsSection({
               <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">{key}</p>
               <div className="flex flex-wrap gap-1.5">
                 {tools.slice(0, 6).map((toolName) => (
-                  <Badge key={`${key}-${toolName}`} variant="outline" className="border-border text-muted-foreground">
-                    {toolName}
-                  </Badge>
+                  <OutlineBadge key={`${key}-${toolName}`}>{toolName}</OutlineBadge>
                 ))}
               </div>
             </div>
           ) : null,
         )}
       </div>
-    </div>
+    </SectionCard>
   );
 }
 
@@ -97,30 +91,28 @@ export function GithubStatsSection({
     return null;
   }
 
+  const githubStatBadges = [
+    `Stars: ${githubStats.stars}`,
+    `Forks: ${githubStats.forks}`,
+    `Watchers: ${githubStats.watchers}`,
+    `Issues: ${githubStats.openIssues}`,
+    githubStats.license ?? "No license",
+  ];
+
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">GitHub stats</p>
+    <SectionCard>
+      <SectionLabel>GitHub stats</SectionLabel>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
-          Stars: {githubStats.stars}
-        </Badge>
-        <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
-          Forks: {githubStats.forks}
-        </Badge>
-        <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
-          Watchers: {githubStats.watchers}
-        </Badge>
-        <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
-          Issues: {githubStats.openIssues}
-        </Badge>
-        <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
-          {githubStats.license ?? "No license"}
-        </Badge>
+        {githubStatBadges.map((statBadge) => (
+          <OutlineBadge key={statBadge} className="justify-center px-3 py-2 text-foreground">
+            {statBadge}
+          </OutlineBadge>
+        ))}
       </div>
       {githubStats.pushedAt ? (
         <p className="mt-3 text-xs text-muted-foreground">Last push: {formatCheckedAt(githubStats.pushedAt, locale)}</p>
       ) : null}
-    </div>
+    </SectionCard>
   );
 }
 
@@ -131,10 +123,8 @@ export function HealthSection({
   isHealthPending,
 }: HealthSectionProps) {
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        {tr(locale, "Health check", "Health check")}
-      </p>
+    <SectionCard>
+      <SectionLabel className="mb-2">{tr(locale, "Health check", "Health check")}</SectionLabel>
       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         <span>
           {tr(locale, "Status", "Status")}: {isHealthPending
@@ -153,7 +143,7 @@ export function HealthSection({
       <div className="mt-3">
         <ConnectionTestButton slug={mcpServer.slug} />
       </div>
-    </div>
+    </SectionCard>
   );
 }
 
@@ -171,8 +161,8 @@ export function RiskTrustSection({
   hasLicense: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">Risk & trust</p>
+    <SectionCard>
+      <SectionLabel className="mb-2">Risk & trust</SectionLabel>
       <ul className="space-y-1 text-sm text-muted-foreground">
         <li>Verification: {verificationLabel}</li>
         <li>Health: {isHealthPending ? "Pending first health scan" : healthLabel}</li>
@@ -180,7 +170,7 @@ export function RiskTrustSection({
         <li>License detected: {hasLicense ? "Yes" : "No"}</li>
         <li>Maintainer: {mcpServer.maintainer?.name ?? "Unknown"}</li>
       </ul>
-    </div>
+    </SectionCard>
   );
 }
 
@@ -197,19 +187,19 @@ export function RecentActivitySection({
     return null;
   }
 
+  const formatActivityDate = (date: string | null) => (date ? ` - ${formatCheckedAt(date, locale)}` : "");
+
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Recent activity</p>
+    <SectionCard>
+      <SectionLabel>Recent activity</SectionLabel>
       {githubActivity.releases.length > 0 ? (
         <div className="mb-3">
           <p className="mb-1 text-sm font-medium text-foreground">Releases</p>
           <div className="space-y-1 text-sm text-muted-foreground">
             {githubActivity.releases.slice(0, 3).map((release) => (
               <p key={release.url}>
-                <Link href={release.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                  {release.name}
-                </Link>
-                {release.publishedAt ? ` - ${formatCheckedAt(release.publishedAt, locale)}` : ""}
+                <ExternalTextLink href={release.url}>{release.name}</ExternalTextLink>
+                {formatActivityDate(release.publishedAt)}
               </p>
             ))}
           </div>
@@ -221,16 +211,14 @@ export function RecentActivitySection({
           <div className="space-y-1 text-sm text-muted-foreground">
             {githubActivity.commits.slice(0, 3).map((commit) => (
               <p key={commit.sha}>
-                <Link href={commit.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                  {commit.message || commit.sha.slice(0, 7)}
-                </Link>
-                {commit.date ? ` - ${formatCheckedAt(commit.date, locale)}` : ""}
+                <ExternalTextLink href={commit.url}>{commit.message || commit.sha.slice(0, 7)}</ExternalTextLink>
+                {formatActivityDate(commit.date)}
               </p>
             ))}
           </div>
         </div>
       ) : null}
-    </div>
+    </SectionCard>
   );
 }
 
@@ -244,8 +232,8 @@ export function SimilarServersSection({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card/70 p-4">
-      <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Similar servers</p>
+    <SectionCard>
+      <SectionLabel>Similar servers</SectionLabel>
       <div className="grid gap-2 sm:grid-cols-2">
         {similarServers.map(({ server }) => (
           <Link
@@ -257,7 +245,7 @@ export function SimilarServersSection({
           </Link>
         ))}
       </div>
-    </div>
+    </SectionCard>
   );
 }
 
