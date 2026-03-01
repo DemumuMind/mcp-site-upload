@@ -33,10 +33,12 @@ function tokensMatch(expectedToken: string, actualToken: string): boolean {
 }
 
 export function authorizeTaskApiRequest(request: Request, envVarName = "TASKS_API_BEARER_TOKEN"): boolean {
-  const expectedToken = process.env[envVarName];
-  // Backward-compatible mode: auth is optional unless a token is configured.
+  const authMode = process.env.TASKS_API_AUTH_MODE?.trim().toLowerCase() ?? "required";
+  const allowUnauthenticated = authMode === "optional";
+  const expectedToken = process.env[envVarName]?.trim();
+
   if (!expectedToken) {
-    return true;
+    return allowUnauthenticated;
   }
 
   const providedToken = getBearerTokenFromRequest(request);

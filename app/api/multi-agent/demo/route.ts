@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { extractBearerToken, validateCronToken } from "@/lib/api/auth-helpers";
 import { createLogger } from "@/lib/api/logger";
+import { RATE_LIMITS, checkRateLimit } from "@/lib/api/rate-limiter";
 import { runMultiAgentPipeline } from "@/lib/multi-agent/pipeline";
 import { persistMultiAgentTelemetry } from "@/lib/multi-agent/telemetry";
 import { emitMultiAgentTaskEvent } from "@/lib/multi-agent/task-events";
@@ -38,8 +40,17 @@ function isAuthorized(request: NextRequest): boolean {
     return process.env.NODE_ENV === "development";
   }
 
-  const auth = request.headers.get("authorization") ?? "";
-  return auth === `Bearer ${secret}`;
+  const providedToken = extractBearerToken(request);
+  if (!providedToken) {
+    return false;
+  }
+  return validateCronToken(providedToken, secret);
+}
+
+function getRateLimitKey(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const clientIp = forwardedFor?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  return `multi-agent-demo:${clientIp}`;
 }
 
 function isPipelineResult(value: unknown): value is MultiAgentPipelineResult {
@@ -52,6 +63,7 @@ function isPipelineResult(value: unknown): value is MultiAgentPipelineResult {
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const startedAt = Date.now();
+  const rateLimit = checkRateLimit(getRateLimitKey(request), RATE_LIMITS.public);
 
   try {
     await emitMultiAgentTaskEvent({
@@ -82,6 +94,18 @@ export async function POST(request: NextRequest) {
           requestId,
         },
         { status: 401 },
+      );
+    }
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Too Many Requests",
+          requestId,
+          retryAfterMs: Math.max(0, rateLimit.resetAt - Date.now()),
+        },
+        { status: 429 },
       );
     }
 

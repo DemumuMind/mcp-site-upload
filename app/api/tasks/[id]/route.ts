@@ -17,6 +17,10 @@ function toDurationMs(startedAt: string | null, finishedAt: string | null): numb
 }
 
 export async function GET(request: Request, context: RouteContext) {
+  if (!authorizeTaskApiRequest(request)) {
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  }
+
   const { id } = await context.params;
   const taskId = id.trim();
   if (!taskId) {
@@ -29,22 +33,6 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   const durationMs = toDurationMs(task.startedAt, task.finishedAt);
-  const isAuthorized = authorizeTaskApiRequest(request);
-
-  if (!isAuthorized) {
-    // Return a safe status-only payload when auth is configured but missing/invalid.
-    return NextResponse.json({
-      ok: true,
-      id: task.id,
-      status: task.status,
-      startedAt: task.startedAt,
-      finishedAt: task.finishedAt,
-      durationMs,
-      errorSummary: task.errorSummary,
-      deltaEta: task.deltaEta,
-    });
-  }
-
   return NextResponse.json({
     ok: true,
     id: task.id,
