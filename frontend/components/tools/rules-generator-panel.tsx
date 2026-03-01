@@ -1,13 +1,11 @@
 "use client";
 
-import { History, Sparkles, Wand2, X } from "lucide-react";
-import { type KeyboardEvent } from "react";
-
+import { Sparkles, Wand2 } from "lucide-react";
 import { ExportTabs } from "@/components/tools/export-tabs";
 import { PresetManager } from "@/components/tools/preset-manager";
+import { HistoryList } from "@/components/tools/rules-generator-panel/history-list";
+import { TagField } from "@/components/tools/rules-generator-panel/tag-field";
 import {
-  formatTimestamp,
-  normalizeTag,
   useRulesGeneratorController,
 } from "@/components/tools/rules-generator-panel/use-rules-generator-controller";
 import { SkillSelector } from "@/components/tools/skill-selector";
@@ -25,81 +23,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { RulesTone } from "@/lib/tools/rules-engine";
-
-type TagFieldProps = {
-  label: string;
-  tags: string[];
-  draft: string;
-  placeholder: string;
-  onDraftChange: (value: string) => void;
-  onAddTag: (tag: string) => void;
-  onRemoveTag: (tag: string) => void;
-};
-
-function TagField({
-  label,
-  tags,
-  draft,
-  placeholder,
-  onDraftChange,
-  onAddTag,
-  onRemoveTag,
-}: TagFieldProps) {
-  function commitDraft() {
-    const normalized = normalizeTag(draft);
-    if (!normalized) return;
-    onAddTag(normalized);
-    onDraftChange("");
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter" || event.key === ",") {
-      event.preventDefault();
-      commitDraft();
-    }
-  }
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex flex-wrap gap-2">
-        <Input
-          value={draft}
-          onChange={(event) => onDraftChange(event.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          className="h-9 min-w-[12rem] flex-1 border-border bg-muted/50"
-        />
-        <Button type="button" size="sm" variant="outline" onClick={commitDraft}>
-          Add
-        </Button>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {tags.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No tags yet.</p>
-        ) : (
-          tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="outline"
-              className="flex items-center gap-1 border-border bg-muted/50 text-foreground"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => onRemoveTag(tag)}
-                className="rounded p-0.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                aria-label={`Remove ${tag}`}
-              >
-                <X className="size-3" />
-              </button>
-            </Badge>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
 
 export function RulesGeneratorPanel() {
   const {
@@ -297,42 +220,7 @@ export function RulesGeneratorPanel() {
 
         {generationResult ? <ExportTabs artifacts={generationResult.artifacts} /> : null}
 
-        <div className="space-y-3 rounded-xl border border-border bg-card p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-foreground">Generation History</p>
-            <Badge variant="outline" className="border-border bg-muted/50 text-foreground">
-              {historyItems.length}
-            </Badge>
-          </div>
-
-          <div className="max-h-44 space-y-2 overflow-y-auto pr-1">
-            {historyItems.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border/70 px-3 py-2 text-xs text-muted-foreground">
-                No generations yet.
-              </p>
-            ) : (
-              historyItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleLoadHistory(item)}
-                  className="flex w-full items-start justify-between gap-3 rounded-lg border border-border/70 bg-muted/40 p-2 text-left hover:border-border"
-                >
-                  <span className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {item.input.projectName || "Untitled project"}
-                    </p>
-                    <p className="line-clamp-1 text-xs text-muted-foreground">{item.input.description}</p>
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    <History className="mb-1 ml-auto size-3.5" />
-                    {formatTimestamp(item.createdAt)}
-                  </span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
+        <HistoryList historyItems={historyItems} onLoadHistory={handleLoadHistory} />
 
         <div className="rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs text-foreground">
           <p className="flex items-center gap-1.5 font-medium">
