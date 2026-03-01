@@ -4,11 +4,18 @@ import {
   pipelineInputSchema,
   pipelineLogEntrySchema,
   pipelineResultSchema,
+  type AgentCore,
+  type ExecutionState,
+  type ExecutionStateMachine,
+  type MemoryStore,
   type MultiAgentPipelineInput,
   type MultiAgentPipelineResult,
   type PipelineLogEntry,
+  type ToolGateway,
   type WorkerRole,
 } from "./types";
+import { InMemoryMemoryStore } from "./memory";
+import { RetryingToolGateway } from "./tool-gateway";
 
 const WORKER_ROLES: readonly WorkerRole[] = ["analyst", "developer", "tester"];
 const ESTIMATED_COST_PER_1K_TOKENS_USD = 0.0025;
@@ -33,11 +40,38 @@ const addLog = (
   );
 };
 
-const createInitialOutput = async (role: WorkerRole, input: MultiAgentPipelineInput): Promise<InitialOutputMap[WorkerRole]> => {
-  const contextSize = Object.keys(input.context).length;
-  const content = `${role} analysis for "${input.task}" with ${contextSize} context item(s).`;
-  return agentMessageSchema.parse({ role, content });
+class WorkerAgentCore implements AgentCore {
+  constructor(public readonly role: WorkerRole) {}
+
+  async createInitialOutput(input: MultiAgentPipelineInput): Promise<InitialOutputMap[WorkerRole]> {
+    const contextSize = Object.keys(input.context).length;
+    const content = `${this.role} analysis for "${input.task}" with ${contextSize} context item(s).`;
+    return agentMessageSchema.parse({ role: this.role, content });
+  }
+}
+
+const EXECUTION_TRANSITIONS: Record<ExecutionState, readonly ExecutionState[]> = {
+  initial: ["exchange"],
+  exchange: ["final"],
+  final: ["completed"],
+  completed: [],
 };
+
+class PipelineExecutionStateMachine implements ExecutionStateMachine {
+  private state: ExecutionState = "initial";
+
+  getState(): ExecutionState {
+    return this.state;
+  }
+
+  transition(to: ExecutionState): void {
+    const allowed = EXECUTION_TRANSITIONS[this.state];
+    if (!allowed.includes(to)) {
+      throw new Error(`Invalid state transition from ${this.state} to ${to}`);
+    }
+    this.state = to;
+  }
+}
 
 const createFeedback = (from: WorkerRole, to: WorkerRole, outputs: InitialOutputMap): string => {
   const target = outputs[to].content;
@@ -69,30 +103,6 @@ const estimatePipelineTokens = (input: MultiAgentPipelineInput, workers: WorkerR
   return estimateTokensFromText(raw) * 4;
 };
 
-const wait = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-const createInitialOutputWithRetry = async (
-  role: WorkerRole,
-  input: MultiAgentPipelineInput,
-): Promise<{ output: InitialOutputMap[WorkerRole]; retries: number }> => {
-  let attempt = 0;
-  while (true) {
-    try {
-      const output = await createInitialOutput(role, input);
-      return { output, retries: attempt };
-    } catch (error) {
-      if (attempt >= MAX_INITIAL_RETRIES) {
-        throw error;
-      }
-      attempt += 1;
-      await wait(RETRY_BACKOFF_MS * attempt);
-    }
-  }
-};
-
 export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): Promise<MultiAgentPipelineResult> => {
   const pipelineStartedAt = Date.now();
   const input = pipelineInputSchema.parse(rawInput);
@@ -107,7 +117,22 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
     exchange: 0,
     final: 0,
   };
+  const stateMachine: ExecutionStateMachine = new PipelineExecutionStateMachine();
+  const memoryStore: MemoryStore = new InMemoryMemoryStore();
+  const toolGateway: ToolGateway = new RetryingToolGateway();
+  const agents: Record<WorkerRole, AgentCore> = {
+    analyst: new WorkerAgentCore("analyst"),
+    developer: new WorkerAgentCore("developer"),
+    tester: new WorkerAgentCore("tester"),
+  };
   let initialRetries = 0;
+
+  memoryStore.append({
+    key: "input.task",
+    type: "input",
+    content: input.task,
+    createdAt: new Date().toISOString(),
+  });
 
   const initialStartedAt = Date.now();
   addLog(logs, indexRef, {
@@ -119,8 +144,17 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
 
   const initialEntries = await Promise.all(
     activeWorkers.map(async (role) => {
-      const { output, retries } = await createInitialOutputWithRetry(role, input);
+      const { result: output, retries } = await toolGateway.execute(
+        () => agents[role].createInitialOutput(input),
+        { retries: MAX_INITIAL_RETRIES, backoffMs: RETRY_BACKOFF_MS },
+      );
       initialRetries += retries;
+      memoryStore.append({
+        key: `initial.${role}`,
+        type: "output",
+        content: output.content,
+        createdAt: new Date().toISOString(),
+      });
       return [role, output] as const;
     }),
   );
@@ -136,6 +170,7 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
     });
   }
   stageDurationsMs.initial = Date.now() - initialStartedAt;
+  stateMachine.transition("exchange");
 
   const exchangeStartedAt = Date.now();
   addLog(logs, indexRef, {
@@ -168,6 +203,12 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
         });
 
   for (const item of feedback) {
+    memoryStore.append({
+      key: `feedback.${item.from}.${item.to}`,
+      type: "feedback",
+      content: item.content,
+      createdAt: new Date().toISOString(),
+    });
     addLog(logs, indexRef, {
       stage: "exchange",
       status: "completed",
@@ -177,9 +218,16 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
     });
   }
   stageDurationsMs.exchange = Date.now() - exchangeStartedAt;
+  stateMachine.transition("final");
 
   const finalStartedAt = Date.now();
   const coordinatorSummary = `Coordinator summary: ${activeWorkers.join(", ")} completed initial + exchange phases for "${input.task}" using ${coordinationMode}.`;
+  memoryStore.append({
+    key: "summary.coordinator",
+    type: "summary",
+    content: coordinatorSummary,
+    createdAt: new Date().toISOString(),
+  });
 
   addLog(logs, indexRef, {
     stage: "final",
@@ -188,6 +236,8 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
     message: coordinatorSummary,
   });
   stageDurationsMs.final = Date.now() - finalStartedAt;
+  stateMachine.transition("completed");
+  memoryStore.compact();
 
   const tokenSource = [
     input.task,

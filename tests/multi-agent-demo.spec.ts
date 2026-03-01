@@ -49,6 +49,7 @@ test.describe("POST /api/multi-agent/demo", () => {
     expect(body.result.metrics.estimatedTokens).toBeGreaterThan(0);
     expect(body.result.metrics.estimatedCostUsd).toBeGreaterThanOrEqual(0);
     expect(body.result.metrics.initialRetries).toBeGreaterThanOrEqual(0);
+    expect(body.result.metrics.logEntries).toBe(body.log.length);
     expect(Array.isArray(body.result.metrics.activeWorkers)).toBe(true);
     expect(body.result.metrics.activeWorkers.length).toBeGreaterThan(0);
     expect(["full-mesh", "ring"]).toContain(body.result.metrics.coordinationMode);
@@ -65,5 +66,6 @@ test.describe("POST /api/multi-agent/demo", () => {
         entry.message.trim().length > 0
     );
     expect(coordinatorFinalLog).toBeTruthy();
+    expect(body.result.metrics.feedbackCount).toBe(crossAgentLogs.length);
   });
 });

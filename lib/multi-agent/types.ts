@@ -12,6 +12,9 @@ export type PipelineStage = z.infer<typeof pipelineStageSchema>;
 export const pipelineStatusSchema = z.enum(["started", "completed"]);
 export type PipelineStatus = z.infer<typeof pipelineStatusSchema>;
 
+export const executionStateSchema = z.enum(["initial", "exchange", "final", "completed"]);
+export type ExecutionState = z.infer<typeof executionStateSchema>;
+
 export const pipelineInputSchema = z.object({
   task: z.string().trim().min(1),
   context: z.record(z.string(), z.string()).default({}),
@@ -41,6 +44,43 @@ export const pipelineLogEntrySchema = z.object({
   message: z.string().trim().min(1),
 });
 export type PipelineLogEntry = z.infer<typeof pipelineLogEntrySchema>;
+
+export type MemoryRecordType = "input" | "output" | "feedback" | "summary";
+
+export type MemoryRecord = {
+  key: string;
+  type: MemoryRecordType;
+  content: string;
+  createdAt: string;
+};
+
+export interface MemoryStore {
+  append(record: MemoryRecord): void;
+  getAll(): MemoryRecord[];
+  compact(): void;
+}
+
+export interface ToolGateway {
+  execute<T>(operation: () => Promise<T>, options?: { retries?: number; backoffMs?: number }): Promise<{ result: T; retries: number }>;
+}
+
+export interface AgentCore {
+  role: WorkerRole;
+  createInitialOutput(input: MultiAgentPipelineInput): Promise<AgentMessage>;
+}
+
+export interface ExecutionStateMachine {
+  getState(): ExecutionState;
+  transition(to: ExecutionState): void;
+}
+
+export interface TelemetrySink {
+  persist(input: {
+    requestId: string;
+    durationMs: number;
+    pipeline: MultiAgentPipelineResult;
+  }): Promise<void>;
+}
 
 export const pipelineResultSchema = z.object({
   input: pipelineInputSchema,
