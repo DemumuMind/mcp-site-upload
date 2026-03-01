@@ -32,3 +32,4 @@ uv run scrapy crawl mcp_registry -O ../../docs/mcp-registry-scrapy.json
 ## Scrapy environment
 
 - `MCP_SCRAPY_REGISTRY_URL` (optional): override registry endpoint.
+- `MCP_SCRAPY_DEDUPE_BY_SLUG` (optional, default `1`): keep one latest entry per slug.

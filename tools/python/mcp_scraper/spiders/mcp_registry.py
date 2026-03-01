@@ -39,6 +39,21 @@ class McpRegistrySpider(scrapy.Spider):
         registry_url = os.getenv("MCP_SCRAPY_REGISTRY_URL", DEFAULT_REGISTRY_URL).strip() or DEFAULT_REGISTRY_URL
         yield scrapy.Request(registry_url, callback=self.parse_registry)
 
+    @staticmethod
+    def _entry_rank(payload: dict[str, Any], record: dict[str, Any]) -> tuple[int, str, str]:
+        official_meta = {}
+        root_meta = record.get("_meta")
+        if isinstance(root_meta, dict):
+            candidate = root_meta.get("io.modelcontextprotocol.registry/official")
+            if isinstance(candidate, dict):
+                official_meta = candidate
+
+        is_latest = 1 if official_meta.get("isLatest") is True else 0
+        updated_at = str(official_meta.get("updatedAt") or "")
+        published_at = str(official_meta.get("publishedAt") or "")
+        version = str(payload.get("version") or "")
+        return (is_latest, updated_at or published_at, version)
+
     def parse_registry(self, response: scrapy.http.Response):
         data = json.loads(response.text)
 
@@ -55,6 +70,10 @@ class McpRegistrySpider(scrapy.Spider):
                 records = [data]
         else:
             records = []
+
+        dedupe_enabled = os.getenv("MCP_SCRAPY_DEDUPE_BY_SLUG", "1").strip().lower() not in {"0", "false", "no"}
+        selected_by_slug: dict[str, tuple[tuple[int, str, str], dict[str, Any], dict[str, Any]]] = {}
+        fallback_items: list[tuple[dict[str, Any], dict[str, Any]]] = []
 
         for record in records:
             payload = record.get("server") if isinstance(record.get("server"), dict) else record
@@ -74,8 +93,7 @@ class McpRegistrySpider(scrapy.Spider):
                 continue
 
             tags = sorted(set(["registry-auto", "scrapy-sync", *[t.lower() for t in _to_list(payload.get("tags"))]]))
-
-            yield {
+            item = {
                 "name": name[:120],
                 "slug": slug,
                 "description": (description or f"Imported by Scrapy from {response.url}.")[:800],
@@ -84,3 +102,17 @@ class McpRegistrySpider(scrapy.Spider):
                 "tags": tags[:12],
                 "raw": record,
             }
+            if dedupe_enabled:
+                rank = self._entry_rank(payload, record)
+                current = selected_by_slug.get(slug)
+                if current is None or rank > current[0]:
+                    selected_by_slug[slug] = (rank, item, payload)
+            else:
+                fallback_items.append((item, payload))
+
+        if dedupe_enabled:
+            for _, item, _ in selected_by_slug.values():
+                yield item
+        else:
+            for item, _ in fallback_items:
+                yield item
