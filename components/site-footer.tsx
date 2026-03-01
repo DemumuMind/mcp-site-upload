@@ -51,13 +51,13 @@ export function SiteFooter({ locale }: SiteFooterProps) {
     return cn(
       "group relative flex items-center gap-2 rounded-md border border-transparent px-3 py-1.5 text-[0.78rem] font-medium uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       isActive
-        ? "border-blacksmith/70 bg-card/80 text-foreground"
-        : "text-muted-foreground hover:border-blacksmith/70 hover:bg-card/70 hover:text-foreground"
+        ? "border-border/70 bg-card/80 text-foreground"
+        : "text-muted-foreground hover:border-border/70 hover:bg-card/70 hover:text-foreground"
     );
   };
 
   return (
-    <footer className="relative z-10 overflow-hidden border-t border-blacksmith/80 bg-background">
+    <footer className="relative z-10 overflow-hidden border-t border-border/80 bg-background">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <GridPattern
           width={40}
@@ -79,7 +79,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           <div className="space-y-5">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center rounded-md border border-transparent px-1 text-foreground transition-colors hover:border-blacksmith/70 hover:bg-card/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex min-h-11 items-center rounded-md border border-transparent px-1 text-foreground transition-colors hover:border-border/70 hover:bg-card/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <BrandLockup className="gap-2.5" markClassName="size-8 text-accent/90" textClassName="text-3xl tracking-[0.05em] sm:text-4xl" subtitle="MCP Directory" />
             </Link>
@@ -97,7 +97,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith/80 bg-card/70 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-border/80 bg-card/70 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={item.label}
                 >
                   <item.icon className="size-4" />
@@ -185,7 +185,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
               <Link
                 href="/submit-server"
                 className={cn(
-                  "group relative flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] font-medium tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                  "group relative flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] font-medium tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   pathname === "/submit-server" ? "text-primary" : "text-muted-foreground hover:text-primary"
                 )}
               >
@@ -203,7 +203,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </BlurFade>
       </div>
 
-      <div className="section-shell relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-blacksmith/50 py-6 text-xs text-muted-foreground">
+      <div className="section-shell relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/50 py-6 text-xs text-muted-foreground">
         <p>{tr(locale, `(c) ${year} DemumuMind. All rights reserved.`, `(c) ${year} DemumuMind. All rights reserved.`)}</p>
         <div className="flex items-center gap-6">
           <CookieSettingsButton label={tr(locale, "Cookie Settings", "Cookie Settings")} />

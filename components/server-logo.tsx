@@ -30,8 +30,8 @@ export function ServerLogo({ mcpServer, className, imageClassName, imageSizes = 
     const hasImageLogo = Boolean(activeLogo);
     return (<div className="flex flex-col items-center text-center">
       <div className={cn("relative inline-flex items-center justify-center overflow-hidden rounded-2xl", hasImageLogo
-            ? "border border-blacksmith bg-card shadow-[0_12px_28px_rgba(2,6,23,0.55)] backdrop-blur-[2px]"
-            : cn("border border-blacksmith bg-gradient-to-br shadow-[0_14px_28px_rgba(2,6,23,0.3)]", fallbackTheme.containerClassName), className)}>
+            ? "border border-border bg-card shadow-[0_12px_28px_rgba(2,6,23,0.55)] backdrop-blur-[2px]"
+            : cn("border border-border bg-gradient-to-br shadow-[0_14px_28px_rgba(2,6,23,0.3)]", fallbackTheme.containerClassName), className)}>
         {hasImageLogo ? (
         <Image src={activeLogo} alt={`${mcpServer.name} logo`} fill sizes={imageSizes} className={cn("h-full w-full object-contain p-2 drop-shadow-[0_6px_12px_rgba(2,6,23,0.4)]", imageClassName)} referrerPolicy="no-referrer" onError={() => setFallbackState((current) => current.key === candidatesKey
                 ? { key: candidatesKey, index: current.index + 1 }

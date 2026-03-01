@@ -52,14 +52,14 @@ export function AdminAutoRefresh({ intervalSec, labels }: AdminAutoRefreshProps)
   const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs text-violet-200">
-      <span className="rounded-full border border-white/15 bg-white/[0.04] px-2 py-1">
+    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+      <span className="rounded-full border border-border bg-card px-2 py-1">
         {labels.autoRefresh}: {enabled ? `${safeIntervalSec}s` : "off"}
       </span>
       <Button
         type="button"
         variant="outline"
-        className="h-7 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06]"
+        className="h-7 border-border bg-card px-2.5 text-xs hover:bg-accent"
         onClick={() => setEnabled((prev) => !prev)}
       >
         {enabled ? "Pause" : "Resume"}
@@ -72,10 +72,10 @@ export function AdminAutoRefresh({ intervalSec, labels }: AdminAutoRefreshProps)
       >
         {labels.refreshNow}
       </Button>
-      <span className="text-violet-300">
+      <span className="text-muted-foreground">
         {labels.lastUpdated}: {formatTime(lastUpdatedAt)}
       </span>
-      <span className="max-w-[360px] truncate text-violet-400" title={currentUrl}>
+      <span className="max-w-[360px] truncate text-muted-foreground" title={currentUrl}>
         {currentUrl}
       </span>
     </div>

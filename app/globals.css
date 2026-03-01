@@ -36,7 +36,6 @@
   --border: 219 12% 28%;
   --input: 219 14% 22%;
   --ring: 38 95% 66%;
-  --blacksmith: 219 12% 28%;
 
   /* Editorial-industrial design primitives */
   --surface-0: 220 20% 8%;
@@ -141,7 +140,6 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --color-blacksmith: hsl(var(--blacksmith));
 
   --color-surface-0: hsl(var(--surface-0));
   --color-surface-1: hsl(var(--surface-1));

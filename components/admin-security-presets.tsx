@@ -46,7 +46,7 @@ export function AdminSecurityPresets({ labels }: AdminSecurityPresetsProps) {
 
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs">
-      <span className="text-violet-300">{labels.title}</span>
+      <span className="text-muted-foreground">{labels.title}</span>
 
       <Button
         type="button"
@@ -140,7 +140,7 @@ export function AdminSecurityPresets({ labels }: AdminSecurityPresetsProps) {
       <Button
         type="button"
         variant="outline"
-        className="h-7 border-violet-300/30 bg-violet-500/10 px-2.5 text-violet-100 hover:bg-violet-500/20"
+        className="h-7 border-border bg-card px-2.5 text-foreground hover:bg-accent"
         onClick={() => {
           const fromBounds = buildDayBounds(sevenDaysAgo);
           const toBounds = buildDayBounds(today);

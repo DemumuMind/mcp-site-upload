@@ -39,10 +39,7 @@ export function BlogReadingProgress() {
       aria-hidden
       className="pointer-events-none fixed inset-x-0 top-[57px] z-40 h-[2px] bg-transparent sm:top-[61px]"
     >
-      <div
-        className="h-full bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400 transition-[width] duration-150 ease-out"
-        style={{ width }}
-      />
+      <div className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-[width] duration-150 ease-out" style={{ width }} />
     </div>
   );
 }
