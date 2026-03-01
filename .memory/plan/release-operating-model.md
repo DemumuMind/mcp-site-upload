@@ -31,10 +31,10 @@
 - Updated at: 2026-03-01
 - Evidence: `docs/runbooks/release-preflight-quality-control.md`
 - Verification:
-  - utf8: PASS (strict UTF-8 validation command)
+  - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
-  - tests: FAIL (`spawn EPERM` in Playwright process)
+  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
+  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
 
 ## Эпик B: Release rollout strategy
 - Priority: P0
@@ -62,10 +62,10 @@
 - Updated at: 2026-03-01
 - Evidence: `docs/runbooks/release-rollout-strategy.md`
 - Verification:
-  - utf8: PASS (strict UTF-8 validation command)
+  - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
-  - tests: FAIL (`spawn EPERM` in Playwright process)
+  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
+  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
 
 ## Эпик C: SEO/Marketing release control
 - Priority: P1
@@ -93,10 +93,10 @@
 - Updated at: 2026-03-01
 - Evidence: `docs/runbooks/release-seo-marketing-control.md`
 - Verification:
-  - utf8: PASS (strict UTF-8 validation command)
+  - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
-  - tests: FAIL (`spawn EPERM` in Playwright process)
+  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
+  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
 
 ## Эпик D: Post-release hypercare
 - Priority: P1
@@ -124,10 +124,10 @@
 - Updated at: 2026-03-01
 - Evidence: `docs/runbooks/post-release-hypercare.md`
 - Verification:
-  - utf8: PASS (strict UTF-8 validation command)
+  - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
-  - tests: FAIL (`spawn EPERM` in Playwright process)
+  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
+  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
 
 ## Эпик E: Cost/resource optimization in operations
 - Priority: P2
@@ -155,7 +155,7 @@
 - Updated at: 2026-03-01
 - Evidence: `docs/runbooks/release-cost-resource-optimization.md`
 - Verification:
-  - utf8: PASS (strict UTF-8 validation command)
+  - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
-  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
-  - tests: FAIL (`spawn EPERM` in Playwright process)
+  - build: FAIL (TypeScript error in `components/home/sections/trust-signals-section.tsx` for `point.icon` JSX typing)
+  - tests: FAIL (Playwright webServer can't start because `.next` build is absent)
