@@ -36,11 +36,11 @@ export default async function CategoriesPage() {
         />
 
         <PageSection surface="plain" className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-blacksmith bg-card p-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{tr(locale, "Category options", "Category options")}</p>
             <p className="text-2xl font-semibold text-foreground">{catalogSnapshot.categoryEntries.length}</p>
           </div>
-          <div className="rounded-2xl border border-blacksmith bg-card p-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{tr(locale, "Language options", "Language options")}</p>
             <p className="text-2xl font-semibold text-foreground">{catalogSnapshot.languageEntries.length}</p>
           </div>
@@ -53,3 +53,4 @@ export default async function CategoriesPage() {
     </PageFrame>
   );
 }
+

@@ -25,7 +25,7 @@ export function ClientReference({ title, description, whereLabel, smokeLabel, it
     if (!selectedItem) {
         return null;
     }
-    return (<div className="space-y-4 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
+    return (<div className="space-y-4 rounded-3xl border border-border bg-card p-6 sm:p-8">
       <div className="space-y-2">
         <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h3>
         <p className="text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
@@ -35,8 +35,8 @@ export function ClientReference({ title, description, whereLabel, smokeLabel, it
         {items.map((item) => {
             const isActive = item.client === selectedItem.client;
             return (<Button key={item.client} type="button" variant={isActive ? "default" : "outline"} className={cn("h-9 rounded-full px-4 text-xs", isActive
-                    ? "bg-primary text-foreground hover:bg-cyan-400"
-                    : "border-blacksmith bg-card text-foreground hover:bg-accent")} onClick={() => {
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-border bg-card text-foreground hover:bg-accent")} onClick={() => {
                     if (isActive) {
                         return;
                     }
@@ -48,7 +48,7 @@ export function ClientReference({ title, description, whereLabel, smokeLabel, it
         })}
       </div>
 
-      <Card className="border-blacksmith bg-card">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center justify-between gap-2 text-lg text-foreground">
             <span>{selectedItem.client}</span>

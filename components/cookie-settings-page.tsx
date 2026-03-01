@@ -99,7 +99,7 @@ export function CookieSettingsPage() {
       </div>
 
       <div className="space-y-3">
-        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
+        <div className="rounded-xl border border-border bg-card px-4 py-3">
           <p className="font-medium text-foreground">{tr(locale, "Strictly necessary", "Strictly necessary")}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {tr(locale, "Required for core navigation, authentication, and platform security.", "Required for core navigation, authentication, and platform security.")}
@@ -107,7 +107,7 @@ export function CookieSettingsPage() {
           <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-primary">{tr(locale, "Always enabled", "Always enabled")}</p>
         </div>
 
-        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
+        <div className="rounded-xl border border-border bg-card px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-medium text-foreground">{tr(locale, "Preferences and UX", "Preferences and UX")}</p>
             <button
@@ -125,7 +125,7 @@ export function CookieSettingsPage() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-blacksmith bg-card px-4 py-3">
+        <div className="rounded-xl border border-border bg-card px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-medium text-foreground">{tr(locale, "Analytics (optional)", "Analytics (optional)")}</p>
             <button
@@ -160,7 +160,7 @@ export function CookieSettingsPage() {
 
         <Button
           type="button"
-          className="h-11 bg-blue-500 hover:bg-blue-400"
+          className="h-11 bg-primary hover:bg-primary/90"
           onClick={() => {
             const nextProfile: CookieConsentProfile = {
               necessary: true,
@@ -179,7 +179,7 @@ export function CookieSettingsPage() {
         <Button
           type="button"
           variant="outline"
-          className="h-11 border-blacksmith bg-card text-foreground hover:bg-accent sm:col-span-2"
+          className="h-11 border-border bg-card text-foreground hover:bg-accent sm:col-span-2"
           onClick={() => {
             const nextProfile = { ...DEFAULT_COOKIE_CONSENT_PROFILE };
             setCookieConsent("necessary");

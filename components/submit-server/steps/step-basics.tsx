@@ -10,7 +10,7 @@ function ErrorText({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="mt-1 text-xs text-rose-300">{message}</p>;
+  return <p className="mt-1 text-xs text-destructive">{message}</p>;
 }
 
 type SubmitStepBasicsProps = {
@@ -27,7 +27,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
           id="name"
           placeholder={tr(locale, "Acme MCP Gateway", "Acme MCP Gateway")}
           autoComplete="organization"
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("name")}
         />
         <ErrorText message={form.formState.errors.name?.message} />
@@ -39,7 +39,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
           id="category"
           placeholder={tr(locale, "Developer Tools", "Developer Tools")}
           autoComplete="off"
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("category")}
         />
         <ErrorText message={form.formState.errors.category?.message} />
@@ -56,7 +56,7 @@ export function SubmitStepBasics({ form, locale }: SubmitStepBasicsProps) {
             "Describe core capabilities, tools exposed by your server, and when teams should use it.",
             "Describe core capabilities, tools exposed by your server, and when teams should use it.",
           )}
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("description")}
         />
         <ErrorText message={form.formState.errors.description?.message} />

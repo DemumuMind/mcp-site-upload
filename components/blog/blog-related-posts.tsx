@@ -18,7 +18,7 @@ export function BlogRelatedPosts({ posts, locale }: BlogRelatedPostsProps) {
       <div className="grid gap-3 md:grid-cols-3">
         {posts.map((post) => {
             const localized = post.locale[locale];
-            return (<Card key={post.slug} className="border-blacksmith bg-card">
+            return (<Card key={post.slug} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base text-foreground">{localized.title}</CardTitle>
               </CardHeader>

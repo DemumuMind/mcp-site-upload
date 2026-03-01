@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { ArrowRight, Blocks, CheckCircle2, ShieldCheck, Star } from "lucide-react";
@@ -68,8 +68,8 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
           <div className="space-y-3">
             {content.points.map((point, idx) => (
               <BlurFade key={point.title} delay={0.4 + idx * 0.1} inView>
-                <article className="rounded-xl border border-blacksmith bg-card/30 p-4 backdrop-blur-sm transition-all hover:bg-card/50">
-                  <div className="mb-2 inline-flex rounded-sm border border-blacksmith bg-background p-1.5 shadow-inner">
+                <article className="rounded-xl border border-border bg-card/30 p-4 backdrop-blur-sm transition-all hover:bg-card/50">
+                  <div className="mb-2 inline-flex rounded-sm border border-border bg-background p-1.5 shadow-inner">
                     {(() => { const Icon = iconMap[point.icon]; return Icon ? <Icon className="size-4 text-primary" aria-hidden="true" /> : null; })()}
                   </div>
                   <h3 className="text-sm font-bold text-foreground">{point.title}</h3>
@@ -81,7 +81,7 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
 
           <BlurFade delay={0.6} inView>
             <CoolMode>
-              <Button asChild variant="outline" className="h-11 rounded-md border-blacksmith bg-background/50 hover:bg-primary/5">
+              <Button asChild variant="outline" className="h-11 rounded-md border-border bg-background/50 hover:bg-primary/5">
                 <Link href="/catalog">
                   {content.exploreCta}
                   <ArrowRight className="size-4" />
@@ -101,7 +101,7 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                     <Badge
                       key={entry.label}
                       variant="outline"
-                      className="border-blacksmith bg-background/40 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+                      className="border-border bg-background/40 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
                     >
                       {entry.label}
                       <span className="ml-2 opacity-50">{entry.count}</span>
@@ -118,7 +118,7 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                     <Badge
                       key={entry.label}
                       variant="outline"
-                      className="border-blacksmith bg-background/40 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm transition-all hover:border-accent/50 hover:bg-accent/5 hover:text-accent"
+                      className="border-border bg-background/40 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm transition-all hover:border-accent/50 hover:bg-accent/5 hover:text-accent"
                     >
                       {entry.label}
                       <span className="ml-2 opacity-50">{entry.count}</span>
@@ -145,13 +145,13 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                     <Dialog key={server.id}>
                       <DialogTrigger asChild>
                         <article
-                          className="group relative cursor-pointer overflow-hidden rounded-xl border border-blacksmith bg-card/30 p-4 backdrop-blur-md transition-all hover:border-primary/40 hover:bg-card/50 shadow-2xl shadow-black"
+                          className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-card/30 p-4 backdrop-blur-md transition-all hover:border-primary/40 hover:bg-card/50 shadow-2xl shadow-black"
                         >
                           <BorderBeam size={120} duration={10} className="opacity-0 group-hover:opacity-100" />
 
                           <div className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                              <div className="flex size-10 items-center justify-center rounded-lg border border-blacksmith bg-background/80 shadow-inner">
+                              <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-background/80 shadow-inner">
                                 <Star className="size-5 text-primary group-hover:scale-110 transition-transform" />
                               </div>
                               <div>
@@ -167,14 +167,14 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                             </Badge>
                           </div>
 
-                          <div className="mt-4 flex items-center justify-between border-t border-blacksmith/50 pt-3 text-[10px] font-medium tracking-wide text-muted-foreground">
+                          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3 text-[10px] font-medium tracking-wide text-muted-foreground">
                             <div className="flex items-center gap-4">
                               <span className="flex items-center gap-1.5">
                                 <span className="text-primary/70 uppercase">{content.featuredAuthLabel}:</span>
                                 <span className="text-foreground">{server.authLabel}</span>
                               </span>
                             </div>
-                            <span className="rounded-full bg-blacksmith/30 px-2 py-0.5 text-foreground/80">
+                            <span className="rounded-full bg-muted/30 px-2 py-0.5 text-foreground/80">
                               {server.toolsCount} {content.featuredToolsLabel}
                             </span>
                           </div>
@@ -191,18 +191,18 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                           </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
-                          <div className="rounded-lg border border-blacksmith bg-muted/30 p-4">
+                          <div className="rounded-lg border border-border bg-muted/30 p-4">
                             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Capabilities</h4>
                             <p className="text-sm text-foreground">
                               This server provides {server.toolsCount} specialized tools for agentic workflows, focusing on {server.category}.
                             </p>
                           </div>
                           <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-lg border border-blacksmith bg-muted/20 p-3">
+                            <div className="rounded-lg border border-border bg-muted/20 p-3">
                               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Category</p>
                               <p className="text-sm font-semibold text-foreground mt-0.5">{server.category}</p>
                             </div>
-                            <div className="rounded-lg border border-blacksmith bg-muted/20 p-3">
+                            <div className="rounded-lg border border-border bg-muted/20 p-3">
                               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Auth Model</p>
                               <p className="text-sm font-semibold text-foreground mt-0.5">{server.authLabel}</p>
                             </div>
@@ -213,7 +213,7 @@ export function TrustProofSectionV3({ content, featuredServers, topCategories, t
                           </div>
                         </div>
                         <div className="flex justify-end gap-3 mt-2">
-                          <Button asChild variant="outline" className="rounded-md border-blacksmith">
+                          <Button asChild variant="outline" className="rounded-md border-border">
                             <Link href="/catalog">Visit Catalog</Link>
                           </Button>
                           <Button asChild className="rounded-md">

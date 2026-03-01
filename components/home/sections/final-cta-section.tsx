@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { HomeContent } from "@/lib/home/content";
@@ -9,7 +9,7 @@ type FinalCtaSectionProps = {
 
 export function FinalCtaSection({ content }: FinalCtaSectionProps) {
   return (
-    <section className="relative border-y border-blacksmith bg-background">
+    <section className="relative border-y border-border bg-background">
       <div className="section-shell flex max-w-4xl flex-col items-center gap-6 py-24 text-center">
         <Badge>{content.badge}</Badge>
         <h3 className="text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-6xl">

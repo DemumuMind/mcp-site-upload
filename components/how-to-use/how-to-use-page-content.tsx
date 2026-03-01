@@ -101,7 +101,7 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
 
       <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-6 pt-10 sm:px-6 sm:pt-14">
         <BlurFade delay={0.1}>
-          <div className="relative overflow-hidden space-y-5 rounded-2xl border border-blacksmith bg-card/40 backdrop-blur-sm p-6 sm:p-10 shadow-2xl shadow-primary/5">
+          <div className="relative overflow-hidden space-y-5 rounded-2xl border border-border bg-card/70 backdrop-blur-sm p-6 sm:p-10 shadow-2xl shadow-primary/5">
             <BorderBeam size={300} duration={12} delay={0} />
             <Badge className="w-fit border-primary/35 bg-primary/10 text-primary">
               <Sparkles className="size-3"/>
@@ -125,7 +125,7 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
                   <ArrowRight className="size-4"/>
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="h-11 rounded-md border-blacksmith bg-background text-foreground hover:bg-muted/50">
+              <Button asChild variant="outline" size="lg" className="h-11 rounded-md border-border bg-background text-foreground hover:bg-muted/50">
                 <Link href="#scenario-paths">
                   <ListChecks className="size-4"/>
                   {content.heroActions.secondaryLabel}
@@ -174,7 +174,7 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
 
         <BlurFade delay={0.5}>
           <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-            <div className="relative overflow-hidden space-y-4 rounded-2xl border border-blacksmith bg-card/40 backdrop-blur-sm p-6 sm:p-8">
+            <div className="relative overflow-hidden space-y-4 rounded-2xl border border-border bg-card/70 backdrop-blur-sm p-6 sm:p-8">
               <BorderBeam size={150} duration={8} delay={5} className="opacity-50" />
               <div className="space-y-2">
                 <h2 className="font-serif flex items-center gap-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -184,7 +184,7 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
                 <p className="text-sm leading-7 text-muted-foreground sm:text-base">{content.trustChecks.description}</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                {content.trustChecks.items.map((item) => (<Card key={item.title} className="group relative overflow-hidden border-blacksmith bg-background/50 hover:bg-muted/30 transition-colors">
+                {content.trustChecks.items.map((item) => (<Card key={item.title} className="group relative overflow-hidden border-border bg-background/70 hover:bg-muted/40 transition-colors">
                     <BorderBeam size={60} duration={10} className="opacity-0 group-hover:opacity-100" />
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg text-foreground">{item.title}</CardTitle>
@@ -198,16 +198,16 @@ export function HowToUsePageContent({ locale, sectionCopy, content, sampleServer
 
         <BlurFade delay={0.6}>
           <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-            <div className="relative overflow-hidden space-y-4 rounded-2xl border border-blacksmith bg-card/40 backdrop-blur-sm p-6 sm:p-8">
+            <div className="relative overflow-hidden space-y-4 rounded-2xl border border-border bg-card/70 backdrop-blur-sm p-6 sm:p-8">
               <div className="space-y-2">
                 <h2 className="font-serif flex items-center gap-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                  <TriangleAlert className="size-6 text-amber-500"/>
+                  <TriangleAlert className="size-6 text-primary"/>
                   {content.troubleshooting.title}
                 </h2>
                 <p className="text-sm leading-7 text-muted-foreground sm:text-base">{content.troubleshooting.description}</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                {content.troubleshooting.items.map((item) => (<Card key={item.problem} className="border-blacksmith bg-background/50">
+                {content.troubleshooting.items.map((item) => (<Card key={item.problem} className="border-border bg-background/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg text-foreground">{item.problem}</CardTitle>
                     </CardHeader>

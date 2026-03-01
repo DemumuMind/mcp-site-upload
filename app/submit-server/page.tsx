@@ -13,7 +13,7 @@ const highlights = [
   {
     icon: Workflow,
     title: "3-step workflow",
-    description: "Basics → Technical details → Review and submit.",
+    description: "Basics -> Technical details -> Review and submit.",
   },
   {
     icon: ShieldCheck,
@@ -48,7 +48,7 @@ export default async function SubmitServerPage() {
         <PageHero
           surface="mesh"
           eyebrow={
-            <Badge className="border-fuchsia-400/35 bg-fuchsia-500/10 text-fuchsia-200">
+            <Badge className="border-border bg-card text-foreground">
               <Sparkles className="size-3" />
               {tr(locale, "Server Submission", "Server Submission")}
             </Badge>
@@ -61,13 +61,13 @@ export default async function SubmitServerPage() {
           )}
           actions={
             <>
-              <Button asChild className="bg-blue-500 hover:bg-blue-400">
+              <Button asChild>
                 <Link href="/catalog">
                   {tr(locale, "Open catalog", "Open catalog")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
+              <Button asChild variant="outline" className="border-border bg-card text-foreground hover:bg-accent">
                 <Link href="/account">{tr(locale, "View my account", "View my account")}</Link>
               </Button>
             </>
@@ -76,10 +76,10 @@ export default async function SubmitServerPage() {
 
         <PageSection surface="steel" className="grid gap-4 lg:grid-cols-3">
           {highlights.map((item) => (
-            <Card key={item.title} className="border-blacksmith bg-card">
+            <Card key={item.title} className="border-border bg-card">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg text-foreground">
-                  <item.icon className="size-4 text-fuchsia-200" />
+                  <item.icon className="size-4 text-primary" />
                   {item.title}
                 </CardTitle>
               </CardHeader>
@@ -103,3 +103,5 @@ export default async function SubmitServerPage() {
     </PageFrame>
   );
 }
+
+

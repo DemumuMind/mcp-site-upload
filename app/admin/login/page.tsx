@@ -46,26 +46,26 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
     return (<PageFrame variant="ops">
       <PageShell className="max-w-md px-4">
         <PageHero surface="plain" animated={false} badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Admin access", "Admin access")} description={tr(locale, "Use your admin role or emergency token to open moderation dashboard.", "Use your admin role or emergency token to open moderation dashboard.")}/>
-        <PageSection surface="plain" className="bg-indigo-900/70">
-        <h1 className="text-xl font-semibold text-violet-50">
+        <PageSection surface="plain" className="border border-border bg-card">
+        <h1 className="text-xl font-semibold text-foreground">
           {tr(locale, "Admin access", "Admin access")}
         </h1>
-        <p className="mt-2 text-sm text-violet-200">
+        <p className="mt-2 text-sm text-muted-foreground">
           {tr(locale, "Use your admin role or emergency token to open moderation dashboard.", "Use your admin role or emergency token to open moderation dashboard.")}
         </p>
-        <p className="mt-2 rounded-md border border-cyan-400/25 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+        <p className="mt-2 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
           {authModeHint}
         </p>
 
-        {errorMessage ? (<p className="mt-3 rounded-md border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+        {errorMessage ? (<p className="mt-3 rounded-md border border-border bg-accent px-3 py-2 text-sm text-foreground">
             {errorMessage}
           </p>) : null}
 
         {supabaseLoginEnabled ? (<div className="mt-5 space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-violet-300">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {tr(locale, "Supabase role login", "Supabase role login")}
             </p>
-            <Button asChild className="w-full bg-blue-500 hover:bg-blue-400">
+            <Button asChild className="w-full">
               <Link href={supabaseAuthPath}>
                 {tr(locale, "Continue with Supabase auth", "Continue with Supabase auth")}
               </Link>
@@ -76,13 +76,13 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
             <input type="hidden" name="redirect" value={safeRedirectPath}/>
             <input type="text" name="username" autoComplete="username" defaultValue="admin" tabIndex={-1} readOnly aria-hidden="true" className="sr-only"/>
 
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-violet-300">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {tr(locale, "Emergency token login", "Emergency token login")}
             </p>
 
             <div className="space-y-1.5">
               <Label htmlFor="token">{tr(locale, "Admin token", "Admin token")}</Label>
-              <Input id="token" name="token" type="password" autoComplete="current-password" required className="border-white/10 bg-indigo-950/80"/>
+              <Input id="token" name="token" type="password" autoComplete="current-password" required className="border-border bg-background"/>
             </div>
 
             <Button type="submit" variant="outline" className="w-full border-white/20 bg-white/[0.03]">
@@ -90,11 +90,12 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
             </Button>
           </form>) : null}
 
-        {!supabaseLoginEnabled && !tokenLoginEnabled ? (<p className="mt-4 rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+        {!supabaseLoginEnabled && !tokenLoginEnabled ? (<p className="mt-4 rounded-md border border-border bg-accent px-3 py-2 text-xs text-muted-foreground">
             {tr(locale, "No admin auth method is enabled. Configure ADMIN_AUTH_MODE and credentials.", "No admin auth method is enabled. Configure ADMIN_AUTH_MODE and credentials.")}
           </p>) : null}
         </PageSection>
       </PageShell>
     </PageFrame>);
 }
+
 

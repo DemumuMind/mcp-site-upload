@@ -454,17 +454,17 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         onClearAll: handleClearAllFilters,
     };
     return (<div className="space-y-4">
-      <div className="sticky top-14 z-30 rounded-2xl border border-blacksmith bg-card/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
+      <div className="sticky top-14 z-30 rounded-2xl border border-border bg-card/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
         <CatalogFilterBar searchQuery={searchInputValue} sortField={queryState.sortBy} sortDirection={queryState.sortDir} pageSize={queryState.pageSize} viewMode={queryState.layout} activeFilterCount={activeFilterCount} isMobileFiltersOpen={isMobileFiltersOpen} onSearchQueryChange={setSearchInputValue} onSortFieldChange={handleSortFieldChange} onSortDirectionChange={handleSortDirectionChange} onPageSizeChange={handlePageSizeChange} onViewModeChange={handleViewModeChange} onToggleMobileFilters={() => setIsMobileFiltersOpen((current) => !current)}/>
       </div>
 
-      {activeFilterChips.length > 0 ? (<div className="rounded-xl border border-blacksmith bg-card p-2.5 shadow-[0_16px_32px_-24px_rgba(15,23,42,0.9)] backdrop-blur">
+      {activeFilterChips.length > 0 ? (<div className="rounded-xl border border-border bg-card p-2.5 shadow-[0_16px_32px_-24px_rgba(15,23,42,0.9)] backdrop-blur">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
               {tr(locale, "Active filters", "Active filters")}
             </p>
 
-            {activeFilterChips.map((chip) => (<button key={chip.key} type="button" onClick={chip.onRemove} className="inline-flex max-w-full items-center gap-1 rounded-full border border-blacksmith bg-card px-2.5 py-1 text-xs text-foreground transition hover:bg-accent hover:text-foreground">
+            {activeFilterChips.map((chip) => (<button key={chip.key} type="button" onClick={chip.onRemove} className="inline-flex max-w-full items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs text-foreground transition hover:bg-accent hover:text-foreground">
                 <span className="max-w-[170px] truncate">{chip.label}</span>
                 <X className="size-3"/>
               </button>))}
@@ -478,13 +478,13 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
 
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-xs text-muted-foreground">{tr(locale, "Quick filters:", "Quick filters:")}</p>
-        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("official")}>
+        <Button type="button" variant="outline" size="xs" className="border-border bg-card" onClick={() => applyQuickFilter("official")}>
           {tr(locale, "Official only", "Official only")}
         </Button>
-        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("healthy")}>
+        <Button type="button" variant="outline" size="xs" className="border-border bg-card" onClick={() => applyQuickFilter("healthy")}>
           {tr(locale, "Healthy only", "Healthy only")}
         </Button>
-        <Button type="button" variant="outline" size="xs" className="border-blacksmith bg-card" onClick={() => applyQuickFilter("no_auth")}>
+        <Button type="button" variant="outline" size="xs" className="border-border bg-card" onClick={() => applyQuickFilter("no_auth")}>
           {tr(locale, "No auth only", "No auth only")}
         </Button>
       </div>
@@ -517,7 +517,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
         <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" {...taxonomyPanelCommonProps}/>
 
         <div>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blacksmith bg-card p-2.5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-2.5">
             <p className="text-xs text-muted-foreground">
               {tr(locale, "Can't find your MCP server?", "Can't find your MCP server?")}
             </p>
@@ -538,7 +538,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
                   {paginationEntries.map((entry, index) => entry === "ellipsis" ? (<span key={`ellipsis-${index}`} className="inline-flex h-6 min-w-8 items-center justify-center px-1 text-xs text-muted-foreground" aria-hidden>
                         ...
                       </span>) : (<Button key={`page-${entry}`} type="button" variant={entry === result.page ? "default" : "ghost"} size="xs" onClick={() => setCatalogPage(entry)} aria-current={entry === result.page ? "page" : undefined} className={entry === result.page
-                        ? "min-w-8 bg-blue-600 text-foreground hover:bg-blue-500"
+                        ? "min-w-8 bg-primary text-foreground hover:bg-primary"
                         : "min-w-8 text-muted-foreground hover:bg-accent hover:text-foreground"}>
                         {entry}
                       </Button>))}
@@ -547,7 +547,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
                     {tr(locale, "Next", "Next")}
                   </Button>
                 </div>) : null}
-            </div>) : (<Card className="border-blacksmith bg-card shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
+            </div>) : (<Card className="border-border bg-card shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
                   <SearchX className="size-4 text-muted-foreground"/>
@@ -557,7 +557,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
               <CardContent className="text-sm text-foreground">
                 {tr(locale, "Try another search query or reset categories/tags/access filters.", "Try another search query or reset categories/tags/access filters.")}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button type="button" size="xs" variant="outline" className="border-blacksmith bg-card" onClick={handleClearAllFilters}>
+                  <Button type="button" size="xs" variant="outline" className="border-border bg-card" onClick={handleClearAllFilters}>
                     {tr(locale, "Reset all filters", "Reset all filters")}
                   </Button>
                   <Button asChild size="xs">

@@ -88,13 +88,13 @@ export default async function AboutPage() {
           )}
           actions={
             <>
-              <Button asChild size="lg" className="h-11 rounded-md px-6 shadow-[0_0_20px_-5px_rgba(246,166,35,0.4)]">
+              <Button asChild size="lg" className="h-11 rounded-md px-6 shadow-sm">
                 <Link href="/catalog">
                   {tr(locale, "Explore catalog", "Explore catalog")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-11 rounded-md border-blacksmith bg-background text-foreground hover:bg-muted/50">
+              <Button asChild size="lg" variant="outline" className="h-11 rounded-md border-border bg-background text-foreground hover:bg-muted/50">
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
               </Button>
             </>
@@ -108,8 +108,8 @@ export default async function AboutPage() {
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
               {pillars.map((pillar) => (
-                <article key={pillar.title} className="rounded-xl border border-blacksmith bg-background/50 p-5 transition-colors hover:bg-muted/30">
-                  <div className="mb-3 inline-flex rounded-sm border border-blacksmith bg-card p-1.5">
+                <article key={pillar.title} className="rounded-xl border border-border bg-background/50 p-5 transition-colors hover:bg-muted/30">
+                  <div className="mb-3 inline-flex rounded-sm border border-border bg-card p-1.5">
                     <pillar.icon className="size-4 text-primary" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground">{pillar.title}</h3>
@@ -140,7 +140,7 @@ export default async function AboutPage() {
             </h2>
             <div className="grid gap-3">
               {timeline.map((item, index) => (
-                <div key={item.stage} className="rounded-xl border border-blacksmith bg-background/50 px-5 py-4 transition-colors hover:bg-muted/30">
+                <div key={item.stage} className="rounded-xl border border-border bg-background/50 px-5 py-4 transition-colors hover:bg-muted/30">
                   <p className="text-[10px] font-bold tracking-[0.15em] text-primary uppercase">
                     {tr(locale, `Stage ${index + 1}`, `Stage ${index + 1}`)} — {item.stage}
                   </p>
@@ -157,12 +157,12 @@ export default async function AboutPage() {
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {principles.map((principle) => (
-                <div key={principle} className="flex items-center rounded-xl border border-blacksmith bg-background/50 px-4 py-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:bg-muted/30">
+                <div key={principle} className="flex items-center rounded-xl border border-border bg-background/50 px-4 py-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:bg-muted/30">
                   {principle}
                 </div>
               ))}
             </div>
-            <div className="rounded-xl border border-primary/30 bg-primary/10 p-5 text-sm leading-relaxed text-primary shadow-[0_0_20px_-10px_rgba(246,166,35,0.3)]">
+            <div className="rounded-xl border border-border bg-primary/10 p-5 text-sm leading-relaxed text-primary shadow-sm">
               {tr(
                 locale,
                 "We focus on creating sustainable, verifiable AI integration patterns that teams can own for the long term.",

@@ -77,7 +77,7 @@ export default async function DiscordPage() {
       <PageShell className="max-w-6xl gap-8">
         <PageHero
           surface="rail"
-          eyebrow={<Badge className="w-fit border-indigo-400/35 bg-primary/10 text-primary">{tr(locale, "Community", "Community")}</Badge>}
+          eyebrow={<Badge className="w-fit border-border bg-card text-primary">{tr(locale, "Community", "Community")}</Badge>}
           title={tr(locale, "DemumuMind Discord", "DemumuMind Discord")}
           description={tr(
             locale,
@@ -86,13 +86,13 @@ export default async function DiscordPage() {
           )}
           actions={
             <>
-              <Button asChild className="bg-blue-500 hover:bg-blue-400">
+              <Button asChild>
                 <Link href="https://discord.gg/bridgemind" target="_blank" rel="noreferrer">
                   {tr(locale, "Join Discord", "Join Discord")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-blacksmith bg-card text-foreground hover:bg-accent">
+              <Button asChild variant="outline" className="border-border bg-card text-foreground hover:bg-accent">
                 <Link href="/blog">{tr(locale, "Read latest updates", "Read latest updates")}</Link>
               </Button>
             </>
@@ -101,7 +101,7 @@ export default async function DiscordPage() {
 
         <PageSection surface="mesh" className="grid gap-4 md:grid-cols-3" aria-label={tr(locale, "Discord channels", "Discord channels")}>
           {communityChannels.map((channel) => (
-            <Card key={channel.name} className="border-blacksmith bg-card">
+            <Card key={channel.name} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg text-foreground">
                   <channel.icon className="size-4 text-primary" />
@@ -114,7 +114,7 @@ export default async function DiscordPage() {
         </PageSection>
 
         <PageSection surface="plain" className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <Card className="border-blacksmith bg-card">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl text-foreground">
                 <Users className="size-5 text-muted-foreground" />
@@ -123,14 +123,14 @@ export default async function DiscordPage() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               {participationRules.map((rule) => (
-                <p key={rule.en} className="rounded-lg border border-blacksmith bg-card px-3 py-2 text-foreground">
+                <p key={rule.en} className="rounded-lg border border-border bg-card px-3 py-2 text-foreground">
                   {tr(locale, rule.en, rule.en)}
                 </p>
               ))}
             </CardContent>
           </Card>
 
-          <PageActionZone className="border-indigo-400/20 bg-[linear-gradient(130deg,rgba(50,38,92,0.55),rgba(8,12,24,0.92))]">
+          <PageActionZone className="border-border bg-card">
             <CardHeader className="px-0 pb-2">
               <CardTitle className="text-xl text-foreground">{tr(locale, "Why teams join", "Why teams join")}</CardTitle>
             </CardHeader>
@@ -144,7 +144,7 @@ export default async function DiscordPage() {
               <p>
                 {tr(locale, "Shared playbooks for setup, moderation readiness, and rollout quality checks.", "Shared playbooks for setup, moderation readiness, and rollout quality checks.")}
               </p>
-              <Button asChild className="bg-blue-500 hover:bg-blue-400">
+              <Button asChild>
                 <Link href="https://discord.gg/bridgemind" target="_blank" rel="noreferrer">
                   {tr(locale, "Enter the community", "Enter the community")}
                   <ArrowRight className="size-4" />
@@ -157,3 +157,4 @@ export default async function DiscordPage() {
     </PageFrame>
   );
 }
+

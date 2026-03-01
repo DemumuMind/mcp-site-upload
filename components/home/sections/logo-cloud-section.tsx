@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import type { HomeContent } from "@/lib/home/content";
 
 type LogoCloudSectionProps = {
@@ -7,7 +7,7 @@ type LogoCloudSectionProps = {
 
 export function LogoCloudSection({ content }: LogoCloudSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell py-10">
         <p className="mb-4 text-center text-xs tracking-[0.18em] text-muted-foreground uppercase">{content.label}</p>
         <div className="flex flex-wrap items-center justify-center gap-2.5">

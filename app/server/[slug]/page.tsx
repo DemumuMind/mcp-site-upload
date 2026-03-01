@@ -55,8 +55,8 @@ const healthBadgeConfig: Record<
   },
   unknown: {
     label: "Unknown",
-    className: "border-white/10 bg-primary/5 text-violet-200",
-    dotClassName: "bg-violet-300",
+    className: "border-border bg-muted text-muted-foreground",
+    dotClassName: "bg-muted-foreground",
   },
 };
 
@@ -193,7 +193,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
         <div className="mb-6">
-          <Button asChild variant="ghost" className="px-0 text-violet-200 hover:text-white">
+          <Button asChild variant="ghost" className="px-0 text-muted-foreground hover:text-foreground">
             <Link href="/catalog">
               <ArrowLeft className="size-4" />
               {tr(locale, "Back to catalog", "Back to catalog")}
@@ -201,30 +201,30 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
           </Button>
         </div>
 
-        <Card className="border-white/10 bg-indigo-900/70">
+        <Card className="border-border bg-card/90">
           <CardHeader className="space-y-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-start gap-4">
                 <ServerLogo
                   mcpServer={mcpServer}
-                  className="size-16 border-blacksmith bg-card shadow-[0_12px_28px_rgba(2,6,23,0.55)] sm:size-20"
+                  className="size-16 border-border bg-card shadow-[0_12px_28px_hsl(var(--foreground)/0.25)] sm:size-20"
                   imageClassName="h-full w-full object-contain p-2"
                   symbolClassName="text-3xl sm:text-4xl"
                 />
 
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-semibold tracking-tight text-violet-50">{mcpServer.name}</h1>
-                  <p className="text-sm text-violet-200">{mcpServer.description}</p>
+                  <h1 className="text-3xl font-semibold tracking-tight text-foreground">{mcpServer.name}</h1>
+                  <p className="text-sm text-muted-foreground">{mcpServer.description}</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-                <Badge variant="outline" className="border-white/10 bg-card/70 text-violet-200">
+                <Badge className="bg-primary/15 text-primary">{mcpServer.category}</Badge>
+                <Badge variant="outline" className="border-border bg-card/70 text-muted-foreground">
                   <AuthIcon className="mr-1 size-3" />
                   {tr(locale, authBadge.label, authBadge.label)}
                 </Badge>
-                <Badge variant="outline" className="border-white/15 text-violet-200">
+                <Badge variant="outline" className="border-border text-muted-foreground">
                   <VerificationIcon className="mr-1 size-3" />
                   {tr(locale, verificationBadge.label, verificationBadge.label)}
                 </Badge>
@@ -237,37 +237,37 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-              <p className="mb-2 text-xs font-medium tracking-wide text-violet-300 uppercase">{tr(locale, "Server URL", "Server URL")}</p>
-              <p className="break-all text-sm text-violet-100">{mcpServer.serverUrl}</p>
+            <div className="rounded-xl border border-border bg-card/70 p-4">
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">{tr(locale, "Server URL", "Server URL")}</p>
+              <p className="break-all text-sm text-foreground">{mcpServer.serverUrl}</p>
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-lg font-medium text-violet-50">{tr(locale, "Available tools", "Available tools")}</h2>
+              <h2 className="text-lg font-medium text-foreground">{tr(locale, "Available tools", "Available tools")}</h2>
               {mcpServer.tools.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {mcpServer.tools.map((toolName) => (
-                    <Badge key={toolName} variant="outline" className="border-white/12 text-violet-200">
+                    <Badge key={toolName} variant="outline" className="border-border text-muted-foreground">
                       {toolName}
                     </Badge>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-violet-300">{tr(locale, "No tool list published yet.", "No tool list published yet.")}</p>
+                <p className="text-sm text-muted-foreground">{tr(locale, "No tool list published yet.", "No tool list published yet.")}</p>
               )}
             </div>
 
             {hasCapabilityGroups ? (
-              <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-                <p className="mb-3 text-xs font-medium tracking-wide text-violet-300 uppercase">Tool capabilities</p>
+              <div className="rounded-xl border border-border bg-card/70 p-4">
+                <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Tool capabilities</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {Object.entries(capabilityGroups).map(([key, tools]) =>
                     tools.length > 0 ? (
-                      <div key={key} className="rounded-lg border border-white/10 bg-card/50 p-3">
-                        <p className="mb-2 text-xs font-semibold uppercase text-violet-200">{key}</p>
+                      <div key={key} className="rounded-lg border border-border bg-card/50 p-3">
+                        <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">{key}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {tools.slice(0, 6).map((toolName) => (
-                            <Badge key={`${key}-${toolName}`} variant="outline" className="border-white/12 text-violet-200">
+                            <Badge key={`${key}-${toolName}`} variant="outline" className="border-border text-muted-foreground">
                               {toolName}
                             </Badge>
                           ))}
@@ -280,26 +280,26 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
             ) : null}
 
             {githubStats ? (
-              <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-                <p className="mb-3 text-xs font-medium tracking-wide text-violet-300 uppercase">GitHub stats</p>
+              <div className="rounded-xl border border-border bg-card/70 p-4">
+                <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">GitHub stats</p>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                  <Badge variant="outline" className="justify-center border-white/15 px-3 py-2 text-violet-100">⭐ {githubStats.stars}</Badge>
-                  <Badge variant="outline" className="justify-center border-white/15 px-3 py-2 text-violet-100">🍴 {githubStats.forks}</Badge>
-                  <Badge variant="outline" className="justify-center border-white/15 px-3 py-2 text-violet-100">👀 {githubStats.watchers}</Badge>
-                  <Badge variant="outline" className="justify-center border-white/15 px-3 py-2 text-violet-100">🐞 {githubStats.openIssues}</Badge>
-                  <Badge variant="outline" className="justify-center border-white/15 px-3 py-2 text-violet-100">
+                  <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">Stars: {githubStats.stars}</Badge>
+                  <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">Forks: {githubStats.forks}</Badge>
+                  <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">Watchers: {githubStats.watchers}</Badge>
+                  <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">Issues: {githubStats.openIssues}</Badge>
+                  <Badge variant="outline" className="justify-center border-border px-3 py-2 text-foreground">
                     {githubStats.license ?? "No license"}
                   </Badge>
                 </div>
                 {githubStats.pushedAt ? (
-                  <p className="mt-3 text-xs text-violet-300">Last push: {formatCheckedAt(githubStats.pushedAt, locale)}</p>
+                  <p className="mt-3 text-xs text-muted-foreground">Last push: {formatCheckedAt(githubStats.pushedAt, locale)}</p>
                 ) : null}
               </div>
             ) : null}
 
-            <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-              <p className="mb-2 text-xs font-medium tracking-wide text-violet-300 uppercase">{tr(locale, "Health check", "Health check")}</p>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-violet-200">
+            <div className="rounded-xl border border-border bg-card/70 p-4">
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">{tr(locale, "Health check", "Health check")}</p>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <span>
                   {tr(locale, "Status", "Status")}: {isHealthPending
                     ? tr(locale, "Pending first health scan", "Pending first health scan")
@@ -319,9 +319,9 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
               </div>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-              <p className="mb-2 text-xs font-medium tracking-wide text-violet-300 uppercase">Risk & trust</p>
-              <ul className="space-y-1 text-sm text-violet-200">
+            <div className="rounded-xl border border-border bg-card/70 p-4">
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">Risk & trust</p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
                 <li>Verification: {verificationBadge.label}</li>
                 <li>Health: {isHealthPending ? "Pending first health scan" : healthBadge.label}</li>
                 <li>Repository linked: {mcpServer.repoUrl ? "Yes" : "No"}</li>
@@ -331,18 +331,18 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
             </div>
 
             {githubActivity && (githubActivity.commits.length > 0 || githubActivity.releases.length > 0) ? (
-              <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-                <p className="mb-3 text-xs font-medium tracking-wide text-violet-300 uppercase">Recent activity</p>
+              <div className="rounded-xl border border-border bg-card/70 p-4">
+                <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Recent activity</p>
                 {githubActivity.releases.length > 0 ? (
                   <div className="mb-3">
-                    <p className="mb-1 text-sm font-medium text-violet-100">Releases</p>
-                    <div className="space-y-1 text-sm text-violet-200">
+                    <p className="mb-1 text-sm font-medium text-foreground">Releases</p>
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       {githubActivity.releases.slice(0, 3).map((release) => (
                         <p key={release.url}>
                           <Link href={release.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
                             {release.name}
                           </Link>
-                          {release.publishedAt ? ` · ${formatCheckedAt(release.publishedAt, locale)}` : ""}
+                          {release.publishedAt ? ` - ${formatCheckedAt(release.publishedAt, locale)}` : ""}
                         </p>
                       ))}
                     </div>
@@ -350,14 +350,14 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
                 ) : null}
                 {githubActivity.commits.length > 0 ? (
                   <div>
-                    <p className="mb-1 text-sm font-medium text-violet-100">Commits</p>
-                    <div className="space-y-1 text-sm text-violet-200">
+                    <p className="mb-1 text-sm font-medium text-foreground">Commits</p>
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       {githubActivity.commits.slice(0, 3).map((commit) => (
                         <p key={commit.sha}>
                           <Link href={commit.url} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
                             {commit.message || commit.sha.slice(0, 7)}
                           </Link>
-                          {commit.date ? ` · ${formatCheckedAt(commit.date, locale)}` : ""}
+                          {commit.date ? ` - ${formatCheckedAt(commit.date, locale)}` : ""}
                         </p>
                       ))}
                     </div>
@@ -367,14 +367,14 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
             ) : null}
 
             {similarServers.length > 0 ? (
-              <div className="rounded-xl border border-white/10 bg-card/70 p-4">
-                <p className="mb-3 text-xs font-medium tracking-wide text-violet-300 uppercase">Similar servers</p>
+              <div className="rounded-xl border border-border bg-card/70 p-4">
+                <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">Similar servers</p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {similarServers.map(({ server }) => (
                     <Link
                       key={server.id}
                       href={`/server/${server.slug}`}
-                      className="rounded-lg border border-white/10 bg-card/50 px-3 py-2 text-sm text-violet-100 transition hover:border-white/25"
+                      className="rounded-lg border border-border bg-card/50 px-3 py-2 text-sm text-foreground transition hover:border-primary/40"
                     >
                       {server.name}
                     </Link>
@@ -385,7 +385,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
 
             <div className="flex flex-wrap gap-3">
               {visitUrl ? (
-                <Button asChild className="bg-blue-500 hover:bg-blue-400">
+                <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link href={visitUrl} target="_blank" rel="noreferrer">
                     {tr(locale, "Visit", "Visit")}
                     <ExternalLink className="size-4" />
@@ -400,3 +400,5 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
     </PageFrame>
   );
 }
+
+

@@ -134,16 +134,16 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         query: rawSearchParams.toString(),
         source: "admin_page",
     });
-    const securityFilterEvent = queryState.securityEvent ?? "all";
-    const securityFilterEmail = (queryState.securityEmail ?? "").trim();
-    const securityFilterFrom = (queryState.securityFrom ?? "").trim();
-    const securityFilterTo = (queryState.securityTo ?? "").trim();
-    const securityFilterFromTs = (queryState.securityFromTs ?? "").trim();
-    const securityFilterToTs = (queryState.securityToTs ?? "").trim();
-    const securityPage = Math.max(Number(queryState.securityPage ?? "1") || 1, 1);
-    const securityPageSize = Math.max(Number(queryState.securityPageSize ?? "50") || 50, 10);
-    const securitySortBy = queryState.securitySortBy ?? "created_at";
-    const securitySortOrder = queryState.securitySortOrder ?? "desc";
+    const securityFilterEvent = queryState.securityEvent || "all";
+    const securityFilterEmail = (queryState.securityEmail || "").trim();
+    const securityFilterFrom = (queryState.securityFrom || "").trim();
+    const securityFilterTo = (queryState.securityTo || "").trim();
+    const securityFilterFromTs = (queryState.securityFromTs || "").trim();
+    const securityFilterToTs = (queryState.securityToTs || "").trim();
+    const securityPage = Math.max(Number(queryState.securityPage || "1") || 1, 1);
+    const securityPageSize = Math.max(Number(queryState.securityPageSize || "50") || 50, 10);
+    const securitySortBy = queryState.securitySortBy || "created_at";
+    const securitySortOrder = queryState.securitySortOrder || "desc";
     const [pendingServers, dashboardSnapshot] = await Promise.all([
         getPendingServers(),
         getAdminDashboardSnapshot({
@@ -160,9 +160,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         }),
     ]);
     const pendingCount = pendingServers.length;
-    const query = (queryState.q ?? "").trim();
-    const selectedCategory = queryState.category ?? "all";
-    const selectedAuth = queryState.auth ?? "all";
+    const query = (queryState.q || "").trim();
+    const selectedCategory = queryState.category || "all";
+    const selectedAuth = queryState.auth || "all";
     const selectedSecurityEvent = securityFilterEvent;
     const normalizedQuery = query.toLowerCase();
     const categoryOptions = Array.from(new Set(pendingServers.map((item) => item.category))).sort((left, right) => left.localeCompare(right));
@@ -230,7 +230,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     return (<PageFrame variant="ops">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
         <PageHero surface="mesh" badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Moderation Dashboard", "Moderation Dashboard")} description={tr(locale, "Review pending MCP submissions, manage analytics, and keep catalog quality high.", "Review pending MCP submissions, manage analytics, and keep catalog quality high.")} actions={<div className="flex flex-wrap items-center gap-2">
-              <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+              <Button asChild variant="outline" className="border-border bg-card hover:bg-muted/60">
                 <Link href={`/admin/blog?from=${encodeURIComponent(stickyAdminHref)}`}>
                   <FileText className="size-4"/>
                   {tr(locale, "Blog studio", "Blog studio")}
@@ -238,15 +238,15 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </Button>
 
               <form action={logoutAdminAction}>
-                <Button type="submit" variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                <Button type="submit" variant="outline" className="border-border bg-card hover:bg-muted/60">
                   {tr(locale, "Logout", "Logout")}
                 </Button>
               </form>
-            </div>} metrics={<PageMetric surface="mesh" label={tr(locale, "Pending queue", "Pending queue")} value={pendingCount} valueClassName={pendingCount > 0 ? "text-amber-200" : "text-emerald-200"}/>}/>
+            </div>} metrics={<PageMetric surface="mesh" label={tr(locale, "Pending queue", "Pending queue")} value={pendingCount} valueClassName={pendingCount > 0 ? "text-foreground" : "text-foreground"}/>}/>
 
         {feedback ? (<div className={`rounded-md border px-3 py-2 text-sm ${feedback.tone === "success"
-                ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
-                : "border-rose-400/35 bg-rose-500/10 text-rose-200"}`}>
+                ? "border-accent bg-accent/20 text-foreground"
+                : "border-border bg-muted/60 text-foreground"}`}>
             {feedback.text}
           </div>) : null}
 
@@ -258,48 +258,48 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-violet-50">
+            <h2 className="text-xl font-semibold text-foreground">
               {tr(locale, "System overview", "System overview")}
             </h2>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardContent className="space-y-1 p-4">
-                  <p className="text-xs tracking-wide text-violet-300 uppercase">
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">
                     {tr(locale, "Active servers", "Active servers")}
                   </p>
-                  <p className="text-2xl font-semibold text-emerald-200">
+                  <p className="text-2xl font-semibold text-foreground">
                     {dashboardSnapshot.overview.activeServers}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardContent className="space-y-1 p-4">
-                  <p className="text-xs tracking-wide text-violet-300 uppercase">
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">
                     {tr(locale, "Total requests", "Total requests")}
                   </p>
-                  <p className="text-2xl font-semibold text-violet-50">
+                  <p className="text-2xl font-semibold text-foreground">
                     {formatCompactNumber(locale, dashboardSnapshot.overview.totalRequests)}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardContent className="space-y-1 p-4">
-                  <p className="text-xs tracking-wide text-violet-300 uppercase">
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">
                     {tr(locale, "Average latency", "Average latency")}
                   </p>
-                  <p className="text-2xl font-semibold text-cyan-200">
+                  <p className="text-2xl font-semibold text-foreground">
                     {dashboardSnapshot.overview.averageLatencyMs}ms
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardContent className="space-y-1 p-4">
-                  <p className="text-xs tracking-wide text-violet-300 uppercase">Uptime</p>
-                  <p className="text-2xl font-semibold text-emerald-200">
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">Uptime</p>
+                  <p className="text-2xl font-semibold text-foreground">
                     {dashboardSnapshot.overview.uptimePercent.toFixed(1)}%
                   </p>
                 </CardContent>
@@ -310,46 +310,46 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Multi-agent performance (24h)", "Multi-agent performance (24h)")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Runs", "Runs")}</p>
-                  <p className="text-lg font-semibold text-violet-50">{dashboardSnapshot.multiAgent.totalRuns24h}</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Runs", "Runs")}</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.totalRuns24h}</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">p95</p>
-                  <p className="text-lg font-semibold text-cyan-200">{dashboardSnapshot.multiAgent.p95DurationMs24h}ms</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">p95</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.p95DurationMs24h}ms</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Budget misses", "Budget misses")}</p>
-                  <p className="text-lg font-semibold text-amber-200">{dashboardSnapshot.multiAgent.budgetMisses24h}</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Budget misses", "Budget misses")}</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.budgetMisses24h}</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Mode split", "Mode split")}</p>
-                  <p className="text-sm font-medium text-violet-100">
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Mode split", "Mode split")}</p>
+                  <p className="text-sm font-medium text-foreground">
                     full-mesh: {dashboardSnapshot.multiAgent.modeSplit24h.fullMesh} · ring: {dashboardSnapshot.multiAgent.modeSplit24h.ring}
                   </p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly runs", "Weekly runs")}</p>
-                  <p className="text-lg font-semibold text-violet-50">{dashboardSnapshot.multiAgent.weeklyRunCount}</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Weekly runs", "Weekly runs")}</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.weeklyRunCount}</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly avg latency", "Weekly avg latency")}</p>
-                  <p className="text-lg font-semibold text-cyan-200">{dashboardSnapshot.multiAgent.weeklyAvgDurationMs}ms</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Weekly avg latency", "Weekly avg latency")}</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.weeklyAvgDurationMs}ms</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Weekly budget misses", "Weekly budget misses")}</p>
-                  <p className="text-lg font-semibold text-amber-200">{dashboardSnapshot.multiAgent.weeklyBudgetMisses}</p>
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Weekly budget misses", "Weekly budget misses")}</p>
+                  <p className="text-lg font-semibold text-foreground">{dashboardSnapshot.multiAgent.weeklyBudgetMisses}</p>
                 </div>
-                <div className="rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                  <p className="text-xs uppercase tracking-wide text-violet-300">{tr(locale, "Report", "Report")}</p>
-                  <Button asChild variant="outline" className="mt-1 h-8 border-white/15 bg-white/[0.02] text-xs hover:bg-white/[0.06]">
+                <div className="rounded-md border border-border bg-background px-3 py-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{tr(locale, "Report", "Report")}</p>
+                  <Button asChild variant="outline" className="mt-1 h-8 border-border bg-card text-xs hover:bg-muted/60">
                     <Link href="/api/admin/multi-agent/weekly-export">
                       {tr(locale, "Export weekly CSV", "Export weekly CSV")}
                     </Link>
@@ -358,23 +358,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Recent multi-agent runs", "Recent multi-agent runs")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {dashboardSnapshot.multiAgent.recentRuns.length === 0 ? (
-                  <p className="text-sm text-violet-300">{tr(locale, "No recent runs yet.", "No recent runs yet.")}</p>
+                  <p className="text-sm text-muted-foreground">{tr(locale, "No recent runs yet.", "No recent runs yet.")}</p>
                 ) : (
                   dashboardSnapshot.multiAgent.recentRuns.map((run) => (
-                    <div key={run.id} className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2 text-xs">
-                      <span className="font-mono text-violet-300">{run.timeLabel}</span>
-                      <span className="text-violet-100">{run.coordinationMode}</span>
-                      <span className="text-cyan-200">{run.durationMs}ms</span>
-                      <span className="text-violet-200">{run.estimatedTokens} tok</span>
-                      <span className={run.withinBudget ? "text-emerald-200" : "text-amber-200"}>
+                    <div key={run.id} className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-3 py-2 text-xs">
+                      <span className="font-mono text-muted-foreground">{run.timeLabel}</span>
+                      <span className="text-foreground">{run.coordinationMode}</span>
+                      <span className="text-foreground">{run.durationMs}ms</span>
+                      <span className="text-foreground">{run.estimatedTokens} tok</span>
+                      <span className={run.withinBudget ? "text-foreground" : "text-foreground"}>
                         {run.withinBudget ? tr(locale, "within budget", "within budget") : tr(locale, "over budget", "over budget")}
                       </span>
                     </div>
@@ -383,9 +383,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </CardContent>
             </Card>
           </div>
-          <Card className="mt-4 border-white/10 bg-indigo-900/70">
+          <Card className="mt-4 border-border bg-card">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base text-violet-50">
+              <CardTitle className="text-base text-foreground">
                 {tr(locale, "Auto alerts", "Auto alerts")}
               </CardTitle>
             </CardHeader>
@@ -395,10 +395,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   key={alert.id}
                   className={`rounded-md border px-3 py-2 text-sm ${
                     alert.level === "error"
-                      ? "border-rose-400/35 bg-rose-500/10 text-rose-200"
+                      ? "border-border bg-muted/60 text-foreground"
                       : alert.level === "warning"
-                        ? "border-amber-400/35 bg-amber-500/10 text-amber-200"
-                        : "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
+                        ? "border-border bg-muted/60 text-foreground"
+                        : "border-accent bg-accent/20 text-foreground"
                   }`}
                 >
                   {tr(locale, alert.message, alert.message)}
@@ -410,42 +410,42 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Request distribution by servers", "Request distribution by servers")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {dashboardSnapshot.analytics.requestDistribution.map((item) => (<div key={item.serverSlug} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-violet-200">
+                    <div className="flex items-center justify-between text-xs text-foreground">
                       <span className="font-mono">{item.serverName}</span>
                       <span>{formatCompactNumber(locale, item.requestCount)}</span>
                     </div>
-                    <div className="h-2 rounded-full bg-indigo-800">
-                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500" style={{ width: `${Math.max(item.sharePercent, 2)}%` }}/>
+                    <div className="h-2 rounded-full bg-muted">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent" style={{ width: `${Math.max(item.sharePercent, 2)}%` }}/>
                     </div>
                   </div>))}
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Latest events", "Latest events")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {dashboardSnapshot.analytics.latestEvents.map((event) => (<div key={event.id} className="flex items-center gap-3 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2">
-                    <span className="text-xs font-mono text-violet-300">{event.timeLabel}</span>
+                {dashboardSnapshot.analytics.latestEvents.map((event) => (<div key={event.id} className="flex items-center gap-3 rounded-md border border-border bg-background px-3 py-2">
+                    <span className="text-xs font-mono text-muted-foreground">{event.timeLabel}</span>
                     <span className={`inline-flex size-2 rounded-full ${event.level === "success"
-                ? "bg-emerald-400"
+                ? "bg-accent"
                 : event.level === "warning"
-                    ? "bg-amber-400"
+                    ? "bg-muted"
                     : event.level === "error"
-                        ? "bg-rose-400"
-                        : "bg-violet-300"}`}/>
-                    <p className="text-sm text-violet-100">{tr(locale, event.messageEn, event.messageEn)}</p>
+                        ? "bg-muted"
+                        : "bg-accent"}`}/>
+                    <p className="text-sm text-foreground">{tr(locale, event.messageEn, event.messageEn)}</p>
                   </div>))}
               </CardContent>
             </Card>
@@ -454,57 +454,57 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-violet-50">
+            <h2 className="text-xl font-semibold text-foreground">
               {tr(locale, "Dashboard settings", "Dashboard settings")}
             </h2>
 
             <form action={saveAdminDashboardSettingsAction} className="grid gap-4 lg:grid-cols-2">
               <input type="hidden" name="returnTo" value={stickyAdminHref}/>
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-violet-50">
+                  <CardTitle className="text-base text-foreground">
                     {tr(locale, "General settings", "General settings")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <label className="grid gap-1.5 text-sm text-violet-200">
+                  <label className="grid gap-1.5 text-sm text-foreground">
                     <span>{tr(locale, "Status update interval (sec)", "Status update interval (sec)")}</span>
-                    <Input name="statusUpdateIntervalSec" type="number" min={1} max={300} defaultValue={dashboardSnapshot.settings.statusUpdateIntervalSec} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                    <Input name="statusUpdateIntervalSec" type="number" min={1} max={300} defaultValue={dashboardSnapshot.settings.statusUpdateIntervalSec} className="border-border bg-background text-foreground"/>
                   </label>
 
-                  <label className="grid gap-1.5 text-sm text-violet-200">
+                  <label className="grid gap-1.5 text-sm text-foreground">
                     <span>{tr(locale, "Request limit per minute", "Request limit per minute")}</span>
-                    <Input name="requestLimitPerMinute" type="number" min={1} max={100000} defaultValue={dashboardSnapshot.settings.requestLimitPerMinute} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                    <Input name="requestLimitPerMinute" type="number" min={1} max={100000} defaultValue={dashboardSnapshot.settings.requestLimitPerMinute} className="border-border bg-background text-foreground"/>
                   </label>
                 </CardContent>
               </Card>
 
-              <Card className="border-white/10 bg-indigo-900/70">
+              <Card className="border-border bg-card">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-violet-50">
+                  <CardTitle className="text-base text-foreground">
                     {tr(locale, "Notifications", "Notifications")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2.5">
-                  <label className="flex items-center gap-2 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2 text-sm text-violet-100">
-                    <input type="checkbox" name="notifyEmailOnErrors" defaultChecked={dashboardSnapshot.settings.notifyEmailOnErrors} className="size-4 rounded border-white/20 bg-indigo-900 accent-cyan-400"/>
+                  <label className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
+                    <input type="checkbox" name="notifyEmailOnErrors" defaultChecked={dashboardSnapshot.settings.notifyEmailOnErrors} className="size-4 rounded border-border bg-card accent-primary"/>
                     <span>{tr(locale, "Email alerts on errors", "Email alerts on errors")}</span>
                   </label>
 
-                  <label className="flex items-center gap-2 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2 text-sm text-violet-100">
-                    <input type="checkbox" name="notifyPushNotifications" defaultChecked={dashboardSnapshot.settings.notifyPushNotifications} className="size-4 rounded border-white/20 bg-indigo-900 accent-cyan-400"/>
+                  <label className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
+                    <input type="checkbox" name="notifyPushNotifications" defaultChecked={dashboardSnapshot.settings.notifyPushNotifications} className="size-4 rounded border-border bg-card accent-primary"/>
                     <span>{tr(locale, "Push notifications", "Push notifications")}</span>
                   </label>
 
-                  <label className="flex items-center gap-2 rounded-md border border-white/10 bg-indigo-950/60 px-3 py-2 text-sm text-violet-100">
-                    <input type="checkbox" name="notifyWebhookIntegrations" defaultChecked={dashboardSnapshot.settings.notifyWebhookIntegrations} className="size-4 rounded border-white/20 bg-indigo-900 accent-cyan-400"/>
+                  <label className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
+                    <input type="checkbox" name="notifyWebhookIntegrations" defaultChecked={dashboardSnapshot.settings.notifyWebhookIntegrations} className="size-4 rounded border-border bg-card accent-primary"/>
                     <span>{tr(locale, "Webhook integrations", "Webhook integrations")}</span>
                   </label>
                 </CardContent>
               </Card>
 
               <div className="flex justify-end lg:col-span-2">
-                <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-400">
+                <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   {tr(locale, "Save settings", "Save settings")}
                 </Button>
               </div>
@@ -514,29 +514,29 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-violet-50">
+            <h2 className="text-xl font-semibold text-foreground">
               {tr(locale, "Metrics editor", "Metrics editor")}
             </h2>
 
             <form action={saveAdminDashboardMetricsAction} className="grid gap-4 lg:grid-cols-3">
               <input type="hidden" name="returnTo" value={stickyAdminHref}/>
-              <label className="grid gap-1.5 text-sm text-violet-200">
+              <label className="grid gap-1.5 text-sm text-foreground">
                 <span>{tr(locale, "Total requests", "Total requests")}</span>
-                <Input name="totalRequests" type="number" min={0} defaultValue={dashboardSnapshot.overview.totalRequests} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="totalRequests" type="number" min={0} defaultValue={dashboardSnapshot.overview.totalRequests} className="border-border bg-background text-foreground"/>
               </label>
 
-              <label className="grid gap-1.5 text-sm text-violet-200">
+              <label className="grid gap-1.5 text-sm text-foreground">
                 <span>{tr(locale, "Average latency (ms)", "Average latency (ms)")}</span>
-                <Input name="averageLatencyMs" type="number" min={0} defaultValue={dashboardSnapshot.overview.averageLatencyMs} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="averageLatencyMs" type="number" min={0} defaultValue={dashboardSnapshot.overview.averageLatencyMs} className="border-border bg-background text-foreground"/>
               </label>
 
-              <label className="grid gap-1.5 text-sm text-violet-200">
+              <label className="grid gap-1.5 text-sm text-foreground">
                 <span>{tr(locale, "Uptime percent", "Uptime percent")}</span>
-                <Input name="uptimePercent" type="number" min={0} max={100} step={0.1} defaultValue={dashboardSnapshot.overview.uptimePercent} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="uptimePercent" type="number" min={0} max={100} step={0.1} defaultValue={dashboardSnapshot.overview.uptimePercent} className="border-border bg-background text-foreground"/>
               </label>
 
               <div className="flex justify-end lg:col-span-3">
-                <Button type="submit" className="bg-cyan-500 text-indigo-950 hover:bg-cyan-400">
+                <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   {tr(locale, "Save metrics", "Save metrics")}
                 </Button>
               </div>
@@ -546,18 +546,18 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         <PageSection surface="mesh">
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Create system event", "Create system event")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form action={createAdminSystemEventAction} className="space-y-3">
                   <input type="hidden" name="returnTo" value={stickyAdminHref}/>
-                  <label className="grid gap-1.5 text-sm text-violet-200">
+                  <label className="grid gap-1.5 text-sm text-foreground">
                     <span>{tr(locale, "Level", "Level")}</span>
-                    <select name="level" defaultValue="info" className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                    <select name="level" defaultValue="info" className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                       <option value="info">info</option>
                       <option value="success">success</option>
                       <option value="warning">warning</option>
@@ -565,41 +565,41 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     </select>
                   </label>
 
-                  <label className="grid gap-1.5 text-sm text-violet-200">
+                  <label className="grid gap-1.5 text-sm text-foreground">
                     <span>Message</span>
-                    <Input name="messageEn" required className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                    <Input name="messageEn" required className="border-border bg-background text-foreground"/>
                   </label>
 
-                  <label className="grid gap-1.5 text-sm text-violet-200">
+                  <label className="grid gap-1.5 text-sm text-foreground">
                     <span>{tr(locale, "Occurred at (optional)", "Occurred at (optional)")}</span>
-                    <Input name="occurredAt" type="datetime-local" className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                    <Input name="occurredAt" type="datetime-local" className="border-border bg-background text-foreground"/>
                   </label>
 
-                  <Button type="submit" className="w-full bg-emerald-500 text-white hover:bg-emerald-400">
+                  <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-accent">
                     {tr(locale, "Add event", "Add event")}
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-indigo-900/70">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-violet-50">
+                <CardTitle className="text-base text-foreground">
                   {tr(locale, "Manage events", "Manage events")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {dashboardSnapshot.analytics.latestEvents.map((event) => (<div key={event.id} className="flex items-center justify-between gap-2 rounded-md border border-white/10 bg-indigo-950/70 px-3 py-2">
+                {dashboardSnapshot.analytics.latestEvents.map((event) => (<div key={event.id} className="flex items-center justify-between gap-2 rounded-md border border-border bg-background px-3 py-2">
                     <div className="min-w-0">
-                      <p className="truncate text-xs text-violet-300">{event.timeLabel}</p>
-                      <p className="truncate text-sm text-violet-100">
+                      <p className="truncate text-xs text-muted-foreground">{event.timeLabel}</p>
+                      <p className="truncate text-sm text-foreground">
                         {tr(locale, event.messageEn, event.messageEn)}
                       </p>
                     </div>
                     <form action={deleteAdminSystemEventAction}>
                       <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                       <input type="hidden" name="eventId" value={event.id}/>
-                      <Button type="submit" variant="outline" className="border-rose-400/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20">
+                      <Button type="submit" variant="outline" className="border-border bg-muted/60 text-foreground hover:bg-muted/70">
                         {tr(locale, "Delete", "Delete")}
                       </Button>
                     </form>
@@ -610,19 +610,19 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </PageSection>
 
         <PageSection surface="mesh">
-          <Card className="border-white/10 bg-indigo-900/70">
+          <Card className="border-border bg-card">
             <CardHeader className="space-y-2">
-              <CardTitle className="text-base text-violet-50">
+              <CardTitle className="text-base text-foreground">
                 {tr(locale, "Auth security events", "Auth security events")}
               </CardTitle>
               <div className="flex flex-wrap gap-2 text-xs">
-                <Badge variant="secondary" className="bg-rose-500/15 text-rose-200">
+                <Badge variant="secondary" className="bg-muted/15 text-foreground">
                   {tr(locale, "Failed logins (24h)", "Failed logins (24h)")}: {dashboardSnapshot.security.failedLast24h}
                 </Badge>
-                <Badge variant="secondary" className="bg-amber-500/15 text-amber-200">
+                <Badge variant="secondary" className="bg-muted/15 text-foreground">
                   {tr(locale, "Rate-limited (24h)", "Rate-limited (24h)")}: {dashboardSnapshot.security.rateLimitedLast24h}
                 </Badge>
-                <Badge variant="secondary" className="bg-blue-500/15 text-blue-200">
+                <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">
                   {tr(locale, "Total", "Total")}: {dashboardSnapshot.security.totalEvents}
                 </Badge>
               </div>
@@ -636,55 +636,55 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             latest100: tr(locale, "Latest 100", "Latest 100"),
             last7days: tr(locale, "Last 7 days", "Last 7 days"),
         }}/>
-              {securityFilterFromTs || securityFilterToTs ? (<p className="text-xs text-cyan-200/90">
+              {securityFilterFromTs || securityFilterToTs ? (<p className="text-xs text-muted-foreground">
                   {tr(locale, "Local browser time-range is active for this filter.", "Local browser time-range is active for this filter.")}
                 </p>) : null}
 
-              <form method="get" className="grid gap-2 rounded-md border border-white/10 bg-indigo-950/40 p-3 md:grid-cols-[160px_minmax(0,1fr)_160px_160px_160px_140px_160px_auto]">
-                <select name="securityEvent" defaultValue={selectedSecurityEvent} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+              <form method="get" className="grid gap-2 rounded-md border border-border bg-background/80 p-3 md:grid-cols-[160px_minmax(0,1fr)_160px_160px_160px_140px_160px_auto]">
+                <select name="securityEvent" defaultValue={selectedSecurityEvent} className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                   <option value="all">{tr(locale, "All event types", "All event types")}</option>
                   {securityEventOptions.map((eventType) => (<option key={eventType} value={eventType}>
                       {eventType}
                     </option>))}
                 </select>
-                <Input name="securityEmail" defaultValue={queryState.securityEmail ?? ""} placeholder={tr(locale, "Filter by email", "Filter by email")} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
-                <Input name="securityFrom" type="date" defaultValue={securityFilterFrom} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
-                <Input name="securityTo" type="date" defaultValue={securityFilterTo} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="securityEmail" defaultValue={queryState.securityEmail || ""} placeholder={tr(locale, "Filter by email", "Filter by email")} className="border-border bg-background text-foreground"/>
+                <Input name="securityFrom" type="date" defaultValue={securityFilterFrom} className="border-border bg-background text-foreground"/>
+                <Input name="securityTo" type="date" defaultValue={securityFilterTo} className="border-border bg-background text-foreground"/>
                 <input type="hidden" name="securityFromTs" value={securityFilterFromTs}/>
                 <input type="hidden" name="securityToTs" value={securityFilterToTs}/>
-                <select name="securitySortBy" defaultValue={securitySortBy} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                <select name="securitySortBy" defaultValue={securitySortBy} className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                   <option value="created_at">created_at</option>
                   <option value="event_type">event_type</option>
                   <option value="email">email</option>
                   <option value="ip_address">ip_address</option>
                 </select>
-                <select name="securitySortOrder" defaultValue={securitySortOrder} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+                <select name="securitySortOrder" defaultValue={securitySortOrder} className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                   <option value="desc">desc</option>
                   <option value="asc">asc</option>
                 </select>
-                <Input name="securityPageSize" type="number" min={10} max={200} defaultValue={securityPageSize} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
+                <Input name="securityPageSize" type="number" min={10} max={200} defaultValue={securityPageSize} className="border-border bg-background text-foreground"/>
                 <input type="hidden" name="securityPage" value="1"/>
                 <div className="flex gap-2">
-                  <Button type="submit" variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                  <Button type="submit" variant="outline" className="border-border bg-card hover:bg-muted/60">
                     {tr(locale, "Apply", "Apply")}
                   </Button>
-                  <Button asChild variant="outline" className="border-cyan-300/35 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20">
-                    <Link href={`/api/admin/security-events/export?eventType=${encodeURIComponent(selectedSecurityEvent)}&email=${encodeURIComponent(queryState.securityEmail ?? "")}&from=${encodeURIComponent(securityFilterFrom)}&to=${encodeURIComponent(securityFilterTo)}&fromTs=${encodeURIComponent(securityFilterFromTs)}&toTs=${encodeURIComponent(securityFilterToTs)}`}>
+                  <Button asChild variant="outline" className="border-accent bg-primary/10 text-accent-foreground hover:bg-primary/20">
+                    <Link href={`/api/admin/security-events/export?eventType=${encodeURIComponent(selectedSecurityEvent)}&email=${encodeURIComponent(queryState.securityEmail || "")}&from=${encodeURIComponent(securityFilterFrom)}&to=${encodeURIComponent(securityFilterTo)}&fromTs=${encodeURIComponent(securityFilterFromTs)}&toTs=${encodeURIComponent(securityFilterToTs)}`}>
                       {tr(locale, "Export CSV", "Export CSV")}
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" className="text-violet-200 hover:bg-white/5">
+                  <Button asChild variant="ghost" className="text-foreground hover:bg-muted">
                     <Link href="/admin">{tr(locale, "Reset", "Reset")}</Link>
                   </Button>
                 </div>
               </form>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-violet-300">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>{tr(locale, "Quick sort:", "Quick sort:")}</span>
                 {(["created_at", "event_type", "email", "ip_address"] as const).map((sortKey) => {
                 const nextOrder = securitySortBy === sortKey && securitySortOrder === "desc" ? "asc" : "desc";
-                return (<Button key={sortKey} asChild variant="outline" className="h-7 border-white/15 bg-white/[0.02] px-2.5 text-xs hover:bg-white/[0.06]">
-                      <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(sortKey)}&securitySortOrder=${encodeURIComponent(nextOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=1`}>
+                return (<Button key={sortKey} asChild variant="outline" className="h-7 border-border bg-card px-2.5 text-xs hover:bg-muted/60">
+                      <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(sortKey)}&securitySortOrder=${encodeURIComponent(nextOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=1`}>
                         {sortKey}
                         {securitySortBy === sortKey ? ` (${securitySortOrder})` : ""}
                       </Link>
@@ -692,42 +692,42 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             })}
               </div>
 
-              {filteredSecurityEvents.length === 0 ? (<p className="text-sm text-violet-300">
+              {filteredSecurityEvents.length === 0 ? (<p className="text-sm text-muted-foreground">
                   {tr(locale, "No security events found for selected filters.", "No security events found for selected filters.")}
-                </p>) : (filteredSecurityEvents.map((event) => (<div key={event.id} className="flex flex-wrap items-center gap-2 rounded-md border border-white/10 bg-indigo-950/70 px-3 py-2 text-xs text-violet-200">
-                    <span className="font-mono text-violet-300">{event.timeLabel}</span>
+                </p>) : (filteredSecurityEvents.map((event) => (<div key={event.id} className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground">
+                    <span className="font-mono text-muted-foreground">{event.timeLabel}</span>
                     <Badge className={getSecurityEventBadgeClass(event.eventType)}>
                       {getSecurityEventLabel(locale, event.eventType)}
                     </Badge>
-                    <span className="text-violet-100">{event.email}</span>
-                    {event.ipAddress ? (<span className="text-violet-300">IP: {event.ipAddress}</span>) : null}
-                    {event.userId ? (<span className="text-violet-300">uid:{event.userId.slice(0, 8)}</span>) : null}
+                    <span className="text-foreground">{event.email}</span>
+                    {event.ipAddress ? (<span className="text-muted-foreground">IP: {event.ipAddress}</span>) : null}
+                    {event.userId ? (<span className="text-muted-foreground">uid:{event.userId.slice(0, 8)}</span>) : null}
                   </div>)))}
-              <div className="flex items-center justify-between text-xs text-violet-300">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   {tr(locale, "Page", "Page")} {dashboardSnapshot.security.page} / {dashboardSnapshot.security.totalPages}
                 </span>
                 <div className="flex items-center gap-2">
                   <form method="get" className="flex items-center gap-2">
                     <input type="hidden" name="securityEvent" value={selectedSecurityEvent}/>
-                    <input type="hidden" name="securityEmail" value={queryState.securityEmail ?? ""}/>
+                    <input type="hidden" name="securityEmail" value={queryState.securityEmail || ""}/>
                     <input type="hidden" name="securityFrom" value={securityFilterFrom}/>
                     <input type="hidden" name="securityTo" value={securityFilterTo}/>
                     <input type="hidden" name="securitySortBy" value={securitySortBy}/>
                     <input type="hidden" name="securitySortOrder" value={securitySortOrder}/>
                     <input type="hidden" name="securityPageSize" value={dashboardSnapshot.security.pageSize}/>
-                    <Input name="securityPage" type="number" min={1} max={dashboardSnapshot.security.totalPages} defaultValue={dashboardSnapshot.security.page} className="h-8 w-20 border-white/15 bg-indigo-950/80 text-violet-50"/>
-                    <Button type="submit" variant="outline" className="h-8 border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                    <Input name="securityPage" type="number" min={1} max={dashboardSnapshot.security.totalPages} defaultValue={dashboardSnapshot.security.page} className="h-8 w-20 border-border bg-background text-foreground"/>
+                    <Button type="submit" variant="outline" className="h-8 border-border bg-card hover:bg-muted/60">
                       {tr(locale, "Go", "Go")}
                     </Button>
                   </form>
-                  <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]" disabled={dashboardSnapshot.security.page <= 1}>
-                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.max(1, dashboardSnapshot.security.page - 1)}`}>
+                  <Button asChild variant="outline" className="border-border bg-card hover:bg-muted/60" disabled={dashboardSnapshot.security.page <= 1}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.max(1, dashboardSnapshot.security.page - 1)}`}>
                       {tr(locale, "Prev", "Prev")}
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]" disabled={dashboardSnapshot.security.page >= dashboardSnapshot.security.totalPages}>
-                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail ?? "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.min(dashboardSnapshot.security.totalPages, dashboardSnapshot.security.page + 1)}`}>
+                  <Button asChild variant="outline" className="border-border bg-card hover:bg-muted/60" disabled={dashboardSnapshot.security.page >= dashboardSnapshot.security.totalPages}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.min(dashboardSnapshot.security.totalPages, dashboardSnapshot.security.page + 1)}`}>
                       {tr(locale, "Next", "Next")}
                     </Link>
                   </Button>
@@ -738,22 +738,22 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </PageSection>
 
         <PageSection surface="mesh">
-          <Card className="border-white/10 bg-indigo-900/70">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base text-violet-50">
+              <CardTitle className="text-base text-foreground">
                 {tr(locale, "Admin audit timeline", "Admin audit timeline")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {dashboardSnapshot.audit.recentActions.length > 0 ? (dashboardSnapshot.audit.recentActions.map((item) => (<div key={item.id} className="flex flex-wrap items-center gap-2 rounded-md border border-white/10 bg-indigo-950/70 px-3 py-2 text-xs text-violet-200">
-                    <span className="font-mono text-violet-300">{item.timeLabel}</span>
-                    <Badge variant="secondary" className="bg-white/10 text-violet-100">
+              {dashboardSnapshot.audit.recentActions.length > 0 ? (dashboardSnapshot.audit.recentActions.map((item) => (<div key={item.id} className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground">
+                    <span className="font-mono text-muted-foreground">{item.timeLabel}</span>
+                    <Badge variant="secondary" className="bg-muted/60 text-foreground">
                       {item.action}
                     </Badge>
-                    <span className="text-violet-200">{item.actorLabel}</span>
-                    <span className="text-violet-400">→</span>
-                    <span className="text-violet-100">{item.targetLabel}</span>
-                  </div>))) : (<p className="text-sm text-violet-300">
+                    <span className="text-foreground">{item.actorLabel}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span className="text-foreground">{item.targetLabel}</span>
+                  </div>))) : (<p className="text-sm text-muted-foreground">
                   {tr(locale, "No audit records yet.", "No audit records yet.")}
                 </p>)}
             </CardContent>
@@ -763,89 +763,89 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         <PageSection surface="mesh">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold text-violet-50">
+              <h2 className="text-xl font-semibold text-foreground">
                 {tr(locale, "Moderation queue", "Moderation queue")}
               </h2>
               <div className="flex flex-wrap gap-2 text-xs">
-                <Badge variant="secondary" className="bg-white/10 text-violet-100">
+                <Badge variant="secondary" className="bg-muted/60 text-foreground">
                   {tr(locale, "Total", "Total")}: {pendingCount}
                 </Badge>
-                <Badge variant="secondary" className="bg-blue-500/15 text-blue-200">
+                <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">
                   {tr(locale, "Showing", "Showing")}: {filteredCount}
                 </Badge>
               </div>
             </div>
 
-            <form method="get" className="grid gap-3 rounded-lg border border-white/10 bg-indigo-900/50 p-3 lg:grid-cols-[minmax(0,1fr)_220px_200px_auto]">
-              <Input name="q" defaultValue={query} placeholder={tr(locale, "Search by name, slug, description, or URL", "Search by name, slug, description, or URL")} className="border-white/15 bg-indigo-950/80 text-violet-50"/>
-              <select name="category" defaultValue={selectedCategory} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+            <form method="get" className="grid gap-3 rounded-lg border border-border bg-card p-3 lg:grid-cols-[minmax(0,1fr)_220px_200px_auto]">
+              <Input name="q" defaultValue={query} placeholder={tr(locale, "Search by name, slug, description, or URL", "Search by name, slug, description, or URL")} className="border-border bg-background text-foreground"/>
+              <select name="category" defaultValue={selectedCategory} className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                 <option value="all">{tr(locale, "All categories", "All categories")}</option>
                 {categoryOptions.map((category) => (<option key={category} value={category}>
                     {category}
                   </option>))}
               </select>
-              <select name="auth" defaultValue={selectedAuth} className="h-10 rounded-md border border-white/15 bg-indigo-950/80 px-3 text-sm text-violet-50">
+              <select name="auth" defaultValue={selectedAuth} className="h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground">
                 <option value="all">{tr(locale, "All auth types", "All auth types")}</option>
                 {authOptions.map((authType) => (<option key={authType} value={authType}>
                     {getAuthTypeLabel(locale, authType)}
                   </option>))}
               </select>
               <div className="flex items-center gap-2">
-                <Button type="submit" variant="outline" className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+                <Button type="submit" variant="outline" className="border-border bg-card hover:bg-muted/60">
                   {tr(locale, "Apply", "Apply")}
                 </Button>
-                <Button asChild variant="ghost" className="text-violet-200 hover:bg-white/5">
+                <Button asChild variant="ghost" className="text-foreground hover:bg-muted">
                   <Link href="/admin">{tr(locale, "Reset", "Reset")}</Link>
                 </Button>
               </div>
             </form>
 
-            {pendingServers.length === 0 ? (<Card className="border-white/10 bg-indigo-900/55">
+            {pendingServers.length === 0 ? (<Card className="border-border bg-card">
               <CardHeader>
-                <CardTitle className="text-violet-50">
+                <CardTitle className="text-foreground">
                   {tr(locale, "No pending submissions", "No pending submissions")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-violet-200">
+              <CardContent className="text-sm text-foreground">
                 {tr(locale, "New servers submitted through the public form will appear here.", "New servers submitted through the public form will appear here.")}
               </CardContent>
-            </Card>) : filteredPendingServers.length === 0 ? (<Card className="border-white/10 bg-indigo-900/55">
+            </Card>) : filteredPendingServers.length === 0 ? (<Card className="border-border bg-card">
               <CardHeader>
-                <CardTitle className="text-violet-50">
+                <CardTitle className="text-foreground">
                   {tr(locale, "No results", "No results")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-violet-200">
+              <CardContent className="text-sm text-foreground">
                 {tr(locale, "Try changing search text or filters.", "Try changing search text or filters.")}
               </CardContent>
             </Card>) : (<div className="grid gap-4 lg:grid-cols-2">
-              {filteredPendingServers.map((mcpServer) => (<Card key={mcpServer.id} className="border-white/10 bg-indigo-900/70">
+              {filteredPendingServers.map((mcpServer) => (<Card key={mcpServer.id} className="border-border bg-card">
                   <CardHeader className="space-y-2">
                     <div className="flex items-start justify-between gap-3">
-                      <CardTitle className="text-base text-violet-50">{mcpServer.name}</CardTitle>
-                      <p className="shrink-0 text-xs text-violet-300">
+                      <CardTitle className="text-base text-foreground">{mcpServer.name}</CardTitle>
+                      <p className="shrink-0 text-xs text-muted-foreground">
                         {tr(locale, "Queued", "Queued")}: {formatQueuedAt(locale, mcpServer.createdAt)}
                       </p>
                     </div>
-                    <p className="font-mono text-xs text-violet-300">/{mcpServer.slug}</p>
+                    <p className="font-mono text-xs text-muted-foreground">/{mcpServer.slug}</p>
                     <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-blue-500/15 text-blue-300">{mcpServer.category}</Badge>
-                      <Badge variant="secondary" className="bg-white/8 text-violet-200">
+                      <Badge className="bg-accent/20 text-accent-foreground">{mcpServer.category}</Badge>
+                      <Badge variant="secondary" className="bg-muted/60 text-foreground">
                         {getAuthTypeLabel(locale, mcpServer.authType)}
                       </Badge>
                     </div>
                   </CardHeader>
 
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-violet-200">{mcpServer.description}</p>
-                    <p className="truncate text-xs text-violet-300">{mcpServer.serverUrl}</p>
+                    <p className="text-sm text-foreground">{mcpServer.description}</p>
+                    <p className="truncate text-xs text-muted-foreground">{mcpServer.serverUrl}</p>
 
                     <div className="flex gap-2">
                       <form action={moderateServerStatusAction} className="w-full">
                         <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                         <input type="hidden" name="serverId" value={mcpServer.id}/>
                         <input type="hidden" name="status" value="active"/>
-                        <Button type="submit" className="w-full bg-emerald-500/80 text-white hover:bg-emerald-400">
+                        <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-accent">
                           {tr(locale, "Approve", "Approve")}
                         </Button>
                       </form>
@@ -854,7 +854,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                         <input type="hidden" name="returnTo" value={stickyAdminHref}/>
                         <input type="hidden" name="serverId" value={mcpServer.id}/>
                         <input type="hidden" name="status" value="rejected"/>
-                        <Button type="submit" variant="outline" className="w-full border-rose-400/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20">
+                        <Button type="submit" variant="outline" className="w-full border-border bg-muted/60 text-foreground hover:bg-muted/70">
                           {tr(locale, "Reject", "Reject")}
                         </Button>
                       </form>
@@ -867,5 +867,3 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       </div>
     </PageFrame>);
 }
-
-

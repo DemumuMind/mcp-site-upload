@@ -67,7 +67,7 @@ export default async function PricingPage() {
   return (
     <PageFrame variant="marketing">
       <main className="w-full bg-background">
-        <section className="border-b border-blacksmith" aria-labelledby="pricing-page-heading">
+        <section className="border-b border-border" aria-labelledby="pricing-page-heading">
           <div className="section-shell space-y-5 py-14 sm:py-20">
             <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">{tr(locale, "Pricing", "Pricing")}</p>
             <h1 id="pricing-page-heading" className="max-w-4xl font-serif text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-6xl">
@@ -79,13 +79,13 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        <section className="border-b border-blacksmith" aria-label={tr(locale, "Plans", "Plans")}>
+        <section className="border-b border-border" aria-label={tr(locale, "Plans", "Plans")}>
           <div className="section-shell py-10 sm:py-14">
             <div className="grid gap-5 lg:grid-cols-2">
               {plans.map((plan) => (
                 <article
                   key={plan.id}
-                  className={plan.highlighted ? "rounded-md border border-primary/40 bg-card p-6" : "rounded-md border border-blacksmith bg-card p-6"}
+                  className={plan.highlighted ? "rounded-md border border-primary/40 bg-card p-6" : "rounded-md border border-border bg-card p-6"}
                 >
                   <p className="font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">{`$ plan --tier ${plan.id}`}</p>
                   <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground">{tr(locale, plan.name.en, plan.name.en)}</h2>
@@ -115,7 +115,7 @@ export default async function PricingPage() {
           </div>
         </section>
 
-        <section className="border-b border-blacksmith" aria-label="Pricing footnote">
+        <section className="border-b border-border" aria-label="Pricing footnote">
           <div className="section-shell py-6">
             <p className="text-xs text-muted-foreground">{tr(locale, "All prices are in USD.", "All prices are in USD.")}</p>
           </div>
@@ -124,3 +124,4 @@ export default async function PricingPage() {
     </PageFrame>
   );
 }
+

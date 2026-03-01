@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +20,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
   if (!selectedStack) return null;
 
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.15fr] lg:items-center">
         <div className="space-y-4">
           <h2 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
@@ -44,7 +44,7 @@ export function ComparisonSection({ content }: ComparisonSectionProps) {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Card className="border-blacksmith bg-background">
+          <Card className="border-border bg-background">
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">Legacy process</CardTitle>
             </CardHeader>

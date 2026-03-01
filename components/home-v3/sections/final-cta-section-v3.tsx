@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
@@ -12,7 +12,7 @@ export function FinalCtaSectionV3({ content }: FinalCtaSectionV3Props) {
   return (
     <section className="bg-background">
       <div className="section-shell py-16 sm:py-20">
-        <div className="rounded-md border border-blacksmith bg-card p-8 sm:p-10">
+        <div className="rounded-md border border-border bg-card p-8 sm:p-10">
           <div className="space-y-5">
             <SectionLabel>{content.badge}</SectionLabel>
             <h2 className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">

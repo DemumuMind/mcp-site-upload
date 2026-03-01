@@ -155,15 +155,15 @@ export function AuthResetPasswordPanel() {
             </Button>}/>);
     }
     if (isLoading || isRecoveryInitializing) {
-        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-blacksmith bg-card shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)]" title={tr(locale, "Checking recovery session...", "Checking recovery session...")} titleClassName="text-sm font-normal text-muted-foreground"/>);
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]" title={tr(locale, "Checking recovery session...", "Checking recovery session...")} titleClassName="text-sm font-normal text-muted-foreground"/>);
     }
     if (!user) {
-        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-blacksmith bg-card shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)]" title={tr(locale, "Recovery session is missing", "Recovery session is missing")} message={tr(locale, "Open the reset link from your email first, or request a new reset email on the login page.", "Open the reset link from your email first, or request a new reset email on the login page.")} messageClassName="mt-3 text-sm text-muted-foreground" action={<Button asChild className="mt-6 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary">
+        return (<AuthStatusCard containerClassName="rounded-[1.75rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]" title={tr(locale, "Recovery session is missing", "Recovery session is missing")} message={tr(locale, "Open the reset link from your email first, or request a new reset email on the login page.", "Open the reset link from your email first, or request a new reset email on the login page.")} messageClassName="mt-3 text-sm text-muted-foreground" action={<Button asChild className="mt-6 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/auth">{tr(locale, "Back to login", "Back to login")}</Link>
             </Button>}/>);
     }
     if (isCompleted) {
-        return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+        return (<section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
           <span className="inline-flex rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
@@ -181,14 +181,14 @@ export function AuthResetPasswordPanel() {
             {tr(locale, "s.", "s.")}
           </p>
           <div className="mt-5">
-            <Button type="button" className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary" onClick={() => router.replace("/auth")}>
+            <Button type="button" className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.replace("/auth")}>
               {tr(locale, "Go to login now", "Go to login now")}
             </Button>
           </div>
         </div>
       </section>);
     }
-    return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+    return (<section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
         <span className="inline-flex rounded-full border border-primary/40 bg-card px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground">
@@ -202,12 +202,12 @@ export function AuthResetPasswordPanel() {
           {tr(locale, "This page is linked to your recovery email. Enter and confirm your new password.", "This page is linked to your recovery email. Enter and confirm your new password.")}
         </p>
 
-        <form className="mt-6 grid gap-3 rounded-2xl border border-blacksmith bg-card p-4 sm:p-5" onSubmit={submitPasswordReset}>
+        <form className="mt-6 grid gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5" onSubmit={submitPasswordReset}>
           <div className="space-y-1.5">
             <Label htmlFor="newPassword" className="text-sm text-foreground">
               {tr(locale, "New password", "New password")}
             </Label>
-            <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
+            <Input id="newPassword" type="password" autoComplete="new-password" required value={values.newPassword} onChange={(event) => updateField("newPassword", event.target.value)} placeholder={tr(locale, `At least ${PASSWORD_MIN_LENGTH} characters`, `At least ${PASSWORD_MIN_LENGTH} characters`)} className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             <PasswordStrengthChecklist score={passwordStrengthScore} strengthLabel={getPasswordStrengthLabel(locale, passwordStrengthScore)} checklistItems={passwordChecklistItems}/>
             {errors.newPassword ? <p className="text-xs text-rose-300">{errors.newPassword}</p> : null}
           </div>
@@ -216,11 +216,11 @@ export function AuthResetPasswordPanel() {
             <Label htmlFor="confirmPassword" className="text-sm text-foreground">
               {tr(locale, "Confirm password", "Confirm password")}
             </Label>
-            <Input id="confirmPassword" type="password" autoComplete="new-password" required value={values.confirmPassword} onChange={(event) => updateField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
+            <Input id="confirmPassword" type="password" autoComplete="new-password" required value={values.confirmPassword} onChange={(event) => updateField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
             {errors.confirmPassword ? (<p className="text-xs text-rose-300">{errors.confirmPassword}</p>) : null}
           </div>
 
-          <Button type="submit" disabled={isPending} className="h-11 rounded-xl bg-primary text-primary-foreground transition hover:bg-primary">
+          <Button type="submit" disabled={isPending} className="h-11 rounded-xl bg-primary text-primary-foreground transition hover:bg-primary/90">
             {isPending ? <LoaderCircle className="size-4 animate-spin"/> : null}
             {tr(locale, "Update password", "Update password")}
           </Button>

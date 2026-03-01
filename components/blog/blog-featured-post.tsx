@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+﻿import { Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FeaturedArticleCardBase } from "@/components/blog/shared/featured-article-card-base";
 import { formatBlogDate } from "@/lib/blog/date-format";
@@ -23,7 +23,7 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
   return (
     <FeaturedArticleCardBase
       badge={
-        <Badge className="w-fit border-violet-300/40 bg-primary0/15 text-foreground">
+        <Badge className="w-fit border-primary/30 bg-primary0/15 text-foreground">
           <Sparkles className="size-3" />
           {tr(locale, "Featured article", "Featured article")}
         </Badge>
@@ -34,7 +34,7 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
           {localized.excerpt}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {tags.map(({ tagSlug, tag }) => (
-              <Badge key={tagSlug} variant="outline" className="border-violet-300/40 bg-primary0/15 text-foreground">
+              <Badge key={tagSlug} variant="outline" className="border-primary/30 bg-primary0/15 text-foreground">
                 {tag ? tag.label[locale] : tagSlug}
               </Badge>
             ))}
@@ -52,7 +52,7 @@ export async function BlogFeaturedPost({ post, locale }: BlogFeaturedPostProps) 
         content: "space-y-4 text-sm text-muted-foreground",
         excerpt: "",
         meta: "flex flex-wrap items-center gap-3 text-xs tracking-[0.1em] text-muted-foreground uppercase",
-        button: "bg-blue-500 hover:bg-blue-400",
+        button: "bg-primary hover:bg-primary/90",
       }}
     />
   );

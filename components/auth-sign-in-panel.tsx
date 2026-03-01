@@ -124,7 +124,7 @@ type OAuthProviderButtonProps = {
 };
 function OAuthProviderButton({ provider, pendingOAuthProvider, isEmailPending, onSignIn, buttonClassName, label, icon, iconClassName, }: OAuthProviderButtonProps) {
     return (<Button type="button" variant="outline" onClick={() => onSignIn(provider)} disabled={pendingOAuthProvider !== null || isEmailPending} className={buttonClassName}>
-      {pendingOAuthProvider === provider ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className={`inline-flex size-6 items-center justify-center rounded-full border border-violet-400/70 bg-card font-bold text-foreground ${iconClassName ?? "text-xs"}`}>
+      {pendingOAuthProvider === provider ? (<LoaderCircle className="size-4 animate-spin"/>) : (<span className={`inline-flex size-6 items-center justify-center rounded-full border border-border/60 bg-card font-bold text-foreground ${iconClassName ?? "text-xs"}`}>
           {icon}
         </span>)}
       <span>{label}</span>
@@ -216,8 +216,8 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
     const [oauthProviderMessage, setOauthProviderMessage] = useState<string | null>(null);
     const emailPasswordStrengthScore = useMemo(() => getPasswordStrengthScore(emailAuthValues.password), [emailAuthValues.password]);
     const signupChecklistItems = useMemo(() => getPasswordChecklistItems(locale, emailAuthValues.password), [locale, emailAuthValues.password]);
-    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-blacksmith bg-card px-4 text-left text-sm font-semibold text-foreground transition hover:border-violet-300/70 hover:bg-accent focus-visible:ring-primary/40";
-    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-primary text-primary-foreground transition hover:bg-primary";
+    const oauthButtonClass = "h-12 w-full justify-start rounded-xl border border-border/60 bg-card px-4 text-left text-sm font-semibold text-foreground transition hover:border-primary/50 hover:bg-accent focus-visible:ring-primary/40";
+    const primaryActionButtonClass = "h-11 w-full rounded-xl bg-primary text-primary-foreground transition hover:bg-primary/90";
     function getOAuthRedirectTo(): string | undefined {
         if (typeof window === "undefined") {
             return undefined;
@@ -427,10 +427,10 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
         toast.success(tr(locale, "Signed out", "Signed out"));
     }
     if (!hasMounted) {
-        return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+        return (<section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
         <div className="relative p-6 sm:p-10">
-          <AuthHeroIntro locale={locale} description={tr(locale, "Loading sign-in panelвЂ¦", "Loading sign-in panelвЂ¦")}/>
+          <AuthHeroIntro locale={locale} description={tr(locale, "Loading sign-in panel...", "Loading sign-in panel...")}/>
         </div>
       </section>);
     }
@@ -440,7 +440,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             </Button>}/>);
     }
     if (user) {
-        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-blacksmith bg-card p-6 shadow-[0_24px_56px_-36px_rgba(2,6,23,0.9)] sm:p-8">
+        return (<div className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card p-6 shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)] sm:p-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"/>
         <div className="relative">
           <h1 className="text-2xl font-semibold text-foreground">
@@ -458,7 +458,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             </Button>
             <Button type="button" variant="outline" onClick={() => {
                 void signOut();
-            }} className="h-10 rounded-xl border-blacksmith bg-card hover:bg-accent">
+            }} className="h-10 rounded-xl border-border/60 bg-card hover:bg-accent">
               {tr(locale, "Sign out", "Sign out")}
             </Button>
           </div>
@@ -467,7 +467,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
     }
     const isSignUpMode = emailAuthMode === "sign-up";
     const isResetRequestMode = emailAuthMode === "reset-request";
-    return (<section className="relative overflow-hidden rounded-[2rem] border border-blacksmith bg-[linear-gradient(180deg,rgba(15,23,42,0.96)_0%,rgba(2,6,23,0.98)_100%)] shadow-[0_30px_72px_-50px_rgba(2,6,23,0.95)]">
+    return (<section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-[0_24px_56px_-36px_hsl(var(--foreground)/0.35)]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent"/>
       <div className="relative p-6 sm:p-10">
         <AuthHeroIntro locale={locale} description={tr(locale, "Sign in to submit MCP servers and manage your integrations.", "Sign in to submit MCP servers and manage your integrations.")}/>
@@ -510,7 +510,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-blacksmith bg-card p-4 sm:p-5">
+        <div className="mt-6 rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {isSignUpMode
             ? tr(locale, "Register with email", "Register with email")
@@ -524,7 +524,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
               <Label htmlFor="email" className="text-sm text-foreground">
                 Email
               </Label>
-              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
+              <Input id="email" type="email" autoComplete="email" required value={emailAuthValues.email} onChange={(event) => updateEmailField("email", event.target.value)} placeholder="you@example.com" className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
               {emailAuthErrors.email ? (<p className="text-xs text-rose-300">{emailAuthErrors.email}</p>) : null}
             </div>
 
@@ -536,7 +536,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
                 : "Enter your password", isSignUpMode
                 ? `At least ${PASSWORD_MIN_LENGTH} characters`
-                : "Enter your password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
+                : "Enter your password")} className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
                 {isSignUpMode ? (<PasswordStrengthChecklist score={emailPasswordStrengthScore} strengthLabel={getPasswordStrengthLabel(locale, emailPasswordStrengthScore)} checklistItems={signupChecklistItems}/>) : null}
                 {emailAuthErrors.password ? (<p className="text-xs text-rose-300">{emailAuthErrors.password}</p>) : null}
               </div>) : null}
@@ -545,7 +545,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
                 <Label htmlFor="confirmPassword" className="text-sm text-foreground">
                   {tr(locale, "Confirm password", "Confirm password")}
                 </Label>
-                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-blacksmith bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
+                <Input id="confirmPassword" type="password" autoComplete="new-password" required value={emailAuthValues.confirmPassword} onChange={(event) => updateEmailField("confirmPassword", event.target.value)} placeholder={tr(locale, "Repeat password", "Repeat password")} className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"/>
                 {emailAuthErrors.confirmPassword ? (<p className="text-xs text-rose-300">{emailAuthErrors.confirmPassword}</p>) : null}
               </div>) : null}
 
@@ -583,7 +583,7 @@ export function AuthSignInPanel({ nextPath, errorCode, authErrorCode, authErrorD
             {emailMessage}
           </p>) : null}
 
-        <p className="mt-6 border-t border-blacksmith pt-4 text-xs leading-6 text-muted-foreground">
+        <p className="mt-6 border-t border-border/60 pt-4 text-xs leading-6 text-muted-foreground">
           {tr(locale, "By signing in, you agree to our", "By signing in, you agree to our")}{" "}
           <Link href="/terms" className="font-semibold text-foreground underline underline-offset-4 transition hover:text-foreground">
             {tr(locale, "Terms", "Terms")}

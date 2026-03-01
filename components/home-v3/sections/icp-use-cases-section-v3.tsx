@@ -1,4 +1,4 @@
-import { Blocks, Command, ShieldCheck } from "lucide-react";
+﻿import { Blocks, Command, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
 import type { HomeContent } from "@/lib/home/content";
@@ -15,7 +15,7 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
   };
 
   return (
-    <section className="border-b border-blacksmith bg-background">
+    <section className="border-b border-border bg-background">
       <div className="section-shell space-y-7 py-14">
         <header className="space-y-3">
           <SectionLabel>ICP / Use Cases</SectionLabel>
@@ -25,9 +25,9 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
 
         <div className="grid gap-4 lg:grid-cols-3">
           {content.cards.map((card) => (
-            <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
+            <article key={card.title} className="rounded-md border border-border bg-card p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
+                <div className="inline-flex rounded-sm border border-border bg-background p-1.5">
                   {renderIcon(card.icon)}
                 </div>
                 <Badge variant="outline">ICP</Badge>

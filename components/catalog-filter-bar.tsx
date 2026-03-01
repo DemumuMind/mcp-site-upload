@@ -27,14 +27,14 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
     return (<div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_170px_150px_130px_auto]">
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"/>
-        <Input value={searchQuery} onChange={(event) => onSearchQueryChange(event.target.value)} placeholder={tr(locale, "Search tools, features, or descriptions...", "Search tools, features, or descriptions...")} className="h-10 rounded-xl border-blacksmith bg-card pl-9 text-foreground placeholder:text-muted-foreground focus-visible:border-blue-400/55 focus-visible:ring-blue-500/20"/>
+        <Input value={searchQuery} onChange={(event) => onSearchQueryChange(event.target.value)} placeholder={tr(locale, "Search tools, features, or descriptions...", "Search tools, features, or descriptions...")} className="h-10 rounded-xl border-border bg-card pl-9 text-foreground placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20"/>
       </div>
 
       <Select value={sortField} onValueChange={(value) => onSortFieldChange(value as CatalogSortField)}>
-        <SelectTrigger className="h-10 w-full rounded-xl border-blacksmith bg-card text-foreground hover:bg-accent">
+        <SelectTrigger className="h-10 w-full rounded-xl border-border bg-card text-foreground hover:bg-accent">
           <SelectValue placeholder={tr(locale, "Sort by", "Sort by")}/>
         </SelectTrigger>
-        <SelectContent className="border-blacksmith bg-card text-foreground">
+        <SelectContent className="border-border bg-card text-foreground">
           <SelectItem value="rating" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Best match", "Best match")}
           </SelectItem>
@@ -51,10 +51,10 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
       </Select>
 
       <Select value={sortDirection} onValueChange={(value) => onSortDirectionChange(value as CatalogSortDirection)}>
-        <SelectTrigger className="h-10 w-full rounded-xl border-blacksmith bg-card text-foreground hover:bg-accent">
+        <SelectTrigger className="h-10 w-full rounded-xl border-border bg-card text-foreground hover:bg-accent">
           <SelectValue placeholder={tr(locale, "Order", "Order")}/>
         </SelectTrigger>
-        <SelectContent className="border-blacksmith bg-card text-foreground">
+        <SelectContent className="border-border bg-card text-foreground">
           <SelectItem value="desc" className="focus:bg-card focus:text-foreground">
             {tr(locale, "Descending", "Descending")}
           </SelectItem>
@@ -65,10 +65,10 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
       </Select>
 
       <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number.parseInt(value, 10))}>
-        <SelectTrigger className="h-10 w-full rounded-xl border-blacksmith bg-card text-foreground hover:bg-accent">
+        <SelectTrigger className="h-10 w-full rounded-xl border-border bg-card text-foreground hover:bg-accent">
           <SelectValue placeholder={tr(locale, "Page size", "Page size")}/>
         </SelectTrigger>
-        <SelectContent className="border-blacksmith bg-card text-foreground">
+        <SelectContent className="border-border bg-card text-foreground">
           <SelectItem value="12" className="focus:bg-card focus:text-foreground">
             12 / {tr(locale, "page", "page")}
           </SelectItem>
@@ -82,22 +82,22 @@ export function CatalogFilterBar({ searchQuery, sortField, sortDirection, pageSi
       </Select>
 
       <div className="flex items-center justify-end gap-2">
-        <Button type="button" size="sm" variant="outline" className="h-10 rounded-xl border-blacksmith bg-card text-foreground hover:bg-accent lg:hidden" onClick={onToggleMobileFilters} aria-label={tr(locale, "Open filters", "Open filters")} aria-expanded={isMobileFiltersOpen} aria-controls="catalog-mobile-filters">
+        <Button type="button" size="sm" variant="outline" className="h-10 rounded-xl border-border bg-card text-foreground hover:bg-accent lg:hidden" onClick={onToggleMobileFilters} aria-label={tr(locale, "Open filters", "Open filters")} aria-expanded={isMobileFiltersOpen} aria-controls="catalog-mobile-filters">
           <SlidersHorizontal className="size-4"/>
           {tr(locale, "Filters", "Filters")}
-          {activeFilterCount > 0 ? (<span className="inline-flex min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[11px] font-semibold text-foreground">
+          {activeFilterCount > 0 ? (<span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">
               {activeFilterCount}
             </span>) : null}
         </Button>
 
-        <div className="flex items-center gap-1 rounded-lg border border-blacksmith bg-card p-1">
+        <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
           <Button type="button" size="icon-sm" variant={viewMode === "grid" ? "default" : "ghost"} className={cn("transition", viewMode === "grid"
-            ? "bg-blue-600 text-foreground hover:bg-blue-500"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
             : "text-muted-foreground hover:bg-accent hover:text-foreground")} onClick={() => onViewModeChange("grid")} aria-label={tr(locale, "Grid view", "Grid view")}>
             <Grid2X2 className="size-4"/>
           </Button>
           <Button type="button" size="icon-sm" variant={viewMode === "list" ? "default" : "ghost"} className={cn("transition", viewMode === "list"
-            ? "bg-blue-600 text-foreground hover:bg-blue-500"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
             : "text-muted-foreground hover:bg-accent hover:text-foreground")} onClick={() => onViewModeChange("list")} aria-label={tr(locale, "List view", "List view")}>
             <List className="size-4"/>
           </Button>

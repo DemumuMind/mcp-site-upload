@@ -252,10 +252,10 @@ export function SubmitServerWizard() {
               className={[
                 "rounded-xl border p-4 transition",
                 isCurrent
-                  ? "border-cyan-400/40 bg-primary/10"
+                  ? "border-primary/40 bg-primary/10"
                   : isCompleted
                     ? "border-primary/30 bg-primary/10"
-                    : "border-blacksmith bg-card",
+                    : "border-border bg-card",
               ].join(" ")}
             >
               <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">
@@ -277,14 +277,14 @@ export function SubmitServerWizard() {
               : tr(locale, "Guest mode: sign in only on final submit", "Guest mode: sign in only on final submit")}
         </Badge>
         {restoredDraftAt ? (
-          <Badge className="border-blacksmith bg-card text-muted-foreground">
+          <Badge className="border-border bg-card text-muted-foreground">
             {tr(locale, "Draft restored", "Draft restored")}: {restoredDraftAt}
           </Badge>
         ) : null}
       </div>
 
       {!isConfigured ? (
-        <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
           <p className="font-medium">{tr(locale, "Auth is not configured", "Auth is not configured")}</p>
           <p className="mt-1">
             {tr(
@@ -297,7 +297,7 @@ export function SubmitServerWizard() {
       ) : null}
 
       {submittedMessage ? (
-        <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm text-primary-foreground">
+        <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground">
           <p className="flex items-center gap-2 font-medium">
             <CheckCircle2 className="size-4" />
             {submittedMessage}
@@ -310,7 +310,7 @@ export function SubmitServerWizard() {
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-blacksmith bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         {step === 0 ? <SubmitStepBasics form={form} locale={locale} /> : null}
         {step === 1 ? <SubmitStepTechnical form={form} locale={locale} /> : null}
         {step === 2 ? <SubmitStepReview locale={locale} values={form.getValues()} isAuthenticated={isAuthenticated} /> : null}
@@ -320,7 +320,7 @@ export function SubmitServerWizard() {
         <Button
           type="button"
           variant="outline"
-          className="border-blacksmith bg-card text-foreground hover:bg-accent"
+          className="border-border bg-card text-foreground hover:bg-accent"
           onClick={goBack}
           disabled={step === 0 || isPending}
         >
@@ -329,12 +329,12 @@ export function SubmitServerWizard() {
         </Button>
 
         {step < 2 ? (
-          <Button type="button" className="bg-blue-500 hover:bg-blue-400" onClick={() => void goNext()} disabled={isPending}>
+          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void goNext()} disabled={isPending}>
             {tr(locale, "Continue", "Continue")}
             <ChevronRight className="size-4" />
           </Button>
         ) : (
-          <Button type="button" className="bg-blue-500 hover:bg-blue-400" onClick={() => void handleFinalSubmit()} disabled={isPending}>
+          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void handleFinalSubmit()} disabled={isPending}>
             {isPending ? <LoaderCircle className="size-4 animate-spin" /> : isAuthenticated ? <Send className="size-4" /> : <LogIn className="size-4" />}
             {isAuthenticated
               ? tr(locale, "Submit for moderation", "Submit for moderation")

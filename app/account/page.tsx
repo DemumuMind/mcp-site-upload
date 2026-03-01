@@ -166,26 +166,26 @@ export default async function AccountPage() {
     const isEmailVerified = Boolean(userData.user.email_confirmed_at);
     return (<PageFrame variant="content">
       <PageShell className="max-w-6xl px-4 sm:px-6">
-      <section className="rounded-2xl border border-white/10 bg-indigo-900/72 p-6">
+      <section className="rounded-2xl border border-border bg-card/90 p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             {avatarUrl ? (
-        <Image src={avatarUrl} alt={displayName} width={64} height={64} sizes="64px" className="size-16 rounded-2xl border border-blue-300/30 object-cover" referrerPolicy="no-referrer"/>) : (<div className="inline-flex size-16 items-center justify-center rounded-2xl border border-blue-300/30 bg-blue-500/10 text-xl font-semibold text-blue-200">
+        <Image src={avatarUrl} alt={displayName} width={64} height={64} sizes="64px" className="size-16 rounded-2xl border border-border object-cover" referrerPolicy="no-referrer"/>) : (<div className="inline-flex size-16 items-center justify-center rounded-2xl border border-border bg-muted text-xl font-semibold text-foreground">
                 {initials}
               </div>)}
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 {tr(locale, "Personal cabinet", "Personal cabinet")}
               </p>
-              <h1 className="text-2xl font-semibold text-violet-50 sm:text-3xl">{displayName}</h1>
-              <p className="text-sm text-violet-200">
+              <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">{displayName}</h1>
+              <p className="text-sm text-muted-foreground">
                 {userData.user.email ?? tr(locale, "authenticated user", "authenticated user")}
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button asChild className="bg-blue-500 hover:bg-blue-400">
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/submit-server">{tr(locale, "Submit server", "Submit server")}</Link>
             </Button>
             <AccountSignOutButton locale={locale}/>
@@ -194,22 +194,22 @@ export default async function AccountPage() {
       </section>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="border-white/10 bg-indigo-900/72">
+        <Card className="border-border bg-card/90">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-violet-300">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {tr(locale, "Total submissions", "Total submissions")}
               </p>
-              <p className="mt-1 text-2xl font-semibold text-violet-50">{submissions.length}</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">{submissions.length}</p>
             </div>
-            <FolderGit2 className="size-5 text-blue-300"/>
+            <FolderGit2 className="size-5 text-primary"/>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-indigo-900/72">
+        <Card className="border-border bg-card/90">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-violet-300">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {tr(locale, "Active", "Active")}
               </p>
               <p className="mt-1 text-2xl font-semibold text-emerald-200">{activeCount}</p>
@@ -218,10 +218,10 @@ export default async function AccountPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-indigo-900/72">
+        <Card className="border-border bg-card/90">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-violet-300">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {tr(locale, "Pending", "Pending")}
               </p>
               <p className="mt-1 text-2xl font-semibold text-amber-200">{pendingCount}</p>
@@ -230,10 +230,10 @@ export default async function AccountPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-indigo-900/72">
+        <Card className="border-border bg-card/90">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-violet-300">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {tr(locale, "Rejected", "Rejected")}
               </p>
               <p className="mt-1 text-2xl font-semibold text-rose-200">{rejectedCount}</p>
@@ -245,13 +245,13 @@ export default async function AccountPage() {
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.05fr_1.45fr]">
         <div className="space-y-5">
-          <Card className="border-white/10 bg-indigo-900/72">
+          <Card className="border-border bg-card/90">
             <CardHeader className="space-y-2">
-              <CardTitle className="flex items-center gap-2 text-xl text-violet-50">
-                <UserCircle2 className="size-5 text-blue-300"/>
+              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+                <UserCircle2 className="size-5 text-primary"/>
                 {tr(locale, "Account overview", "Account overview")}
               </CardTitle>
-              <p className="text-sm text-violet-200">
+              <p className="text-sm text-muted-foreground">
                 {tr(locale, "Core account information and verification status.", "Core account information and verification status.")}
               </p>
             </CardHeader>
@@ -268,28 +268,28 @@ export default async function AccountPage() {
                 </Badge>
               </div>
 
-              <dl className="grid gap-3 text-violet-200">
-                <div className="rounded-lg border border-white/10 bg-indigo-950/50 px-3 py-2.5">
-                  <dt className="text-xs uppercase tracking-wide text-violet-300">
+              <dl className="grid gap-3 text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
                     {tr(locale, "User ID", "User ID")}
                   </dt>
-                  <dd className="mt-1 font-mono text-xs text-violet-100" title={userData.user.id}>
+                  <dd className="mt-1 font-mono text-xs text-foreground" title={userData.user.id}>
                     {getShortUserId(userData.user.id)}
                   </dd>
                 </div>
 
-                <div className="rounded-lg border border-white/10 bg-indigo-950/50 px-3 py-2.5">
-                  <dt className="text-xs uppercase tracking-wide text-violet-300">
+                <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
                     {tr(locale, "Created", "Created")}
                   </dt>
-                  <dd className="mt-1 text-violet-100">{formatDate(userData.user.created_at, locale)}</dd>
+                  <dd className="mt-1 text-foreground">{formatDate(userData.user.created_at, locale)}</dd>
                 </div>
 
-                <div className="rounded-lg border border-white/10 bg-indigo-950/50 px-3 py-2.5">
-                  <dt className="text-xs uppercase tracking-wide text-violet-300">
+                <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
                     {tr(locale, "Last sign in", "Last sign in")}
                   </dt>
-                  <dd className="mt-1 text-violet-100">{formatDate(userData.user.last_sign_in_at ?? null, locale)}</dd>
+                  <dd className="mt-1 text-foreground">{formatDate(userData.user.last_sign_in_at ?? null, locale)}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -297,25 +297,25 @@ export default async function AccountPage() {
 
           <AccountProfileForms locale={locale} initialProfile={initialProfile}/>
 
-          <Card className="border-white/10 bg-indigo-900/72">
+          <Card className="border-border bg-card/90">
             <CardHeader className="space-y-2">
-              <CardTitle className="flex items-center gap-2 text-xl text-violet-50">
-                <ShieldCheck className="size-5 text-blue-300"/>
+              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+                <ShieldCheck className="size-5 text-primary"/>
                 {tr(locale, "Security activity", "Security activity")}
               </CardTitle>
-              <p className="text-sm text-violet-200">
+              <p className="text-sm text-muted-foreground">
                 {tr(locale, "Recent login/security events for your account.", "Recent login/security events for your account.")}
               </p>
             </CardHeader>
             <CardContent className="space-y-2">
-              {authEvents.length === 0 ? (<div className="rounded-lg border border-dashed border-white/15 bg-indigo-950/45 px-4 py-3 text-sm text-violet-200">
+              {authEvents.length === 0 ? (<div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
                   {tr(locale, "No security events yet.", "No security events yet.")}
-                </div>) : (authEvents.map((event) => (<div key={event.id} className="rounded-lg border border-white/10 bg-indigo-950/60 px-3 py-2.5">
+                </div>) : (authEvents.map((event) => (<div key={event.id} className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge className={getSecurityEventBadgeClass(event.event_type)}>{getSecurityEventLabel(locale, event.event_type)}</Badge>
-                      <span className="text-xs text-violet-300">{formatDate(event.created_at, locale)}</span>
+                      <span className="text-xs text-muted-foreground">{formatDate(event.created_at, locale)}</span>
                     </div>
-                    {event.ip_address ? (<p className="mt-1 text-xs text-violet-300">
+                    {event.ip_address ? (<p className="mt-1 text-xs text-muted-foreground">
                         IP: {event.ip_address}
                       </p>) : null}
                   </div>)))}
@@ -323,13 +323,13 @@ export default async function AccountPage() {
           </Card>
         </div>
 
-        <Card className="border-white/10 bg-indigo-900/72">
+        <Card className="border-border bg-card/90">
           <CardHeader className="space-y-2">
-            <CardTitle className="flex items-center gap-2 text-xl text-violet-50">
-              <FolderGit2 className="size-5 text-blue-300"/>
+            <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+              <FolderGit2 className="size-5 text-primary"/>
               {tr(locale, "My submissions", "My submissions")}
             </CardTitle>
-            <p className="text-sm text-violet-200">
+            <p className="text-sm text-muted-foreground">
               {tr(locale, "Track your MCP servers and moderation status.", "Track your MCP servers and moderation status.")}
             </p>
           </CardHeader>
@@ -339,7 +339,7 @@ export default async function AccountPage() {
                 {tr(locale, "Could not load your submissions right now.", "Could not load your submissions right now.")}
               </div>) : null}
 
-            {!submissionError && submissions.length === 0 ? (<div className="rounded-lg border border-dashed border-white/15 bg-indigo-950/45 px-4 py-3 text-sm text-violet-200">
+            {!submissionError && submissions.length === 0 ? (<div className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
                 {tr(locale, "No submissions yet. Use “Submit Your Server” to send your first MCP server for moderation.", "No submissions yet. Use “Submit Your Server” to send your first MCP server for moderation.")}
               </div>) : null}
 
@@ -347,27 +347,27 @@ export default async function AccountPage() {
             const hasPublicPage = Boolean(submission.slug) &&
                 submission.status !== "pending" &&
                 submission.status !== "rejected";
-            return (<article key={submission.id} className="rounded-lg border border-white/10 bg-indigo-950/60 p-4">
+            return (<article key={submission.id} className="rounded-lg border border-border bg-muted/30 p-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold text-violet-50">
+                    <h3 className="text-sm font-semibold text-foreground">
                       {submission.name ?? tr(locale, "Untitled server", "Untitled server")}
                     </h3>
                     <Badge className={getStatusClass(submission.status)}>
                       <FileCheck2 className="size-3"/>
                       {getStatusLabel(locale, submission.status)}
                     </Badge>
-                    <Badge variant="secondary" className="bg-white/8 text-violet-200">
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
                       {getAuthLabel(locale, submission.auth_type)}
                     </Badge>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-violet-300">
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                     <span>{submission.category ?? tr(locale, "Other", "Other")}</span>
-                    <span className="text-violet-400">вЂў</span>
-                    {hasPublicPage && submission.slug ? (<Link href={`/server/${submission.slug}`} className="font-medium text-blue-300 transition hover:text-blue-200">
+                    <span className="text-muted-foreground">-</span>
+                    {hasPublicPage && submission.slug ? (<Link href={`/server/${submission.slug}`} className="font-medium text-primary transition hover:text-primary/80">
                         /server/{submission.slug}
                       </Link>) : (<span>{submission.slug ?? "-"}</span>)}
-                    <span className="text-violet-400">вЂў</span>
+                    <span className="text-muted-foreground">-</span>
                     <span className="inline-flex items-center gap-1">
                       <CalendarDays className="size-3.5"/>
                       {formatDate(submission.created_at, locale)}

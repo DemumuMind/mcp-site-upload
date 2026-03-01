@@ -6,7 +6,7 @@ type BlogArticleBodyProps = {
 };
 export function BlogArticleBody({ post, locale }: BlogArticleBodyProps) {
     const localized = post.locale[locale];
-    return (<article className="space-y-8 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
+    return (<article className="space-y-8 rounded-3xl border border-border bg-card p-6 sm:p-8">
       <header className="space-y-3">
         <h1 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">
           {localized.title}

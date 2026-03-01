@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, Blocks, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
   };
 
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.05fr]">
         <div className="space-y-6">
           <h3 className="text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">{content.heading}</h3>
@@ -29,7 +29,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
 
           <div className="grid gap-3 text-sm sm:grid-cols-1">
             {content.points.map((point) => (
-              <div key={point.title} className="rounded-xl border border-blacksmith bg-card p-3">
+              <div key={point.title} className="rounded-xl border border-border bg-card p-3">
                 {renderIcon(point.icon)}
                 <p className="font-medium text-foreground">{point.title}</p>
                 <p className="text-xs text-muted-foreground">{point.description}</p>
@@ -38,7 +38,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-blacksmith bg-card p-3">
+            <div className="rounded-xl border border-border bg-card p-3">
               <p className="mb-2 text-xs tracking-[0.16em] text-muted-foreground uppercase">{content.categoriesLabel}</p>
               <div className="flex flex-wrap gap-2">
                 {topCategories.map((entry) => (
@@ -48,7 +48,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
                 ))}
               </div>
             </div>
-            <div className="rounded-xl border border-blacksmith bg-card p-3">
+            <div className="rounded-xl border border-border bg-card p-3">
               <p className="mb-2 text-xs tracking-[0.16em] text-muted-foreground uppercase">{content.languagesLabel}</p>
               <div className="flex flex-wrap gap-2">
                 {topLanguages.map((entry) => (
@@ -77,7 +77,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
               <p className="text-sm text-muted-foreground">{content.featuredEmptyLabel}</p>
             ) : (
               featuredServers.map((server) => (
-                <div key={server.id} className="rounded-lg border border-blacksmith bg-background p-3">
+                <div key={server.id} className="rounded-lg border border-border bg-background p-3">
                   <div className="mb-1 flex items-center justify-between gap-3">
                     <p className="font-medium text-foreground">{server.name}</p>
                     <Badge variant="secondary" className="text-[10px]">{server.category}</Badge>

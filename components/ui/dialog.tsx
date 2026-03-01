@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -48,7 +48,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-          "gap-4 border border-blacksmith bg-card/90 p-6 shadow-2xl backdrop-blur-xl duration-200 rounded-2xl",
+          "gap-4 border border-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl duration-200 rounded-2xl",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

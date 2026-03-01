@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight, Command } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -98,7 +98,7 @@ export function HeroSectionV3({ content, workflows, metrics }: HeroSectionV3Prop
                   <Link
                     key={item.title}
                     href={item.href}
-                    className="group flex items-center justify-between rounded-md border border-blacksmith px-3 py-2 text-sm transition hover:bg-muted/50"
+                    className="group flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm transition hover:bg-muted/50"
                   >
                     <span>{item.cta}</span>
                     <ArrowRight className="size-4 text-muted-foreground transition group-hover:text-foreground" />
@@ -112,7 +112,7 @@ export function HeroSectionV3({ content, workflows, metrics }: HeroSectionV3Prop
         <ul className="grid gap-2 sm:grid-cols-3" aria-label="Catalog signal strip">
           {metrics.map((metric, idx) => (
             <BlurFade key={metric.id} delay={0.7 + idx * 0.1}>
-              <li className="relative overflow-hidden rounded-md border border-blacksmith bg-card px-4 py-3">
+              <li className="relative overflow-hidden rounded-md border border-border bg-card px-4 py-3">
                 <BorderBeam size={100} duration={8} />
                 <p className="text-[11px] tracking-[0.18em] text-muted-foreground uppercase">{metric.label}</p>
                 <div className="mt-1 flex items-baseline gap-1">

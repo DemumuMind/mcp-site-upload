@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { History, Sparkles, Wand2, X } from "lucide-react";
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
@@ -107,7 +107,7 @@ function TagField({
           onChange={(event) => onDraftChange(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="h-9 min-w-[12rem] flex-1 border-slate-500/40 bg-slate-900/70"
+          className="h-9 min-w-[12rem] flex-1 border-border bg-muted/50"
         />
         <Button type="button" size="sm" variant="outline" onClick={commitDraft}>
           Add
@@ -115,19 +115,19 @@ function TagField({
       </div>
       <div className="flex flex-wrap gap-2">
         {tags.length === 0 ? (
-          <p className="text-xs text-slate-400">No tags yet.</p>
+          <p className="text-xs text-muted-foreground">No tags yet.</p>
         ) : (
           tags.map((tag) => (
             <Badge
               key={tag}
               variant="outline"
-              className="flex items-center gap-1 border-slate-500/40 bg-slate-900/70 text-slate-200"
+              className="flex items-center gap-1 border-border bg-muted/50 text-foreground"
             >
               {tag}
               <button
                 type="button"
                 onClick={() => onRemoveTag(tag)}
-                className="rounded p-0.5 text-slate-300 transition hover:bg-slate-700 hover:text-slate-50"
+                className="rounded p-0.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 aria-label={`Remove ${tag}`}
               >
                 <X className="size-3" />
@@ -300,15 +300,15 @@ export function RulesGeneratorPanel() {
   }
 
   return (
-    <Card className="gap-4 border-slate-500/30 bg-slate-950/70 shadow-[0_14px_34px_rgba(4,8,20,0.45)] backdrop-blur-md">
+    <Card className="gap-4 border-border bg-card shadow-[0_14px_34px_rgba(4,8,20,0.45)] backdrop-blur-md">
       <CardHeader className="space-y-3 pb-0">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-xl text-slate-50">Rules Generator</CardTitle>
-          <Badge variant="outline" className="border-blue-400/40 bg-blue-500/10 text-blue-200">
+          <CardTitle className="text-xl text-foreground">Rules Generator</CardTitle>
+          <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
             advanced
           </Badge>
         </div>
-        <CardDescription className="text-slate-300">
+        <CardDescription className="text-muted-foreground">
           Build AGENTS.md, .cursorrules, and Copilot instructions from structured project input.
         </CardDescription>
       </CardHeader>
@@ -321,7 +321,7 @@ export function RulesGeneratorPanel() {
             value={projectName}
             onChange={(event) => setProjectName(event.target.value)}
             placeholder="DemumuMind MCP"
-            className="border-slate-500/40 bg-slate-900/70"
+            className="border-border bg-muted/50"
           />
         </div>
 
@@ -333,7 +333,7 @@ export function RulesGeneratorPanel() {
             onChange={(event) => setProjectDescription(event.target.value)}
             rows={5}
             placeholder="Describe architecture, quality gates, and delivery constraints..."
-            className="border-slate-500/40 bg-slate-900/70 text-slate-100 placeholder:text-slate-400"
+            className="border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
           />
         </div>
 
@@ -362,7 +362,7 @@ export function RulesGeneratorPanel() {
           <div className="space-y-2">
             <Label htmlFor="rules-tone">Delivery tone</Label>
             <Select value={tone} onValueChange={(value) => setTone(value as RulesTone)}>
-              <SelectTrigger id="rules-tone" className="w-full border-slate-500/40 bg-slate-900/70">
+              <SelectTrigger id="rules-tone" className="w-full border-border bg-muted/50">
                 <SelectValue placeholder="Choose tone" />
               </SelectTrigger>
               <SelectContent>
@@ -405,19 +405,19 @@ export function RulesGeneratorPanel() {
               onChange={(event) => setExistingRulesText(event.target.value)}
               rows={4}
               placeholder="Paste current AGENTS.md or policy snippets..."
-              className="border-slate-500/40 bg-slate-900/70 text-slate-100 placeholder:text-slate-400"
+              className="border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
             />
           </div>
         ) : null}
 
-        <div className="space-y-2 rounded-xl border border-slate-500/30 bg-slate-950/60 p-3">
-          <p className="text-sm font-semibold text-slate-100">Auto-detected skill signals</p>
+        <div className="space-y-2 rounded-xl border border-border bg-card p-3">
+          <p className="text-sm font-semibold text-foreground">Auto-detected skill signals</p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <Badge
                 key={suggestion.id}
                 variant="outline"
-                className="border-slate-500/40 bg-slate-900/70 text-slate-200"
+                className="border-border bg-muted/50 text-foreground"
                 title={suggestion.reason}
               >
                 {suggestion.title}
@@ -457,17 +457,17 @@ export function RulesGeneratorPanel() {
 
         {generationResult ? <ExportTabs artifacts={generationResult.artifacts} /> : null}
 
-        <div className="space-y-3 rounded-xl border border-slate-500/30 bg-slate-950/60 p-3">
+        <div className="space-y-3 rounded-xl border border-border bg-card p-3">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-slate-100">Generation History</p>
-            <Badge variant="outline" className="border-slate-500/40 bg-slate-900/70 text-slate-200">
+            <p className="text-sm font-semibold text-foreground">Generation History</p>
+            <Badge variant="outline" className="border-border bg-muted/50 text-foreground">
               {historyItems.length}
             </Badge>
           </div>
 
           <div className="max-h-44 space-y-2 overflow-y-auto pr-1">
             {historyItems.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-slate-600/40 px-3 py-2 text-xs text-slate-400">
+              <p className="rounded-lg border border-dashed border-border/70 px-3 py-2 text-xs text-muted-foreground">
                 No generations yet.
               </p>
             ) : (
@@ -476,15 +476,15 @@ export function RulesGeneratorPanel() {
                   key={item.id}
                   type="button"
                   onClick={() => handleLoadHistory(item)}
-                  className="flex w-full items-start justify-between gap-3 rounded-lg border border-slate-500/20 bg-slate-900/40 p-2 text-left hover:border-slate-400/40"
+                  className="flex w-full items-start justify-between gap-3 rounded-lg border border-border/70 bg-muted/40 p-2 text-left hover:border-border"
                 >
                   <span className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-100">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {item.input.projectName || "Untitled project"}
                     </p>
-                    <p className="line-clamp-1 text-xs text-slate-400">{item.input.description}</p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">{item.input.description}</p>
                   </span>
-                  <span className="shrink-0 text-xs text-slate-400">
+                  <span className="shrink-0 text-xs text-muted-foreground">
                     <History className="mb-1 ml-auto size-3.5" />
                     {formatTimestamp(item.createdAt)}
                   </span>
@@ -494,12 +494,12 @@ export function RulesGeneratorPanel() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-blue-400/30 bg-blue-500/10 px-3 py-2 text-xs text-blue-100">
+        <div className="rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs text-foreground">
           <p className="flex items-center gap-1.5 font-medium">
             <Sparkles className="size-3.5" />
             Expert mode active
           </p>
-          <p className="mt-1 text-blue-100/90">
+          <p className="mt-1 text-foreground/90">
             Presets and generation history are saved locally in your browser only.
           </p>
         </div>

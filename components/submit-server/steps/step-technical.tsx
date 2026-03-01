@@ -10,7 +10,7 @@ function ErrorText({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="mt-1 text-xs text-rose-300">{message}</p>;
+  return <p className="mt-1 text-xs text-destructive">{message}</p>;
 }
 
 type SubmitStepTechnicalProps = {
@@ -29,7 +29,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           autoComplete="url"
           spellCheck={false}
           placeholder="https://mcp.example.com/sse"
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("serverUrl")}
         />
         <ErrorText message={form.formState.errors.serverUrl?.message} />
@@ -42,7 +42,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           name="authType"
           render={({ field }) => (
             <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger id="authType" className="border-blacksmith bg-card">
+              <SelectTrigger id="authType" className="border-border bg-background">
                 <SelectValue placeholder={tr(locale, "Select auth type", "Select auth type")} />
               </SelectTrigger>
               <SelectContent>
@@ -64,7 +64,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           autoComplete="url"
           spellCheck={false}
           placeholder="https://github.com/org/repo"
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("repoUrl")}
         />
         <ErrorText message={form.formState.errors.repoUrl?.message} />
@@ -76,7 +76,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           id="maintainerName"
           autoComplete="name"
           placeholder={tr(locale, "Jane Doe", "Jane Doe")}
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("maintainerName")}
         />
         <ErrorText message={form.formState.errors.maintainerName?.message} />
@@ -89,7 +89,7 @@ export function SubmitStepTechnical({ form, locale }: SubmitStepTechnicalProps) 
           type="email"
           autoComplete="email"
           placeholder="maintainer@example.com"
-          className="border-blacksmith bg-card"
+          className="border-border bg-background"
           {...form.register("maintainerEmail")}
         />
         <ErrorText message={form.formState.errors.maintainerEmail?.message} />

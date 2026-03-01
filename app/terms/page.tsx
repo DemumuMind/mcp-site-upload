@@ -71,7 +71,7 @@ export default async function TermsPage() {
           </PageSection>
 
           {termsV2Sections.map((section) => (
-            <Card key={section.id} id={section.id} className="scroll-mt-24 border-blacksmith bg-card">
+            <Card key={section.id} id={section.id} className="scroll-mt-24 border-border bg-card">
               <CardHeader className="space-y-2 pb-2">
                 <CardTitle className="text-xl text-foreground">{section.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">{section.summary}</p>
@@ -91,18 +91,18 @@ export default async function TermsPage() {
             </Card>
           ))}
 
-          <PageActionZone className="space-y-3 border-amber-300/30 bg-amber-500/10">
-            <h3 className="text-lg text-amber-100">{tr(locale, "Important legal notice", "Important legal notice")}</h3>
-            <p className="text-sm leading-7 text-amber-50/95">
+          <PageActionZone className="space-y-3 border-border bg-card">
+            <h3 className="text-lg text-foreground">{tr(locale, "Important legal notice", "Important legal notice")}</h3>
+            <p className="text-sm leading-7 text-muted-foreground">
               {tr(
                 locale,
                 "This document is a platform baseline and does not constitute legal advice. You should consult qualified counsel before relying on these Terms for production legal use.",
                 "This document is a platform baseline and does not constitute legal advice. You should consult qualified counsel before relying on these Terms for production legal use.",
               )}
             </p>
-            <p className="text-sm text-amber-50/95">
+            <p className="text-sm text-muted-foreground">
               {tr(locale, "Contact", "Contact")}: {" "}
-              <Link href={`mailto:${legalEmail}`} className="inline-flex items-center gap-1 text-amber-100 underline underline-offset-2 transition hover:text-foreground">
+              <Link href={`mailto:${legalEmail}`} className="inline-flex items-center gap-1 text-primary underline underline-offset-2 transition hover:text-foreground">
                 {legalEmail}
                 <ArrowUpRight className="size-3" />
               </Link>
@@ -113,4 +113,5 @@ export default async function TermsPage() {
     </PageFrame>
   );
 }
+
 

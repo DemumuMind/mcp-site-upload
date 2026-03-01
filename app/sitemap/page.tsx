@@ -98,7 +98,7 @@ export default async function SitemapPage() {
 
         <PageSection surface="mesh" className="grid gap-4 lg:grid-cols-2">
           {sitemapGroups.map((group) => (
-            <Card key={group.title} className="border-blacksmith bg-card">
+            <Card key={group.title} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl text-foreground">{group.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">{group.description}</p>
@@ -108,7 +108,7 @@ export default async function SitemapPage() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block rounded-xl border border-blacksmith bg-card px-4 py-3 transition hover:border-primary/35 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                    className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:border-primary/35 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                   >
                     <span className="flex items-center justify-between gap-2 text-sm font-medium text-foreground">
                       {item.label}
@@ -125,3 +125,4 @@ export default async function SitemapPage() {
     </PageFrame>
   );
 }
+

@@ -36,8 +36,8 @@ const accessLabelByAuthType: Record<AuthType, string> = {
 
 const accentClassByLevel: Record<VerificationLevel, string> = {
   official: "from-orange-500/18 via-rose-500/12 to-amber-500/18",
-  partner: "from-sky-500/18 via-blue-500/12 to-indigo-500/18",
-  community: "from-emerald-500/16 via-cyan-500/12 to-blue-500/18",
+  partner: "from-primary/20 via-primary/10 to-accent/20",
+  community: "from-accent/20 via-accent/10 to-primary/20",
 };
 
 function getRatingValue(mcpServer: McpServer, score?: number): number {
@@ -57,13 +57,13 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
     <Card
       data-anime-hover="card"
       className={cn(
-        "group flex h-full flex-col overflow-hidden border-blacksmith bg-card shadow-[0_16px_40px_-28px_rgba(15,23,42,0.95)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.005] hover:border-blue-400/45 hover:shadow-[0_24px_45px_-30px_rgba(59,130,246,0.45)]",
+        "group flex h-full flex-col overflow-hidden border-border bg-card shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.3)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.005] hover:border-primary/45 hover:shadow-[0_24px_45px_-30px_hsl(var(--primary)/0.4)]",
         viewMode === "list" && "md:grid md:grid-cols-[220px_1fr]",
       )}
     >
       <div
         className={cn(
-          "relative overflow-hidden border-b border-blacksmith bg-gradient-to-br p-3",
+          "relative overflow-hidden border-b border-border bg-gradient-to-br p-3",
           accentClassByLevel[mcpServer.verificationLevel],
           viewMode === "grid" ? "h-36" : "h-32 md:h-full md:border-r md:border-b-0",
         )}
@@ -71,7 +71,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
         <div className="absolute -right-8 -bottom-10 size-32 rounded-full bg-card blur-[1px]" />
         <div className="relative flex h-full flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
-            <Badge className="border border-blacksmith bg-card text-[11px] font-medium text-foreground shadow-none">
+            <Badge className="border border-border bg-card text-[11px] font-medium text-foreground shadow-none">
               {tr(locale, verificationLabel, verificationLabel)}
             </Badge>
 
@@ -79,8 +79,8 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
               type="button"
               aria-label={tr(locale, "Save card", "Save card")}
               className={cn(
-                "inline-flex size-7 items-center justify-center rounded-md border border-blacksmith bg-card text-muted-foreground transition hover:text-rose-400",
-                saved && "text-rose-400",
+                "inline-flex size-7 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:text-destructive",
+                saved && "text-destructive",
               )}
               onClick={() => setSaved((isSaved) => !isSaved)}
             >
@@ -127,7 +127,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
               {tr(locale, "Trust", "Trust")} {typeof trustScore === "number" ? trustScore.toFixed(1) : "--"}
             </span>
 
-            <Badge variant="secondary" className="border border-blue-400/30 bg-blue-500/15 text-[11px] font-semibold text-blue-200">
+            <Badge variant="secondary" className="border border-primary/30 bg-primary/15 text-[11px] font-semibold text-primary">
               {tr(locale, accessLabel, accessLabel)}
             </Badge>
           </div>
@@ -142,20 +142,20 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
 
           <div className="flex flex-wrap gap-1.5">
             {mcpServer.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="rounded-full border border-blacksmith bg-card px-2 py-0.5 text-xs text-muted-foreground">
+              <span key={tag} className="rounded-full border border-border bg-card px-2 py-0.5 text-xs text-muted-foreground">
                 {tag}
               </span>
             ))}
             {mcpServer.tags.length > 2 ? (
-              <span className="rounded-full border border-blacksmith bg-card px-2 py-0.5 text-xs text-muted-foreground">
+              <span className="rounded-full border border-border bg-card px-2 py-0.5 text-xs text-muted-foreground">
                 +{mcpServer.tags.length - 2}
               </span>
             ) : null}
           </div>
         </CardContent>
 
-        <CardFooter className="mt-auto border-t border-blacksmith bg-card p-3">
-          <Button asChild variant="outline" className="w-full border-blacksmith bg-card text-foreground hover:bg-accent">
+        <CardFooter className="mt-auto border-t border-border bg-card p-3">
+          <Button asChild variant="outline" className="w-full border-border bg-card text-foreground hover:bg-accent">
             <Link href={`/server/${mcpServer.slug}`}>{tr(locale, "View details", "View details")}</Link>
           </Button>
         </CardFooter>

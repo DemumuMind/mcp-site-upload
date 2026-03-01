@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Loader2, Wifi } from "lucide-react";
@@ -20,7 +20,7 @@ export function ConnectionTestButton({ slug }: { slug: string }) {
       <Button
         type="button"
         variant="outline"
-        className="border-white/15 bg-card/40 text-violet-100"
+        className="border-white/15 bg-card/40 text-foreground"
         onClick={async () => {
           setLoading(true);
           try {

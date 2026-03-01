@@ -20,12 +20,12 @@ function TaxonomyList({ title, items, }: {
     title: string;
     items: readonly TaxonomyEntry[];
 }) {
-    return (<div className="rounded-2xl border border-blacksmith bg-card p-4 shadow-[0_0_0_1px_rgba(148,163,184,0.06)] backdrop-blur">
+    return (<div className="rounded-2xl border border-border bg-card p-4 shadow-[0_0_0_1px_hsl(var(--border)/0.45)] backdrop-blur">
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (<li key={item.label} className="flex items-center justify-between gap-3 rounded-lg border border-blacksmith bg-card px-3 py-1.5 text-xs text-muted-foreground">
+        {items.map((item) => (<li key={item.label} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
             <span>{item.label}</span>
-            {typeof item.count === "number" ? (<span className="rounded-full border border-blacksmith bg-card px-2 py-0.5 text-[11px] text-muted-foreground">
+            {typeof item.count === "number" ? (<span className="rounded-full border border-border bg-card px-2 py-0.5 text-[11px] text-muted-foreground">
                 {item.count}
               </span>) : null}
           </li>))}
@@ -124,12 +124,12 @@ function FilterOptionsSection<TValue extends string>({ title, options, selectedV
     className?: string;
     renderLabelPrefix?: (option: FilterOption<TValue>) => ReactNode;
 }) {
-    return (<div className={cn("border-t border-blacksmith px-4 py-4", className)}>
+    return (<div className={cn("border-t border-border px-4 py-4", className)}>
       <h3 className="mb-2 text-sm font-semibold text-foreground">{title}</h3>
       <div className="space-y-1">
-        {options.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-card">
+        {options.map((option) => (<label key={option.value} className="flex cursor-pointer items-center justify-between rounded-md px-1.5 py-1.5 transition hover:bg-muted/50">
             <span className="inline-flex items-center gap-2">
-              <input type="checkbox" className="size-4 rounded border-blacksmith bg-card text-primary focus:ring-primary" checked={selectedValues.includes(option.value)} onChange={() => onToggle(option.value)}/>
+              <input type="checkbox" className="size-4 rounded border-border bg-background text-primary focus:ring-primary" checked={selectedValues.includes(option.value)} onChange={() => onToggle(option.value)}/>
               {renderLabelPrefix ? renderLabelPrefix(option) : null}
               <span className="text-sm text-muted-foreground">{option.label}</span>
             </span>
@@ -163,7 +163,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
             label: tag,
             count,
         }));
-        return (<aside id={props.panelId} className={cn("h-fit overflow-hidden rounded-2xl border border-blacksmith bg-card shadow-[0_18px_38px_-26px_rgba(15,23,42,0.95)] backdrop-blur lg:sticky lg:top-24", props.className)}>
+        return (<aside id={props.panelId} className={cn("h-fit overflow-hidden rounded-2xl border border-border bg-card shadow-[0_18px_38px_-26px_hsl(var(--foreground)/0.35)] backdrop-blur lg:sticky lg:top-24", props.className)}>
         <div className="flex items-center justify-between gap-3 px-4 py-4">
           <h2 className="text-lg font-semibold text-foreground">{tr(localeFromContext, "Filters", "Filters")}</h2>
 
@@ -172,7 +172,7 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
               {tr(localeFromContext, "Clear all", "Clear all")}
             </button>
 
-            {props.onRequestClose ? (<button type="button" className="inline-flex size-7 items-center justify-center rounded-md border border-blacksmith text-muted-foreground transition hover:bg-accent hover:text-foreground" onClick={props.onRequestClose} aria-label={tr(localeFromContext, "Close filters", "Close filters")}>
+            {props.onRequestClose ? (<button type="button" className="inline-flex size-7 items-center justify-center rounded-md border border-border text-muted-foreground transition hover:bg-accent hover:text-foreground" onClick={props.onRequestClose} aria-label={tr(localeFromContext, "Close filters", "Close filters")}>
                 <X className="size-4"/>
               </button>) : null}
           </div>
@@ -186,26 +186,26 @@ export function CatalogTaxonomyPanel(props: CatalogTaxonomyPanelProps) {
 
         <FilterOptionsSection title={tr(localeFromContext, "Health status", "Health status")} options={props.healthOptions} selectedValues={props.selectedHealthStatuses} onToggle={props.onToggleHealthStatus}/>
 
-        <div className="border-t border-blacksmith px-4 py-4">
+        <div className="border-t border-border px-4 py-4">
           <h3 className="mb-2 text-sm font-semibold text-foreground">
             {tr(localeFromContext, "Tool count range", "Tool count range")}
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">{tr(localeFromContext, "Min", "Min")}</p>
-              <Input type="number" min={0} inputMode="numeric" value={props.toolsMin ?? ""} onChange={(event) => props.onToolsMinChange(parseToolsBound(event.target.value))} className="h-9 border-blacksmith bg-card text-foreground placeholder:text-muted-foreground"/>
+              <Input type="number" min={0} inputMode="numeric" value={props.toolsMin ?? ""} onChange={(event) => props.onToolsMinChange(parseToolsBound(event.target.value))} className="h-9 border-border bg-card text-foreground placeholder:text-muted-foreground"/>
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">{tr(localeFromContext, "Max", "Max")}</p>
-              <Input type="number" min={0} inputMode="numeric" value={props.toolsMax ?? ""} onChange={(event) => props.onToolsMaxChange(parseToolsBound(event.target.value))} className="h-9 border-blacksmith bg-card text-foreground placeholder:text-muted-foreground"/>
+              <Input type="number" min={0} inputMode="numeric" value={props.toolsMax ?? ""} onChange={(event) => props.onToolsMaxChange(parseToolsBound(event.target.value))} className="h-9 border-border bg-card text-foreground placeholder:text-muted-foreground"/>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-blacksmith px-4 py-4">
+        <div className="border-t border-border px-4 py-4">
           <FilterOptionsSection title={tr(localeFromContext, "Tags", "Tags")} options={tagOptions} selectedValues={props.selectedTags} onToggle={props.onToggleTag} className="border-t-0 p-0 [&>div]:max-h-56 [&>div]:overflow-y-auto [&>div]:pr-1" renderLabelPrefix={(option) => (<span className={cn("inline-block size-2 rounded-full", getTagDotClass(option.value))}/>)} />
 
-          {hasAdditionalTags ? (<button type="button" className="mt-3 text-xs font-medium text-blue-300 transition hover:text-blue-200" onClick={() => setShowAllTags((current) => !current)}>
+          {hasAdditionalTags ? (<button type="button" className="mt-3 text-xs font-medium text-primary transition hover:text-primary/80" onClick={() => setShowAllTags((current) => !current)}>
               {showAllTags
                     ? tr(localeFromContext, "Show fewer tags", "Show fewer tags")
                     : tr(localeFromContext, "Show more tags", "Show more tags")}

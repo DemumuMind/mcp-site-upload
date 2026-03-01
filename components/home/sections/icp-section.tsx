@@ -1,4 +1,4 @@
-import { Blocks, Command, ShieldCheck } from "lucide-react";
+﻿import { Blocks, Command, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
@@ -15,7 +15,7 @@ export function IcpSection({ content }: IcpSectionProps) {
   };
 
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell flex flex-col gap-8 py-14">
         <div className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>
@@ -27,7 +27,7 @@ export function IcpSection({ content }: IcpSectionProps) {
             <Card key={card.title}>
               <CardHeader className="space-y-3 pb-3">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
+                  <div className="rounded-lg border border-border bg-muted p-2.5">
                     {renderIcon(card.icon)}
                   </div>
                   <Badge>ICP</Badge>

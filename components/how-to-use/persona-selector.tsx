@@ -24,8 +24,8 @@ export function PersonaSelector({ title, description, scenarios, selectedPersona
       <div className="grid gap-4 lg:grid-cols-2">
         {scenarios.map((scenario) => {
             const isSelected = scenario.id === selectedPersona;
-            return (<Card key={scenario.id} className={cn("border-blacksmith bg-card transition duration-300", isSelected
-                    ? "border-primary/45 shadow-[0_0_0_1px_rgba(34,211,238,0.22)]"
+            return (<Card key={scenario.id} className={cn("border-border bg-card transition duration-300", isSelected
+                    ? "border-primary/45 shadow-[0_0_0_1px_hsl(var(--primary)/0.25)]"
                     : "hover:-translate-y-1 hover:border-primary/35")}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-3">
@@ -42,8 +42,8 @@ export function PersonaSelector({ title, description, scenarios, selectedPersona
               <CardContent className="space-y-4">
                 <p className="text-sm leading-7 text-muted-foreground">{scenario.description}</p>
                 <Button type="button" variant={isSelected ? "default" : "outline"} className={cn("h-10 rounded-xl", isSelected
-                    ? "bg-emerald-500 text-foreground hover:bg-emerald-400"
-                    : "border-blacksmith bg-card text-foreground hover:bg-accent")} onClick={() => onSelect(scenario.id)}>
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-border bg-card text-foreground hover:bg-accent")} onClick={() => onSelect(scenario.id)}>
                   {isSelected ? selectedLabel : chooseLabel}
                 </Button>
               </CardContent>

@@ -11,7 +11,7 @@ type SubmitStepReviewProps = {
 export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStepReviewProps) {
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blacksmith bg-card p-4">
+      <div className="rounded-2xl border border-border bg-muted/20 p-4">
         <p className="text-sm text-muted-foreground">
           {isAuthenticated
             ? tr(
@@ -41,7 +41,7 @@ export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStep
         />
       </div>
 
-      <div className="rounded-2xl border border-blacksmith bg-card p-4">
+      <div className="rounded-2xl border border-border bg-muted/20 p-4">
         <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">
           {tr(locale, "Description", "Description")}
         </p>
@@ -53,7 +53,7 @@ export function SubmitStepReview({ locale, values, isAuthenticated }: SubmitStep
 
 function SummaryItem({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
-    <div className={["rounded-xl border border-blacksmith bg-card p-3", className].filter(Boolean).join(" ")}>
+    <div className={["rounded-xl border border-border bg-background p-3", className].filter(Boolean).join(" ")}>
       <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">{label}</p>
       <div className="mt-2 flex items-center gap-2">
         <Badge className="border-primary/30 bg-primary/10 text-primary">{value}</Badge>

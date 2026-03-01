@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { ArticleCardBase } from "@/components/blog/shared/article-card-base";
 import { formatBlogDate } from "@/lib/blog/date-format";
 import { tr, type Locale } from "@/lib/i18n";
@@ -37,7 +37,7 @@ export async function BlogPostCard({ post, locale }: BlogPostCardProps) {
         </div>
       }
       classes={{
-        card: "border-blacksmith bg-card",
+        card: "border-border bg-card",
         header: "space-y-3 pb-2",
         title: "text-lg text-foreground",
         content: "space-y-4 text-sm text-muted-foreground",

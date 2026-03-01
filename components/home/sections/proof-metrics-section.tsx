@@ -1,4 +1,4 @@
-import { CountUpValue } from "@/components/home/count-up-value";
+﻿import { CountUpValue } from "@/components/home/count-up-value";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 import type { HomeMetric } from "@/lib/home/types";
@@ -23,7 +23,7 @@ function getMetricLabel(metric: HomeMetric, content: HomeContent["metrics"]): st
 
 export function ProofMetricsSection({ content, metrics }: ProofMetricsSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell flex flex-col gap-8 py-14">
         <div className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>

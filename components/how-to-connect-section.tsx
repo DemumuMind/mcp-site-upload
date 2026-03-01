@@ -42,7 +42,7 @@ export function HowToConnectSection({ serverName, serverUrl, onConfigCopied, }: 
             toast.error(tr(locale, "Unable to copy config snippet.", "Unable to copy config snippet."));
         }
     }
-    return (<section id="how-to-use" className="space-y-4 rounded-2xl border border-blacksmith bg-card p-6 sm:p-8">
+    return (<section id="how-to-use" className="space-y-4 rounded-2xl border border-border bg-card p-6 sm:p-8">
       <div className="space-y-2">
         <h3 className="text-xl font-semibold text-foreground">
           {tr(locale, "How to connect an MCP server", "How to connect an MCP server")}
@@ -53,7 +53,7 @@ export function HowToConnectSection({ serverName, serverUrl, onConfigCopied, }: 
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-blacksmith bg-card">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base text-foreground">
               <Search className="size-4 text-primary"/>
@@ -65,7 +65,7 @@ export function HowToConnectSection({ serverName, serverUrl, onConfigCopied, }: 
           </CardContent>
         </Card>
 
-        <Card className="border-blacksmith bg-card">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base text-foreground">
               <FileCode2 className="size-4 text-primary"/>
@@ -77,7 +77,7 @@ export function HowToConnectSection({ serverName, serverUrl, onConfigCopied, }: 
           </CardContent>
         </Card>
 
-        <Card className="border-blacksmith bg-card">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base text-foreground">
               <CheckCircle2 className="size-4 text-primary"/>
@@ -90,18 +90,18 @@ export function HowToConnectSection({ serverName, serverUrl, onConfigCopied, }: 
         </Card>
       </div>
 
-      <div className="rounded-xl border border-blacksmith bg-card p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="text-sm text-muted-foreground">
             {tr(locale, "Example config for", "Example config for")} {" "}
             <span className="font-medium text-foreground">{serverName}</span>
           </div>
-          <Button type="button" variant="outline" className="border-blacksmith bg-card hover:bg-accent" onClick={handleCopyConfig}>
+          <Button type="button" variant="outline" className="border-border bg-card hover:bg-accent" onClick={handleCopyConfig}>
             <Copy className="size-4"/>
             {tr(locale, "Copy config", "Copy config")}
           </Button>
         </div>
-        <pre className="overflow-x-auto rounded-lg border border-blacksmith bg-card p-3 text-xs text-foreground">
+        <pre className="overflow-x-auto rounded-lg border border-border bg-card p-3 text-xs text-foreground">
           <code>{configSnippet}</code>
         </pre>
       </div>

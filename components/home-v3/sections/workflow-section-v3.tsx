@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -35,7 +35,7 @@ export function WorkflowSectionV3({ content }: WorkflowSectionV3Props) {
         <ol className="grid gap-4 lg:grid-cols-2" aria-label="Delivery workflow steps">
           {content.cards.map((item, index) => (
             <BlurFade key={item.title} delay={0.4 + index * 0.1} inView>
-              <li className="group relative overflow-hidden rounded-md border border-blacksmith bg-card p-5 transition-all duration-300 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
+              <li className="group relative overflow-hidden rounded-md border border-border bg-card p-5 transition-all duration-300 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
                 <BorderBeam size={80} duration={8} className="opacity-0 group-hover:opacity-100" />
                 <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">Step {index + 1}</p>
                 <h3 className="mt-2 text-xl font-semibold text-foreground">{item.title}</h3>

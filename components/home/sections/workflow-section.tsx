@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Activity, ArrowRight, Search, ShieldCheck, Wrench } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
@@ -17,7 +17,7 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
   };
 
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell flex flex-col gap-8 py-20">
         <div className="space-y-2 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">{content.heading}</h2>
@@ -29,7 +29,7 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
             <Card key={item.title}>
               <CardHeader className="space-y-4 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
+                  <div className="rounded-lg border border-border bg-muted p-2.5">
                     {renderIcon(item.icon, item.accentClass)}
                   </div>
                   <CardTitle className="text-xl text-foreground">{item.title}</CardTitle>

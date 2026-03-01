@@ -1,4 +1,4 @@
-import { CheckCircle2 } from "lucide-react";
+﻿import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 
@@ -8,7 +8,7 @@ type ProductProofSectionProps = {
 
 export function ProductProofSection({ content }: ProductProofSectionProps) {
   return (
-    <section className="border-y border-blacksmith bg-background">
+    <section className="border-y border-border bg-background">
       <div className="section-shell grid gap-8 py-18 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div className="space-y-3">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{content.heading}</h2>

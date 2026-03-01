@@ -9,14 +9,14 @@ type ScenarioStepsProps = {
     onPrimaryCtaClick: (action: HowToUseLocaleAction, persona: HowToUsePersona) => void;
 };
 export function ScenarioSteps({ scenario, onPrimaryCtaClick }: ScenarioStepsProps) {
-    return (<div id="scenario-paths" className="space-y-5 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
+    return (<div id="scenario-paths" className="space-y-5 rounded-3xl border border-border bg-card p-6 sm:p-8">
       <div className="space-y-2">
         <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{scenario.stepsTitle}</h3>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-3">
-          {scenario.steps.map((step, index) => (<Card key={step.title} className="border-blacksmith bg-card">
+          {scenario.steps.map((step, index) => (<Card key={step.title} className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg text-foreground">
                   <span className="inline-flex size-7 items-center justify-center rounded-full border border-primary/35 bg-primary/10 text-xs font-semibold text-primary">
@@ -29,7 +29,7 @@ export function ScenarioSteps({ scenario, onPrimaryCtaClick }: ScenarioStepsProp
             </Card>))}
         </div>
 
-        <Card className="border-blacksmith bg-card">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg text-foreground">{scenario.checklistTitle}</CardTitle>
           </CardHeader>
@@ -40,7 +40,7 @@ export function ScenarioSteps({ scenario, onPrimaryCtaClick }: ScenarioStepsProp
                   <span>{item}</span>
                 </li>))}
             </ul>
-            <Button asChild className="h-11 w-full rounded-xl bg-blue-500 text-foreground hover:bg-blue-400">
+            <Button asChild className="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href={scenario.primaryCta.href} onClick={() => onPrimaryCtaClick(scenario.primaryCta, scenario.id)}>
                 {scenario.primaryCta.label}
                 <ArrowRight className="size-4"/>

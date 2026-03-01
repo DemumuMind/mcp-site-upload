@@ -21,7 +21,7 @@ export default async function ToolsPage() {
   return (
     <PageFrame variant="content">
       <PageShell className="max-w-7xl px-4 sm:px-6 lg:px-8">
-        <section className="space-y-3 rounded-3xl border border-blacksmith bg-card p-6 sm:p-8">
+        <section className="space-y-3 rounded-3xl border border-border bg-card p-6 sm:p-8">
           {sectionCopy?.eyebrow ? (
             <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{sectionCopy.eyebrow}</p>
           ) : null}
@@ -39,3 +39,4 @@ export default async function ToolsPage() {
     </PageFrame>
   );
 }
+

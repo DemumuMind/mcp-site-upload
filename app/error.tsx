@@ -27,10 +27,10 @@ export default function Error({ error, reset }: ErrorProps) {
         {tr(locale, "Please try again. If the issue persists, return to the home page.", "Please try again. If the issue persists, return to the home page.")}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <Button onClick={reset} className="bg-blue-500 hover:bg-blue-400">
+        <Button onClick={reset} className="bg-primary hover:bg-primary/90">
           {tr(locale, "Try again", "Try again")}
         </Button>
-        <Button asChild variant="outline" className="border-blacksmith bg-transparent">
+        <Button asChild variant="outline" className="border-border bg-transparent">
           <Link href="/">{tr(locale, "Back to home", "Back to home")}</Link>
         </Button>
       </div>

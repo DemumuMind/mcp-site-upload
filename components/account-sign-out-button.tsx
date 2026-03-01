@@ -24,7 +24,7 @@ export function AccountSignOutButton({ locale }: AccountSignOutButtonProps) {
     }
     return (<Button type="button" variant="outline" onClick={() => {
             void signOut();
-        }} className="border-white/15 bg-white/[0.02] hover:bg-white/[0.06]">
+        }} className="border-border/60 bg-background hover:bg-accent">
       <LogOut className="size-4"/>
       {tr(locale, "Sign out", "Sign out")}
     </Button>);

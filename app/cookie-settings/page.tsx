@@ -59,13 +59,13 @@ export default async function CookieSettingsRoute() {
         </section>
 
         <section className="space-y-4">
-          <Card className="border-blacksmith bg-card">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl text-foreground">{tr(locale, "How cookies are used", "How cookies are used")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
               {cookieTypes.map((item) => (
-                <div key={item.title} className="rounded-xl border border-blacksmith bg-card px-4 py-3">
+                <div key={item.title} className="rounded-xl border border-border bg-card px-4 py-3">
                   <p className="font-medium text-foreground">{item.title}</p>
                   <p className="mt-1 text-muted-foreground">{item.description}</p>
                 </div>
@@ -73,7 +73,7 @@ export default async function CookieSettingsRoute() {
             </CardContent>
           </Card>
 
-          <Card className="border-blacksmith bg-card">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl text-foreground">{tr(locale, "Related policy", "Related policy")}</CardTitle>
             </CardHeader>
@@ -89,4 +89,5 @@ export default async function CookieSettingsRoute() {
     </PageFrame>
   );
 }
+
 

@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, Clock3, LifeBuoy, MessageSquareText } from "lucide-react";
 import { PageFrame, PageSection, PageShell } from "@/components/page-templates";
@@ -61,10 +61,10 @@ export default async function ContactPage() {
   return (
     <PageFrame>
       <PageShell>
-        <PageSection surface="plain" className="border-b border-blacksmith bg-background sm:p-8">
+        <PageSection surface="plain" className="border-b border-border bg-background sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="space-y-5">
-              <Badge className="border-blacksmith bg-card text-muted-foreground">
+              <Badge className="border-border bg-card text-muted-foreground">
                 <Clock3 className="size-3" />
                 {tr(locale, "Contact DemumuMind", "Contact DemumuMind")}
               </Badge>
@@ -92,13 +92,13 @@ export default async function ContactPage() {
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-11 border-blacksmith bg-card px-6">
+                <Button asChild size="lg" variant="outline" className="h-11 border-border bg-card px-6">
                   <Link href="/discord">{tr(locale, "Open Discord", "Open Discord")}</Link>
                 </Button>
               </div>
             </div>
 
-            <aside className="rounded-lg border border-blacksmith bg-card p-5" aria-label="Response service levels">
+            <aside className="rounded-lg border border-border bg-card p-5" aria-label="Response service levels">
               <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 {tr(locale, "Response expectations", "Response expectations")}
               </p>
@@ -106,17 +106,17 @@ export default async function ContactPage() {
                 {tr(locale, "Trust-first support flow", "Trust-first support flow")}
               </h2>
               <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
-                <li className="rounded-md border border-blacksmith px-3 py-2">
+                <li className="rounded-md border border-border px-3 py-2">
                   {tr(locale, "Mon-Fri - 09:00-18:00 UTC", "Mon-Fri - 09:00-18:00 UTC")}
                 </li>
-                <li className="rounded-md border border-blacksmith px-3 py-2">
+                <li className="rounded-md border border-border px-3 py-2">
                   {tr(
                     locale,
                     "For urgent operational issues, include 'urgent' in your subject line.",
                     "For urgent operational issues, include 'urgent' in your subject line.",
                   )}
                 </li>
-                <li className="rounded-md border border-blacksmith px-3 py-2">
+                <li className="rounded-md border border-border px-3 py-2">
                   {tr(
                     locale,
                     "We answer community questions asynchronously every day.",
@@ -140,7 +140,7 @@ export default async function ContactPage() {
 
           <div className="grid gap-4 lg:grid-cols-3">
             {channels.map((channel) => (
-              <Card key={channel.title} className="border-blacksmith bg-card">
+              <Card key={channel.title} className="border-border bg-card">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 font-serif text-xl text-foreground">
                     <channel.icon className="size-4 text-primary" />
@@ -149,7 +149,7 @@ export default async function ContactPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
                   <p>{channel.description}</p>
-                  <p className="rounded-md border border-blacksmith bg-background px-3 py-2 text-xs tracking-wide">{channel.responseTarget}</p>
+                  <p className="rounded-md border border-border bg-background px-3 py-2 text-xs tracking-wide">{channel.responseTarget}</p>
                   <Button asChild variant="ghost" className="h-auto px-0 font-semibold text-foreground hover:bg-transparent">
                     <Link href={channel.href}>
                       {channel.cta}
@@ -163,7 +163,7 @@ export default async function ContactPage() {
         </PageSection>
 
         <PageSection surface="plain" className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="border-blacksmith bg-card">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 {tr(locale, "Request quality", "Request quality")}
@@ -182,7 +182,7 @@ export default async function ContactPage() {
               </p>
               <ul className="space-y-2">
                 {requestTemplate.map((item) => (
-                  <li key={item} className="rounded-md border border-blacksmith bg-background px-4 py-2.5">
+                  <li key={item} className="rounded-md border border-border bg-background px-4 py-2.5">
                     {item}
                   </li>
                 ))}
@@ -190,7 +190,7 @@ export default async function ContactPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-blacksmith bg-card">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 {tr(locale, "Escalation", "Escalation")}
@@ -218,5 +218,6 @@ export default async function ContactPage() {
     </PageFrame>
   );
 }
+
 
 

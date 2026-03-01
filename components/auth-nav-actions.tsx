@@ -28,7 +28,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
         window.location.assign(authRedirectHref);
     }
     if (!isConfigured) {
-        return (<Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+        return (<Button asChild className="h-11 rounded-full bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={authRedirectHref}>
           <span className="sm:hidden">{tr(locale, "Login", "Login")}</span>
           <span className="hidden sm:inline">{tr(locale, "Login", "Login")}</span>
@@ -36,7 +36,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>);
     }
     if (!user) {
-        return (<Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+        return (<Button asChild className="h-11 rounded-full bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={authRedirectHref}>
           <span className="sm:hidden">{tr(locale, "Login", "Login")}</span>
           <span className="hidden sm:inline">{tr(locale, "Login", "Login")}</span>
@@ -44,13 +44,13 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>);
     }
     return (<div className="flex items-center gap-2">
-      <Button asChild variant="outline" className="h-11 rounded-full border-blacksmith bg-card px-3 text-xs font-semibold hover:bg-accent sm:h-10 sm:px-4 sm:text-sm">
+      <Button asChild variant="outline" className="h-11 rounded-full border-border/60 bg-card px-3 text-xs font-semibold hover:bg-accent sm:h-10 sm:px-4 sm:text-sm">
         <Link href={accountHref}>
           <span className="sm:hidden">{tr(locale, "Account", "Account")}</span>
           <span className="hidden sm:inline">{tr(locale, "My account", "My account")}</span>
         </Link>
       </Button>
-      <Button asChild className="h-11 rounded-full bg-blue-500 px-3 text-xs font-semibold hover:bg-blue-400 sm:h-10 sm:px-4 sm:text-sm">
+      <Button asChild className="h-11 rounded-full bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:h-10 sm:px-4 sm:text-sm">
         <Link href={submitHref}>
           <span className="sm:hidden">{tr(locale, "Submit", "Submit")}</span>
           <span className="hidden sm:inline">{tr(locale, "Submit Your Server", "Submit Your Server")}</span>
@@ -58,7 +58,7 @@ export function AuthNavActions({ locale }: AuthNavActionsProps) {
       </Button>
       <Button type="button" variant="outline" size="sm" onClick={() => {
             void signOut();
-        }} className="h-11 border-blacksmith bg-card px-2.5 text-xs hover:bg-accent sm:h-10 sm:px-3 sm:text-sm" aria-label={tr(locale, "Sign out", "Sign out")}>
+        }} className="h-11 border-border/60 bg-card px-2.5 text-xs hover:bg-accent sm:h-10 sm:px-3 sm:text-sm" aria-label={tr(locale, "Sign out", "Sign out")}>
         <LogOut className="size-4"/>
         <span className="hidden sm:inline">{tr(locale, "Sign out", "Sign out")}</span>
       </Button>
