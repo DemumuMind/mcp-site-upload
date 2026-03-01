@@ -97,7 +97,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         <div className="flex shrink-0 items-center gap-3 lg:hidden">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="touch-hitbox inline-flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             onClick={() => setIsMobileMenuOpen((current) => !current)}
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}

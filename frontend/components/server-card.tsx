@@ -79,7 +79,7 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
               type="button"
               aria-label={tr(locale, "Save card", "Save card")}
               className={cn(
-                "inline-flex size-7 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:text-destructive",
+                "touch-hitbox inline-flex size-7 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:text-destructive",
                 saved && "text-destructive",
               )}
               onClick={() => setSaved((isSaved) => !isSaved)}

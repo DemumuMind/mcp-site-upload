@@ -82,7 +82,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-border/80 bg-card/70 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="touch-hitbox inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-border/80 bg-card/70 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={item.label}
                 >
                   <item.icon className="size-4" />
