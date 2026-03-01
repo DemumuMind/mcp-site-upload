@@ -1,4 +1,5 @@
 import { writeDailyLogFile } from "@/lib/log-file-utils";
+import { maskEmail, maskIpAddress } from "@/lib/security/data-protection";
 
 type AuthSecurityLogInput = {
   eventType: string;
@@ -22,9 +23,9 @@ export async function writeAuthSecurityLog(input: AuthSecurityLogInput): Promise
   const line = [
     new Date().toISOString(),
     `event=${input.eventType}`,
-    `email=${input.email ?? "-"}`,
+    `email=${maskEmail(input.email) || "-"}`,
     `user=${input.userId ?? "-"}`,
-    `ip=${input.ipAddress ?? "-"}`,
+    `ip=${maskIpAddress(input.ipAddress) || "-"}`,
     `note=${input.note ?? "-"}`,
   ].join(" ") + "\n";
   await writeDailyLogFile({

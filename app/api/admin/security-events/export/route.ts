@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { csvEscape } from "@/lib/api/auth-helpers";
+import { maskEmail, maskIpAddress } from "@/lib/security/data-protection";
 import { withAdminAuth } from "@/lib/api/with-auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -49,6 +50,9 @@ export const GET = withAdminAuth(
     const toTs = (url.searchParams.get("toTs") ?? "").trim();
     const parsedFromTs = fromTs ? parseIsoTimestamp(fromTs) : null;
     const parsedToTs = toTs ? parseIsoTimestamp(toTs) : null;
+    const includeRawRequested = (url.searchParams.get("includeRaw") ?? "").trim().toLowerCase();
+    const allowRawExport = process.env.ADMIN_SECURITY_EXPORT_ALLOW_RAW === "1";
+    const includeRaw = allowRawExport && (includeRawRequested === "1" || includeRawRequested === "true");
 
     if (fromTs && !parsedFromTs) {
       return NextResponse.json({ ok: false, error: "Invalid fromTs timestamp." }, { status: 400 });
@@ -89,9 +93,9 @@ export const GET = withAdminAuth(
       [
         row.created_at ?? "",
         row.event_type ?? "",
-        row.email ?? "",
+        includeRaw ? row.email ?? "" : maskEmail(row.email),
         row.user_id ?? "",
-        row.ip_address ?? "",
+        includeRaw ? row.ip_address ?? "" : maskIpAddress(row.ip_address),
       ]
         .map((value) => csvEscape(value))
         .join(","),
