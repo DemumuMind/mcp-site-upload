@@ -10,6 +10,7 @@ Keep the MCP catalog auto-filled from GitHub MCP repositories with zero local fi
 ## Data source
 - GitHub Search API (`topic:mcp-server`)
 - Source is fixed to GitHub in current architecture.
+- Optional offline crawler snapshot via Scrapy (`tools/python`, spider: `mcp_registry`) for diagnostics and source comparison.
 
 ## Runtime settings
 - `CATALOG_AUTOSYNC_MAX_PAGES` (default `10`, max `10`)
@@ -35,6 +36,15 @@ Keep the MCP catalog auto-filled from GitHub MCP repositories with zero local fi
 curl -X POST "https://your-domain/api/catalog/auto-sync?pages=120" \
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
 ```
+
+## Optional Scrapy snapshot
+
+```bash
+npm run py:scrapy:registry
+```
+
+- Output: `docs/mcp-registry-scrapy.json`
+- Purpose: diagnostics and source parity checks; does not change production runtime ingest path.
 
 ## CI alerting for sudden catalog drops
 - Workflow: `.github/workflows/catalog-count-guard.yml`

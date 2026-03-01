@@ -36,7 +36,8 @@
     "ops:backup-verify": "node scripts/backup-verify.mjs",
     "ops:backup-verify-remote": "node scripts/backup-verify-remote.mjs",
     "py:catalog:enrich": "cd tools/python && uv run python scripts/catalog_enrich.py --dry-run",
-    "py:ops:report": "cd tools/python && uv run python scripts/ops_report.py --output ../../docs/python-ops-report.md"
+    "py:ops:report": "cd tools/python && uv run python scripts/ops_report.py --output ../../docs/python-ops-report.md",
+    "py:scrapy:registry": "cd tools/python && uv run scrapy crawl mcp_registry -O ../../docs/mcp-registry-scrapy.json"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",

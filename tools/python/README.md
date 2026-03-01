@@ -4,9 +4,10 @@ This folder contains Python-only automation helpers.
 
 ## Scope
 
-- ✅ Reporting / ops automation
-- ✅ Catalog enrichment / validation helpers
-- ❌ Next.js app runtime logic
+- Reporting and ops automation
+- Catalog enrichment and validation helpers
+- Optional Scrapy-based registry crawling
+- Not used by Next.js runtime logic
 
 ## Setup (uv)
 
@@ -22,5 +23,12 @@ uv sync
 uv run python scripts/catalog_enrich.py --dry-run
 
 # Ops report snapshot
-uv run python scripts/ops_report.py --output docs/python-ops-report.md
+uv run python scripts/ops_report.py --output ../../docs/python-ops-report.md
+
+# Scrapy registry crawl snapshot
+uv run scrapy crawl mcp_registry -O ../../docs/mcp-registry-scrapy.json
 ```
+
+## Scrapy environment
+
+- `MCP_SCRAPY_REGISTRY_URL` (optional): override registry endpoint.

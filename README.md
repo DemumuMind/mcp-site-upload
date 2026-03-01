@@ -232,6 +232,7 @@ npm run smoke:check -- https://your-domain
 npm run ops:health-report -- --base-url https://your-domain
 npm run ops:backup-verify
 npm run ops:backup-verify-remote
+npm run py:scrapy:registry
 ```
 
 Recommended pre-merge verification:

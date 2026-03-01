@@ -3,7 +3,9 @@ name = "mcp-site-automation"
 version = "0.1.0"
 description = "Python automation tools for mcp-site (reporting and catalog enrichment)"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+  "scrapy>=2.13.3",
+]
 
 [build-system]
 requires = ["hatchling"]
