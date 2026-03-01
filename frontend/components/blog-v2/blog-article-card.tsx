@@ -26,7 +26,7 @@ export function BlogArticleCard({ post }: BlogArticleCardProps) {
         </div>
       }
       classes={{
-        card: "group h-full border-slate-700/70 bg-slate-950/72 shadow-[0_0_0_1px_rgba(35,52,95,0.25),0_22px_64px_rgba(2,8,24,0.56)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.005] hover:border-primary/35",
+        card: "group h-full border-slate-700/70 bg-slate-950/72 shadow-[0_0_0_1px_rgba(35,52,95,0.25),0_22px_64px_rgba(2,8,24,0.56)] transition-[border-color,box-shadow] duration-200 ease-out hover:border-primary/35 hover:shadow-[0_26px_68px_rgba(2,8,24,0.62)]",
         header: "space-y-3 pb-3",
         title: "text-xl leading-tight text-foreground",
         content: "flex h-full flex-col gap-4 text-sm text-slate-300",

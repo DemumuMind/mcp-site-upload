@@ -57,13 +57,13 @@ export function ServerCard({ mcpServer, viewMode = "grid", score, trustScore }: 
     <Card
       data-anime-hover="card"
       className={cn(
-        "group flex h-full flex-col overflow-hidden border-border bg-card shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.3)] transition duration-300 hover:-translate-y-0.5 hover:scale-[1.005] hover:border-primary/45 hover:shadow-[0_24px_45px_-30px_hsl(var(--primary)/0.4)]",
+        "group flex h-full flex-col overflow-hidden border-border bg-card shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.3)] transition-colors duration-200 ease-out hover:border-primary/45",
         viewMode === "list" && "md:grid md:grid-cols-[220px_1fr]",
       )}
     >
       <div
         className={cn(
-          "relative overflow-hidden border-b border-border bg-gradient-to-br p-3",
+          "relative overflow-hidden border-b border-border bg-gradient-to-br p-3 transition-[transform,box-shadow] duration-200 ease-out motion-safe:will-change-transform group-hover:-translate-y-0.5 group-hover:scale-[1.005] group-hover:shadow-[0_24px_45px_-30px_hsl(var(--primary)/0.4)]",
           accentClassByLevel[mcpServer.verificationLevel],
           viewMode === "grid" ? "h-36" : "h-32 md:h-full md:border-r md:border-b-0",
         )}
