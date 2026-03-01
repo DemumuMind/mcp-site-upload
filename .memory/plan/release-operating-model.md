@@ -88,6 +88,15 @@
 - SEO regressions после редизайна.
 ### Acceptance Criteria
 - SEO smoke and brand checks pass.
+### Status
+- State: Completed
+- Updated at: 2026-03-01
+- Evidence: `docs/runbooks/release-seo-marketing-control.md`
+- Verification:
+  - utf8: PASS (strict UTF-8 validation command)
+  - lint: PASS (`npm.cmd run lint`)
+  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
+  - tests: FAIL (`spawn EPERM` in Playwright process)
 
 ## Эпик D: Post-release hypercare
 - Priority: P1
