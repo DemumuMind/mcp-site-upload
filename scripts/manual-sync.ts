@@ -7,9 +7,9 @@ async function runAll() {
   console.log("Starting full catalog synchronization...");
 
   try {
-    const { runCatalogGithubSync } = await import("../lib/catalog/github-sync");
-    const { runCatalogSmitherySync } = await import("../lib/catalog/smithery-sync");
-    const { runCatalogNpmSync } = await import("../lib/catalog/npm-sync");
+    const { runCatalogGithubSync } = await import("../frontend/lib/catalog/github-sync");
+    const { runCatalogSmitherySync } = await import("../frontend/lib/catalog/smithery-sync");
+    const { runCatalogNpmSync } = await import("../frontend/lib/catalog/npm-sync");
 
     console.log("--- Syncing GitHub ---");
     const github = await runCatalogGithubSync({ maxPages: 2 });

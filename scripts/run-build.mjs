@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv";
 
-const normalizedCwd = process.cwd().replace(/\\/g, "/");
+const frontendDir = path.join(process.cwd(), "frontend");
 
 const envFiles = [".env", ".env.local"];
 for (const file of envFiles) {
@@ -20,8 +20,6 @@ for (const file of envFiles) {
 
 const env = {
   ...process.env,
-  PWD: normalizedCwd,
-  INIT_CWD: process.env.INIT_CWD ?? normalizedCwd,
 };
 
 function sleep(ms) {
@@ -31,6 +29,7 @@ function sleep(ms) {
 function run(command, label, { retries = 0, retryDelayMs = 1500 } = {}) {
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const result = spawnSync(command, {
+      cwd: frontendDir,
       stdio: "pipe",
       encoding: "utf8",
       env,

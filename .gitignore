@@ -17,7 +17,9 @@
 
 # next.js
 /.next/
+/frontend/.next/
 /out/
+/frontend/.contentlayer/
 
 # production
 /build
@@ -41,6 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/frontend/next-env.d.ts
 
 # local debug artifacts
 artifacts/

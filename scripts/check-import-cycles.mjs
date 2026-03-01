@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const roots = ["app", "components", "lib"];
+const roots = ["frontend/app", "frontend/components", "frontend/lib"];
 const exts = [".ts", ".tsx", ".mts", ".cts"];
 const importRe = /(?:import|export)\s+(?:[^"'`]*?from\s+)?["']([^"']+)["']/g;
 
@@ -41,7 +41,7 @@ function tryResolveBase(basePath) {
 
 function resolveImport(specifier, importerDir) {
   if (specifier.startsWith("@/")) {
-    return tryResolveBase(path.resolve(specifier.slice(2)));
+    return tryResolveBase(path.resolve("frontend", specifier.slice(2)));
   }
   if (specifier.startsWith("./") || specifier.startsWith("../")) {
     return tryResolveBase(path.resolve(importerDir, specifier));

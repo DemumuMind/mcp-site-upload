@@ -22,7 +22,7 @@ const env = {
   ...process.env,
 };
 
-const nextArgs = ["start", ...process.argv.slice(2)];
+const nextArgs = ["start", "frontend", ...process.argv.slice(2)];
 
 const result = spawnSync("next", nextArgs, {
   stdio: "inherit",

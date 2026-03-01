@@ -5,16 +5,25 @@ const config = [
   {
     ignores: [
       ".next/**",
+      "frontend/.next/**",
       ".next-build-tools/**",
       ".next-dev-tools/**",
       ".next-playwright-howto/**",
       ".contentlayer/**",
+      "frontend/.contentlayer/**",
       ".worktrees/**",
       "node_modules/**",
     ],
   },
   {
-    files: ["app/api/**/*.ts", "app/api/**/*.tsx"],
+    settings: {
+      next: {
+        rootDir: "frontend",
+      },
+    },
+  },
+  {
+    files: ["frontend/app/api/**/*.ts", "frontend/app/api/**/*.tsx"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -25,7 +34,7 @@ const config = [
     },
   },
   {
-    files: ["components/**/*.ts", "components/**/*.tsx"],
+    files: ["frontend/components/**/*.ts", "frontend/components/**/*.tsx"],
     rules: {
       "no-restricted-imports": [
         "error",
