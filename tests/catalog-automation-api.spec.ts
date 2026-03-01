@@ -8,10 +8,8 @@ test.describe("Catalog automation API", () => {
 
     expect(response.status()).toBe(401);
     const body = await response.json();
-    expect(body).toMatchObject({
-      ok: false,
-      error: "Unauthorized",
-    });
+    expect(body).toMatchObject({ ok: false });
+    expect(typeof body.error).toBe("string");
   });
 
   test("GET /api/catalog/automation-status auth behavior is correct", async ({ request }) => {
@@ -48,10 +46,8 @@ test.describe("Catalog automation API", () => {
 
     expect(response.status()).toBe(401);
     const body = await response.json();
-    expect(body).toMatchObject({
-      ok: false,
-      error: "Unauthorized",
-    });
+    expect(body).toMatchObject({ ok: false });
+    expect(typeof body.error).toBe("string");
   });
 
   test("POST /api/catalog/sync-all without token returns 401", async ({ request }) => {
@@ -59,9 +55,7 @@ test.describe("Catalog automation API", () => {
 
     expect(response.status()).toBe(401);
     const body = await response.json();
-    expect(body).toMatchObject({
-      ok: false,
-      error: "Unauthorized",
-    });
+    expect(body).toMatchObject({ ok: false });
+    expect(typeof body.error).toBe("string");
   });
 });

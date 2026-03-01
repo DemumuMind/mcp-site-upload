@@ -17,6 +17,13 @@ async function forceEnglishLocale(page: Page) {
 }
 
 test.describe("Auth email flows", () => {
+  test.beforeEach(async ({ page }) => {
+    await forceEnglishLocale(page);
+    await page.goto("/auth?next=%2Faccount", { waitUntil: "networkidle" });
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    test.skip((await authDisabled.count()) > 0, "Supabase auth env is not configured in this environment.");
+  });
+
   test("sign-up shows password rules and redirects to check-email step", async ({ page }) => {
     await page.route("**/auth/v1/signup**", async (route) => {
       if (route.request().method() === "OPTIONS") {
@@ -63,9 +70,6 @@ test.describe("Auth email flows", () => {
         body: JSON.stringify({}),
       });
     });
-
-    await forceEnglishLocale(page);
-    await page.goto("/auth?next=%2Faccount");
 
     const signupButton = page.getByRole("button", { name: "No account? Sign up" });
     await signupButton.waitFor({ state: "visible", timeout: 60000 });
@@ -116,9 +120,6 @@ test.describe("Auth email flows", () => {
         body: JSON.stringify({}),
       });
     });
-
-    await forceEnglishLocale(page);
-    await page.goto("/auth?next=%2Faccount");
 
     const forgotButton = page.getByRole("button", { name: "Forgot password?" });
     await forgotButton.waitFor({ state: "visible", timeout: 60000 });

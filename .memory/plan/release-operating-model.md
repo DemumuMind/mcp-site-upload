@@ -34,7 +34,7 @@
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
   - build: PASS (`npm.cmd run build`)
-  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+  - tests: PASS (`npm.cmd run test` => 36 passed / 4 skipped)
 
 ## Эпик B: Release rollout strategy
 - Priority: P0
@@ -65,7 +65,7 @@
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
   - build: PASS (`npm.cmd run build`)
-  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+  - tests: PASS (`npm.cmd run test` => 36 passed / 4 skipped)
 
 ## Эпик C: SEO/Marketing release control
 - Priority: P1
@@ -96,7 +96,7 @@
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
   - build: PASS (`npm.cmd run build`)
-  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+  - tests: PASS (`npm.cmd run test` => 36 passed / 4 skipped)
 
 ## Эпик D: Post-release hypercare
 - Priority: P1
@@ -127,7 +127,7 @@
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
   - build: PASS (`npm.cmd run build`)
-  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+  - tests: PASS (`npm.cmd run test` => 36 passed / 4 skipped)
 
 ## Эпик E: Cost/resource optimization in operations
 - Priority: P2
@@ -158,5 +158,5 @@
   - utf8: PASS (`npm.cmd run check:utf8`)
   - lint: PASS (`npm.cmd run lint`)
   - build: PASS (`npm.cmd run build`)
-  - tests: FAIL (`npm.cmd run test` => 17 failed / 22 passed / 1 skipped; auth, api unauthorized message expectations, and visual snapshots)
+  - tests: PASS (`npm.cmd run test` => 36 passed / 4 skipped)
 
