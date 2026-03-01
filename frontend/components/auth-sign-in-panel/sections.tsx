@@ -4,16 +4,22 @@ import Link from "next/link";
 import type { FormEvent } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   getPasswordChecklistItems,
-  getPasswordStrengthLabel,
-  PasswordStrengthChecklist,
 } from "@/lib/auth/password-ui";
 import { tr, type Locale } from "@/lib/i18n";
-import { PASSWORD_MIN_LENGTH, type PasswordStrengthScore } from "@/lib/password-strength";
+import type { PasswordStrengthScore } from "@/lib/password-strength";
 import type { EmailAuthMode } from "@/components/auth-sign-in-panel/use-email-auth";
+import {
+  ConfirmPasswordField,
+  EmailAuthModeLinks,
+  EmailField,
+  PasswordField,
+} from "@/components/auth-sign-in-panel/email-auth-form-primitives";
+import type {
+  EmailAuthErrors,
+  EmailAuthValues,
+} from "@/components/auth-sign-in-panel/email-auth-form.types";
 
 type OAuthButtonsSectionProps = {
   locale: Locale;
@@ -121,14 +127,6 @@ export function OAuthButtonsSection({
   );
 }
 
-type EmailAuthValues = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type EmailAuthErrors = Partial<Record<keyof EmailAuthValues, string>>;
-
 type EmailAuthFormSectionProps = {
   locale: Locale;
   emailAuthMode: EmailAuthMode;
@@ -173,72 +171,31 @@ export function EmailAuthFormSection({
       </p>
 
       <form className="mt-4 grid gap-3" onSubmit={onSubmit}>
-        <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-sm text-foreground">
-            Email
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={emailAuthValues.email}
-            onChange={event => updateEmailField("email", event.target.value)}
-            placeholder="you@example.com"
-            className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"
-          />
-          {emailAuthErrors.email ? <p className="text-xs text-rose-300">{emailAuthErrors.email}</p> : null}
-        </div>
+        <EmailField
+          email={emailAuthValues.email}
+          error={emailAuthErrors.email}
+          onChange={value => updateEmailField("email", value)}
+        />
 
         {!isResetRequestMode ? (
-          <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-sm text-foreground">
-              {tr(locale, "Password", "Password")}
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete={isSignUpMode ? "new-password" : "current-password"}
-              required
-              value={emailAuthValues.password}
-              onChange={event => updateEmailField("password", event.target.value)}
-              placeholder={tr(
-                locale,
-                isSignUpMode ? `At least ${PASSWORD_MIN_LENGTH} characters` : "Enter your password",
-                isSignUpMode ? `At least ${PASSWORD_MIN_LENGTH} characters` : "Enter your password",
-              )}
-              className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"
-            />
-            {isSignUpMode ? (
-              <PasswordStrengthChecklist
-                score={emailPasswordStrengthScore}
-                strengthLabel={getPasswordStrengthLabel(locale, emailPasswordStrengthScore)}
-                checklistItems={signupChecklistItems}
-              />
-            ) : null}
-            {emailAuthErrors.password ? <p className="text-xs text-rose-300">{emailAuthErrors.password}</p> : null}
-          </div>
+          <PasswordField
+            locale={locale}
+            isSignUpMode={isSignUpMode}
+            password={emailAuthValues.password}
+            error={emailAuthErrors.password}
+            passwordStrengthScore={emailPasswordStrengthScore}
+            signupChecklistItems={signupChecklistItems}
+            onChange={value => updateEmailField("password", value)}
+          />
         ) : null}
 
         {isSignUpMode ? (
-          <div className="space-y-1.5">
-            <Label htmlFor="confirmPassword" className="text-sm text-foreground">
-              {tr(locale, "Confirm password", "Confirm password")}
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={emailAuthValues.confirmPassword}
-              onChange={event => updateEmailField("confirmPassword", event.target.value)}
-              placeholder={tr(locale, "Repeat password", "Repeat password")}
-              className="h-11 rounded-xl border-border/60 bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/40"
-            />
-            {emailAuthErrors.confirmPassword ? (
-              <p className="text-xs text-rose-300">{emailAuthErrors.confirmPassword}</p>
-            ) : null}
-          </div>
+          <ConfirmPasswordField
+            locale={locale}
+            confirmPassword={emailAuthValues.confirmPassword}
+            error={emailAuthErrors.confirmPassword}
+            onChange={value => updateEmailField("confirmPassword", value)}
+          />
         ) : null}
 
         <Button
@@ -255,46 +212,7 @@ export function EmailAuthFormSection({
         </Button>
       </form>
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
-        {emailAuthMode === "sign-in" ? (
-          <>
-            <button
-              type="button"
-              onClick={() => onSwitchMode("sign-up")}
-              className="underline underline-offset-4 transition hover:text-foreground"
-            >
-              {tr(locale, "No account? Sign up", "No account? Sign up")}
-            </button>
-            <button
-              type="button"
-              onClick={() => onSwitchMode("reset-request")}
-              className="underline underline-offset-4 transition hover:text-foreground"
-            >
-              {tr(locale, "Forgot password?", "Forgot password?")}
-            </button>
-          </>
-        ) : null}
-
-        {emailAuthMode === "sign-up" ? (
-          <button
-            type="button"
-            onClick={() => onSwitchMode("sign-in")}
-            className="underline underline-offset-4 transition hover:text-foreground"
-          >
-            {tr(locale, "Already have an account? Sign in", "Already have an account? Sign in")}
-          </button>
-        ) : null}
-
-        {emailAuthMode === "reset-request" ? (
-          <button
-            type="button"
-            onClick={() => onSwitchMode("sign-in")}
-            className="underline underline-offset-4 transition hover:text-foreground"
-          >
-            {tr(locale, "Remembered your password? Sign in", "Remembered your password? Sign in")}
-          </button>
-        ) : null}
-      </div>
+      <EmailAuthModeLinks locale={locale} mode={emailAuthMode} onSwitchMode={onSwitchMode} />
     </div>
   );
 }
