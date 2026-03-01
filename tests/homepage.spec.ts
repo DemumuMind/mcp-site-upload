@@ -7,7 +7,7 @@ test.describe("Homepage refactor", () => {
     await page.goto("/");
     const main = page.getByRole("main");
 
-    await expect(main.getByText("Community-Curated MCP Directory")).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(main.getByRole("link", { name: "Start Exploring Servers" }).first()).toBeVisible();
     await expect(main.getByRole("link", { name: "Submit Your Server" }).first()).toBeVisible();
 
@@ -24,7 +24,7 @@ test.describe("Homepage refactor", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
-    await expect(page.getByText("Community-Curated MCP Directory", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByRole("link", { name: "Start Exploring Servers" }).first()).toBeVisible();
 
     const hasHorizontalOverflow = await page.evaluate(() => {

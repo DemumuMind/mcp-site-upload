@@ -91,3 +91,7 @@ export async function getCatalogSnapshot(options: CatalogSnapshotOptions = {}): 
     const servers = options.bypassCache ? await getActiveServers() : await getCachedActiveServers();
     return buildCatalogSnapshot(servers, options);
 }
+
+export async function clearCatalogSnapshotRedisCache(): Promise<void> {
+    // Redis snapshot cache is currently not configured in this build.
+}

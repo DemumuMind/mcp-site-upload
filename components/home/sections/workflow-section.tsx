@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { Activity, ArrowRight, Search, ShieldCheck, Wrench, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 
@@ -8,6 +8,13 @@ type WorkflowSectionProps = {
 };
 
 export function WorkflowSection({ content }: WorkflowSectionProps) {
+  const iconByToken: Record<string, LucideIcon> = {
+    search: Search,
+    "shield-check": ShieldCheck,
+    activity: Activity,
+    wrench: Wrench,
+  };
+
   return (
     <section className="border-y border-blacksmith bg-background">
       <div className="section-shell flex flex-col gap-8 py-20">
@@ -17,25 +24,28 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {content.cards.map((item) => (
-            <Card key={item.title}>
-              <CardHeader className="space-y-4 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
-                    <item.icon className={`size-4 ${item.accentClass}`} />
+          {content.cards.map((item) => {
+            const Icon = iconByToken[item.icon] ?? Search;
+            return (
+              <Card key={item.title}>
+                <CardHeader className="space-y-4 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
+                      <Icon className={`size-4 ${item.accentClass}`} aria-hidden="true" />
+                    </div>
+                    <CardTitle className="text-xl text-foreground">{item.title}</CardTitle>
                   </div>
-                  <CardTitle className="text-xl text-foreground">{item.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm text-muted-foreground">
-                <p>{item.description}</p>
-                <Link href={item.href} className={`inline-flex items-center gap-2 text-sm font-medium ${item.accentClass}`}>
-                  {item.cta}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm text-muted-foreground">
+                  <p>{item.description}</p>
+                  <Link href={item.href} className={`inline-flex items-center gap-2 text-sm font-medium ${item.accentClass}`}>
+                    {item.cta}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>

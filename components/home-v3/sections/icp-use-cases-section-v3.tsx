@@ -1,3 +1,4 @@
+import { Blocks, Command, ShieldCheck, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
 import type { HomeContent } from "@/lib/home/content";
@@ -7,6 +8,12 @@ type IcpUseCasesSectionV3Props = {
 };
 
 export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
+  const iconByToken: Record<string, LucideIcon> = {
+    command: Command,
+    blocks: Blocks,
+    "shield-check": ShieldCheck,
+  };
+
   return (
     <section className="border-b border-blacksmith bg-background">
       <div className="section-shell space-y-7 py-14">
@@ -17,19 +24,22 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
         </header>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          {content.cards.map((card) => (
-            <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
-                  <card.icon className="size-4 text-primary" aria-hidden="true" />
+          {content.cards.map((card) => {
+            const Icon = iconByToken[card.icon] ?? Blocks;
+            return (
+              <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
+                    <Icon className="size-4 text-primary" aria-hidden="true" />
+                  </div>
+                  <Badge variant="outline">ICP</Badge>
                 </div>
-                <Badge variant="outline">ICP</Badge>
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
-              <p className="mt-4 text-sm font-medium text-foreground">{card.outcome}</p>
-            </article>
-          ))}
+                <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
+                <p className="mt-4 text-sm font-medium text-foreground">{card.outcome}</p>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
