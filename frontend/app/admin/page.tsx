@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import { createAdminSystemEventAction, deleteAdminSystemEventAction, logoutAdminAction, moderateServerStatusAction, saveAdminDashboardMetricsAction, saveAdminDashboardSettingsAction, } from "@/app/admin/actions";
+import { buildAdminPageViewModel, buildRawSearchParams, buildSecurityQuery, type AdminPageQueryState, } from "@/app/admin/page-view-model";
 import { AdminAutoRefresh } from "@/components/admin-auto-refresh";
 import { AdminSecurityPresets } from "@/components/admin-security-presets";
 import { PageFrame, PageHero, PageMetric, PageSection } from "@/components/page-templates";
@@ -21,23 +22,7 @@ export const metadata: Metadata = {
     description: "Admin moderation dashboard for pending server submissions.",
 };
 type AdminPageProps = {
-    searchParams: Promise<{
-        success?: string;
-        error?: string;
-        q?: string;
-        category?: string;
-        auth?: string;
-        securityEvent?: string;
-        securityEmail?: string;
-        securityFrom?: string;
-        securityTo?: string;
-        securityFromTs?: string;
-        securityToTs?: string;
-        securityPage?: string;
-        securityPageSize?: string;
-        securitySortBy?: "created_at" | "event_type" | "email" | "ip_address";
-        securitySortOrder?: "asc" | "desc";
-    }>;
+    searchParams: Promise<AdminPageQueryState>;
 };
 function formatCompactNumber(locale: Locale, value: number): string {
     return new Intl.NumberFormat("en-US", {
@@ -123,110 +108,47 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     await requireAdminAccess("/admin");
     const locale = await getLocale();
     const queryState = await searchParams;
-    const rawSearchParams = new URLSearchParams();
-    Object.entries(queryState).forEach(([key, value]) => {
-        if (typeof value === "string" && value.length > 0) {
-            rawSearchParams.set(key, value);
-        }
-    });
+    const rawSearchParams = buildRawSearchParams(queryState);
     await writeAdminRequestLog({
         path: "/admin",
         query: rawSearchParams.toString(),
         source: "admin_page",
     });
-    const securityFilterEvent = queryState.securityEvent || "all";
-    const securityFilterEmail = (queryState.securityEmail || "").trim();
-    const securityFilterFrom = (queryState.securityFrom || "").trim();
-    const securityFilterTo = (queryState.securityTo || "").trim();
-    const securityFilterFromTs = (queryState.securityFromTs || "").trim();
-    const securityFilterToTs = (queryState.securityToTs || "").trim();
-    const securityPage = Math.max(Number(queryState.securityPage || "1") || 1, 1);
-    const securityPageSize = Math.max(Number(queryState.securityPageSize || "50") || 50, 10);
-    const securitySortBy = queryState.securitySortBy || "created_at";
-    const securitySortOrder = queryState.securitySortOrder || "desc";
+    const security = buildSecurityQuery(queryState);
     const [pendingServers, dashboardSnapshot] = await Promise.all([
         getPendingServers(),
         getAdminDashboardSnapshot({
-            eventType: securityFilterEvent,
-            emailQuery: securityFilterEmail,
-            fromDate: securityFilterFrom,
-            toDate: securityFilterTo,
-            fromTs: securityFilterFromTs || undefined,
-            toTs: securityFilterToTs || undefined,
-            page: securityPage,
-            pageSize: securityPageSize,
-            sortBy: securitySortBy,
-            sortOrder: securitySortOrder,
+            eventType: security.eventType,
+            emailQuery: security.emailQuery,
+            fromDate: security.fromDate,
+            toDate: security.toDate,
+            fromTs: security.fromTs || undefined,
+            toTs: security.toTs || undefined,
+            page: security.page,
+            pageSize: security.pageSize,
+            sortBy: security.sortBy,
+            sortOrder: security.sortOrder,
         }),
     ]);
-    const pendingCount = pendingServers.length;
-    const query = (queryState.q || "").trim();
-    const selectedCategory = queryState.category || "all";
-    const selectedAuth = queryState.auth || "all";
-    const selectedSecurityEvent = securityFilterEvent;
-    const normalizedQuery = query.toLowerCase();
-    const categoryOptions = Array.from(new Set(pendingServers.map((item) => item.category))).sort((left, right) => left.localeCompare(right));
-    const authOptions = Array.from(new Set(pendingServers.map((item) => item.authType))).sort((left, right) => left.localeCompare(right));
-    const filteredPendingServers = pendingServers.filter((server) => {
-        const queryMatches = normalizedQuery.length === 0 ||
-            server.name.toLowerCase().includes(normalizedQuery) ||
-            server.slug.toLowerCase().includes(normalizedQuery) ||
-            server.description.toLowerCase().includes(normalizedQuery) ||
-            server.serverUrl.toLowerCase().includes(normalizedQuery);
-        const categoryMatches = selectedCategory === "all" || server.category === selectedCategory;
-        const authMatches = selectedAuth === "all" || server.authType === selectedAuth;
-        return queryMatches && categoryMatches && authMatches;
+    const { pendingCount, filteredCount, query, selectedCategory, selectedAuth, selectedSecurityEvent, categoryOptions, authOptions, filteredPendingServers, securityEventOptions, filteredSecurityEvents, stickyAdminHref, } = buildAdminPageViewModel({
+        pendingServers,
+        dashboardSnapshot,
+        security,
+        queryState,
     });
-    const filteredCount = filteredPendingServers.length;
-    const securityEventOptions = Array.from(new Set(dashboardSnapshot.security.recentEvents.map((item) => item.eventType))).sort((left, right) => left.localeCompare(right));
-    const filteredSecurityEvents = dashboardSnapshot.security.recentEvents;
+    const securityFilterEmail = security.emailQuery;
+    const securityFilterFrom = security.fromDate;
+    const securityFilterTo = security.toDate;
+    const securityFilterFromTs = security.fromTs;
+    const securityFilterToTs = security.toTs;
+    const securityPageSize = security.pageSize;
+    const securitySortBy = security.sortBy;
+    const securitySortOrder = security.sortOrder;
     const feedback = getFeedbackMessage({
         locale,
         success: queryState.success,
         error: queryState.error,
     });
-    const stickyParams = new URLSearchParams();
-    if (query) {
-        stickyParams.set("q", query);
-    }
-    if (selectedCategory !== "all") {
-        stickyParams.set("category", selectedCategory);
-    }
-    if (selectedAuth !== "all") {
-        stickyParams.set("auth", selectedAuth);
-    }
-    if (selectedSecurityEvent !== "all") {
-        stickyParams.set("securityEvent", selectedSecurityEvent);
-    }
-    if (securityFilterEmail) {
-        stickyParams.set("securityEmail", securityFilterEmail);
-    }
-    if (securityFilterFrom) {
-        stickyParams.set("securityFrom", securityFilterFrom);
-    }
-    if (securityFilterTo) {
-        stickyParams.set("securityTo", securityFilterTo);
-    }
-    if (securityFilterFromTs) {
-        stickyParams.set("securityFromTs", securityFilterFromTs);
-    }
-    if (securityFilterToTs) {
-        stickyParams.set("securityToTs", securityFilterToTs);
-    }
-    if (securitySortBy !== "created_at") {
-        stickyParams.set("securitySortBy", securitySortBy);
-    }
-    if (securitySortOrder !== "desc") {
-        stickyParams.set("securitySortOrder", securitySortOrder);
-    }
-    if (securityPageSize !== 50) {
-        stickyParams.set("securityPageSize", String(securityPageSize));
-    }
-    if (securityPage !== 1) {
-        stickyParams.set("securityPage", String(securityPage));
-    }
-    const stickyQueryString = stickyParams.toString();
-    const stickyAdminHref = `/admin${stickyQueryString ? `?${stickyQueryString}` : ""}`;
     return (<PageFrame variant="ops">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
         <PageHero surface="mesh" badgeTone="emerald" eyebrow={tr(locale, "Operations", "Operations")} title={tr(locale, "Moderation Dashboard", "Moderation Dashboard")} description={tr(locale, "Review pending MCP submissions, manage analytics, and keep catalog quality high.", "Review pending MCP submissions, manage analytics, and keep catalog quality high.")} actions={<div className="flex flex-wrap items-center gap-2">
@@ -647,7 +569,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       {eventType}
                     </option>))}
                 </select>
-                <Input name="securityEmail" defaultValue={queryState.securityEmail || ""} placeholder={tr(locale, "Filter by email", "Filter by email")} className="border-border bg-background text-foreground"/>
+                <Input name="securityEmail" defaultValue={securityFilterEmail} placeholder={tr(locale, "Filter by email", "Filter by email")} className="border-border bg-background text-foreground"/>
                 <Input name="securityFrom" type="date" defaultValue={securityFilterFrom} className="border-border bg-background text-foreground"/>
                 <Input name="securityTo" type="date" defaultValue={securityFilterTo} className="border-border bg-background text-foreground"/>
                 <input type="hidden" name="securityFromTs" value={securityFilterFromTs}/>
@@ -669,7 +591,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     {tr(locale, "Apply", "Apply")}
                   </Button>
                   <Button asChild variant="outline" className="border-accent bg-primary/10 text-accent-foreground hover:bg-primary/20">
-                    <Link href={`/api/admin/security-events/export?eventType=${encodeURIComponent(selectedSecurityEvent)}&email=${encodeURIComponent(queryState.securityEmail || "")}&from=${encodeURIComponent(securityFilterFrom)}&to=${encodeURIComponent(securityFilterTo)}&fromTs=${encodeURIComponent(securityFilterFromTs)}&toTs=${encodeURIComponent(securityFilterToTs)}`}>
+                    <Link href={`/api/admin/security-events/export?eventType=${encodeURIComponent(selectedSecurityEvent)}&email=${encodeURIComponent(securityFilterEmail)}&from=${encodeURIComponent(securityFilterFrom)}&to=${encodeURIComponent(securityFilterTo)}&fromTs=${encodeURIComponent(securityFilterFromTs)}&toTs=${encodeURIComponent(securityFilterToTs)}`}>
                       {tr(locale, "Export CSV", "Export CSV")}
                     </Link>
                   </Button>
@@ -684,7 +606,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 {(["created_at", "event_type", "email", "ip_address"] as const).map((sortKey) => {
                 const nextOrder = securitySortBy === sortKey && securitySortOrder === "desc" ? "asc" : "desc";
                 return (<Button key={sortKey} asChild variant="outline" className="h-7 border-border bg-card px-2.5 text-xs hover:bg-muted/60">
-                      <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(sortKey)}&securitySortOrder=${encodeURIComponent(nextOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=1`}>
+                      <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(securityFilterEmail)}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(sortKey)}&securitySortOrder=${encodeURIComponent(nextOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=1`}>
                         {sortKey}
                         {securitySortBy === sortKey ? ` (${securitySortOrder})` : ""}
                       </Link>
@@ -710,7 +632,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <div className="flex items-center gap-2">
                   <form method="get" className="flex items-center gap-2">
                     <input type="hidden" name="securityEvent" value={selectedSecurityEvent}/>
-                    <input type="hidden" name="securityEmail" value={queryState.securityEmail || ""}/>
+                    <input type="hidden" name="securityEmail" value={securityFilterEmail}/>
                     <input type="hidden" name="securityFrom" value={securityFilterFrom}/>
                     <input type="hidden" name="securityTo" value={securityFilterTo}/>
                     <input type="hidden" name="securitySortBy" value={securitySortBy}/>
@@ -722,12 +644,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                     </Button>
                   </form>
                   <Button asChild variant="outline" className="border-border bg-card hover:bg-muted/60" disabled={dashboardSnapshot.security.page <= 1}>
-                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.max(1, dashboardSnapshot.security.page - 1)}`}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(securityFilterEmail)}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.max(1, dashboardSnapshot.security.page - 1)}`}>
                       {tr(locale, "Prev", "Prev")}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="border-border bg-card hover:bg-muted/60" disabled={dashboardSnapshot.security.page >= dashboardSnapshot.security.totalPages}>
-                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(queryState.securityEmail || "")}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.min(dashboardSnapshot.security.totalPages, dashboardSnapshot.security.page + 1)}`}>
+                    <Link href={`/admin?securityEvent=${encodeURIComponent(selectedSecurityEvent)}&securityEmail=${encodeURIComponent(securityFilterEmail)}&securityFrom=${encodeURIComponent(securityFilterFrom)}&securityTo=${encodeURIComponent(securityFilterTo)}&securityFromTs=${encodeURIComponent(securityFilterFromTs)}&securityToTs=${encodeURIComponent(securityFilterToTs)}&securitySortBy=${encodeURIComponent(securitySortBy)}&securitySortOrder=${encodeURIComponent(securitySortOrder)}&securityPageSize=${dashboardSnapshot.security.pageSize}&securityPage=${Math.min(dashboardSnapshot.security.totalPages, dashboardSnapshot.security.page + 1)}`}>
                       {tr(locale, "Next", "Next")}
                     </Link>
                   </Button>
