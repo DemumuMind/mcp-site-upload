@@ -10,7 +10,8 @@ import { tr, type Locale } from "@/lib/i18n";
 import type { McpServer } from "@/lib/types";
 
 import { formatCheckedAt, type CapabilityGroups } from "./page-view-model";
-import { ExternalTextLink, OutlineBadge, SectionCard, SectionLabel } from "./section-primitives";
+import { RecentActivityCard, RiskTrustList } from "./page-sections-extra";
+import { OutlineBadge, SectionCard, SectionLabel } from "./section-primitives";
 
 type CommonSectionProps = {
   locale: Locale;
@@ -160,18 +161,7 @@ export function RiskTrustSection({
   isHealthPending: boolean;
   hasLicense: boolean;
 }) {
-  return (
-    <SectionCard>
-      <SectionLabel className="mb-2">Risk & trust</SectionLabel>
-      <ul className="space-y-1 text-sm text-muted-foreground">
-        <li>Verification: {verificationLabel}</li>
-        <li>Health: {isHealthPending ? "Pending first health scan" : healthLabel}</li>
-        <li>Repository linked: {mcpServer.repoUrl ? "Yes" : "No"}</li>
-        <li>License detected: {hasLicense ? "Yes" : "No"}</li>
-        <li>Maintainer: {mcpServer.maintainer?.name ?? "Unknown"}</li>
-      </ul>
-    </SectionCard>
-  );
+  return <RiskTrustList mcpServer={mcpServer} verificationLabel={verificationLabel} healthLabel={healthLabel} isHealthPending={isHealthPending} hasLicense={hasLicense} />;
 }
 
 export function RecentActivitySection({
@@ -183,43 +173,7 @@ export function RecentActivitySection({
   githubActivity: GithubActivity | null;
   hasRecentGithubActivity: boolean;
 }) {
-  if (!hasRecentGithubActivity || !githubActivity) {
-    return null;
-  }
-
-  const formatActivityDate = (date: string | null) => (date ? ` - ${formatCheckedAt(date, locale)}` : "");
-
-  return (
-    <SectionCard>
-      <SectionLabel>Recent activity</SectionLabel>
-      {githubActivity.releases.length > 0 ? (
-        <div className="mb-3">
-          <p className="mb-1 text-sm font-medium text-foreground">Releases</p>
-          <div className="space-y-1 text-sm text-muted-foreground">
-            {githubActivity.releases.slice(0, 3).map((release) => (
-              <p key={release.url}>
-                <ExternalTextLink href={release.url}>{release.name}</ExternalTextLink>
-                {formatActivityDate(release.publishedAt)}
-              </p>
-            ))}
-          </div>
-        </div>
-      ) : null}
-      {githubActivity.commits.length > 0 ? (
-        <div>
-          <p className="mb-1 text-sm font-medium text-foreground">Commits</p>
-          <div className="space-y-1 text-sm text-muted-foreground">
-            {githubActivity.commits.slice(0, 3).map((commit) => (
-              <p key={commit.sha}>
-                <ExternalTextLink href={commit.url}>{commit.message || commit.sha.slice(0, 7)}</ExternalTextLink>
-                {formatActivityDate(commit.date)}
-              </p>
-            ))}
-          </div>
-        </div>
-      ) : null}
-    </SectionCard>
-  );
+  return <RecentActivityCard locale={locale} githubActivity={githubActivity} hasRecentGithubActivity={hasRecentGithubActivity} />;
 }
 
 export function SimilarServersSection({
