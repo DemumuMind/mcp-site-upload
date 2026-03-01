@@ -35,7 +35,7 @@ class McpRegistrySpider(scrapy.Spider):
     name = "mcp_registry"
     allowed_domains = ["registry.modelcontextprotocol.io"]
 
-    def start_requests(self):
+    async def start(self):
         registry_url = os.getenv("MCP_SCRAPY_REGISTRY_URL", DEFAULT_REGISTRY_URL).strip() or DEFAULT_REGISTRY_URL
         yield scrapy.Request(registry_url, callback=self.parse_registry)
 
@@ -57,18 +57,23 @@ class McpRegistrySpider(scrapy.Spider):
             records = []
 
         for record in records:
-            raw_name = _pick_string(record, ["name", "title", "display_name"])
-            raw_slug = _pick_string(record, ["slug", "id", "key"])
-            description = _pick_string(record, ["description", "summary", "tagline"])
-            repo_url = _pick_string(record, ["repo_url", "repoUrl", "repository", "source_url", "github_url"])
-            server_url = _pick_string(record, ["server_url", "serverUrl", "homepage", "url"])
+            payload = record.get("server") if isinstance(record.get("server"), dict) else record
+            repository = payload.get("repository") if isinstance(payload.get("repository"), dict) else {}
+
+            raw_name = _pick_string(payload, ["title", "name", "display_name"])
+            raw_slug = _pick_string(payload, ["name", "slug", "id", "key"])
+            description = _pick_string(payload, ["description", "summary", "tagline"])
+            repo_url = _pick_string(repository, ["url"]) or _pick_string(
+                payload, ["repo_url", "repoUrl", "source_url", "github_url"]
+            )
+            server_url = _pick_string(payload, ["server_url", "serverUrl", "websiteUrl", "homepage", "url"])
 
             name = raw_name or raw_slug or "Unnamed MCP Server"
             slug = _to_slug(raw_slug or raw_name or name)
             if not slug:
                 continue
 
-            tags = sorted(set(["registry-auto", "scrapy-sync", *[t.lower() for t in _to_list(record.get("tags"))]]))
+            tags = sorted(set(["registry-auto", "scrapy-sync", *[t.lower() for t in _to_list(payload.get("tags"))]]))
 
             yield {
                 "name": name[:120],
