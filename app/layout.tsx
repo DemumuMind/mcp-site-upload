@@ -118,7 +118,9 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <SiteHeader locale={locale} />
               <AuthHashRedirector />
-              <main className="flex-1">{children}</main>
+              <main className="relative flex-1 w-full [--page-shell-block:clamp(1.5rem,3vw,2.75rem)] [&>section]:section-shell [&>section]:py-[var(--page-shell-block)]">
+                {children}
+              </main>
               <SiteFooter locale={locale} />
               <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
               <Toaster richColors position="top-right" />

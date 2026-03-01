@@ -50,6 +50,14 @@
   --section-pad-block: clamp(2.5rem, 5vw, 5rem);
   --shadow-soft: 0 12px 36px hsl(220 50% 3% / 0.26);
   --shadow-hard: 0 2px 0 hsl(219 10% 45% / 0.6), 0 20px 40px hsl(220 50% 3% / 0.35);
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --motion-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-slow: 360ms;
+  --motion-page-enter: 520ms;
 }
 
 .light {
@@ -178,9 +186,10 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 15% 10%, hsl(var(--accent) / 0.14), transparent 40%),
-    radial-gradient(circle at 85% 15%, hsl(var(--primary) / 0.12), transparent 34%),
-    linear-gradient(180deg, hsl(var(--surface-1)), hsl(var(--background)));
+    radial-gradient(circle at 15% 10%, hsl(var(--accent) / 0.14), transparent 42%),
+    radial-gradient(circle at 85% 15%, hsl(var(--primary) / 0.12), transparent 36%),
+    radial-gradient(circle at 50% 120%, hsl(var(--foreground) / 0.05), transparent 48%),
+    linear-gradient(180deg, hsl(var(--surface-1)), hsl(var(--surface-0)) 42%, hsl(var(--background)));
 }
 
 body::after {
@@ -195,6 +204,7 @@ body::after {
     radial-gradient(circle at 68% 52%, hsl(var(--foreground) / 0.24) 0.5px, transparent 0.75px),
     radial-gradient(circle at 40% 86%, hsl(var(--foreground) / 0.26) 0.45px, transparent 0.7px);
   background-size: 150px 150px, 110px 110px, 180px 180px;
+  background-position: 0 0, 28px -16px, -22px 14px;
 }
 
 ::selection {

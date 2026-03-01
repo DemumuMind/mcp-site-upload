@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { BrandLockup } from "@/components/brand-lockup";
 import { CookieSettingsButton } from "@/components/cookie-settings-button";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { cn } from "@/lib/utils";
@@ -40,7 +39,7 @@ type SiteFooterProps = {
 };
 
 const FooterLinkUnderline = () => (
-  <span className="absolute inset-x-3 bottom-1 h-px scale-x-0 bg-primary/50 transition-transform group-hover:scale-x-100" />
+  <span className="absolute inset-x-3 bottom-[5px] h-px scale-x-0 bg-primary/60 transition-transform duration-200 group-hover:scale-x-100" />
 );
 
 export function SiteFooter({ locale }: SiteFooterProps) {
@@ -50,14 +49,15 @@ export function SiteFooter({ locale }: SiteFooterProps) {
   const getLinkClass = (href: string) => {
     const isActive = pathname === href;
     return cn(
-      "group relative flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] font-medium tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
-      isActive ? "text-primary bg-primary/5" : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+      "group relative flex items-center gap-2 rounded-md border border-transparent px-3 py-1.5 text-[0.78rem] font-medium uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      isActive
+        ? "border-blacksmith/70 bg-card/80 text-foreground"
+        : "text-muted-foreground hover:border-blacksmith/70 hover:bg-card/70 hover:text-foreground"
     );
   };
 
   return (
-    <footer className="relative z-10 border-t border-blacksmith bg-background overflow-hidden">
-      {/* Premium Background Effects */}
+    <footer className="relative z-10 overflow-hidden border-t border-blacksmith/80 bg-background">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <GridPattern
           width={40}
@@ -65,26 +65,21 @@ export function SiteFooter({ locale }: SiteFooterProps) {
           x={-1}
           y={-1}
           className={cn(
-            "[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]",
-            "opacity-[0.03]"
+            "[mask-image:radial-gradient(780px_circle_at_center,white,transparent)]",
+            "opacity-[0.025]"
           )}
         />
-        {/* Balanced Atmospheric Glows - Slightly increased visibility */}
-        <div className="absolute top-1/2 left-0 -translate-x-1/4 -translate-y-1/2 size-[850px] rounded-full bg-accent/10 blur-[160px]" />
-        <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 size-[750px] rounded-full bg-primary/10 blur-[140px]" />
-
-        {/* Soft Central Bridge */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[700px] rounded-full bg-primary/10 blur-[150px] opacity-40" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
+        <div className="absolute -left-24 top-12 size-80 rounded-full bg-accent/8 blur-[90px]" />
+        <div className="absolute -right-20 bottom-8 size-72 rounded-full bg-primary/8 blur-[90px]" />
       </div>
-
-      <BorderBeam size={400} duration={10} delay={0} borderWidth={2.5} className="opacity-100" />
 
       <div className="section-shell relative z-10 grid gap-10 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <BlurFade delay={0.1} inView>
           <div className="space-y-5">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center rounded-md text-foreground transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="inline-flex min-h-11 items-center rounded-md border border-transparent px-1 text-foreground transition-colors hover:border-blacksmith/70 hover:bg-card/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <BrandLockup className="gap-2.5" markClassName="size-8 text-accent/90" textClassName="text-3xl tracking-[0.05em] sm:text-4xl" subtitle="MCP Directory" />
             </Link>
@@ -102,7 +97,7 @@ export function SiteFooter({ locale }: SiteFooterProps) {
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith bg-card/50 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-md border border-blacksmith/80 bg-card/70 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={item.label}
                 >
                   <item.icon className="size-4" />
@@ -212,8 +207,18 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         <p>{tr(locale, `(c) ${year} DemumuMind. All rights reserved.`, `(c) ${year} DemumuMind. All rights reserved.`)}</p>
         <div className="flex items-center gap-6">
           <CookieSettingsButton label={tr(locale, "Cookie Settings", "Cookie Settings")} />
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+          <Link
+            href="/privacy"
+            className="rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Terms
+          </Link>
         </div>
       </div>
     </footer>
