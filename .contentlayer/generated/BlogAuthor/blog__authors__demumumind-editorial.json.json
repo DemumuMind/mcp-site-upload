@@ -1,0 +1,18 @@
+{
+  "id": "demumumind-editorial",
+  "name": "DemumuMind Editorial Team",
+  "role": "Research & Implementation Desk",
+  "bio": "We publish practical playbooks, architecture decisions, and delivery patterns for teams shipping MCP and agentic systems in production.",
+  "avatar": "/demumumind-mark.svg",
+  "xUrl": "https://x.com",
+  "linkedinUrl": "https://www.linkedin.com",
+  "_id": "blog/authors/demumumind-editorial.json",
+  "_raw": {
+    "sourceFilePath": "blog/authors/demumumind-editorial.json",
+    "sourceFileName": "demumumind-editorial.json",
+    "sourceFileDir": "blog/authors",
+    "contentType": "data",
+    "flattenedPath": "blog/authors/demumumind-editorial"
+  },
+  "type": "BlogAuthor"
+}

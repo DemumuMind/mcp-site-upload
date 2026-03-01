@@ -57,7 +57,7 @@ function toBlogV2Post(legacyPost: LegacyBlogPost): BlogV2Post {
     seoDescription: localized.seoDescription,
     publishedAt: legacyPost.publishedAt,
     updatedAt: legacyPost.updatedAt,
-    authorId: "bridgemind-editorial",
+    authorId: "demumumind-editorial",
     author: null,
     tags: legacyPost.tags,
     topics,
@@ -197,3 +197,4 @@ export async function getAllBlogV2SitemapEntriesHybrid(): Promise<Array<Pick<Blo
     updatedAt: post.updatedAt,
   }));
 }
+

@@ -71,7 +71,7 @@ function buildMdxFromDraft(input: {
     `seoTitle: ${toQuoted(input.title)}`,
     `seoDescription: ${toQuoted(input.excerpt)}`,
     `publishedAt: ${toQuoted(input.publishedAt)}`,
-    'authorId: "bridgemind-editorial"',
+    'authorId: "demumumind-editorial"',
     "tags:",
     ...input.tags.map((tag) => `  - ${toQuoted(tag)}`),
     "featured: false",
@@ -441,3 +441,4 @@ export async function publishBlogV2Draft(input: {
     sourceCount: draft.researchSourceCount,
   };
 }
+

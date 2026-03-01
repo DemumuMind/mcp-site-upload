@@ -44,6 +44,9 @@ const isVercelDeployment = process.env.VERCEL === "1" || process.env.VERCEL === 
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/site.webmanifest",
   title: {
     default: "DemumuMind MCP",

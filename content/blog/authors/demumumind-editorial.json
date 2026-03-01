@@ -1,9 +1,10 @@
 {
-  "id": "bridgemind-editorial",
-  "name": "BridgeMind Editorial Team",
+  "id": "demumumind-editorial",
+  "name": "DemumuMind Editorial Team",
   "role": "Research & Implementation Desk",
   "bio": "We publish practical playbooks, architecture decisions, and delivery patterns for teams shipping MCP and agentic systems in production.",
   "avatar": "/demumumind-mark.svg",
   "xUrl": "https://x.com",
   "linkedinUrl": "https://www.linkedin.com"
 }
+
