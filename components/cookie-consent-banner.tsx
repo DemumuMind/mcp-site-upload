@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Cookie, X } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
 import {
@@ -21,6 +21,8 @@ type CookieConsentBannerProps = {
 
 export function CookieConsentBanner({ initialConsent, initialProfile }: CookieConsentBannerProps) {
   const locale = useLocale();
+  const headingId = useId();
+  const descriptionId = useId();
 
   const fallbackConsent = useMemo(() => {
     if (initialConsent) {
@@ -62,6 +64,23 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
     };
   }, []);
 
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape" || !isSettingsOpen) {
+        return;
+      }
+
+      event.preventDefault();
+      setIsSettingsOpen(false);
+    }
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isSettingsOpen]);
+
   function chooseConsent(value: CookieConsentChoice) {
     setCookieConsent(value);
     setConsent(value);
@@ -76,8 +95,10 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
     <div className="pointer-events-none fixed inset-x-3 bottom-3 z-[90] sm:inset-x-auto sm:bottom-4 sm:left-4 sm:w-[min(540px,calc(100vw-2rem))]">
       <section
         role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        aria-describedby={descriptionId}
         aria-live="polite"
-        aria-label={tr(locale, "Cookie consent", "Cookie consent")}
         className="pointer-events-auto rounded-3xl border border-indigo-500/55 bg-[#332f8f] p-4 shadow-[0_22px_64px_rgba(4,10,40,0.5)]"
       >
         <div className="flex items-start gap-2.5">
@@ -85,10 +106,10 @@ export function CookieConsentBanner({ initialConsent, initialProfile }: CookieCo
             <Cookie className="size-4" />
           </div>
           <div className="flex-1">
-            <h2 className="text-[1.95rem] font-semibold leading-none text-foreground">
+            <h2 id={headingId} className="text-[1.95rem] font-semibold leading-none text-foreground">
               {tr(locale, "We value your privacy", "We value your privacy")}
             </h2>
-            <p className="mt-2 text-[1.03rem] leading-8 text-muted-foreground/95">
+            <p id={descriptionId} className="mt-2 text-[1.03rem] leading-8 text-muted-foreground/95">
               {tr(
                 locale,
                 "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.",
