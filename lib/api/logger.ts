@@ -44,4 +44,3 @@ export function createLogger(scope: string, options: LoggerOptions = {}): Logger
     },
   };
 }
-

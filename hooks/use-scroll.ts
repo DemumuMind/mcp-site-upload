@@ -17,4 +17,3 @@ export function useScroll(threshold = 0): boolean {
 
   return isScrolled;
 }
-

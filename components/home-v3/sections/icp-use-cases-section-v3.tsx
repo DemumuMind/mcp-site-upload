@@ -1,4 +1,4 @@
-import { Blocks, Command, ShieldCheck, type LucideIcon } from "lucide-react";
+import { Blocks, Command, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
 import type { HomeContent } from "@/lib/home/content";
@@ -8,10 +8,10 @@ type IcpUseCasesSectionV3Props = {
 };
 
 export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
-  const iconByToken: Record<string, LucideIcon> = {
-    command: Command,
-    blocks: Blocks,
-    "shield-check": ShieldCheck,
+  const renderIcon = (token: string) => {
+    if (token === "command") return <Command className="size-4 text-primary" aria-hidden="true" />;
+    if (token === "shield-check") return <ShieldCheck className="size-4 text-primary" aria-hidden="true" />;
+    return <Blocks className="size-4 text-primary" aria-hidden="true" />;
   };
 
   return (
@@ -24,25 +24,21 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
         </header>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          {content.cards.map((card) => {
-            const Icon = iconByToken[card.icon] ?? Blocks;
-            return (
-              <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
-                    <Icon className="size-4 text-primary" aria-hidden="true" />
-                  </div>
-                  <Badge variant="outline">ICP</Badge>
+          {content.cards.map((card) => (
+            <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
+                  {renderIcon(card.icon)}
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
-                <p className="mt-4 text-sm font-medium text-foreground">{card.outcome}</p>
-              </article>
-            );
-          })}
+                <Badge variant="outline">ICP</Badge>
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
+              <p className="mt-4 text-sm font-medium text-foreground">{card.outcome}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
   );
 }
-

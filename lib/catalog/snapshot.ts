@@ -93,5 +93,5 @@ export async function getCatalogSnapshot(options: CatalogSnapshotOptions = {}): 
 }
 
 export async function clearCatalogSnapshotRedisCache(): Promise<void> {
-    // Redis snapshot cache is currently not configured in this build.
+    // Redis cache layer is optional in this environment; no-op keeps API handlers compatible.
 }

@@ -56,4 +56,3 @@ export function checkRateLimit(key: string, config: RateLimitConfig): RateLimitR
     resetAt: existing.resetAt,
   };
 }
-
