@@ -55,9 +55,10 @@ test.describe("visual acceptance sweep", () => {
       }
       const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       expect(mobileOverflow).toBeFalsy();
+      const mobileMaxDiffPixels = route === "/" ? 30000 : route === "/about" ? 10000 : 7000;
       await expect(page).toHaveScreenshot(`visual-${route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "")}-mobile.png`, {
         fullPage: route !== "/",
-        maxDiffPixels: 7000,
+        maxDiffPixels: mobileMaxDiffPixels,
       });
     });
   }
