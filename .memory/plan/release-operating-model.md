@@ -119,6 +119,15 @@
 - Slow response to production issues.
 ### Acceptance Criteria
 - SLA по критичным инцидентам соблюдается.
+### Status
+- State: Completed
+- Updated at: 2026-03-01
+- Evidence: `docs/runbooks/post-release-hypercare.md`
+- Verification:
+  - utf8: PASS (strict UTF-8 validation command)
+  - lint: PASS (`npm.cmd run lint`)
+  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
+  - tests: FAIL (`spawn EPERM` in Playwright process)
 
 ## Эпик E: Cost/resource optimization in operations
 - Priority: P2
