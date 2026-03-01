@@ -1,3 +1,4 @@
+import { Blocks, Command, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
 import type { HomeContent } from "@/lib/home/content";
@@ -7,6 +8,12 @@ type IcpUseCasesSectionV3Props = {
 };
 
 export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
+  const renderIcon = (token: string) => {
+    if (token === "command") return <Command className="size-4 text-primary" aria-hidden="true" />;
+    if (token === "shield-check") return <ShieldCheck className="size-4 text-primary" aria-hidden="true" />;
+    return <Blocks className="size-4 text-primary" aria-hidden="true" />;
+  };
+
   return (
     <section className="border-b border-blacksmith bg-background">
       <div className="section-shell space-y-7 py-14">
@@ -21,7 +28,7 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
             <article key={card.title} className="rounded-md border border-blacksmith bg-card p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div className="inline-flex rounded-sm border border-blacksmith bg-background p-1.5">
-                  <card.icon className="size-4 text-primary" aria-hidden="true" />
+                  {renderIcon(card.icon)}
                 </div>
                 <Badge variant="outline">ICP</Badge>
               </div>
@@ -35,4 +42,3 @@ export function IcpUseCasesSectionV3({ content }: IcpUseCasesSectionV3Props) {
     </section>
   );
 }
-

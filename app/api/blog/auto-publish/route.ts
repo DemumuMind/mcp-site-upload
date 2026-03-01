@@ -11,16 +11,24 @@ export const dynamic = "force-dynamic";
 const DEFAULT_POSTS_PER_RUN = 1;
 const DEFAULT_RECENCY_DAYS = 14;
 const DEFAULT_MAX_SOURCES = 6;
+const BLOG_V1_SUNSET_RFC3339 = "2026-06-05T00:00:00.000Z";
+
+function withDeprecationHeaders(response: NextResponse): NextResponse {
+  response.headers.set("Deprecation", "true");
+  response.headers.set("Sunset", new Date(BLOG_V1_SUNSET_RFC3339).toUTCString());
+  response.headers.set("Link", '</api/admin/blog-v2/generate>; rel="successor-version"');
+  return response;
+}
 
 async function runAutoPublish(request: NextRequest) {
   if (isBlogV2Enabled()) {
-    return NextResponse.json(
+    return withDeprecationHeaders(NextResponse.json(
       {
         ok: false,
         message: "Auto-publish v1 is disabled while BLOG_V2_ENABLED=true. Use /api/admin/blog-v2/* pipeline.",
       },
       { status: 409 },
-    );
+    ));
   }
 
   const countFromQuery = request.nextUrl.searchParams.get("count");
@@ -51,7 +59,7 @@ async function runAutoPublish(request: NextRequest) {
   }
   revalidateTag(BLOG_POSTS_CACHE_TAG, "max");
 
-  return NextResponse.json(
+  return withDeprecationHeaders(NextResponse.json(
     {
       ok: result.failedCount === 0,
       ...result,
@@ -61,7 +69,7 @@ async function runAutoPublish(request: NextRequest) {
       },
     },
     { status: result.failedCount === 0 ? 200 : 207 },
-  );
+  ));
 }
 
 const handlers = withCronAuth(

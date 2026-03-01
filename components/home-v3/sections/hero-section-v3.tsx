@@ -49,7 +49,7 @@ export function HeroSectionV3({ content, workflows, metrics }: HeroSectionV3Prop
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
             <BlurFade delay={0.1}>
-              <SectionLabel className="text-accent/90">Industrial Intelligence</SectionLabel>
+              <SectionLabel className="text-accent/90">{content.eyebrow}</SectionLabel>
             </BlurFade>
             <div className="max-w-4xl">
               <BlurFade delay={0.2}>

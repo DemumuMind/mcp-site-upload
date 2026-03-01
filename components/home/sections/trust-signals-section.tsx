@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Blocks, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,12 @@ type TrustSignalsSectionProps = {
 };
 
 export function TrustSignalsSection({ content, featuredServers, topCategories, topLanguages }: TrustSignalsSectionProps) {
+  const renderIcon = (token: string) => {
+    if (token === "shield-check") return <ShieldCheck className="mb-2 size-4 text-primary" aria-hidden="true" />;
+    if (token === "check-circle") return <CheckCircle2 className="mb-2 size-4 text-primary" aria-hidden="true" />;
+    return <Blocks className="mb-2 size-4 text-primary" aria-hidden="true" />;
+  };
+
   return (
     <section className="border-y border-blacksmith bg-background">
       <div className="section-shell grid gap-8 py-20 lg:grid-cols-[1fr_1.05fr]">
@@ -24,7 +30,7 @@ export function TrustSignalsSection({ content, featuredServers, topCategories, t
           <div className="grid gap-3 text-sm sm:grid-cols-1">
             {content.points.map((point) => (
               <div key={point.title} className="rounded-xl border border-blacksmith bg-card p-3">
-                <point.icon className="mb-2 size-4 text-primary" />
+                {renderIcon(point.icon)}
                 <p className="font-medium text-foreground">{point.title}</p>
                 <p className="text-xs text-muted-foreground">{point.description}</p>
               </div>

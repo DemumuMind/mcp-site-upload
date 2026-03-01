@@ -48,6 +48,12 @@ jobs:
       - name: UTF-8 check
         run: npm run check:utf8:strict
 
+      - name: Architecture import-cycle check
+        run: npm run check:cycles
+
+      - name: Migration governance check
+        run: npm run check:migrations
+
       - name: Lint
         if: ${{ inputs.runLint }}
         run: npm run lint

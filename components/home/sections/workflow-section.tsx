@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { Activity, ArrowRight, Search, ShieldCheck, Wrench } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HomeContent } from "@/lib/home/content";
 
@@ -8,6 +8,14 @@ type WorkflowSectionProps = {
 };
 
 export function WorkflowSection({ content }: WorkflowSectionProps) {
+  const renderIcon = (token: string, accentClass: string) => {
+    const className = `size-4 ${accentClass}`;
+    if (token === "search") return <Search className={className} aria-hidden="true" />;
+    if (token === "shield-check") return <ShieldCheck className={className} aria-hidden="true" />;
+    if (token === "activity") return <Activity className={className} aria-hidden="true" />;
+    return <Wrench className={className} aria-hidden="true" />;
+  };
+
   return (
     <section className="border-y border-blacksmith bg-background">
       <div className="section-shell flex flex-col gap-8 py-20">
@@ -22,7 +30,7 @@ export function WorkflowSection({ content }: WorkflowSectionProps) {
               <CardHeader className="space-y-4 pb-3">
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg border border-blacksmith bg-muted p-2.5">
-                    <item.icon className={`size-4 ${item.accentClass}`} />
+                    {renderIcon(item.icon, item.accentClass)}
                   </div>
                   <CardTitle className="text-xl text-foreground">{item.title}</CardTitle>
                 </div>

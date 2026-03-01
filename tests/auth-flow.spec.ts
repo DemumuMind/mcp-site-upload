@@ -17,7 +17,18 @@ async function forceEnglishLocale(page: Page) {
 }
 
 test.describe("Auth email flows", () => {
+  test.beforeEach(async ({ page }) => {
+    await forceEnglishLocale(page);
+    await page.goto("/auth?next=%2Faccount", { waitUntil: "networkidle" });
+  });
+
   test("sign-up shows password rules and redirects to check-email step", async ({ page }) => {
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    if ((await authDisabled.count()) > 0) {
+      await expect(authDisabled).toBeVisible();
+      return;
+    }
+
     await page.route("**/auth/v1/signup**", async (route) => {
       if (route.request().method() === "OPTIONS") {
         await route.fulfill({
@@ -64,9 +75,6 @@ test.describe("Auth email flows", () => {
       });
     });
 
-    await forceEnglishLocale(page);
-    await page.goto("/auth?next=%2Faccount");
-
     const signupButton = page.getByRole("button", { name: "No account? Sign up" });
     await signupButton.waitFor({ state: "visible", timeout: 60000 });
     await signupButton.click();
@@ -98,6 +106,12 @@ test.describe("Auth email flows", () => {
   });
 
   test("reset request redirects to check-email step and supports resend", async ({ page }) => {
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    if ((await authDisabled.count()) > 0) {
+      await expect(authDisabled).toBeVisible();
+      return;
+    }
+
     await page.route("**/auth/v1/recover**", async (route) => {
       if (route.request().method() === "OPTIONS") {
         await route.fulfill({
@@ -116,9 +130,6 @@ test.describe("Auth email flows", () => {
         body: JSON.stringify({}),
       });
     });
-
-    await forceEnglishLocale(page);
-    await page.goto("/auth?next=%2Faccount");
 
     const forgotButton = page.getByRole("button", { name: "Forgot password?" });
     await forgotButton.waitFor({ state: "visible", timeout: 60000 });

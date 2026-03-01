@@ -32,7 +32,7 @@ test.describe("Blog v2", () => {
     await setConsentCookies(page);
     await page.goto("/blog");
 
-    await page.getByRole("link", { name: /Workflow/i }).first().click();
+    await page.locator('a[href*="topic=workflow"]').first().click();
     await expect.poll(() => page.url()).toContain("topic=workflow");
     await expect(page.getByText("Topic: Workflow")).toBeVisible();
   });

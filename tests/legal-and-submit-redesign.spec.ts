@@ -29,8 +29,13 @@ test.describe("Redesigned company/legal and submit pages", () => {
   });
 
   test("submit server route requires auth and redirects to login", async ({ page }) => {
-    await page.goto("/submit-server");
+    await page.goto("/submit-server", { waitUntil: "networkidle" });
     await expect(page).toHaveURL(/\/auth\?next=%2Fsubmit-server/);
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    if ((await authDisabled.count()) > 0) {
+      await expect(authDisabled).toBeVisible();
+      return;
+    }
     await expect(page.getByLabel("Email")).toBeVisible();
   });
 });

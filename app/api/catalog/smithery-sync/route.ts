@@ -16,7 +16,7 @@ const handlers = withCronAuth(
       // Сброс кэша для обновления данных на сайте
       revalidatePath("/");
       revalidatePath("/catalog");
-      revalidateTag(CATALOG_SERVERS_CACHE_TAG);
+      revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
 
       for (const slug of result.changedSlugs.slice(0, 100)) {
         revalidatePath(`/server/${slug}`);
