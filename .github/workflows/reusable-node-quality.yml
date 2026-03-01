@@ -48,6 +48,9 @@ jobs:
       - name: UTF-8 check
         run: npm run check:utf8:strict
 
+      - name: Architecture import-cycle check
+        run: npm run check:cycles
+
       - name: Lint
         if: ${{ inputs.runLint }}
         run: npm run lint
