@@ -17,7 +17,15 @@ const sectionIndexSchema = z.object({
 });
 type SectionIndex = z.infer<typeof sectionIndexSchema>;
 export type SectionLocaleCopy = z.infer<typeof sectionLocaleSchema>;
-const contentRoot = path.join(process.cwd(), "content");
+function resolveContentRoot(): string {
+    const cwd = process.cwd();
+    const direct = path.join(cwd, "content");
+    if (fs.existsSync(direct)) {
+        return direct;
+    }
+    return path.join(cwd, "frontend", "content");
+}
+const contentRoot = resolveContentRoot();
 const sectionCache = new Map<string, SectionIndex | null>();
 function getSectionIndexFilePath(sectionKey: string): string {
     return path.join(contentRoot, sectionKey, "_index.json");

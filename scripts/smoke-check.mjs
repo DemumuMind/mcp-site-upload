@@ -79,6 +79,8 @@ const healthToken =
   getEnvValue("SMOKE_HEALTH_TOKEN") ||
   getEnvValue("HEALTH_CHECK_CRON_SECRET") ||
   getEnvValue("CRON_SECRET");
+const skipAuthHealthProbe =
+  String(process.env.SMOKE_SKIP_AUTH_HEALTH || "false").toLowerCase() === "true";
 
 const { failures, pass: logPass, fail: logFail } = createReporter("smoke");
 const protectedStatusAllowed = allowProtectedMode ? [200, 401] : [200];
@@ -89,8 +91,14 @@ function buildUrl(pathname) {
 
 async function request(pathname, options = {}) {
   const url = buildUrl(pathname);
+  const timeoutMs = Number(process.env.SMOKE_REQUEST_TIMEOUT_MS || "15000");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
   const response = await fetch(url, {
     redirect: "follow",
+    signal: controller.signal,
     headers: {
       "user-agent": "demumumind-mcp-smoke-check/1.0",
       ...(options.headers || {}),
@@ -99,6 +107,9 @@ async function request(pathname, options = {}) {
   });
 
   return response;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function assertStatus(pathname, expectedStatuses, options = {}) {
@@ -160,6 +171,11 @@ async function checkCorePages() {
 async function checkHealthEndpoint() {
   const unauthorizedExpectedStatuses = allowProtectedMode ? [401, 500, 404] : [401, 500];
   await assertStatus("/api/health-check", unauthorizedExpectedStatuses);
+
+  if (skipAuthHealthProbe) {
+    console.log("INFO: SMOKE_SKIP_AUTH_HEALTH=true; skipping authorized /api/health-check probe");
+    return;
+  }
 
   if (!healthToken) {
     console.log(

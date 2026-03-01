@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { buildDraftPostFromResearch, runDeepResearchWorkflow } from "@/lib/blog/research";
 import { normalizeBlogSlug, normalizeSlugList, toTitleFromSlug } from "@/lib/blog/slug";
@@ -12,7 +13,16 @@ import {
   type BlogV2PublishResult,
 } from "@/lib/blog-v2/pipeline/types";
 
-const blogRoot = path.join(process.cwd(), "content", "blog");
+function resolveContentRoot(): string {
+  const cwd = process.cwd();
+  const direct = path.join(cwd, "content");
+  if (existsSync(direct)) {
+    return direct;
+  }
+  return path.join(cwd, "frontend", "content");
+}
+
+const blogRoot = path.join(resolveContentRoot(), "blog");
 const postsRoot = path.join(blogRoot, "posts");
 const topicsPath = path.join(blogRoot, "taxonomy", "topics.json");
 

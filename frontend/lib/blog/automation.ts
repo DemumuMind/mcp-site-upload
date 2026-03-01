@@ -1,9 +1,19 @@
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { buildDraftPostFromResearch, type DeepResearchPacket, type ResearchVerificationCheck, } from "@/lib/blog/research";
 import { normalizeBlogSlug, normalizeSlugList, toTitleFromSlug } from "@/lib/blog/slug";
 import { saveBlogPostToSupabase } from "@/lib/blog/supabase-store";
-const blogRoot = path.join(process.cwd(), "content", "blog");
+function resolveContentRoot(): string {
+    const cwd = process.cwd();
+    const direct = path.join(cwd, "content");
+    if (existsSync(direct)) {
+        return direct;
+    }
+    return path.join(cwd, "frontend", "content");
+}
+
+const blogRoot = path.join(resolveContentRoot(), "blog");
 const postsRoot = path.join(blogRoot, "posts");
 const researchRoot = path.join(blogRoot, "research");
 const tagsPath = path.join(blogRoot, "tags.json");

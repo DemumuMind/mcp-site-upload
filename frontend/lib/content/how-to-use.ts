@@ -154,7 +154,15 @@ export type HowToUseLocaleContent = {
         actions: HowToUseLocaleAction[];
     };
 };
-const howToUsePathsFilePath = path.join(process.cwd(), "content", "how-to-use", "paths.json");
+function resolveContentRoot(): string {
+    const cwd = process.cwd();
+    const direct = path.join(cwd, "content");
+    if (fs.existsSync(direct)) {
+        return direct;
+    }
+    return path.join(cwd, "frontend", "content");
+}
+const howToUsePathsFilePath = path.join(resolveContentRoot(), "how-to-use", "paths.json");
 let cachedHowToUsePaths: HowToUsePaths | null = null;
 let hasLoadedHowToUsePaths = false;
 const fallbackHowToUsePaths: HowToUsePaths = {

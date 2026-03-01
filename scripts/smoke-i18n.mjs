@@ -17,7 +17,7 @@ const checks = [
       en: "DemumuMind MCP",
     },
     h1: {
-      en: "Ship MCP Integrations",
+      en: "Ship MCP Faster",
     },
   },
   {
@@ -80,7 +80,7 @@ const checks = [
       en: "Discord Community",
     },
     h1: {
-      en: "BridgeMind Discord",
+      en: "DemumuMind Discord",
     },
   },
   {

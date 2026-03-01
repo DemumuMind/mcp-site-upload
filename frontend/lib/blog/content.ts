@@ -3,7 +3,17 @@ import path from "node:path";
 import { z } from "zod";
 import { normalizeBlogSlug, toTitleFromSlug } from "@/lib/blog/slug";
 import type { BlogPost, BlogTag } from "@/lib/blog/types";
-const blogContentRoot = path.join(process.cwd(), "content", "blog");
+
+function resolveContentRoot(): string {
+    const cwd = process.cwd();
+    const direct = path.join(cwd, "content");
+    if (fs.existsSync(direct)) {
+        return direct;
+    }
+    return path.join(cwd, "frontend", "content");
+}
+
+const blogContentRoot = path.join(resolveContentRoot(), "blog");
 const blogPostsRoot = path.join(blogContentRoot, "posts");
 const blogTagsFile = path.join(blogContentRoot, "tags.json");
 const blogContentBlockSchema = z.object({
