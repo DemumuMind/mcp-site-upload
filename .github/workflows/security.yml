@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   dependency-review:
-    if: ${{ github.event_name == 'pull_request' && vars.DEPENDENCY_REVIEW_ENABLED == 'true' }}
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,6 +26,7 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+          deny-licenses: GPL-2.0, AGPL-1.0, AGPL-3.0
 
   npm-audit:
     runs-on: ubuntu-latest
@@ -63,5 +64,29 @@ jobs:
         run: |
           docker run --rm \
             -v "$PWD:/repo" \
-            zricethezav/gitleaks:latest \
-            detect --source=/repo --no-git --no-banner --redact --exit-code 1
+            ghcr.io/gitleaks/gitleaks:v8.24.2 \
+            git --source=/repo --no-banner --redact --exit-code 1 --log-opts="--all"
+
+  osv-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run OSV scanner
+        shell: bash
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo" \
+            ghcr.io/google/osv-scanner:v2.2.2 \
+            scan --lockfile=/repo/package-lock.json --severity=HIGH,CRITICAL
