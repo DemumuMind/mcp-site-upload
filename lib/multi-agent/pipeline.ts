@@ -16,12 +16,14 @@ import {
 } from "./types";
 import { InMemoryMemoryStore } from "./memory";
 import { RetryingToolGateway } from "./tool-gateway";
+import { emitMultiAgentTaskEvent } from "./task-events";
+import { DEFAULT_AGENT_CONFIG } from "./config";
 
 const WORKER_ROLES: readonly WorkerRole[] = ["analyst", "developer", "tester"];
 const ESTIMATED_COST_PER_1K_TOKENS_USD = 0.0025;
 const MAX_ESTIMATED_TOKENS_BUDGET = 4000;
-const MAX_INITIAL_RETRIES = 2;
-const RETRY_BACKOFF_MS = 40;
+const MAX_INITIAL_RETRIES = DEFAULT_AGENT_CONFIG.retryPolicy.maxAttempts - 1;
+const RETRY_BACKOFF_MS = DEFAULT_AGENT_CONFIG.retryPolicy.backoffMs;
 const ADAPTIVE_ORCHESTRATION_ENABLED = process.env.MULTI_AGENT_ADAPTIVE_ENABLED !== "0";
 
 type InitialOutputMap = Record<WorkerRole, { role: WorkerRole; content: string }>;
@@ -86,10 +88,12 @@ const estimateTokensFromText = (text: string): number => {
 const selectActiveWorkers = (input: MultiAgentPipelineInput): WorkerRole[] => {
   const base = [...WORKER_ROLES];
   const contextSize = Object.keys(input.context).length;
+  const boundedMaxWorkers = Math.max(1, Math.min(DEFAULT_AGENT_CONFIG.maxParallel, base.length));
+  const boundedBase = base.slice(0, boundedMaxWorkers);
   if (contextSize <= 1 && input.task.length < 120) {
-    return base.filter((role) => role !== "tester");
+    return boundedBase.filter((role) => role !== "tester");
   }
-  return base;
+  return boundedBase;
 };
 
 const estimatePipelineTokens = (input: MultiAgentPipelineInput, workers: WorkerRole[], exchangeMode: "full-mesh" | "ring"): number => {
@@ -103,13 +107,31 @@ const estimatePipelineTokens = (input: MultiAgentPipelineInput, workers: WorkerR
   return estimateTokensFromText(raw) * 4;
 };
 
-export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): Promise<MultiAgentPipelineResult> => {
+export const runMultiAgentPipeline = async (
+  rawInput: MultiAgentPipelineInput,
+  options?: { requestId?: string },
+): Promise<MultiAgentPipelineResult> => {
   const pipelineStartedAt = Date.now();
   const input = pipelineInputSchema.parse(rawInput);
   const activeWorkers = ADAPTIVE_ORCHESTRATION_ENABLED ? selectActiveWorkers(input) : [...WORKER_ROLES];
   const plannedFullMeshTokens = estimatePipelineTokens(input, activeWorkers, "full-mesh");
   const coordinationMode: "full-mesh" | "ring" =
     !ADAPTIVE_ORCHESTRATION_ENABLED || plannedFullMeshTokens <= MAX_ESTIMATED_TOKENS_BUDGET ? "full-mesh" : "ring";
+  if (options?.requestId && coordinationMode === "ring" && ADAPTIVE_ORCHESTRATION_ENABLED) {
+    await emitMultiAgentTaskEvent({
+      requestId: options.requestId,
+      eventType: "fallback_triggered",
+      status: "success",
+      stage: "execution",
+      payload: {
+        reason: "coordination_downgrade",
+        from: "full-mesh",
+        to: "ring",
+        plannedFullMeshTokens,
+        maxEstimatedTokensBudget: MAX_ESTIMATED_TOKENS_BUDGET,
+      },
+    });
+  }
   const logs: PipelineLogEntry[] = [];
   const indexRef = { value: 0 };
   const stageDurationsMs = {
@@ -146,7 +168,12 @@ export const runMultiAgentPipeline = async (rawInput: MultiAgentPipelineInput): 
     activeWorkers.map(async (role) => {
       const { result: output, retries } = await toolGateway.execute(
         () => agents[role].createInitialOutput(input),
-        { retries: MAX_INITIAL_RETRIES, backoffMs: RETRY_BACKOFF_MS },
+        {
+          retries: MAX_INITIAL_RETRIES,
+          backoffMs: RETRY_BACKOFF_MS,
+          requestId: options?.requestId,
+          stage: "execution",
+        },
       );
       initialRetries += retries;
       memoryStore.append({

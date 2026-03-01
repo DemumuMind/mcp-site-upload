@@ -15,6 +15,17 @@ export type PipelineStatus = z.infer<typeof pipelineStatusSchema>;
 export const executionStateSchema = z.enum(["initial", "exchange", "final", "completed"]);
 export type ExecutionState = z.infer<typeof executionStateSchema>;
 
+export const agentConfigSchema = z.object({
+  maxParallel: z.number().int().min(1),
+  retryPolicy: z.object({
+    maxAttempts: z.number().int().min(1),
+    backoffMs: z.number().int().min(0),
+  }),
+  timeoutMs: z.number().int().min(1000),
+  featureFlags: z.record(z.string(), z.boolean()).default({}),
+});
+export type AgentConfig = z.infer<typeof agentConfigSchema>;
+
 export const pipelineInputSchema = z.object({
   task: z.string().trim().min(1),
   context: z.record(z.string(), z.string()).default({}),
@@ -61,7 +72,10 @@ export interface MemoryStore {
 }
 
 export interface ToolGateway {
-  execute<T>(operation: () => Promise<T>, options?: { retries?: number; backoffMs?: number }): Promise<{ result: T; retries: number }>;
+  execute<T>(
+    operation: () => Promise<T>,
+    options?: { retries?: number; backoffMs?: number; requestId?: string; stage?: string },
+  ): Promise<{ result: T; retries: number }>;
 }
 
 export interface AgentCore {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createLogger } from "@/lib/api/logger";
 import { runMultiAgentPipeline } from "@/lib/multi-agent/pipeline";
 import { persistMultiAgentTelemetry } from "@/lib/multi-agent/telemetry";
+import { emitMultiAgentTaskEvent } from "@/lib/multi-agent/task-events";
 import type { MultiAgentPipelineResult } from "@/lib/multi-agent/types";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +54,27 @@ export async function POST(request: NextRequest) {
   const startedAt = Date.now();
 
   try {
+    await emitMultiAgentTaskEvent({
+      requestId,
+      eventType: "task_received",
+      status: "started",
+      stage: "validation",
+      payload: {
+        method: request.method,
+        path: request.nextUrl.pathname,
+      },
+    });
+
     if (!isAuthorized(request)) {
+      await emitMultiAgentTaskEvent({
+        requestId,
+        eventType: "task_failed",
+        status: "failed",
+        stage: "validation",
+        payload: {
+          reason: "unauthorized",
+        },
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -66,8 +87,18 @@ export async function POST(request: NextRequest) {
 
     const json = await request.json();
     const input = requestSchema.parse(json);
+    await emitMultiAgentTaskEvent({
+      requestId,
+      eventType: "task_received",
+      status: "success",
+      stage: "validation",
+      payload: {
+        taskLength: input.task.length,
+        contextSize: Object.keys(input.context).length,
+      },
+    });
 
-    const pipelineOutput = await runMultiAgentPipeline(input);
+    const pipelineOutput = await runMultiAgentPipeline(input, { requestId });
 
     const result =
       pipelineOutput && typeof pipelineOutput === "object" && "result" in pipelineOutput
@@ -93,8 +124,30 @@ export async function POST(request: NextRequest) {
       } catch (telemetryError) {
         const telemetryMessage = telemetryError instanceof Error ? telemetryError.message : "Unknown telemetry error";
         logger.error("telemetry_error", { requestId, message: telemetryMessage });
+        await emitMultiAgentTaskEvent({
+          requestId,
+          eventType: "task_failed",
+          status: "failed",
+          stage: "telemetry",
+          payload: {
+            reason: "persist_multi_agent_telemetry_failed",
+            message: telemetryMessage,
+          },
+        });
       }
     }
+
+    await emitMultiAgentTaskEvent({
+      requestId,
+      eventType: "task_completed",
+      status: "success",
+      stage: "execution",
+      payload: {
+        durationMs,
+        hasPipelineResult: isPipelineResult(result),
+        logEntries: Array.isArray(log) ? log.length : 0,
+      },
+    });
 
     return NextResponse.json({
       ok: true,
@@ -108,6 +161,16 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       logger.warn("validation_error", { requestId, issues: error.issues.length });
+      await emitMultiAgentTaskEvent({
+        requestId,
+        eventType: "task_failed",
+        status: "failed",
+        stage: "validation",
+        payload: {
+          reason: "invalid_request_body",
+          issues: error.issues.length,
+        },
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -121,6 +184,16 @@ export async function POST(request: NextRequest) {
 
     const message = error instanceof Error ? error.message : "Unknown error";
     logger.error("unhandled_error", { requestId, message });
+    await emitMultiAgentTaskEvent({
+      requestId,
+      eventType: "task_failed",
+      status: "failed",
+      stage: "execution",
+      payload: {
+        reason: "unhandled_error",
+        message,
+      },
+    });
 
     return NextResponse.json(
       {

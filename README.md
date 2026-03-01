@@ -107,6 +107,7 @@ Apply migrations via Supabase CLI in your environment.
 ## Health Checks
 
 Endpoint:
+- `GET /api/health` (public runtime probe)
 - `GET/POST /api/health-check`
 
 Auth:
@@ -123,6 +124,9 @@ Scheduler:
 - `vercel.json` runs daily at `03:00` UTC.
 
 Detailed operational notes: `docs/health-check-runbook.md`.
+
+Public runtime probe response (`GET /api/health`):
+- `{ ok, readiness, liveness, planVersion: "v2", checkedAt }`
 
 ## Blog Auto-Publish
 
@@ -144,6 +148,15 @@ Default Vercel cron schedule:
 - `06:15` UTC
 - `12:15` UTC
 - `18:15` UTC
+
+## Multi-Agent Config
+
+`AgentConfig` shape (`lib/multi-agent/types.ts`):
+- `maxParallel: number` (int, `>= 1`)
+- `retryPolicy.maxAttempts: number` (int, `>= 1`)
+- `retryPolicy.backoffMs: number` (int, `>= 0`)
+- `timeoutMs: number` (int, `>= 1000`)
+- `featureFlags: Record<string, boolean>` (default `{}`)
 
 ## Catalog Auto-Sync
 
