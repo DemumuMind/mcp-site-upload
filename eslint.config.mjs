@@ -9,6 +9,7 @@ const config = [
       ".next-dev-tools/**",
       ".next-playwright-howto/**",
       ".contentlayer/**",
+      ".worktrees/**",
       "node_modules/**",
     ],
   },
