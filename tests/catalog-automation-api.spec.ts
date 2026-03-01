@@ -14,18 +14,26 @@ test.describe("Catalog automation API", () => {
     });
   });
 
-  test("GET /api/catalog/automation-status with token returns 200 and status shape", async ({ request }) => {
-    test.skip(!cronToken, "CATALOG_AUTOSYNC_CRON_SECRET or CRON_SECRET is required for authorized case.");
+  test("GET /api/catalog/automation-status auth behavior is correct", async ({ request }) => {
+    const headers = cronToken
+      ? {
+          Authorization: `Bearer ${cronToken}`,
+        }
+      : undefined;
 
-    const response = await request.get("/api/catalog/automation-status", {
-      headers: {
-        Authorization: `Bearer ${cronToken}`,
-      },
-    });
+    const response = await request.get("/api/catalog/automation-status", { headers });
+    const body = await response.json();
+
+    if (!cronToken) {
+      expect(response.status()).toBe(401);
+      expect(body).toMatchObject({
+        ok: false,
+        error: "Unauthorized",
+      });
+      return;
+    }
 
     expect(response.status()).toBe(200);
-
-    const body = await response.json();
     expect(body).toMatchObject({
       ok: expect.any(Boolean),
       checks: expect.any(Object),
