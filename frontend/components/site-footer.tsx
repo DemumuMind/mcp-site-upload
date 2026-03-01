@@ -7,21 +7,10 @@ import {
   MessageCircle,
   Send,
   Youtube,
-  House,
-  LayoutGrid,
-  Tags,
-  Cpu,
-  Wrench,
-  Newspaper,
-  BookOpen,
-  Info,
-  Wallet,
-  Mail,
-  PlusCircle,
-  LogIn
 } from "lucide-react";
 import { BrandLockup } from "@/components/brand-lockup";
 import { CookieSettingsButton } from "@/components/cookie-settings-button";
+import { FooterNavColumn, footerNavSections } from "@/components/site-footer/sections";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { cn } from "@/lib/utils";
@@ -37,10 +26,6 @@ const socialLinks = [
 type SiteFooterProps = {
   locale: Locale;
 };
-
-const FooterLinkUnderline = () => (
-  <span className="absolute inset-x-3 bottom-[5px] h-px scale-x-0 bg-primary/60 transition-transform duration-200 group-hover:scale-x-100" />
-);
 
 export function SiteFooter({ locale }: SiteFooterProps) {
   const year = new Date().getFullYear();
@@ -108,98 +93,33 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <div className="space-y-4 text-sm">
-            <p className="px-3 text-xs tracking-[0.16em] text-muted-foreground uppercase">{tr(locale, "Explore", "Explore")}</p>
-            <nav className="flex flex-col items-start gap-1">
-              <Link href="/" className={getLinkClass("/")}>
-                <House className="size-3.5 opacity-80" />
-                {tr(locale, "Overview", "Overview")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/catalog" className={getLinkClass("/catalog")}>
-                <LayoutGrid className="size-3.5 opacity-80" />
-                {tr(locale, "Catalog", "Catalog")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/categories" className={getLinkClass("/categories")}>
-                <Tags className="size-3.5 opacity-80" />
-                {tr(locale, "Categories", "Categories")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/tools" className={getLinkClass("/tools")}>
-                <Wrench className="size-3.5 opacity-80" />
-                {tr(locale, "Tools", "Tools")}
-                <FooterLinkUnderline />
-              </Link>
-            </nav>
-          </div>
+          <FooterNavColumn
+            locale={locale}
+            title={footerNavSections[0].title}
+            items={footerNavSections[0].items}
+            pathname={pathname}
+            getLinkClass={getLinkClass}
+          />
         </BlurFade>
 
         <BlurFade delay={0.3} inView>
-          <div className="space-y-4 text-sm">
-            <p className="px-3 text-xs tracking-[0.16em] text-muted-foreground uppercase">{tr(locale, "Resources", "Resources")}</p>
-            <nav className="flex flex-col items-start gap-1">
-              <Link href="/how-to-use" className={getLinkClass("/how-to-use")}>
-                <BookOpen className="size-3.5 opacity-80" />
-                {tr(locale, "Documentation", "Documentation")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/mcp" className={getLinkClass("/mcp")}>
-                <Cpu className="size-3.5 opacity-80" />
-                {tr(locale, "MCP Overview", "MCP Overview")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/blog" className={getLinkClass("/blog")}>
-                <Newspaper className="size-3.5 opacity-80" />
-                {tr(locale, "Blog", "Blog")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/pricing" className={getLinkClass("/pricing")}>
-                <Wallet className="size-3.5 opacity-80" />
-                {tr(locale, "Pricing", "Pricing")}
-                <FooterLinkUnderline />
-              </Link>
-            </nav>
-          </div>
+          <FooterNavColumn
+            locale={locale}
+            title={footerNavSections[1].title}
+            items={footerNavSections[1].items}
+            pathname={pathname}
+            getLinkClass={getLinkClass}
+          />
         </BlurFade>
 
         <BlurFade delay={0.4} inView>
-          <div className="space-y-4 text-sm">
-            <p className="px-3 text-xs tracking-[0.16em] text-muted-foreground uppercase">{tr(locale, "Community", "Community")}</p>
-            <nav className="flex flex-col items-start gap-1">
-              <Link href="/about" className={getLinkClass("/about")}>
-                <Info className="size-3.5 opacity-80" />
-                {tr(locale, "About Us", "About Us")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/contact" className={getLinkClass("/contact")}>
-                <Mail className="size-3.5 opacity-80" />
-                {tr(locale, "Contact", "Contact")}
-                <FooterLinkUnderline />
-              </Link>
-              <a href="https://discord.com" target="_blank" rel="noreferrer" className={getLinkClass("https://discord.com")}>
-                <MessageCircle className="size-3.5 opacity-80" />
-                {tr(locale, "Discord", "Discord")}
-                <FooterLinkUnderline />
-              </a>
-              <Link
-                href="/submit-server"
-                className={cn(
-                  "group relative flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] font-medium tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                  pathname === "/submit-server" ? "text-primary" : "text-muted-foreground hover:text-primary"
-                )}
-              >
-                <PlusCircle className="size-3.5" />
-                {tr(locale, "Submit Your Server", "Submit Your Server")}
-                <FooterLinkUnderline />
-              </Link>
-              <Link href="/auth" className={getLinkClass("/auth")}>
-                <LogIn className="size-3.5 opacity-80" />
-                {tr(locale, "Sign In", "Sign In")}
-                <FooterLinkUnderline />
-              </Link>
-            </nav>
-          </div>
+          <FooterNavColumn
+            locale={locale}
+            title={footerNavSections[2].title}
+            items={footerNavSections[2].items}
+            pathname={pathname}
+            getLinkClass={getLinkClass}
+          />
         </BlurFade>
       </div>
 
