@@ -143,7 +143,10 @@ test.describe("Catalog query v2 filters", () => {
     await page.goto("/catalog");
 
     const visibleCardCount = await getVisibleCardCount(page);
-    test.skip(visibleCardCount === 0, "No visible cards in current fixture/environment.");
+    if (visibleCardCount === 0) {
+      await expect(page.getByText("No tools found")).toBeVisible();
+      return;
+    }
     expect(visibleCardCount).toBeGreaterThan(0);
 
     const cardLogoImages = page.locator('img[alt$=" logo"]');

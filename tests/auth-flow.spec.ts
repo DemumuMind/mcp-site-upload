@@ -20,11 +20,15 @@ test.describe("Auth email flows", () => {
   test.beforeEach(async ({ page }) => {
     await forceEnglishLocale(page);
     await page.goto("/auth?next=%2Faccount", { waitUntil: "networkidle" });
-    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
-    test.skip((await authDisabled.count()) > 0, "Supabase auth env is not configured in this environment.");
   });
 
   test("sign-up shows password rules and redirects to check-email step", async ({ page }) => {
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    if ((await authDisabled.count()) > 0) {
+      await expect(authDisabled).toBeVisible();
+      return;
+    }
+
     await page.route("**/auth/v1/signup**", async (route) => {
       if (route.request().method() === "OPTIONS") {
         await route.fulfill({
@@ -102,6 +106,12 @@ test.describe("Auth email flows", () => {
   });
 
   test("reset request redirects to check-email step and supports resend", async ({ page }) => {
+    const authDisabled = page.getByRole("heading", { name: "Auth is not configured" });
+    if ((await authDisabled.count()) > 0) {
+      await expect(authDisabled).toBeVisible();
+      return;
+    }
+
     await page.route("**/auth/v1/recover**", async (route) => {
       if (route.request().method() === "OPTIONS") {
         await route.fulfill({
