@@ -47,6 +47,9 @@ Use `ops/backup-manifest.example.json` as reference. Required fields:
   - `BACKUP_SUPABASE_SERVICE_ROLE_KEY`
 
 ## Monthly Restore Drill
+Cadence owner: Data Lead  
+Cadence target: run by the 5th business day of each month
+
 1. Pick latest backup and create isolated staging database.
 2. Restore database dump.
 3. Run critical checks:
@@ -55,6 +58,7 @@ Use `ops/backup-manifest.example.json` as reference. Required fields:
    - `/api/health-check` operational behavior
 4. Update `lastRestoreDrillAt` in manifest.
 5. Record actual RTO and any gaps.
+6. Open a follow-up ticket for any gap with deadline and owner.
 
 ## Failure Handling
 - If `ops:backup-verify` fails:

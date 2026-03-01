@@ -55,6 +55,11 @@ jobs:
       - name: Supabase CLI version
         run: supabase --version
 
+      - name: Validate migration filename determinism
+        shell: bash
+        run: |
+          npm run check:migrations
+
       - name: Resolve migration mode
         id: migration_mode
         shell: bash

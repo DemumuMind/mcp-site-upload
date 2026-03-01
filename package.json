@@ -14,6 +14,7 @@
     "content:build": "contentlayer2 build",
     "check:utf8": "node scripts/check-utf8.mjs",
     "check:utf8:strict": "node scripts/check-utf8.mjs --strict-missing",
+    "check:migrations": "node scripts/check-migration-prefixes.mjs",
     "lint": "eslint .",
     "blog:new": "node scripts/blog-new-post.mjs",
     "blog:migrate-mdx": "node scripts/blog-migrate-json-to-mdx.mjs",
