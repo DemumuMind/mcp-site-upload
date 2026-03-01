@@ -30,14 +30,14 @@ export async function generateMetadata(): Promise<Metadata> {
     title: pageTitle,
     description: pageDescription,
     openGraph: {
-      title: "BridgeMind Blog",
+      title: "DemumuMind Blog",
       description: "Editorial + Tech Noir blog for production MCP and agentic engineering workflows.",
       type: "website",
       url: "/blog",
     },
     twitter: {
       card: "summary_large_image",
-      title: "BridgeMind Blog",
+      title: "DemumuMind Blog",
       description: "Editorial + Tech Noir blog for production MCP and agentic engineering workflows.",
     },
   };

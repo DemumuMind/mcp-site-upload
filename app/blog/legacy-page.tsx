@@ -42,7 +42,7 @@ export async function generateLegacyBlogMetadata(): Promise<Metadata> {
       "Articles on vibe coding, agentic coding, prompt engineering, and AI development best practices.",
       "Articles on vibe coding, agentic coding, prompt engineering, and AI development best practices.",
     );
-  const heroTitle = sectionCopy?.heroTitle ?? tr(locale, "BridgeMind Blog", "BridgeMind Blog");
+  const heroTitle = sectionCopy?.heroTitle ?? tr(locale, "DemumuMind Blog", "DemumuMind Blog");
   const heroDescription =
     sectionCopy?.heroDescription ??
     tr(
@@ -139,7 +139,7 @@ export async function LegacyBlogPage({ searchParams }: LegacyBlogPageProps) {
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              {tr(locale, "Latest from BridgeMind", "Latest from BridgeMind")}
+              {tr(locale, "Latest from DemumuMind", "Latest from DemumuMind")}
             </h2>
           </div>
 

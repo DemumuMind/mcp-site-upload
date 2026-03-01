@@ -63,8 +63,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: tr(locale, "Discord Community", "Discord Community"),
     description: tr(
       locale,
-      "Join the BridgeMind developer community for vibe coding and agentic coding.",
-      "Join the BridgeMind developer community for vibe coding and agentic coding.",
+      "Join the DemumuMind developer community for vibe coding and agentic coding.",
+      "Join the DemumuMind developer community for vibe coding and agentic coding.",
     ),
   };
 }
@@ -78,7 +78,7 @@ export default async function DiscordPage() {
         <PageHero
           surface="rail"
           eyebrow={<Badge className="w-fit border-indigo-400/35 bg-primary/10 text-primary">{tr(locale, "Community", "Community")}</Badge>}
-          title={tr(locale, "BridgeMind Discord", "BridgeMind Discord")}
+          title={tr(locale, "DemumuMind Discord", "DemumuMind Discord")}
           description={tr(
             locale,
             "Join engineers and AI builders discussing MCP shipping patterns, benchmark results, and day-to-day implementation decisions.",

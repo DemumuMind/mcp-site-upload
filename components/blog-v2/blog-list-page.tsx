@@ -45,7 +45,7 @@ export async function BlogListPage({ selectedTopic }: BlogListPageProps) {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <PageHero
           eyebrow="Resources"
-          title="BridgeMind Blog"
+          title="DemumuMind Blog"
           description="Editorial playbooks, architecture narratives, and operational checklists for teams building agentic products in production."
           badgeTone="cyan"
         />
@@ -77,7 +77,7 @@ export async function BlogListPage({ selectedTopic }: BlogListPageProps) {
 
         <section>
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground">Latest from BridgeMind</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground">Latest from DemumuMind</h2>
           </div>
 
           {withoutFeatured.length > 0 ? (

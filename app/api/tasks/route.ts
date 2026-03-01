@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { authorizeTaskApiRequest } from "@/lib/tasks/task-api-auth";
 import { createAgentTask } from "@/lib/tasks/task-store";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,10 @@ const createTaskBodySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  if (!authorizeTaskApiRequest(request)) {
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

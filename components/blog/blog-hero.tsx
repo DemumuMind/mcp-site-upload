@@ -8,7 +8,7 @@ type BlogHeroProps = {
 };
 export function BlogHero({ locale, copy }: BlogHeroProps) {
     const eyebrow = copy?.eyebrow ?? tr(locale, "Resources", "Resources");
-    const title = copy?.heroTitle ?? tr(locale, "BridgeMind Blog", "BridgeMind Blog");
+    const title = copy?.heroTitle ?? tr(locale, "DemumuMind Blog", "DemumuMind Blog");
     const description = copy?.heroDescription ??
         tr(locale, "Editorial notes, benchmarks, and implementation playbooks for teams shipping agentic coding workflows.", "Editorial notes, benchmarks, and implementation playbooks for teams shipping agentic coding workflows.");
     return (<section className="rounded-3xl border border-primary/30 bg-card p-6 sm:p-8">

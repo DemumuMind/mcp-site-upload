@@ -39,7 +39,7 @@ function chooseTitle(input: { title?: string; topic: string }): string {
     return provided;
   }
   const normalized = toTitleFromSlug(normalizeBlogSlug(input.topic));
-  return normalized || "BridgeMind Editorial Draft";
+  return normalized || "DemumuMind Editorial Draft";
 }
 
 function buildExcerpt(topic: string, sourceCount: number): string {

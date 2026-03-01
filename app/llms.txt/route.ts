@@ -3,18 +3,18 @@ function absoluteUrl(path: string, siteUrl: string) {
     return new URL(path, siteUrl).toString();
 }
 function buildLlmsText(siteUrl: string) {
-    return `# BridgeMind
+    return `# DemumuMind
 
 Machine-readable sitemaps: ${absoluteUrl("/sitemap.xml", siteUrl)} | ${absoluteUrl("/llms.txt", siteUrl)}
 
-> BridgeMind is the premier vibe coding and agentic coding platform. We empower developers to build production-ready software using natural-language programming with AI tools like Cursor, Claude Code, GitHub Copilot, and Windsurf.
+> DemumuMind is the premier vibe coding and agentic coding platform. We empower developers to build production-ready software using natural-language programming with AI tools like Cursor, Claude Code, GitHub Copilot, and Windsurf.
 
-BridgeMind provides resources, tools, and a thriving community for developers embracing vibe coding and agentic coding workflows. Our mission is to accelerate the adoption of AI-powered development practices worldwide.
+DemumuMind provides resources, tools, and a thriving community for developers embracing vibe coding and agentic coding workflows. Our mission is to accelerate the adoption of AI-powered development practices worldwide.
 
 ## Core Pages
 
 - [Home](${absoluteUrl("/", siteUrl)}): Discover vibe coding and join the agentic coding revolution
-- [About BridgeMind](${absoluteUrl("/about", siteUrl)}): Our mission, vision, and approach to vibe coding and agentic coding
+- [About DemumuMind](${absoluteUrl("/about", siteUrl)}): Our mission, vision, and approach to vibe coding and agentic coding
 - [Pricing](${absoluteUrl("/pricing", siteUrl)}): Free access today with a transparent roadmap for future Pro capabilities
 
 ## Resources
@@ -27,7 +27,7 @@ BridgeMind provides resources, tools, and a thriving community for developers em
 
 ## Company
 
-- [Contact](${absoluteUrl("/contact", siteUrl)}): Get in touch with the BridgeMind team
+- [Contact](${absoluteUrl("/contact", siteUrl)}): Get in touch with the DemumuMind team
 
 ## Optional
 
