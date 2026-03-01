@@ -150,3 +150,12 @@
 - Рост расходов без контроля.
 ### Acceptance Criteria
 - Cost KPIs стабилизированы.
+### Status
+- State: Completed
+- Updated at: 2026-03-01
+- Evidence: `docs/runbooks/release-cost-resource-optimization.md`
+- Verification:
+  - utf8: PASS (strict UTF-8 validation command)
+  - lint: PASS (`npm.cmd run lint`)
+  - build: FAIL (`spawn EPERM` in contentlayer/esbuild process)
+  - tests: FAIL (`spawn EPERM` in Playwright process)
