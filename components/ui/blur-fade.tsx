@@ -1,23 +1,20 @@
 "use client"
 
-import { useRef } from "react"
-import {
-  AnimatePresence,
-  motion,
-  useInView,
-  UseInViewOptions,
-  Variants,
-} from "motion/react"
+import { useMemo, useRef } from "react"
+import { useInView } from "motion/react"
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
+
+type InViewMargin = NonNullable<Parameters<typeof useInView>[1]>["margin"]
 
 interface BlurFadeProps {
   children: React.ReactNode
   className?: string
-  variant?: Variants
+  variant?: unknown
   duration?: number
   delay?: number
   yOffset?: number
   inView?: boolean
-  inViewMargin?: UseInViewOptions["margin"]
+  inViewMargin?: InViewMargin
   blur?: string
 }
 
@@ -32,31 +29,29 @@ export function BlurFade({
   inViewMargin = "-50px",
   blur = "6px",
 }: BlurFadeProps) {
-  const ref = useRef(null)
-  const inViewResult = useInView(ref, { once: true, margin: inViewMargin })
-  const isInView = !inView || inViewResult
-  const defaultVariants: Variants = {
-    hidden: { y: yOffset, opacity: 0, filter: `blur(${blur})` },
-    visible: { y: 0, opacity: 1, filter: `blur(0px)` },
-  }
-  const combinedVariants = variant || defaultVariants
+  void variant
+  const ref = useRef<HTMLDivElement | null>(null)
+  const inViewDetected = useInView(ref, { once: true, margin: inViewMargin })
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const isVisible = prefersReducedMotion || !inView || inViewDetected
+
+  const style = useMemo<React.CSSProperties>(
+    () => ({
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? "translateY(0)" : `translateY(${yOffset}px)`,
+      filter: isVisible ? "blur(0px)" : `blur(${blur})`,
+      transitionProperty: "opacity, transform, filter",
+      transitionDuration: prefersReducedMotion ? "0ms" : `${duration}s`,
+      transitionTimingFunction: "var(--motion-ease-emphasis)",
+      transitionDelay: `${0.04 + delay}s`,
+      willChange: "opacity, transform, filter",
+    }),
+    [blur, delay, duration, isVisible, prefersReducedMotion, yOffset],
+  )
+
   return (
-    <AnimatePresence>
-      <motion.div
-        ref={ref}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-        exit="hidden"
-        variants={combinedVariants}
-        transition={{
-          delay: 0.04 + delay,
-          duration,
-          ease: "easeOut",
-        }}
-        className={className}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <div ref={ref} className={className} style={style}>
+      {children}
+    </div>
   )
 }

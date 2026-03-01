@@ -1,8 +1,35 @@
 import { expect, test } from "@playwright/test";
 
+test.describe("GET /api/multi-agent/health", () => {
+  test("returns health payload with runtime and capabilities", async ({ request }) => {
+    const response = await request.get("/api/multi-agent/health");
+    expect(response.ok()).toBeTruthy();
+
+    const body = await response.json();
+    expect(body.ok).toBe(true);
+    expect(body.status).toBe("healthy");
+    expect(body.service).toBe("multi-agent-pipeline");
+    expect(body.runtime).toBeTruthy();
+    expect(typeof body.runtime.uptimeMs).toBe("number");
+    expect(body.runtime.uptimeMs).toBeGreaterThanOrEqual(0);
+    expect(body.capabilities).toBeTruthy();
+    expect(Array.isArray(body.capabilities.workerRoles)).toBe(true);
+    expect(body.capabilities.workerRoles.length).toBeGreaterThan(0);
+    expect(Array.isArray(body.capabilities.stages)).toBe(true);
+    expect(body.capabilities.stages).toContain("initial");
+    expect(typeof body.timestamp).toBe("string");
+  });
+});
+
 test.describe("POST /api/multi-agent/demo", () => {
   test("returns multi-agent result with full log", async ({ request }) => {
+    const secret = process.env.MULTI_AGENT_DEMO_SECRET?.trim();
     const response = await request.post("/api/multi-agent/demo", {
+      headers: secret
+        ? {
+            authorization: `Bearer ${secret}`,
+          }
+        : undefined,
       data: {
         task: "Draft a deployment-ready implementation plan for a dashboard feature.",
         context: {
@@ -11,6 +38,11 @@ test.describe("POST /api/multi-agent/demo", () => {
         },
       },
     });
+
+    if (!secret) {
+      expect(response.status()).toBe(401);
+      return;
+    }
 
     expect(response.ok()).toBeTruthy();
 
