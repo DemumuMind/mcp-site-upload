@@ -8,6 +8,7 @@ import { LocaleProvider } from "@/components/locale-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SpeedInsightsClient } from "@/components/speed-insights-client";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import {
   COOKIE_CONSENT_COOKIE_KEY,
@@ -112,18 +113,20 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} bg-background text-foreground antialiased`}>
-        <LocaleProvider locale={locale}>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader locale={locale} />
-            <AuthHashRedirector />
-            <main className="flex-1">{children}</main>
-            <SiteFooter locale={locale} />
-            <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
-            <Toaster richColors position="top-right" />
-            {isVercelDeployment ? <ConsentAnalytics initialAnalyticsAllowed={initialAnalyticsAllowed} /> : null}
-            {isVercelDeployment ? <SpeedInsightsClient /> : null}
-          </div>
-        </LocaleProvider>
+        <ThemeProvider>
+          <LocaleProvider locale={locale}>
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader locale={locale} />
+              <AuthHashRedirector />
+              <main className="flex-1">{children}</main>
+              <SiteFooter locale={locale} />
+              <CookieConsentBanner initialConsent={initialConsent} initialProfile={initialProfile} />
+              <Toaster richColors position="top-right" />
+              {isVercelDeployment ? <ConsentAnalytics initialAnalyticsAllowed={initialAnalyticsAllowed} /> : null}
+              {isVercelDeployment ? <SpeedInsightsClient /> : null}
+            </div>
+          </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
