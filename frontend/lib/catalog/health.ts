@@ -1,5 +1,53 @@
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { HealthStatus } from "@/lib/types";
+
+function isPrivateIpv4(address: string): boolean {
+  const octets = address.split(".").map((p) => Number.parseInt(p, 10));
+  if (octets.length !== 4 || octets.some((p) => Number.isNaN(p) || p < 0 || p > 255)) return true;
+  const [first, second] = octets;
+  if (first === 10 || first === 127) return true;
+  if (first === 169 && second === 254) return true;
+  if (first === 172 && second >= 16 && second <= 31) return true;
+  if (first === 192 && second === 168) return true;
+  if (first === 0 || first >= 224) return true;
+  return false;
+}
+
+function isUnsafeHost(hostname: string): boolean {
+  const h = hostname.trim().toLowerCase();
+  if (!h) return true;
+  if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local") || h.endsWith(".internal")) return true;
+  const ipVersion = isIP(h);
+  if (ipVersion === 4) return isPrivateIpv4(h);
+  if (ipVersion === 6) {
+    if (h === "::" || h === "::1") return true;
+    if (h.startsWith("fe80:") || h.startsWith("fc") || h.startsWith("fd")) return true;
+    if (h.startsWith("::ffff:")) return isPrivateIpv4(h.slice("::ffff:".length));
+  }
+  return false;
+}
+
+async function isSafeServerUrl(rawUrl: string): Promise<boolean> {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+  if (parsed.username || parsed.password) return false;
+  if (isUnsafeHost(parsed.hostname)) return false;
+  if (isIP(parsed.hostname)) return true;
+  try {
+    const records = await lookup(parsed.hostname, { all: true, verbatim: true });
+    if (records.length === 0) return false;
+    return records.every((r) => !isUnsafeHost(r.address));
+  } catch {
+    return false;
+  }
+}
 
 export async function checkServerHealth(slug: string, repoUrl?: string, serverUrl?: string) {
   const adminClient = createSupabaseAdminClient();
@@ -24,17 +72,23 @@ export async function checkServerHealth(slug: string, repoUrl?: string, serverUr
       }
     }
 
-    // 2. Check Server/Homepage URL
+    // 2. Check Server/Homepage URL with SSRF protection
     if (status === "healthy" && serverUrl) {
-      try {
-        const res = await fetch(serverUrl, { method: "HEAD", signal: AbortSignal.timeout(5000) });
-        if (!res.ok && res.status !== 405) { // 405 Method Not Allowed is fine for HEAD
+      const safe = await isSafeServerUrl(serverUrl);
+      if (!safe) {
+        status = "unknown";
+        errorMsg = "Unsafe or invalid server URL";
+      } else {
+        try {
+          const res = await fetch(serverUrl, { method: "HEAD", signal: AbortSignal.timeout(5000) });
+          if (!res.ok && res.status !== 405) { // 405 Method Not Allowed is fine for HEAD
+            status = "degraded";
+            errorMsg = `Homepage returned ${res.status}`;
+          }
+        } catch {
           status = "degraded";
-          errorMsg = `Homepage returned ${res.status}`;
+          errorMsg = "Homepage timeout or connection error";
         }
-      } catch {
-        status = "degraded";
-        errorMsg = "Homepage timeout or connection error";
       }
     }
   } catch (e) {
