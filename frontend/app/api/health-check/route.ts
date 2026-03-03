@@ -328,7 +328,7 @@ const handlers = withCronAuth(
             updateErrors,
         });
     },
-    ["HEALTH_CHECK_CRON_SECRET"],
+    ["HEALTH_CHECK_CRON_SECRET", "CRON_SECRET"],
     "health_check",
 );
 

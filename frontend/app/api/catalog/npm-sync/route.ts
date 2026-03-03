@@ -43,7 +43,7 @@ const handlers = withCronAuth(
       }, { status: 500 });
     }
   },
-  ["CATALOG_AUTOSYNC_CRON_SECRET"],
+  ["CATALOG_AUTOSYNC_CRON_SECRET", "CRON_SECRET"],
   "catalog.npm_sync"
 );
 
