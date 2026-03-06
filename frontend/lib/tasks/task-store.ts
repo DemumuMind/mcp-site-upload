@@ -45,6 +45,18 @@ export type CreateAgentTaskInput = {
   deltaEta?: string | null;
 };
 
+export type TaskStoreFailureReason = "unavailable" | "not_found" | "db_error" | "invalid_record";
+
+export type TaskStoreResult<T> =
+  | {
+      ok: true;
+      data: T;
+    }
+  | {
+      ok: false;
+      reason: TaskStoreFailureReason;
+    };
+
 function normalizeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -76,10 +88,10 @@ function mapTaskRow(row: AgentTaskRow): AgentTaskRecord {
   };
 }
 
-export async function createAgentTask(input: CreateAgentTaskInput): Promise<AgentTaskRecord | null> {
+export async function createAgentTask(input: CreateAgentTaskInput): Promise<TaskStoreResult<AgentTaskRecord>> {
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) {
-    return null;
+    return { ok: false, reason: "unavailable" };
   }
 
   const { data, error } = await adminClient
@@ -96,20 +108,23 @@ export async function createAgentTask(input: CreateAgentTaskInput): Promise<Agen
     .single<AgentTaskRow>();
 
   if (error || !data) {
-    return null;
+    return { ok: false, reason: "db_error" };
   }
 
   const parsed = agentTaskRowSchema.safeParse(data);
   if (!parsed.success) {
-    return null;
+    return { ok: false, reason: "invalid_record" };
   }
-  return mapTaskRow(parsed.data);
+  return {
+    ok: true,
+    data: mapTaskRow(parsed.data),
+  };
 }
 
-export async function getAgentTaskById(taskId: string): Promise<AgentTaskRecord | null> {
+export async function getAgentTaskById(taskId: string): Promise<TaskStoreResult<AgentTaskRecord>> {
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) {
-    return null;
+    return { ok: false, reason: "unavailable" };
   }
 
   const { data, error } = await adminClient
@@ -118,13 +133,20 @@ export async function getAgentTaskById(taskId: string): Promise<AgentTaskRecord 
     .eq("id", taskId)
     .maybeSingle<AgentTaskRow>();
 
-  if (error || !data) {
-    return null;
+  if (error) {
+    return { ok: false, reason: "db_error" };
+  }
+
+  if (!data) {
+    return { ok: false, reason: "not_found" };
   }
 
   const parsed = agentTaskRowSchema.safeParse(data);
   if (!parsed.success) {
-    return null;
+    return { ok: false, reason: "invalid_record" };
   }
-  return mapTaskRow(parsed.data);
+  return {
+    ok: true,
+    data: mapTaskRow(parsed.data),
+  };
 }
