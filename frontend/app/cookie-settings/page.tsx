@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
+import { PageFrame } from "@/components/page-templates";
 import { CookieSettingsPage } from "@/components/cookie-settings-page";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 
@@ -39,55 +38,50 @@ export default async function CookieSettingsRoute() {
 
   return (
     <PageFrame variant="content">
-      <PageShell className="max-w-7xl gap-6 px-4 sm:px-6 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-        <section className="space-y-4">
-          <PageHero surface="rail"
-            animated={false}
-            badgeTone="violet"
-            eyebrow={tr(locale, "Privacy controls", "Privacy controls")}
-            title={tr(locale, "Cookie Settings", "Cookie Settings")}
-            description={tr(
-              locale,
-              "Choose how DemumuMind uses cookies on this browser. You can update your preference any time.",
-              "Choose how DemumuMind uses cookies on this browser. You can update your preference any time.",
-            )}
-          />
-
-          <PageSection surface="rail">
-            <CookieSettingsPage />
-          </PageSection>
+      <main className="bg-background text-foreground">
+        <section className="relative isolate overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(var(--accent)/0.14),transparent_24%),radial-gradient(circle_at_82%_18%,hsl(var(--primary)/0.14),transparent_20%),linear-gradient(180deg,hsl(var(--surface-1)),hsl(var(--background))_60%)]" />
+          <div className="section-shell flex min-h-[60vh] flex-col justify-center py-16 sm:py-20">
+            <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">{tr(locale, "Privacy controls", "Privacy controls")}</p>
+            <h1 className="mt-4 max-w-4xl font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              {tr(locale, "Cookie Settings", "Cookie Settings")}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {tr(locale, "Choose how DemumuMind uses cookies on this browser. You can update your preference any time.", "Choose how DemumuMind uses cookies on this browser. You can update your preference any time.")}
+            </p>
+          </div>
         </section>
 
-        <section className="space-y-4">
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-foreground">{tr(locale, "How cookies are used", "How cookies are used")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-              {cookieTypes.map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-card px-4 py-3">
-                  <p className="font-medium text-foreground">{item.title}</p>
-                  <p className="mt-1 text-muted-foreground">{item.description}</p>
+        <section>
+          <div className="section-shell grid gap-10 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+            <div className="border border-border/60 p-4 sm:p-6">
+              <CookieSettingsPage />
+            </div>
+
+            <div className="space-y-6">
+              <section className="border border-border/60 p-6 sm:p-8">
+                <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">{tr(locale, "How cookies are used", "How cookies are used")}</p>
+                <div className="mt-6 border-y border-border/60">
+                  {cookieTypes.map((item) => (
+                    <div key={item.title} className="border-b border-border/60 py-4 last:border-b-0">
+                      <p className="text-sm font-medium text-foreground">{item.title}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </section>
 
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl text-foreground">{tr(locale, "Related policy", "Related policy")}</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm leading-7 text-muted-foreground">
-              <Link href="/privacy" className="inline-flex items-center gap-1 text-primary underline underline-offset-2 transition hover:text-primary">
-                {tr(locale, "Read Privacy Policy", "Read Privacy Policy")}
-                <ArrowUpRight className="size-3" />
-              </Link>
-            </CardContent>
-          </Card>
+              <section className="border border-border/60 p-6 sm:p-8">
+                <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">{tr(locale, "Related policy", "Related policy")}</p>
+                <Link href="/privacy" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary transition-transform hover:translate-x-1">
+                  {tr(locale, "Read Privacy Policy", "Read Privacy Policy")}
+                  <ArrowUpRight className="size-3" />
+                </Link>
+              </section>
+            </div>
+          </div>
         </section>
-      </PageShell>
+      </main>
     </PageFrame>
   );
 }
-
-
