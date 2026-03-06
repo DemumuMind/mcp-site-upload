@@ -1,0 +1,139 @@
+openapi: 3.1.0
+info:
+  title: DemumuMind API Lite
+  version: 2026-03-06
+  description: >
+    Lightweight contract snapshot for the most important production routes.
+    This is not a fully exhaustive spec; it captures stable boundary shapes
+    and auth expectations for the main public, cron, admin, and task endpoints.
+servers:
+  - url: https://demumumind.example
+paths:
+  /api/health:
+    get:
+      summary: Public readiness check
+      responses:
+        "200":
+          description: Readiness payload
+  /api/catalog/search:
+    get:
+      summary: Search catalog entries
+      responses:
+        "200":
+          description: Search results
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal error
+  /api/catalog/auto-sync:
+    post:
+      summary: Run catalog GitHub auto-sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "207":
+          description: Partial sync failure
+        "409":
+          description: Lock already held
+        "500":
+          description: Internal error
+  /api/catalog/sync-all:
+    post:
+      summary: Run full catalog sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "207":
+          description: Partial sync failure
+        "409":
+          description: Lock already held
+        "500":
+          description: Internal error
+  /api/tasks:
+    post:
+      summary: Create agent task
+      security:
+        - bearerTasks: []
+      responses:
+        "200":
+          description: Task created
+        "400":
+          description: Invalid JSON or malformed body
+        "401":
+          description: Unauthorized
+        "500":
+          description: Store error
+  /api/tasks/{id}:
+    get:
+      summary: Read agent task by id
+      security:
+        - bearerTasks: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task payload
+        "400":
+          description: Invalid id
+        "401":
+          description: Unauthorized
+        "404":
+          description: Task not found
+        "500":
+          description: Store error
+  /api/auth/security:
+    post:
+      summary: Auth precheck and login-result reporting
+      responses:
+        "200":
+          description: Security response
+        "400":
+          description: Invalid JSON, email, or action
+  /api/admin/security-events/export:
+    get:
+      summary: Export security events CSV
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: CSV export
+        "400":
+          description: Invalid time filter
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+  /api/admin/multi-agent/weekly-export:
+    get:
+      summary: Export weekly multi-agent telemetry
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: CSV export
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+components:
+  securitySchemes:
+    bearerCron:
+      type: http
+      scheme: bearer
+      description: Cron secret bearer token
+    bearerAdmin:
+      type: http
+      scheme: bearer
+      description: Admin token or resolved admin session
+    bearerTasks:
+      type: http
+      scheme: bearer
+      description: Tasks API bearer token
