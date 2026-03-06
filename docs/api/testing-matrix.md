@@ -33,6 +33,7 @@ This file records how API routes are covered today so new work can extend the ri
 ## Default expectation for new route work
 - Add or update node-level tests when route logic moves into a core/helper.
 - Add Playwright smoke when the route is production-facing and contract-sensitive.
+- Follow `docs/api/route-authoring-checklist.md`.
 - Always rerun:
   - `npm run check:utf8`
   - `npm run lint`

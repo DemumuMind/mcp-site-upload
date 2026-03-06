@@ -40,6 +40,7 @@ A route should usually do only:
   - retry/conflict/partial branches
   - export shaping or cookie/state shaping
 - Keep browser or API smoke tests for route reachability and auth contract where relevant.
+- Use `docs/api/route-authoring-checklist.md` for new route work.
 
 ## Current route clusters already aligned
 - `/api/catalog/*`

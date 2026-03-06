@@ -15,12 +15,33 @@ paths:
       responses:
         "200":
           description: Readiness payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
   /api/catalog/search:
     get:
       summary: Search catalog entries
       responses:
         "200":
           description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  totalPages:
+                    type: integer
         "400":
           description: Invalid request
         "500":
@@ -61,6 +82,10 @@ paths:
       responses:
         "200":
           description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskCreateResponse"
         "400":
           description: Invalid JSON or malformed body
         "401":
@@ -81,6 +106,10 @@ paths:
       responses:
         "200":
           description: Task payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskGetResponse"
         "400":
           description: Invalid id
         "401":
@@ -95,6 +124,10 @@ paths:
       responses:
         "200":
           description: Security response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSecurityResponse"
         "400":
           description: Invalid JSON, email, or action
   /api/admin/security-events/export:
@@ -137,3 +170,84 @@ components:
       type: http
       scheme: bearer
       description: Tasks API bearer token
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        readiness:
+          type: string
+        liveness:
+          type: string
+        planVersion:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+    TaskCreateResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        taskId:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    TaskGetResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        id:
+          type: string
+        status:
+          type: string
+        startedAt:
+          type:
+            - string
+            - "null"
+        finishedAt:
+          type:
+            - string
+            - "null"
+        durationMs:
+          type:
+            - integer
+            - "null"
+        errorSummary:
+          type:
+            - string
+            - "null"
+        deltaEta:
+          type:
+            - string
+            - "null"
+        intent:
+          type: string
+        constraints:
+          type: array
+          items:
+            type: string
+        contextRefs:
+          type: array
+          items:
+            type: string
+    AuthSecurityResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        failedAttemptsInWindow:
+          type: integer
+        maxFailedAttempts:
+          type: integer
+        retryAfterSeconds:
+          type: integer
+        alert:
+          oneOf:
+            - type: "null"
+            - type: object
