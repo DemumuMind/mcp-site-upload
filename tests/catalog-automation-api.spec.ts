@@ -38,6 +38,7 @@ test.describe("Catalog automation API", () => {
       recentRuns: expect.any(Object),
       activeLocks: expect.any(Object),
     });
+    expect(typeof body.checkedAt).toBe("string");
   });
 
   test("POST /api/catalog/auto-sync without token returns 401", async ({ request }) => {
