@@ -51,5 +51,6 @@ Use this checklist when adding or changing an API route.
 
 ## Documentation
 - Update `docs/api/endpoint-inventory-v2.md` and `docs/api/endpoint-inventory-v2.json` when the public surface changes.
+- Keep `docs/api/openapi-lite.yaml` aligned for stable production routes.
 - Keep `docs/api/testing-matrix.md` aligned if a new test layer is added.
 - Follow `docs/api/backend-route-standard.md`.
