@@ -12,7 +12,7 @@ import { AccountSecurityActivityCard } from "@/app/account/account-security-acti
 import { AccountStatsSection } from "@/app/account/account-stats-section";
 import { AccountSubmissionsCard } from "@/app/account/account-submissions-card";
 import { AccountProfileForms } from "@/components/account-profile-forms";
-import { PageFrame, PageShell } from "@/components/page-templates";
+import { PageFrame } from "@/components/page-templates";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/auth-server";
@@ -74,45 +74,52 @@ export default async function AccountPage() {
 
   return (
     <PageFrame variant="content">
-      <PageShell className="max-w-6xl px-4 sm:px-6">
-        <AccountHeroSection
-          locale={locale}
-          avatarUrl={avatarUrl}
-          displayName={displayName}
-          initials={initials}
-          email={userData.user.email ?? null}
-        />
-
-        <AccountStatsSection
-          locale={locale}
-          totalSubmissions={submissions.length}
-          activeCount={activeCount}
-          pendingCount={pendingCount}
-          rejectedCount={rejectedCount}
-        />
-
-        <div className="mt-6 grid gap-5 lg:grid-cols-[1.05fr_1.45fr]">
-          <div className="space-y-5">
-            <AccountOverviewCard
+      <main className="bg-background text-foreground">
+        <section className="relative isolate overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.18),transparent_24%),radial-gradient(circle_at_84%_18%,hsl(var(--accent)/0.14),transparent_18%),linear-gradient(180deg,hsl(var(--surface-1)),hsl(var(--background))_68%)]" />
+          <div className="section-shell">
+            <AccountHeroSection
               locale={locale}
-              isEmailVerified={isEmailVerified}
-              userId={userData.user.id}
-              createdAt={userData.user.created_at ?? null}
-              lastSignInAt={userData.user.last_sign_in_at ?? null}
+              avatarUrl={avatarUrl}
+              displayName={displayName}
+              initials={initials}
+              email={userData.user.email ?? null}
             />
-
-            <AccountProfileForms locale={locale} initialProfile={initialProfile} />
-
-            <AccountSecurityActivityCard locale={locale} authEvents={authEvents} />
           </div>
+        </section>
 
-          <AccountSubmissionsCard
+        <div className="section-shell pb-14 sm:pb-18 lg:pb-24">
+          <AccountStatsSection
             locale={locale}
-            submissions={submissions}
-            hasSubmissionError={Boolean(submissionError)}
+            totalSubmissions={submissions.length}
+            activeCount={activeCount}
+            pendingCount={pendingCount}
+            rejectedCount={rejectedCount}
           />
+
+          <section className="grid gap-5 pt-8 lg:grid-cols-[1.05fr_1.45fr] lg:pt-10">
+            <div className="space-y-5">
+              <AccountOverviewCard
+                locale={locale}
+                isEmailVerified={isEmailVerified}
+                userId={userData.user.id}
+                createdAt={userData.user.created_at ?? null}
+                lastSignInAt={userData.user.last_sign_in_at ?? null}
+              />
+
+              <AccountProfileForms locale={locale} initialProfile={initialProfile} />
+
+              <AccountSecurityActivityCard locale={locale} authEvents={authEvents} />
+            </div>
+
+            <AccountSubmissionsCard
+              locale={locale}
+              submissions={submissions}
+              hasSubmissionError={Boolean(submissionError)}
+            />
+          </section>
         </div>
-      </PageShell>
+      </main>
     </PageFrame>
   );
 }

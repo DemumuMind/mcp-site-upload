@@ -1,6 +1,5 @@
-﻿import { Clock3, FolderGit2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Clock3, FolderGit2, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { tr, type Locale } from "@/lib/i18n";
 
 type AccountStatsSectionProps = {
@@ -11,64 +10,59 @@ type AccountStatsSectionProps = {
   rejectedCount: number;
 };
 
-export function AccountStatsSection({
-  locale,
-  totalSubmissions,
-  activeCount,
-  pendingCount,
-  rejectedCount,
-}: AccountStatsSectionProps) {
+const statItems = [
+  {
+    key: "total",
+    icon: FolderGit2,
+    tone: "text-foreground",
+    label: "Total submissions",
+    getValue: ({ totalSubmissions }: AccountStatsSectionProps) => totalSubmissions,
+  },
+  {
+    key: "active",
+    icon: ShieldCheck,
+    tone: "text-emerald-300",
+    label: "Active",
+    getValue: ({ activeCount }: AccountStatsSectionProps) => activeCount,
+  },
+  {
+    key: "pending",
+    icon: Clock3,
+    tone: "text-amber-300",
+    label: "Pending",
+    getValue: ({ pendingCount }: AccountStatsSectionProps) => pendingCount,
+  },
+  {
+    key: "rejected",
+    icon: ShieldAlert,
+    tone: "text-rose-300",
+    label: "Rejected",
+    getValue: ({ rejectedCount }: AccountStatsSectionProps) => rejectedCount,
+  },
+] as const;
+
+export function AccountStatsSection(props: AccountStatsSectionProps) {
+  const { locale } = props;
+
   return (
-    <section className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <Card className="border-border bg-card/90">
-        <CardContent className="flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {tr(locale, "Total submissions", "Total submissions")}
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">{totalSubmissions}</p>
+    <section className="border-y border-border/60">
+      <div className="grid gap-px bg-border/60 sm:grid-cols-2 xl:grid-cols-4">
+        {statItems.map((item) => (
+          <div key={item.key} className="bg-background px-5 py-5 sm:px-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] tracking-[0.22em] text-muted-foreground uppercase">
+                  {tr(locale, item.label, item.label)}
+                </p>
+                <p className={`mt-3 text-4xl font-semibold tracking-[-0.04em] ${item.tone}`}>
+                  {item.getValue(props)}
+                </p>
+              </div>
+              <item.icon className={`mt-1 size-5 ${item.tone}`} aria-hidden="true" />
+            </div>
           </div>
-          <FolderGit2 className="size-5 text-primary" />
-        </CardContent>
-      </Card>
-
-      <Card className="border-border bg-card/90">
-        <CardContent className="flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {tr(locale, "Active", "Active")}
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-emerald-200">{activeCount}</p>
-          </div>
-          <ShieldCheck className="size-5 text-emerald-300" />
-        </CardContent>
-      </Card>
-
-      <Card className="border-border bg-card/90">
-        <CardContent className="flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {tr(locale, "Pending", "Pending")}
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-amber-200">{pendingCount}</p>
-          </div>
-          <Clock3 className="size-5 text-amber-300" />
-        </CardContent>
-      </Card>
-
-      <Card className="border-border bg-card/90">
-        <CardContent className="flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {tr(locale, "Rejected", "Rejected")}
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-rose-200">{rejectedCount}</p>
-          </div>
-          <ShieldAlert className="size-5 text-rose-300" />
-        </CardContent>
-      </Card>
+        ))}
+      </div>
     </section>
   );
 }
-
-
