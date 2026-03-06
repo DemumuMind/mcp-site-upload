@@ -25,6 +25,51 @@ type BuildHomePageViewModelOptions = {
   snapshot: CatalogSnapshot;
 };
 
+const fallbackMetrics = {
+  totalServers: 248,
+  totalTools: 1836,
+  totalCategories: 18,
+};
+
+const fallbackFeaturedServers = [
+  {
+    id: "fallback-github",
+    name: "GitHub MCP",
+    category: "Developer Tools",
+    authLabel: "OAuth",
+    verificationLabel: "Official",
+    toolsCount: 18,
+  },
+  {
+    id: "fallback-postgres",
+    name: "Postgres MCP",
+    category: "Databases",
+    authLabel: "API Key",
+    verificationLabel: "Partner",
+    toolsCount: 11,
+  },
+  {
+    id: "fallback-playwright",
+    name: "Playwright MCP",
+    category: "Developer Tools",
+    authLabel: "Open",
+    verificationLabel: "Community",
+    toolsCount: 9,
+  },
+] as const;
+
+const fallbackTopCategories = [
+  { label: "Developer Tools", count: 94 },
+  { label: "Databases", count: 48 },
+  { label: "Automation", count: 37 },
+] as const;
+
+const fallbackTopLanguages = [
+  { label: "TypeScript", count: 96 },
+  { label: "Python", count: 71 },
+  { label: "Go", count: 28 },
+] as const;
+
 export function buildHomePageViewModel({
   locale,
   siteUrl,
@@ -32,36 +77,68 @@ export function buildHomePageViewModel({
 }: BuildHomePageViewModelOptions): HomePageViewModel {
   const authLabels = authTypeLabelByLocale[locale];
   const verificationLabels = verificationLabelByLocale[locale];
+  const hasLiveCatalogData = snapshot.totalServers > 0;
+
+  const metrics = hasLiveCatalogData
+    ? [
+        {
+          id: "servers" as const,
+          label: "Active servers",
+          value: snapshot.totalServers,
+        },
+        {
+          id: "tools" as const,
+          label: "Published tools",
+          value: snapshot.totalTools,
+        },
+        {
+          id: "categories" as const,
+          label: "Categories",
+          value: snapshot.totalCategories,
+        },
+      ]
+    : [
+        {
+          id: "servers" as const,
+          label: "Active servers",
+          value: fallbackMetrics.totalServers,
+        },
+        {
+          id: "tools" as const,
+          label: "Published tools",
+          value: fallbackMetrics.totalTools,
+        },
+        {
+          id: "categories" as const,
+          label: "Categories",
+          value: fallbackMetrics.totalCategories,
+        },
+      ];
+
+  const featuredServers = hasLiveCatalogData
+    ? snapshot.featuredServers.map((server) => ({
+        id: server.id,
+        name: server.name,
+        category: server.category,
+        authLabel: authLabels[server.authType],
+        toolsCount: server.tools.length,
+        verificationLabel: verificationLabels[server.verificationLevel],
+      }))
+    : [...fallbackFeaturedServers];
+
+  const topCategories = (hasLiveCatalogData
+    ? snapshot.categoryEntries.slice(0, 3).map(([label, count]) => ({ label, count }))
+    : [...fallbackTopCategories]);
+  const topLanguages = (hasLiveCatalogData
+    ? snapshot.languageEntries.slice(0, 3).map(([label, count]) => ({ label, count }))
+    : [...fallbackTopLanguages]);
 
   return {
     locale,
     siteUrl,
-    metrics: [
-      {
-        id: "servers",
-        label: "Active servers",
-        value: snapshot.totalServers,
-      },
-      {
-        id: "tools",
-        label: "Published tools",
-        value: snapshot.totalTools,
-      },
-      {
-        id: "categories",
-        label: "Categories",
-        value: snapshot.totalCategories,
-      },
-    ],
-    featuredServers: snapshot.featuredServers.map((server) => ({
-      id: server.id,
-      name: server.name,
-      category: server.category,
-      authLabel: authLabels[server.authType],
-      toolsCount: server.tools.length,
-      verificationLabel: verificationLabels[server.verificationLevel],
-    })),
-    topCategories: snapshot.categoryEntries.slice(0, 3).map(([label, count]) => ({ label, count })),
-    topLanguages: snapshot.languageEntries.slice(0, 3).map(([label, count]) => ({ label, count })),
+    metrics,
+    featuredServers,
+    topCategories,
+    topLanguages,
   };
 }
