@@ -28,6 +28,7 @@
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "test": "node scripts/run-playwright.mjs",
     "test:e2e": "node scripts/run-playwright.mjs",
+    "test:e2e:admin:local": "node scripts/run-playwright-admin-local.mjs",
     "test:e2e:auth": "node scripts/check-supabase-envs.mjs && npm run build && node scripts/run-playwright.mjs tests/auth-flow.spec.ts",
     "test:e2e:auth:local": "node scripts/check-supabase-envs.mjs && node scripts/playwright-auth-local.mjs",
     "check:env:supabase": "node scripts/check-supabase-envs.mjs",
