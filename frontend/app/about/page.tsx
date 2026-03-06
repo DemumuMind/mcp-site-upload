@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Brain, Compass, Rocket, ShieldCheck, Workflow } from "lucide-react";
-import { PageFrame, PageHero, PageSection, PageShell } from "@/components/page-templates";
+import { ArrowRight, Compass, Rocket, ShieldCheck, Workflow } from "lucide-react";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -70,108 +70,119 @@ export default async function AboutPage() {
 
   return (
     <PageFrame variant="marketing">
-      <PageShell>
-        <PageHero
-          surface="mesh"
-          eyebrow={
-            <span className="flex items-center gap-2">
-              <Brain className="size-3" />
+      <main className="bg-background text-foreground">
+        <section className="relative isolate overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(var(--accent)/0.14),transparent_24%),radial-gradient(circle_at_82%_20%,hsl(var(--primary)/0.18),transparent_20%),linear-gradient(180deg,hsl(var(--surface-1)),hsl(var(--background))_65%)]" />
+          <div className="section-shell flex min-h-[72vh] flex-col justify-center py-16 sm:py-20 lg:py-24">
+            <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">
               {tr(locale, "About DemumuMind", "About DemumuMind")}
-            </span>
-          }
-          badgeTone="cyan"
-          title={tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")}
-          description={tr(
-            locale,
-            "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
-            "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
-          )}
-          actions={
-            <>
-              <Button asChild size="lg" className="h-11 rounded-md px-6 shadow-sm">
+            </p>
+            <p className="mt-5 font-serif text-[clamp(3.3rem,11vw,8rem)] leading-none tracking-[-0.06em] text-foreground">
+              DemumuMind
+            </p>
+            <h1 className="mt-4 max-w-4xl text-balance text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl lg:text-6xl">
+              {tr(locale, "We build production MCP workflows, not demo theater.", "We build production MCP workflows, not demo theater.")}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {tr(
+                locale,
+                "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
+                "DemumuMind is an engineering organization focused on practical MCP delivery. We combine human architecture decisions with agent execution to help teams ship faster with higher confidence.",
+              )}
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button asChild size="lg" className="h-11 rounded-none px-6">
                 <Link href="/catalog">
                   {tr(locale, "Explore catalog", "Explore catalog")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-11 rounded-md border-border bg-background text-foreground hover:bg-muted/50">
+              <Button asChild size="lg" variant="outline" className="h-11 rounded-none border-border/80 bg-transparent px-6">
                 <Link href="/how-to-use">{tr(locale, "Open setup guide", "Open setup guide")}</Link>
               </Button>
-            </>
-          }
-        />
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.4fr]">
-          <PageSection surface="steel" className="space-y-6">
-            <h2 className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">
-              {tr(locale, "How we deliver", "How we deliver")}
-            </h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              {pillars.map((pillar) => (
-                <article key={pillar.title} className="rounded-xl border border-border bg-background/50 p-5 transition-colors hover:bg-muted/30">
-                  <div className="mb-3 inline-flex rounded-sm border border-border bg-card p-1.5">
-                    <pillar.icon className="size-4 text-primary" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground">{pillar.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{pillar.description}</p>
-                </article>
-              ))}
             </div>
-          </PageSection>
+          </div>
+        </section>
 
-          <PageSection surface="rail" className="flex flex-col justify-center border-accent/20 bg-accent/5">
-            <h2 className="font-serif text-2xl leading-tight font-semibold tracking-tight text-foreground">
-              {tr(locale, "Our mission", "Our mission")}
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              {tr(
-                locale,
-                "Make high-quality agentic engineering repeatable for every product team through trusted MCP standards.",
-                "Make high-quality agentic engineering repeatable for every product team through trusted MCP standards.",
-              )}
-            </p>
-          </PageSection>
-        </div>
+        <section className="border-b border-border/60">
+          <div className="section-shell grid gap-px border-x border-border/60 bg-border/60 lg:grid-cols-3">
+            {pillars.map((pillar, index) => (
+              <article key={pillar.title} className="bg-background px-0 py-8 lg:px-8">
+                <div className="inline-flex size-11 items-center justify-center border border-border/70 text-primary">
+                  <pillar.icon className="size-5" aria-hidden="true" />
+                </div>
+                <p className="mt-5 text-[11px] tracking-[0.22em] text-muted-foreground uppercase">
+                  {tr(locale, `Pillar ${index + 1}`, `Pillar ${index + 1}`)}
+                </p>
+                <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-foreground">{pillar.title}</h2>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">{pillar.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <PageSection surface="steel" className="space-y-6">
-            <h2 className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground">
-              {tr(locale, "Delivery stages", "Delivery stages")}
-            </h2>
-            <div className="grid gap-3">
+        <section className="border-b border-border/60">
+          <div className="section-shell grid gap-10 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">
+                {tr(locale, "Our mission", "Our mission")}
+              </p>
+              <h2 className="mt-4 max-w-xl font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+                {tr(locale, "Make agentic engineering repeatable.", "Make agentic engineering repeatable.")}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                {tr(
+                  locale,
+                  "We want teams to evaluate, validate, and ship MCP-backed workflows through a delivery system they can actually own long term.",
+                  "We want teams to evaluate, validate, and ship MCP-backed workflows through a delivery system they can actually own long term.",
+                )}
+              </p>
+              <div className="mt-8 border-t border-border/60 pt-5 text-sm text-muted-foreground">
+                {tr(
+                  locale,
+                  "The catalog, moderation layer, and operating guidance all exist to reduce avoidable integration waste.",
+                  "The catalog, moderation layer, and operating guidance all exist to reduce avoidable integration waste.",
+                )}
+              </div>
+            </div>
+
+            <div className="border border-border/60">
               {timeline.map((item, index) => (
-                <div key={item.stage} className="rounded-xl border border-border bg-background/50 px-5 py-4 transition-colors hover:bg-muted/30">
-                  <p className="text-[10px] font-bold tracking-[0.15em] text-primary uppercase">
-                    {tr(locale, `Stage ${index + 1}`, `Stage ${index + 1}`)} — {item.stage}
+                <div key={item.stage} className="grid gap-3 border-b border-border/60 px-5 py-5 last:border-b-0 sm:grid-cols-[96px_minmax(0,1fr)] sm:px-6">
+                  <p className="text-xs tracking-[0.24em] text-muted-foreground uppercase">
+                    {tr(locale, `Stage ${index + 1}`, `Stage ${index + 1}`)}
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.details}</p>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground">{item.stage}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.details}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </PageSection>
+          </div>
+        </section>
 
-          <PageSection surface="mesh" className="space-y-6">
-            <h2 className="flex items-center gap-3 font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground">
-              <Rocket className="size-6 text-primary" aria-hidden="true" />
-              {tr(locale, "Operating principles", "Operating principles")}
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {principles.map((principle) => (
-                <div key={principle} className="flex items-center rounded-xl border border-border bg-background/50 px-4 py-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:bg-muted/30">
-                  {principle}
-                </div>
-              ))}
+        <section>
+          <div className="section-shell py-16 sm:py-20">
+            <div className="border-t border-border/60 pt-10">
+              <div className="flex items-center gap-3">
+                <Rocket className="size-5 text-primary" aria-hidden="true" />
+                <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">
+                  {tr(locale, "Operating principles", "Operating principles")}
+                </p>
+              </div>
+              <div className="mt-6 grid gap-px border-y border-border/60 bg-border/60 sm:grid-cols-2">
+                {principles.map((principle) => (
+                  <div key={principle} className="bg-background px-0 py-5 text-sm leading-relaxed text-foreground sm:px-6">
+                    {principle}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="rounded-xl border border-border bg-primary/10 p-5 text-sm leading-relaxed text-primary shadow-sm">
-              {tr(
-                locale,
-                "We focus on creating sustainable, verifiable AI integration patterns that teams can own for the long term.",
-                "We focus on creating sustainable, verifiable AI integration patterns that teams can own for the long term.",
-              )}
-            </div>
-          </PageSection>
-        </div>
-      </PageShell>
+          </div>
+        </section>
+      </main>
     </PageFrame>
   );
 }
+

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, Clock3, LifeBuoy, MessageSquareText } from "lucide-react";
-import { PageFrame, PageSection, PageShell } from "@/components/page-templates";
-import { Badge } from "@/components/ui/badge";
+import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { legalEmail } from "@/lib/legal-content";
@@ -60,164 +58,124 @@ export default async function ContactPage() {
 
   return (
     <PageFrame>
-      <PageShell>
-        <PageSection surface="plain" className="border-b border-border bg-background sm:p-8">
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="space-y-5">
-              <Badge className="border-border bg-card text-muted-foreground">
+      <main className="bg-background text-foreground">
+        <section className="relative isolate overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(var(--accent)/0.14),transparent_24%),radial-gradient(circle_at_78%_22%,hsl(var(--primary)/0.16),transparent_20%),linear-gradient(180deg,hsl(var(--surface-1)),hsl(var(--background))_60%)]" />
+          <div className="section-shell grid min-h-[72vh] gap-10 py-16 sm:py-20 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-24">
+            <div>
+              <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.22em] text-primary uppercase">
                 <Clock3 className="size-3" />
                 {tr(locale, "Contact DemumuMind", "Contact DemumuMind")}
-              </Badge>
-
-              <div className="space-y-4">
-                <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
-                  {tr(locale, "Support channel routing", "Support channel routing")}
-                </p>
-                <h1 className="max-w-3xl font-serif text-4xl leading-tight font-semibold tracking-tight text-foreground sm:text-5xl">
-                  {tr(locale, "Need help shipping MCP workflows?", "Need help shipping MCP workflows?")}
-                </h1>
-                <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                  {tr(
-                    locale,
-                    "Share context in your first message and we will route your request faster to the right team.",
-                    "Share context in your first message and we will route your request faster to the right team.",
-                  )}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button asChild size="lg" className="h-11 px-6">
+              </p>
+              <p className="mt-5 font-serif text-[clamp(3.1rem,10vw,7rem)] leading-none tracking-[-0.06em] text-foreground">DemumuMind</p>
+              <h1 className="mt-4 max-w-4xl text-balance text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl lg:text-6xl">
+                {tr(locale, "Need help shipping MCP workflows?", "Need help shipping MCP workflows?")}
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                {tr(
+                  locale,
+                  "Share useful context in the first message and we will route your request faster to the right team.",
+                  "Share useful context in the first message and we will route your request faster to the right team.",
+                )}
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button asChild size="lg" className="h-11 rounded-none px-6">
                   <Link href={`mailto:${legalEmail}?subject=DemumuMind%20Contact%20Request`}>
                     {legalEmail}
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-11 border-border bg-card px-6">
+                <Button asChild size="lg" variant="outline" className="h-11 rounded-none border-border/80 bg-transparent px-6">
                   <Link href="/discord">{tr(locale, "Open Discord", "Open Discord")}</Link>
                 </Button>
               </div>
             </div>
 
-            <aside className="rounded-lg border border-border bg-card p-5" aria-label="Response service levels">
-              <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
+            <div className="border border-border/60 bg-[linear-gradient(180deg,hsl(var(--surface-1))/0.9,hsl(var(--surface-0))/0.75)] p-6 sm:p-8">
+              <p className="text-[11px] tracking-[0.22em] text-muted-foreground uppercase">
                 {tr(locale, "Response expectations", "Response expectations")}
               </p>
-              <h2 className="mt-3 font-serif text-2xl leading-tight font-semibold text-foreground">
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground">
                 {tr(locale, "Trust-first support flow", "Trust-first support flow")}
               </h2>
-              <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
-                <li className="rounded-md border border-border px-3 py-2">
-                  {tr(locale, "Mon-Fri - 09:00-18:00 UTC", "Mon-Fri - 09:00-18:00 UTC")}
-                </li>
-                <li className="rounded-md border border-border px-3 py-2">
-                  {tr(
-                    locale,
-                    "For urgent operational issues, include 'urgent' in your subject line.",
-                    "For urgent operational issues, include 'urgent' in your subject line.",
-                  )}
-                </li>
-                <li className="rounded-md border border-border px-3 py-2">
-                  {tr(
-                    locale,
-                    "We answer community questions asynchronously every day.",
-                    "We answer community questions asynchronously every day.",
-                  )}
-                </li>
-              </ul>
-            </aside>
+              <div className="mt-6 space-y-0 border-y border-border/60">
+                <div className="border-b border-border/60 py-4 text-sm text-muted-foreground">{tr(locale, "Mon-Fri - 09:00-18:00 UTC", "Mon-Fri - 09:00-18:00 UTC")}</div>
+                <div className="border-b border-border/60 py-4 text-sm text-muted-foreground">
+                  {tr(locale, "For urgent operational issues, include 'urgent' in your subject line.", "For urgent operational issues, include 'urgent' in your subject line.")}
+                </div>
+                <div className="py-4 text-sm text-muted-foreground">
+                  {tr(locale, "We answer community questions asynchronously every day.", "We answer community questions asynchronously every day.")}
+                </div>
+              </div>
+            </div>
           </div>
-        </PageSection>
+        </section>
 
-        <PageSection surface="mesh" className="space-y-5">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
-              {tr(locale, "Choose the right channel", "Choose the right channel")}
-            </p>
-            <h2 className="font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground sm:text-4xl">
-              {tr(locale, "Contact lanes and ownership", "Contact lanes and ownership")}
-            </h2>
+        <section className="border-b border-border/60">
+          <div className="section-shell py-16">
+            <div className="mb-8">
+              <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">
+                {tr(locale, "Choose the right channel", "Choose the right channel")}
+              </p>
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+                {tr(locale, "Contact lanes and ownership", "Contact lanes and ownership")}
+              </h2>
+            </div>
+            <div className="grid gap-px border-y border-border/60 bg-border/60 lg:grid-cols-3">
+              {channels.map((channel) => (
+                <article key={channel.title} className="bg-background px-0 py-6 lg:px-6">
+                  <div className="inline-flex size-10 items-center justify-center border border-border/70 text-primary">
+                    <channel.icon className="size-4" />
+                  </div>
+                  <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-foreground">{channel.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{channel.description}</p>
+                  <p className="mt-5 border-t border-border/60 pt-4 text-xs tracking-[0.16em] text-muted-foreground uppercase">{channel.responseTarget}</p>
+                  <Link href={channel.href} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition-transform hover:translate-x-1">
+                    {channel.cta}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </article>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            {channels.map((channel) => (
-              <Card key={channel.title} className="border-border bg-card">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 font-serif text-xl text-foreground">
-                    <channel.icon className="size-4 text-primary" />
-                    {channel.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
-                  <p>{channel.description}</p>
-                  <p className="rounded-md border border-border bg-background px-3 py-2 text-xs tracking-wide">{channel.responseTarget}</p>
-                  <Button asChild variant="ghost" className="h-auto px-0 font-semibold text-foreground hover:bg-transparent">
-                    <Link href={channel.href}>
-                      {channel.cta}
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </PageSection>
-
-        <PageSection surface="plain" className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
+        <section>
+          <div className="section-shell grid gap-10 py-16 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">
                 {tr(locale, "Request quality", "Request quality")}
               </p>
-              <CardTitle className="font-serif text-3xl text-foreground">
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
                 {tr(locale, "High-signal request template", "High-signal request template")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-              <p>
-                {tr(
-                  locale,
-                  "Use this checklist in your first message to reduce back-and-forth:",
-                  "Use this checklist in your first message to reduce back-and-forth:",
-                )}
-              </p>
-              <ul className="space-y-2">
+              </h2>
+              <div className="mt-6 border-y border-border/60">
                 {requestTemplate.map((item) => (
-                  <li key={item} className="rounded-md border border-border bg-background px-4 py-2.5">
+                  <div key={item} className="border-b border-border/60 py-4 text-sm leading-relaxed text-foreground last:border-b-0">
                     {item}
-                  </li>
+                  </div>
                 ))}
-              </ul>
-            </CardContent>
-          </Card>
+              </div>
+            </div>
 
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <p className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
-                {tr(locale, "Escalation", "Escalation")}
+            <div className="border border-border/60 p-6 sm:p-8">
+              <p className="text-xs font-semibold tracking-[0.22em] text-primary uppercase">{tr(locale, "Escalation", "Escalation")}</p>
+              <h2 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-foreground">
+                {tr(locale, "Need urgent support?", "Need urgent support?")}
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                {tr(locale, "Use your subject line to flag urgency and include a short impact statement so we can prioritize triage quickly.", "Use your subject line to flag urgency and include a short impact statement so we can prioritize triage quickly.")}
               </p>
-              <CardTitle className="font-serif text-3xl text-foreground">{tr(locale, "Need urgent support?", "Need urgent support?")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
-              <p>
-                {tr(
-                  locale,
-                  "Use your subject line to flag urgency and include a short impact statement so we can prioritize triage quickly.",
-                  "Use your subject line to flag urgency and include a short impact statement so we can prioritize triage quickly.",
-                )}
-              </p>
-              <Button asChild className="w-full sm:w-auto">
+              <Button asChild className="mt-8 rounded-none px-6" size="lg">
                 <Link href={`mailto:${legalEmail}?subject=DemumuMind%20Urgent%20Support`}>
                   {tr(locale, "Start urgent email draft", "Start urgent email draft")}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-            </CardContent>
-          </Card>
-        </PageSection>
-      </PageShell>
+            </div>
+          </div>
+        </section>
+      </main>
     </PageFrame>
   );
 }
-
-
-
