@@ -54,6 +54,9 @@ jobs:
       - name: Migration governance check
         run: npm run check:migrations
 
+      - name: API docs contract check
+        run: npm run check:api-docs
+
       - name: Lint
         if: ${{ inputs.runLint }}
         run: npm run lint

@@ -4,6 +4,7 @@
 2. Open Codex (`codex`)
 3. State task in one clear sentence
 4. After implementation:
+   - check:api-docs
    - lint
    - tests
    - build
