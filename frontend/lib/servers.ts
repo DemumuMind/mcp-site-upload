@@ -1,6 +1,8 @@
 import { applyServerCatalogDefaults } from "@/lib/server-catalog-defaults";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthType, HealthStatus, McpServer, ServerStatus, VerificationLevel, } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type SupabaseServerRow = {
     id: string;
@@ -94,6 +96,10 @@ function shouldUseLocalCatalogFallback(): boolean {
 export function getLocalFallbackServers(): McpServer[] {
     return localFallbackServers;
 }
+
+function getCatalogReadClient(): SupabaseClient | null {
+    return createSupabaseAdminClient() ?? createSupabaseServerClient();
+}
 function toAuthType(value: string | null): AuthType {
     if (value === "oauth" || value === "api_key" || value === "none") {
         return value;
@@ -148,7 +154,7 @@ function mapSupabaseRow(row: SupabaseServerRow): McpServer {
     });
 }
 export async function getActiveServers(): Promise<McpServer[]> {
-    const supabaseClient = createSupabaseServerClient();
+    const supabaseClient = getCatalogReadClient();
     if (!supabaseClient) {
         return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
     }
@@ -173,7 +179,7 @@ export async function getActiveServers(): Promise<McpServer[]> {
     }
 }
 export async function getPendingServers(): Promise<McpServer[]> {
-    const supabaseClient = createSupabaseServerClient();
+    const supabaseClient = getCatalogReadClient();
     if (!supabaseClient) {
         return [];
     }
@@ -194,7 +200,7 @@ export async function getPendingServers(): Promise<McpServer[]> {
 }
 export async function getServerBySlug(slug: string): Promise<McpServer | null> {
     const normalizedSlug = slug.trim().toLowerCase();
-    const supabaseClient = createSupabaseServerClient();
+    const supabaseClient = getCatalogReadClient();
     if (!supabaseClient) {
         return null;
     }
