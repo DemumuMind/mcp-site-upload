@@ -21,6 +21,8 @@ This file records how API routes are covered today so new work can extend the ri
   - Playwright covers auto-publish auth and blog page behavior.
 - Auth/Security:
   - Node core tests cover auth security request decisions and security export parsing/CSV masking.
+- Admin:
+  - Playwright auth smoke covers admin route unauthorized behavior.
 - Multi-agent:
   - Node core tests cover demo request handling and weekly export formatting.
   - Playwright covers `/api/multi-agent/health` and `/api/multi-agent/demo`.
