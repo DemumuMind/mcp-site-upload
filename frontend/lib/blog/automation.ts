@@ -158,13 +158,13 @@ export async function createBlogPostFromResearch(input: CreateBlogPostFromResear
             locale: postPayload.locale,
             research: postPayload.research,
         });
-        if (storageTarget) {
+        if (storageTarget.ok) {
             return {
                 slug,
-                postPath: storageTarget === "table"
+                postPath: storageTarget.target === "table"
                     ? `supabase://public.blog_posts/${slug}`
                     : `supabase://storage/${slug}`,
-                researchPath: storageTarget === "table"
+                researchPath: storageTarget.target === "table"
                     ? `supabase://public.blog_posts/${slug}#research`
                     : `supabase://storage/${slug}#research`,
                 sourceCount: input.packet.sources.length,

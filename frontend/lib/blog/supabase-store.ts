@@ -71,6 +71,15 @@ export type PersistedBlogPostInput = {
     research?: BlogResearchMetadata;
 };
 export type BlogStorageTarget = "table" | "storage";
+export type SaveBlogPostResult =
+    | {
+        ok: true;
+        target: BlogStorageTarget;
+    }
+    | {
+        ok: false;
+        reason: "unavailable";
+    };
 function estimateReadTimeMinutes(post: Pick<BlogPost, "locale">): number {
     const allText = post.locale.en.contentBlocks
         .flatMap((block) => [block.heading, ...block.paragraphs, ...(block.bullets ?? [])])
@@ -234,10 +243,10 @@ async function savePostToStorage(adminClient: SupabaseClient, input: PersistedBl
         throw new Error(`Failed to save post in Supabase Storage: ${error.message}`);
     }
 }
-export async function saveBlogPostToSupabase(input: PersistedBlogPostInput): Promise<BlogStorageTarget | null> {
+export async function saveBlogPostToSupabase(input: PersistedBlogPostInput): Promise<SaveBlogPostResult> {
     const adminClient = createSupabaseAdminClient();
     if (!adminClient) {
-        return null;
+        return { ok: false, reason: "unavailable" };
     }
     const { error } = await adminClient.from("blog_posts").insert({
         slug: input.slug,
@@ -251,11 +260,11 @@ export async function saveBlogPostToSupabase(input: PersistedBlogPostInput): Pro
         research: input.research ?? null,
     });
     if (!error) {
-        return "table";
+        return { ok: true, target: "table" };
     }
     if (!isMissingTableError(error.message)) {
         throw new Error(`Failed to save post in blog_posts: ${error.message}`);
     }
     await savePostToStorage(adminClient, input);
-    return "storage";
+    return { ok: true, target: "storage" };
 }

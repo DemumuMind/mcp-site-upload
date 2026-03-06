@@ -393,7 +393,7 @@ export async function publishBlogV2Draft(input: {
   const draft = blogV2DraftSchema.parse(parsedInput.draft);
 
   const contentBlocks = toBlogContentBlocksFromMdx(draft.mdx);
-  const storageTarget = await saveBlogPostToSupabase({
+  const storageResult = await saveBlogPostToSupabase({
     slug: draft.slug,
     tags: draft.tags,
     publishedAt: draft.publishedAt,
@@ -425,11 +425,11 @@ export async function publishBlogV2Draft(input: {
     },
   });
 
-  if (storageTarget) {
+  if (storageResult.ok) {
     return {
       slug: draft.slug,
       path:
-        storageTarget === "table"
+        storageResult.target === "table"
           ? `supabase://public.blog_posts/${draft.slug}`
           : `supabase://storage/${draft.slug}`,
       sourceCount: draft.researchSourceCount,
