@@ -21,38 +21,18 @@ import { getLocale as getServerLocale } from "@/lib/i18n-server";
 
 import "./globals.css";
 
-const fontSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const fontSerif = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
-const fontMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-  weight: ["400", "500"],
-});
+const fontSans = IBM_Plex_Sans({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const fontSerif = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-serif", display: "swap" });
+const fontMono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap", weight: ["400", "500"] });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const isVercelDeployment = process.env.VERCEL === "1" || process.env.VERCEL === "true";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   manifest: "/site.webmanifest",
-  title: {
-    default: "DemumuMind MCP",
-    template: "%s | DemumuMind MCP",
-  },
+  title: { default: "DemumuMind MCP", template: "%s | DemumuMind MCP" },
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -63,28 +43,13 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   description: "A community-curated directory of MCP servers for Claude, OpenAI, and AI agents.",
-  keywords: [
-    "DemumuMind MCP",
-    "DemumuMind",
-    "DemumuMind MCP directory",
-    "Model Context Protocol",
-    "Claude MCP",
-    "AI agent tools",
-    "MCP directory",
-  ],
+  keywords: ["DemumuMind MCP", "DemumuMind", "DemumuMind MCP directory", "Model Context Protocol", "Claude MCP", "AI agent tools", "MCP directory"],
   openGraph: {
     title: "DemumuMind MCP",
     description: "Discover, evaluate, and submit MCP servers for AI agents in one curated catalog.",
     url: "/",
     siteName: "DemumuMind MCP",
-    images: [
-      {
-        url: "/demumumind-og.png",
-        width: 1200,
-        height: 630,
-        alt: "DemumuMind MCP",
-      },
-    ],
+    images: [{ url: "/demumumind-og.png", width: 1200, height: 630, alt: "DemumuMind MCP" }],
     type: "website",
   },
   twitter: {
@@ -95,19 +60,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getServerLocale();
   const cookieStore = await cookies();
-
   const initialConsent = parseCookieConsent(cookieStore.get(COOKIE_CONSENT_COOKIE_KEY)?.value ?? null);
   const initialProfile =
     parseCookieConsentProfile(cookieStore.get(COOKIE_CONSENT_PROFILE_COOKIE_KEY)?.value ?? null) ??
     (initialConsent ? cookieConsentChoiceToProfile(initialConsent) : null);
-
   const initialAnalyticsAllowed = initialProfile?.analytics ?? false;
 
   return (
@@ -116,15 +75,10 @@ export default async function RootLayout({
         <ThemeProvider>
           <LocaleProvider locale={locale}>
             <div className="flex min-h-screen flex-col">
-              <a href="#main-content" className="skip-link">
-                Skip to main content
-              </a>
+              <a href="#main-content" className="skip-link">Skip to main content</a>
               <SiteHeader locale={locale} />
               <AuthHashRedirector />
-              <main
-                id="main-content"
-                className="relative flex-1 w-full [--page-shell-block:clamp(1.5rem,3vw,2.75rem)] [&>section]:section-shell [&>section]:py-[var(--page-shell-block)]"
-              >
+              <main id="main-content" className="relative flex-1 w-full">
                 {children}
               </main>
               <SiteFooter locale={locale} />

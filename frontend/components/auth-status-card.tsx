@@ -14,19 +14,17 @@ type AuthStatusCardProps = {
 export function AuthStatusCard({
   containerClassName,
   topBorderClassName,
-  contentClassName = "p-6 sm:p-8",
+  contentClassName = "p-5 sm:p-6",
   title,
-  titleClassName = "text-2xl font-semibold text-foreground",
+  titleClassName = "text-2xl font-semibold tracking-[-0.03em] text-foreground",
   message,
-  messageClassName = "mt-2 text-sm text-muted-foreground",
+  messageClassName = "mt-3 text-sm leading-7 text-muted-foreground",
   action,
 }: AuthStatusCardProps) {
   return (
-    <div className={`relative overflow-hidden ${containerClassName}`}>
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-px ${topBorderClassName ?? "bg-gradient-to-r from-transparent via-primary/30 to-transparent"}`}
-      />
-      <div className={`relative ${contentClassName}`}>
+    <div className={`editorial-panel ${containerClassName}`}>
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-px ${topBorderClassName ?? "bg-gradient-to-r from-transparent via-primary/30 to-transparent"}`} />
+      <div className={contentClassName}>
         <h1 className={titleClassName}>{title}</h1>
         {message ? <p className={messageClassName}>{message}</p> : null}
         {action}
