@@ -1,38 +1,7 @@
 import { NextResponse } from "next/server";
-import { csvEscape } from "@/lib/api/auth-helpers";
-import { maskEmail, maskIpAddress } from "@/lib/security/data-protection";
 import { withAdminAuth } from "@/lib/api/with-auth";
+import { buildSecurityEventsCsv, parseSecurityEventsExportQuery } from "@/lib/security-events-export-core";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-
-type SecurityExportRow = {
-  created_at: string | null;
-  event_type: string | null;
-  email: string | null;
-  user_id: string | null;
-  ip_address: string | null;
-};
-
-function toStartOfDayIso(value: string | null): string | null {
-  if (!value) return null;
-  const parsed = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return parsed.toISOString();
-}
-
-function toEndOfDayIso(value: string | null): string | null {
-  if (!value) return null;
-  const parsed = new Date(`${value}T23:59:59.999Z`);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return parsed.toISOString();
-}
-
-function parseIsoTimestamp(value: string): string | null {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
-  return parsed.toISOString();
-}
 
 export const GET = withAdminAuth(
   async (request) => {
@@ -42,27 +11,22 @@ export const GET = withAdminAuth(
     }
 
     const url = new URL(request.url);
-    const eventType = url.searchParams.get("eventType") ?? "all";
-    const emailQuery = (url.searchParams.get("email") ?? "").trim();
-    const fromDate = url.searchParams.get("from");
-    const toDate = url.searchParams.get("to");
-    const fromTs = (url.searchParams.get("fromTs") ?? "").trim();
-    const toTs = (url.searchParams.get("toTs") ?? "").trim();
-    const parsedFromTs = fromTs ? parseIsoTimestamp(fromTs) : null;
-    const parsedToTs = toTs ? parseIsoTimestamp(toTs) : null;
-    const includeRawRequested = (url.searchParams.get("includeRaw") ?? "").trim().toLowerCase();
-    const allowRawExport = process.env.ADMIN_SECURITY_EXPORT_ALLOW_RAW === "1";
-    const includeRaw = allowRawExport && (includeRawRequested === "1" || includeRawRequested === "true");
+    const parsedQuery = parseSecurityEventsExportQuery({
+      eventType: url.searchParams.get("eventType") ?? "all",
+      emailQuery: url.searchParams.get("email") ?? "",
+      fromDate: url.searchParams.get("from"),
+      toDate: url.searchParams.get("to"),
+      fromTs: (url.searchParams.get("fromTs") ?? "").trim(),
+      toTs: (url.searchParams.get("toTs") ?? "").trim(),
+      includeRawRequested: (url.searchParams.get("includeRaw") ?? "").trim(),
+      allowRawExport: process.env.ADMIN_SECURITY_EXPORT_ALLOW_RAW === "1",
+    });
 
-    if (fromTs && !parsedFromTs) {
-      return NextResponse.json({ ok: false, error: "Invalid fromTs timestamp." }, { status: 400 });
-    }
-    if (toTs && !parsedToTs) {
-      return NextResponse.json({ ok: false, error: "Invalid toTs timestamp." }, { status: 400 });
+    if (!parsedQuery.ok) {
+      return NextResponse.json({ ok: false, error: parsedQuery.error }, { status: parsedQuery.status });
     }
 
-    const fromIso = parsedFromTs || toStartOfDayIso(fromDate);
-    const toIso = parsedToTs || toEndOfDayIso(toDate);
+    const { eventType, emailQuery, fromIso, toIso, includeRaw } = parsedQuery.filters;
 
     let query = adminClient
       .from("auth_security_events")
@@ -70,7 +34,7 @@ export const GET = withAdminAuth(
       .order("created_at", { ascending: false })
       .limit(5000);
 
-    if (eventType && eventType !== "all") {
+    if (eventType !== "all") {
       query = query.eq("event_type", eventType);
     }
     if (emailQuery) {
@@ -83,24 +47,21 @@ export const GET = withAdminAuth(
       query = query.lte("created_at", toIso);
     }
 
-    const { data, error } = await query.returns<SecurityExportRow[]>();
+    const { data, error } = await query.returns<
+      {
+        created_at: string | null;
+        event_type: string | null;
+        email: string | null;
+        user_id: string | null;
+        ip_address: string | null;
+      }[]
+    >();
+
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
-    const header = "created_at,event_type,email,user_id,ip_address";
-    const lines = (data ?? []).map((row) =>
-      [
-        row.created_at ?? "",
-        row.event_type ?? "",
-        includeRaw ? row.email ?? "" : maskEmail(row.email),
-        row.user_id ?? "",
-        includeRaw ? row.ip_address ?? "" : maskIpAddress(row.ip_address),
-      ]
-        .map((value) => csvEscape(value))
-        .join(","),
-    );
-    const csv = [header, ...lines].join("\n");
+    const csv = buildSecurityEventsCsv(data ?? [], includeRaw);
 
     return new NextResponse(csv, {
       status: 200,
