@@ -1,10 +1,12 @@
 "use client";
 
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowUpRight, ChevronUp, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   buildCatalogCompareItems,
@@ -121,7 +123,7 @@ export function CatalogComparePanel({
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-primary/25 bg-primary/10 px-3 text-sm font-semibold text-primary">
-              {compareItems.length}
+              {items.length}
             </span>
             <Button
               type="button"
@@ -257,33 +259,31 @@ export function CatalogMobileCompareDock({
           onClick={() => onOpenChange(true)}
         >
           <SlidersHorizontal className="size-4" />
-          {tr(locale, `Compare (${compareItems.length})`, `Compare (${compareItems.length})`)}
+          {tr(locale, `Compare (${items.length})`, `Compare (${items.length})`)}
           <ChevronUp className="size-4" />
         </Button>
       </div>
 
-      {isOpen ? (
-        <>
-          <button
-            type="button"
-            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-[2px] xl:hidden"
-            onClick={() => onOpenChange(false)}
-            aria-label={tr(locale, "Close compare", "Close compare")}
-          />
-          <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-[1.75rem] border border-primary/15 bg-[linear-gradient(180deg,hsl(var(--surface-1))/0.98,hsl(var(--background))/0.98)] px-4 pb-5 pt-4 shadow-[0_-24px_64px_-28px_rgba(0,0,0,0.8)] xl:hidden">
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogPortal>
+          <DialogOverlay className="xl:hidden" />
+          <DialogPrimitive.Content
+            className="fixed inset-x-0 bottom-0 z-50 rounded-t-[1.75rem] border border-primary/15 bg-[linear-gradient(180deg,hsl(var(--surface-1))/0.98,hsl(var(--background))/0.98)] px-4 pb-5 pt-4 shadow-[0_-24px_64px_-28px_rgba(0,0,0,0.8)] focus:outline-none xl:hidden"
+            aria-describedby={undefined}
+          >
             <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-border/80" />
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold tracking-[0.16em] text-primary uppercase">
                   {tr(locale, "Compare shortlist", "Compare shortlist")}
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">
+                <DialogTitle className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">
                   {tr(locale, "Trust + fit", "Trust + fit")}
-                </h2>
+                </DialogTitle>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
-                  {compareItems.length}
+                  {items.length}
                 </span>
                 <Button
                   type="button"
@@ -396,9 +396,9 @@ export function CatalogMobileCompareDock({
                 {tr(locale, "Clear", "Clear")}
               </Button>
             </div>
-          </div>
-        </>
-      ) : null}
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      </Dialog>
     </>
   );
 }

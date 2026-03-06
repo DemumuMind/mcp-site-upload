@@ -604,12 +604,16 @@ export function useCatalogController(
         ? shortlist.filter((item) => item.slug !== server.slug)
         : [createCatalogShortlistItem(server), ...shortlist].slice(0, SHORTLIST_LIMIT);
 
+      if (!shouldEnableCatalogCompare(nextShortlist)) {
+        setIsMobileCompareOpen(false);
+      }
       writeShortlistToStorage(nextShortlist);
     },
     [shortlist],
   );
 
   const clearShortlist = useCallback(() => {
+    setIsMobileCompareOpen(false);
     writeShortlistToStorage(EMPTY_SHORTLIST);
   }, []);
 
