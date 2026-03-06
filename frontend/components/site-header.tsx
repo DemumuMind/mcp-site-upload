@@ -73,7 +73,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
       <div
         data-anime="home-nav"
         className={cn(
-          "section-shell flex flex-wrap items-center justify-between gap-2 transition-[padding] duration-200",
+          "section-shell flex flex-nowrap items-center justify-between gap-2 transition-[padding] duration-200",
           isScrolled ? "py-3" : "py-4"
         )}
       >
