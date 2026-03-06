@@ -64,17 +64,17 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b transition-colors duration-200",
+        "sticky top-0 z-50 border-b transition-colors duration-200 bg-background/92 supports-[backdrop-filter]:bg-background/78 supports-[backdrop-filter]:backdrop-blur-lg",
         isScrolled
-          ? "border-border/70 bg-background/92 supports-[backdrop-filter]:bg-background/78 supports-[backdrop-filter]:backdrop-blur-lg"
-          : "border-transparent bg-transparent"
+          ? "border-border/70"
+          : "border-border/35"
       )}
     >
       <div
         data-anime="home-nav"
         className={cn(
           "section-shell flex flex-wrap items-center justify-between gap-2 transition-[padding] duration-200",
-          isScrolled ? "py-3" : "py-5"
+          isScrolled ? "py-3" : "py-4"
         )}
       >
         <BlurFade delay={0.1} yOffset={0}>

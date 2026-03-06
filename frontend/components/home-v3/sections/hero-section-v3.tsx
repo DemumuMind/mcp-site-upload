@@ -54,7 +54,7 @@ export function HeroSectionV3({ content, workflows, featuredServers, topCategori
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-background" />
       </div>
 
-      <div className="section-shell relative z-10 flex min-h-[calc(100vh-4rem)] flex-col justify-center py-16 sm:py-20 lg:py-24">
+      <div className="section-shell relative z-10 flex min-h-[calc(100vh-4rem)] flex-col justify-center pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24">
         <div className="max-w-4xl">
           <BlurFade delay={0.06}>
             <SectionLabel className="text-primary/90">{content.eyebrow}</SectionLabel>
