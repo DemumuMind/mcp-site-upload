@@ -14,9 +14,15 @@ type HomePageV3Props = {
 export function HomePageV3({ content, viewModel }: HomePageV3Props) {
   return (
     <div className="w-full">
-      <HeroSectionV3 content={content.hero} workflows={content.workflows} metrics={viewModel.metrics} />
+      <HeroSectionV3
+        content={content.hero}
+        workflows={content.workflows}
+        featuredServers={viewModel.featuredServers}
+        topCategories={viewModel.topCategories}
+      />
       <TrustProofSectionV3
         content={content.trust}
+        metrics={viewModel.metrics}
         featuredServers={viewModel.featuredServers}
         topCategories={viewModel.topCategories}
         topLanguages={viewModel.topLanguages}
@@ -27,4 +33,3 @@ export function HomePageV3({ content, viewModel }: HomePageV3Props) {
     </div>
   );
 }
-

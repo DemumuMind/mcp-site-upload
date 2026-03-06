@@ -109,18 +109,22 @@ export type HomeContent = {
 export function getHomeContent(locale: Locale): HomeContent {
   return {
     hero: {
-      eyebrow: tr(locale, "Community-Curated MCP Directory", "Community-Curated MCP Directory"),
-      titleLead: tr(locale, "DemumuMind helps teams", "DemumuMind helps teams"),
-      titleAccent: tr(locale, "Ship MCP Faster", "Ship MCP Faster"),
+      eyebrow: tr(locale, "Independent MCP catalog", "Independent MCP catalog"),
+      titleLead: tr(locale, "DemumuMind", "DemumuMind"),
+      titleAccent: tr(locale, "The MCP catalog for teams that ship.", "The MCP catalog for teams that ship."),
       description: tr(
         locale,
-        "Discover production-ready MCP servers, verify trust signals, and move from first lookup to rollout in one focused workflow.",
-        "Discover production-ready MCP servers, verify trust signals, and move from first lookup to rollout in one focused workflow.",
+        "Review auth model, tool depth, and moderation context before your team spends a week on the wrong integration.",
+        "Review auth model, tool depth, and moderation context before your team spends a week on the wrong integration.",
       ),
       primaryCta: tr(locale, "Start Exploring Servers", "Start Exploring Servers"),
       secondaryCta: tr(locale, "Submit Your Server", "Submit Your Server"),
-      pulseLabel: tr(locale, "Live catalog signal", "Live catalog signal"),
-      pulseText: tr(locale, "Fresh metadata, moderation context, and trust-first discovery in one workspace.", "Fresh metadata, moderation context, and trust-first discovery in one workspace."),
+      pulseLabel: tr(locale, "Catalog preview", "Catalog preview"),
+      pulseText: tr(
+        locale,
+        "A readable review surface for discovery, trust checks, and rollout decisions.",
+        "A readable review surface for discovery, trust checks, and rollout decisions.",
+      ),
     },
     logoCloud: {
       label: tr(locale, "Trusted by builders and platform teams", "Trusted by builders and platform teams"),
@@ -140,11 +144,11 @@ export function getHomeContent(locale: Locale): HomeContent {
       },
     },
     workflows: {
-      heading: tr(locale, "The MCP delivery workflow", "The MCP delivery workflow"),
+      heading: tr(locale, "A shorter path from discovery to rollout", "A shorter path from discovery to rollout"),
       description: tr(
         locale,
-        "A compact operating model for discovery, review, and production rollout.",
-        "A compact operating model for discovery, review, and production rollout.",
+        "Each step removes a specific source of integration drag instead of adding another dashboard to watch.",
+        "Each step removes a specific source of integration drag instead of adding another dashboard to watch.",
       ),
       cards: [
         {
@@ -232,11 +236,11 @@ export function getHomeContent(locale: Locale): HomeContent {
       ],
     },
     trust: {
-      heading: tr(locale, "Trust signals before integration", "Trust signals before integration"),
+      heading: tr(locale, "Signal before setup", "Signal before setup"),
       description: tr(
         locale,
-        "Compare featured servers and adoption context without leaving your workflow.",
-        "Compare featured servers and adoption context without leaving your workflow.",
+        "Use the catalog as a review surface: validate fit, check trust context, and shortlist faster.",
+        "Use the catalog as a review surface: validate fit, check trust context, and shortlist faster.",
       ),
       points: [
         {
@@ -264,11 +268,11 @@ export function getHomeContent(locale: Locale): HomeContent {
       exploreCta: tr(locale, "Open the Catalog", "Open the Catalog"),
     },
     icp: {
-      heading: tr(locale, "Built for real ICPs", "Built for real ICPs"),
+      heading: tr(locale, "One source of truth for every delivery lane", "One source of truth for every delivery lane"),
       description: tr(
         locale,
-        "From indie builders to security teams, everyone gets the same trusted source of truth.",
-        "From indie builders to security teams, everyone gets the same trusted source of truth.",
+        "The same catalog supports first experiments, production delivery, and security review without branching into separate workflows.",
+        "The same catalog supports first experiments, production delivery, and security review without branching into separate workflows.",
       ),
       cards: [
         {
@@ -322,13 +326,13 @@ export function getHomeContent(locale: Locale): HomeContent {
       ],
     },
     finalCta: {
-      badge: tr(locale, "Priority moderation available", "Priority moderation available"),
-      titleLead: tr(locale, "Stop Guessing Server Fit.", "Stop Guessing Server Fit."),
-      titleAccent: tr(locale, "Ship with DemumuMind.", "Ship with DemumuMind."),
+      badge: tr(locale, "Curated catalog, live trust context", "Curated catalog, live trust context"),
+      titleLead: tr(locale, "DemumuMind keeps MCP selection readable.", "DemumuMind keeps MCP selection readable."),
+      titleAccent: tr(locale, "Move from shortlist to rollout without guesswork.", "Move from shortlist to rollout without guesswork."),
       description: tr(
         locale,
-        "Use one trusted MCP catalog to evaluate, shortlist, and launch integrations with confidence.",
-        "Use one trusted MCP catalog to evaluate, shortlist, and launch integrations with confidence.",
+        "Open the catalog when you need real selection signal, not another vague integration marketplace.",
+        "Open the catalog when you need real selection signal, not another vague integration marketplace.",
       ),
       primaryCta: tr(locale, "Open the Catalog", "Open the Catalog"),
       secondaryCta: tr(locale, "Read the Setup Guide", "Read the Setup Guide"),

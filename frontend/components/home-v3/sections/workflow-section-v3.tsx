@@ -1,8 +1,6 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SectionLabel } from "@/components/home-v3/primitives/section-label";
-import { BorderBeam } from "@/components/ui/border-beam";
-import { CoolMode } from "@/components/ui/cool-mode";
 import { BlurFade } from "@/components/ui/blur-fade";
 import type { HomeContent } from "@/lib/home/content";
 
@@ -12,14 +10,8 @@ type WorkflowSectionV3Props = {
 
 export function WorkflowSectionV3({ content }: WorkflowSectionV3Props) {
   return (
-    <section className="relative overflow-hidden bg-background">
-      {/* Background Atmosphere */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-1/4 left-0 -translate-x-1/2 size-[500px] rounded-full bg-primary/5 blur-[100px]" />
-        <div className="absolute bottom-1/4 right-0 translate-x-1/2 size-[500px] rounded-full bg-accent/5 blur-[100px]" />
-      </div>
-
-      <div className="section-shell relative z-10 space-y-7 py-14">
+    <section className="border-b border-border/60 bg-background">
+      <div className="section-shell space-y-8 py-16">
         <header className="space-y-3">
           <BlurFade delay={0.1} inView>
             <SectionLabel>Workflow</SectionLabel>
@@ -32,21 +24,20 @@ export function WorkflowSectionV3({ content }: WorkflowSectionV3Props) {
           </BlurFade>
         </header>
 
-        <ol className="grid gap-4 lg:grid-cols-2" aria-label="Delivery workflow steps">
+        <ol className="border-t border-border/60" aria-label="Delivery workflow steps">
           {content.cards.map((item, index) => (
             <BlurFade key={item.title} delay={0.4 + index * 0.1} inView>
-              <li className="group relative overflow-hidden rounded-md border border-border bg-card p-5 transition-colors duration-200 ease-out hover:bg-muted/30">
-                <div className="transition-[transform,box-shadow] duration-200 ease-out motion-safe:will-change-transform group-hover:-translate-y-1 group-hover:shadow-lg group-hover:shadow-primary/5">
-                <BorderBeam size={80} duration={8} className="opacity-0 group-hover:opacity-100" />
-                <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">Step {index + 1}</p>
-                <h3 className="mt-2 text-xl font-semibold text-foreground">{item.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
-                <CoolMode>
-                  <Link href={item.href} className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+              <li className="grid gap-5 border-b border-border/60 py-6 lg:grid-cols-[120px_minmax(0,1fr)_auto] lg:items-start">
+                <p className="text-xs tracking-[0.28em] text-muted-foreground uppercase">Step {index + 1}</p>
+                <div className="max-w-2xl">
+                  <h3 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </div>
+                <div className="lg:pt-1">
+                  <Link href={item.href} className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-transform hover:translate-x-1">
                     {item.cta}
                     <ArrowRight className="size-4" />
                   </Link>
-                </CoolMode>
                 </div>
               </li>
             </BlurFade>

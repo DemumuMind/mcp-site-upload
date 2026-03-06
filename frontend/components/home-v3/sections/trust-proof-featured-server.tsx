@@ -1,9 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { BorderBeam } from "@/components/ui/border-beam";
+import { ArrowUpRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,39 +23,33 @@ export function TrustProofFeaturedServerCard({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <article className="group relative cursor-pointer overflow-hidden rounded-xl border border-border bg-card/30 p-4 shadow-2xl shadow-black backdrop-blur-md transition-[border-color,background-color] duration-200 ease-out hover:border-primary/40 hover:bg-card/50">
-          <BorderBeam size={120} duration={10} className="opacity-0 group-hover:opacity-100" />
-
-          <div className="flex items-center justify-between gap-4">
+        <article className="group cursor-pointer border border-border/60 p-4 transition-colors hover:border-primary/40 hover:bg-white/[0.03]">
+          <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-background/80 shadow-inner">
-                <Star className="size-5 text-primary transition-transform duration-200 ease-out motion-safe:will-change-transform group-hover:scale-110" />
+              <div className="flex size-10 items-center justify-center border border-border/70 bg-background/40">
+                <Star className="size-4 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-bold tracking-tight text-foreground">{server.name}</h3>
+                <h3 className="text-sm font-semibold tracking-tight text-foreground">{server.name}</h3>
                 <div className="mt-0.5 flex items-center gap-2">
-                  <div className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  <div className="size-1.5 rounded-full bg-emerald-500" />
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
                     {server.verificationLabel}
                   </p>
                 </div>
               </div>
             </div>
-            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-[10px] font-bold text-primary">
-              {server.category}
-            </Badge>
+            <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3 text-[10px] font-medium tracking-wide text-muted-foreground">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <span className="text-primary/70 uppercase">{featuredAuthLabel}:</span>
-                <span className="text-foreground">{server.authLabel}</span>
-              </span>
-            </div>
-            <span className="rounded-full bg-muted/30 px-2 py-0.5 text-foreground/80">
-              {server.toolsCount} {featuredToolsLabel}
-            </span>
+          <div className="mt-4 grid gap-2 border-t border-border/50 pt-3 text-[11px] tracking-[0.14em] text-muted-foreground uppercase sm:grid-cols-3">
+            <p>{server.category}</p>
+            <p>
+              {featuredAuthLabel}: <span className="text-foreground">{server.authLabel}</span>
+            </p>
+            <p className="sm:text-right">
+              <span className="text-foreground">{server.toolsCount}</span> {featuredToolsLabel}
+            </p>
           </div>
         </article>
       </DialogTrigger>
@@ -92,7 +82,7 @@ export function TrustProofFeaturedServerCard({
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs font-medium text-emerald-400">
-            <div className="size-2 animate-pulse rounded-full bg-emerald-500" />
+            <div className="size-2 rounded-full bg-emerald-500" />
             {server.verificationLabel}
           </div>
         </div>
