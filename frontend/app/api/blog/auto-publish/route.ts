@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
 import { runAutoPublishBatch } from "@/lib/blog/auto-publish";
+import { executeBlogAutoPublish } from "@/lib/blog/auto-publish-core";
 import { isBlogV2Enabled } from "@/lib/blog-v2/flags";
 import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
 
@@ -20,60 +21,40 @@ function withDeprecationHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-async function runAutoPublish(request: NextRequest) {
-  if (isBlogV2Enabled()) {
-    return withDeprecationHeaders(NextResponse.json(
-      {
-        ok: false,
-        message: "Auto-publish v1 is disabled while BLOG_V2_ENABLED=true. Use /api/admin/blog-v2/* pipeline.",
-      },
-      { status: 409 },
-    ));
-  }
-
-  const countFromQuery = request.nextUrl.searchParams.get("count");
-  const countFromEnv = parseNumberEnv("BLOG_AUTOPUBLISH_POSTS_PER_RUN", DEFAULT_POSTS_PER_RUN, {
-    min: 1,
-    max: 8,
-  });
-  const requestedCount = parseNumber(countFromQuery, countFromEnv, { min: 1, max: 8 });
-  const recencyDays = parseNumberEnv("BLOG_AUTOPUBLISH_RECENCY_DAYS", DEFAULT_RECENCY_DAYS, {
-    min: 1,
-    max: 90,
-  });
-  const maxSources = parseNumberEnv("BLOG_AUTOPUBLISH_MAX_SOURCES", DEFAULT_MAX_SOURCES, {
-    min: 3,
-    max: 12,
-  });
-
-  const result = await runAutoPublishBatch({
-    count: requestedCount,
-    recencyDays,
-    maxSources,
-  });
-
-  revalidatePath("/blog");
-  revalidatePath("/sitemap.xml");
-  for (const createdPost of result.created) {
-    revalidatePath(`/blog/${createdPost.slug}`);
-  }
-  revalidateTag(BLOG_POSTS_CACHE_TAG, "max");
-
-  return withDeprecationHeaders(NextResponse.json(
-    {
-      ok: result.failedCount === 0,
-      ...result,
-      settings: {
-        recencyDays,
-        maxSources,
-      },
-    },
-    { status: result.failedCount === 0 ? 200 : 207 },
-  ));
-}
-
 const handlers = withCronAuth(
-  async (request) => runAutoPublish(request),
+  async (request: NextRequest) => {
+    const response = await executeBlogAutoPublish({
+      isBlogV2Enabled,
+      parseCountFromQuery: () => request.nextUrl.searchParams.get("count"),
+      parsePostsPerRunFromEnv: () =>
+        parseNumberEnv("BLOG_AUTOPUBLISH_POSTS_PER_RUN", DEFAULT_POSTS_PER_RUN, {
+          min: 1,
+          max: 8,
+        }),
+      parseRequestedCount: (value, fallback) => parseNumber(value, fallback, { min: 1, max: 8 }),
+      parseRecencyDaysFromEnv: () =>
+        parseNumberEnv("BLOG_AUTOPUBLISH_RECENCY_DAYS", DEFAULT_RECENCY_DAYS, {
+          min: 1,
+          max: 90,
+        }),
+      parseMaxSourcesFromEnv: () =>
+        parseNumberEnv("BLOG_AUTOPUBLISH_MAX_SOURCES", DEFAULT_MAX_SOURCES, {
+          min: 3,
+          max: 12,
+        }),
+      runBatch: runAutoPublishBatch,
+      clearCaches: async (result) => {
+        revalidatePath("/blog");
+        revalidatePath("/sitemap.xml");
+        for (const createdPost of result.created) {
+          revalidatePath(`/blog/${createdPost.slug}`);
+        }
+        revalidateTag(BLOG_POSTS_CACHE_TAG, "max");
+      },
+    });
+
+    return withDeprecationHeaders(NextResponse.json(response.body, { status: response.status }));
+  },
   ["BLOG_AUTOPUBLISH_CRON_SECRET", "CRON_SECRET"],
   "blog.auto_publish",
 );
