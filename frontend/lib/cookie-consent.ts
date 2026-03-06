@@ -6,6 +6,7 @@ import {
   COOKIE_CONSENT_PROFILE_COOKIE_KEY,
   COOKIE_CONSENT_PROFILE_STORAGE_KEY,
   COOKIE_CONSENT_STORAGE_KEY,
+  withRequestCachePolicy,
 } from "@/lib/cache/policy";
 export {
   COOKIE_CONSENT_COOKIE_KEY,
@@ -130,14 +131,13 @@ async function syncCookieConsentToEndpoint(value: CookieConsentChoice | null, pr
   }
 
   try {
-    const requestInit: RequestInit = {
+    const requestInit = withRequestCachePolicy("providerMutation", {
       method: value === null ? "DELETE" : "POST",
       credentials: "include",
       keepalive: true,
-      cache: "no-store",
       headers: value === null ? undefined : { "content-type": "application/json" },
       body: value === null ? undefined : JSON.stringify({ choice: value, profile }),
-    };
+    });
 
     await fetch(endpoint, requestInit);
   } catch {

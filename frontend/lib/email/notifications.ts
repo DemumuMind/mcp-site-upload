@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import { withRequestCachePolicy } from "@/lib/cache/policy";
 type SendEmailResult = {
     sent: boolean;
     skipped: boolean;
@@ -83,7 +84,7 @@ async function sendEmailViaResend({ to, subject, html, text, }: {
         };
     }
     try {
-        const response = await fetch("https://api.resend.com/emails", {
+        const response = await fetch("https://api.resend.com/emails", withRequestCachePolicy("providerMutation", {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${resendApiKey}`,
@@ -96,8 +97,7 @@ async function sendEmailViaResend({ to, subject, html, text, }: {
                 html,
                 text,
             }),
-            cache: "no-store",
-        });
+        }));
         if (!response.ok) {
             const errorText = await response.text();
             return {

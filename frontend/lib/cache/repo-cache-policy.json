@@ -37,6 +37,31 @@
       "noStore": true
     }
   },
+  "requests": {
+    "internalApi": {
+      "cache": "no-store"
+    },
+    "interactiveSearch": {
+      "cache": "no-store"
+    },
+    "operationalProbe": {
+      "cache": "no-store"
+    },
+    "providerSearch": {
+      "cache": "no-store"
+    },
+    "providerMutation": {
+      "cache": "no-store"
+    }
+  },
+  "memory": {
+    "howToUsePaths": {
+      "ttlSeconds": 60
+    },
+    "sectionIndex": {
+      "ttlSeconds": 60
+    }
+  },
   "storage": {
     "cookieConsent": {
       "choiceLocalStorageKey": "demumumind-cookie-consent",
@@ -67,6 +92,14 @@
     "cron": {
       "windowMs": 60000,
       "maxRequests": 30
+    }
+  },
+  "security": {
+    "auth": {
+      "loginWindowSeconds": 900,
+      "maxFailedAttempts": 5,
+      "alertFailedAttemptsThreshold": 3,
+      "alertFailedAttemptsEscalationThreshold": 5
     }
   },
   "operations": {

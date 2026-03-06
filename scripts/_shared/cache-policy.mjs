@@ -8,6 +8,10 @@ export function getHttpCachePolicy(policyKey) {
   return repoCachePolicy.http?.[policyKey] ?? null;
 }
 
+export function getRequestCachePolicy(policyKey) {
+  return repoCachePolicy.requests?.[policyKey] ?? null;
+}
+
 export function buildCacheControlHeader(policyKey) {
   const policy = getHttpCachePolicy(policyKey);
   if (!policy) {
@@ -39,15 +43,23 @@ export function buildCacheControlHeader(policyKey) {
 }
 
 export function withRequestCachePolicy(policyKey, init = {}) {
-  const policy = getHttpCachePolicy(policyKey);
-  if (!policy?.noStore) {
+  const policy = getRequestCachePolicy(policyKey);
+  if (!policy?.cache) {
     return init;
   }
 
   return {
     ...init,
-    cache: "no-store",
+    cache: policy.cache,
   };
+}
+
+export function getMemoryPolicy(policyKey) {
+  return repoCachePolicy.memory?.[policyKey] ?? null;
+}
+
+export function getSecurityPolicy(policyKey) {
+  return repoCachePolicy.security?.[policyKey] ?? null;
 }
 
 export function getOperationPolicy(policyKey) {

@@ -76,7 +76,7 @@ async function checkEndpoint(path, expectedStatuses, name, options = {}) {
   try {
     const response = await fetch(
       `${baseUrl}${path}`,
-      withRequestCachePolicy("apiNoStore", {
+      withRequestCachePolicy("internalApi", {
         method: options.method || "GET",
         redirect: "follow",
         headers: {

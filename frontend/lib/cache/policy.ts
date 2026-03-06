@@ -16,6 +16,16 @@ type HttpCachePolicy = {
   staleWhileRevalidateSeconds?: number;
 };
 
+type RequestCacheMode = NonNullable<RequestInit["cache"]>;
+
+type RequestCachePolicy = {
+  cache?: RequestCacheMode;
+};
+
+type MemoryCachePolicy = {
+  ttlSeconds: number;
+};
+
 type CookieConsentStoragePolicy = {
   choiceLocalStorageKey: string;
   profileLocalStorageKey: string;
@@ -38,6 +48,13 @@ type ToolsRulesStoragePolicy = {
 type RateLimitPolicy = {
   windowMs: number;
   maxRequests: number;
+};
+
+type AuthSecurityPolicy = {
+  loginWindowSeconds: number;
+  maxFailedAttempts: number;
+  alertFailedAttemptsThreshold: number;
+  alertFailedAttemptsEscalationThreshold: number;
 };
 
 type OperationsPolicy = {
@@ -63,6 +80,17 @@ type RepoCachePolicy = {
     apiNoStore: HttpCachePolicy;
     exportNoStore: HttpCachePolicy;
   };
+  requests: {
+    internalApi: RequestCachePolicy;
+    interactiveSearch: RequestCachePolicy;
+    operationalProbe: RequestCachePolicy;
+    providerSearch: RequestCachePolicy;
+    providerMutation: RequestCachePolicy;
+  };
+  memory: {
+    howToUsePaths: MemoryCachePolicy;
+    sectionIndex: MemoryCachePolicy;
+  };
   storage: {
     cookieConsent: CookieConsentStoragePolicy;
     submitServerDraft: SubmitServerDraftStoragePolicy;
@@ -73,12 +101,18 @@ type RepoCachePolicy = {
     admin: RateLimitPolicy;
     cron: RateLimitPolicy;
   };
+  security: {
+    auth: AuthSecurityPolicy;
+  };
   operations: OperationsPolicy;
 };
 
 type ServerDataPolicyKey = keyof RepoCachePolicy["serverData"];
 type HttpPolicyKey = keyof RepoCachePolicy["http"];
+type RequestPolicyKey = keyof RepoCachePolicy["requests"];
+type MemoryPolicyKey = keyof RepoCachePolicy["memory"];
 type RateLimitPolicyKey = keyof RepoCachePolicy["rateLimits"];
+type SecurityPolicyKey = keyof RepoCachePolicy["security"];
 type OperationPolicyKey = keyof RepoCachePolicy["operations"];
 
 const repoCachePolicy = repoCachePolicyJson as RepoCachePolicy;
@@ -140,23 +174,39 @@ export function buildCacheControlHeader(policyKey: HttpPolicyKey): string {
   return directives.join(", ");
 }
 
+export function getRequestCachePolicy(policyKey: RequestPolicyKey): RequestCachePolicy {
+  return repoCachePolicy.requests[policyKey];
+}
+
 export function withRequestCachePolicy(
-  policyKey: HttpPolicyKey,
+  policyKey: RequestPolicyKey,
   init: RequestInit = {},
 ): RequestInit {
-  const policy = getHttpCachePolicy(policyKey);
-  if (!policy.noStore) {
+  const policy = getRequestCachePolicy(policyKey);
+  if (!policy.cache) {
     return init;
   }
 
   return {
     ...init,
-    cache: "no-store",
+    cache: policy.cache,
   };
+}
+
+export function getMemoryPolicy(policyKey: MemoryPolicyKey): MemoryCachePolicy {
+  return repoCachePolicy.memory[policyKey];
+}
+
+export function getMemoryTtlSeconds(policyKey: MemoryPolicyKey): number {
+  return getMemoryPolicy(policyKey).ttlSeconds;
 }
 
 export function getRateLimitPolicy(policyKey: RateLimitPolicyKey): RateLimitPolicy {
   return repoCachePolicy.rateLimits[policyKey];
+}
+
+export function getSecurityPolicy(policyKey: SecurityPolicyKey): RepoCachePolicy["security"][SecurityPolicyKey] {
+  return repoCachePolicy.security[policyKey];
 }
 
 export function getOperationPolicy(policyKey: OperationPolicyKey): number {
@@ -183,6 +233,14 @@ export const SUBMIT_SERVER_DRAFT_STORAGE_KEY = repoCachePolicy.storage.submitSer
 
 export const TOOLS_RULES_PRESETS_STORAGE_KEY = repoCachePolicy.storage.toolsRules.presetsLocalStorageKey;
 export const TOOLS_RULES_HISTORY_STORAGE_KEY = repoCachePolicy.storage.toolsRules.historyLocalStorageKey;
+
+const authSecurityPolicy = getSecurityPolicy("auth");
+
+export const AUTH_LOGIN_WINDOW_SECONDS = authSecurityPolicy.loginWindowSeconds;
+export const AUTH_MAX_FAILED_ATTEMPTS = authSecurityPolicy.maxFailedAttempts;
+export const AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD = authSecurityPolicy.alertFailedAttemptsThreshold;
+export const AUTH_ALERT_FAILED_ATTEMPTS_ESCALATION_THRESHOLD =
+  authSecurityPolicy.alertFailedAttemptsEscalationThreshold;
 
 export const IMAGE_MINIMUM_CACHE_TTL_SECONDS = repoCachePolicy.operations.imageMinimumCacheTtlSeconds;
 

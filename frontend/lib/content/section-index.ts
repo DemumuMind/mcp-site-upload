@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { readProcessMemoryCache } from "@/lib/cache/memory";
 import type { Locale } from "@/lib/i18n";
 const sectionLocaleSchema = z.object({
     title: z.string().trim().min(1),
@@ -26,33 +27,29 @@ function resolveContentRoot(): string {
     return path.join(cwd, "frontend", "content");
 }
 const contentRoot = resolveContentRoot();
-const sectionCache = new Map<string, SectionIndex | null>();
 function getSectionIndexFilePath(sectionKey: string): string {
     return path.join(contentRoot, sectionKey, "_index.json");
 }
 export function getSectionIndex(sectionKey: string): SectionIndex | null {
-    if (sectionCache.has(sectionKey)) {
-        return sectionCache.get(sectionKey) ?? null;
-    }
     const filePath = getSectionIndexFilePath(sectionKey);
-    if (!fs.existsSync(filePath)) {
-        sectionCache.set(sectionKey, null);
-        return null;
-    }
-    const raw = fs.readFileSync(filePath, "utf8");
-    let parsedJson: unknown;
-    try {
-        parsedJson = JSON.parse(raw);
-    }
-    catch (error) {
-        throw new Error(`Invalid JSON in section index file "${filePath}": ${(error as Error).message}`);
-    }
-    const parsed = sectionIndexSchema.safeParse(parsedJson);
-    if (!parsed.success) {
-        throw new Error(`Invalid section index schema in "${filePath}": ${parsed.error.message}`);
-    }
-    sectionCache.set(sectionKey, parsed.data);
-    return parsed.data;
+    return readProcessMemoryCache("sectionIndex", `content:section-index:${sectionKey}`, () => {
+        if (!fs.existsSync(filePath)) {
+            return null;
+        }
+        const raw = fs.readFileSync(filePath, "utf8");
+        let parsedJson: unknown;
+        try {
+            parsedJson = JSON.parse(raw);
+        }
+        catch (error) {
+            throw new Error(`Invalid JSON in section index file "${filePath}": ${(error as Error).message}`);
+        }
+        const parsed = sectionIndexSchema.safeParse(parsedJson);
+        if (!parsed.success) {
+            throw new Error(`Invalid section index schema in "${filePath}": ${parsed.error.message}`);
+        }
+        return parsed.data;
+    });
 }
 export function getSectionLocaleCopy(sectionIndex: SectionIndex | null, locale: Locale): SectionLocaleCopy | null {
     if (!sectionIndex) {

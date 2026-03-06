@@ -68,7 +68,7 @@ async function fetchCatalogSearch(url, timeoutMs) {
   try {
     return await fetch(
       url,
-      withRequestCachePolicy("apiNoStore", {
+      withRequestCachePolicy("internalApi", {
         method: "GET",
         headers: {
           accept: "application/json",

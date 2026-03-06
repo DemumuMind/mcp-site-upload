@@ -1,6 +1,7 @@
 ﻿import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { readProcessMemoryCache } from "@/lib/cache/memory";
 import type { Locale } from "@/lib/i18n";
 const localizedTextSchema = z.object({
     en: z.string().trim().min(1),
@@ -163,8 +164,7 @@ function resolveContentRoot(): string {
     return path.join(cwd, "frontend", "content");
 }
 const howToUsePathsFilePath = path.join(resolveContentRoot(), "how-to-use", "paths.json");
-let cachedHowToUsePaths: HowToUsePaths | null = null;
-let hasLoadedHowToUsePaths = false;
+const HOW_TO_USE_PATHS_CACHE_KEY = "content:how-to-use-paths";
 const fallbackHowToUsePaths: HowToUsePaths = {
     heroActions: {
         primaryLabel: {
@@ -410,28 +410,24 @@ const fallbackHowToUsePaths: HowToUsePaths = {
     },
 };
 function readHowToUsePaths(): HowToUsePaths {
-    if (hasLoadedHowToUsePaths) {
-        return cachedHowToUsePaths ?? fallbackHowToUsePaths;
-    }
-    hasLoadedHowToUsePaths = true;
-    if (!fs.existsSync(howToUsePathsFilePath)) {
-        cachedHowToUsePaths = fallbackHowToUsePaths;
-        return cachedHowToUsePaths;
-    }
-    const raw = fs.readFileSync(howToUsePathsFilePath, "utf8");
-    let parsedJson: unknown;
-    try {
-        parsedJson = JSON.parse(raw);
-    }
-    catch (error) {
-        throw new Error(`Invalid JSON in "${howToUsePathsFilePath}": ${(error as Error).message}`);
-    }
-    const parsed = howToUsePathsSchema.safeParse(parsedJson);
-    if (!parsed.success) {
-        throw new Error(`Invalid how-to-use content schema in "${howToUsePathsFilePath}": ${parsed.error.message}`);
-    }
-    cachedHowToUsePaths = parsed.data;
-    return cachedHowToUsePaths;
+    return readProcessMemoryCache("howToUsePaths", HOW_TO_USE_PATHS_CACHE_KEY, () => {
+        if (!fs.existsSync(howToUsePathsFilePath)) {
+            return fallbackHowToUsePaths;
+        }
+        const raw = fs.readFileSync(howToUsePathsFilePath, "utf8");
+        let parsedJson: unknown;
+        try {
+            parsedJson = JSON.parse(raw);
+        }
+        catch (error) {
+            throw new Error(`Invalid JSON in "${howToUsePathsFilePath}": ${(error as Error).message}`);
+        }
+        const parsed = howToUsePathsSchema.safeParse(parsedJson);
+        if (!parsed.success) {
+            throw new Error(`Invalid how-to-use content schema in "${howToUsePathsFilePath}": ${parsed.error.message}`);
+        }
+        return parsed.data;
+    });
 }
 function localizeText(locale: Locale, localizedText: LocalizedText): string {
     void locale;

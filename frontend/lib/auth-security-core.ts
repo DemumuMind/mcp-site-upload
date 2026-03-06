@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
-
-const LOGIN_WINDOW_SECONDS = 15 * 60;
-const MAX_FAILED_ATTEMPTS = 5;
-const ALERT_FAILED_ATTEMPTS = 3;
-const ALERT_FAILED_ATTEMPTS_MAX = 5;
+import {
+  AUTH_ALERT_FAILED_ATTEMPTS_ESCALATION_THRESHOLD,
+  AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD,
+  AUTH_LOGIN_WINDOW_SECONDS,
+  AUTH_MAX_FAILED_ATTEMPTS,
+} from "./cache/policy.ts";
 
 export type PrecheckPayload = {
   action: "precheck";
@@ -103,19 +104,19 @@ export async function executeAuthSecurityRequest(
         body: {
           ok: true,
           failedAttemptsInWindow: 0,
-          maxFailedAttempts: MAX_FAILED_ATTEMPTS,
+          maxFailedAttempts: AUTH_MAX_FAILED_ATTEMPTS,
           retryAfterSeconds: 0,
         },
       };
     }
 
     const { count, oldestCreatedAt } = await deps.getFailedAttemptsInWindow(emailHash, ipAddress);
-    const hasLimit = count >= MAX_FAILED_ATTEMPTS;
+    const hasLimit = count >= AUTH_MAX_FAILED_ATTEMPTS;
 
     let retryAfterSeconds = 0;
     if (hasLimit && oldestCreatedAt) {
       const elapsedSeconds = Math.floor((now() - new Date(oldestCreatedAt).getTime()) / 1000);
-      retryAfterSeconds = Math.max(0, LOGIN_WINDOW_SECONDS - elapsedSeconds);
+      retryAfterSeconds = Math.max(0, AUTH_LOGIN_WINDOW_SECONDS - elapsedSeconds);
     }
 
     if (hasLimit) {
@@ -140,7 +141,7 @@ export async function executeAuthSecurityRequest(
       body: {
         ok: !hasLimit,
         failedAttemptsInWindow: count,
-        maxFailedAttempts: MAX_FAILED_ATTEMPTS,
+        maxFailedAttempts: AUTH_MAX_FAILED_ATTEMPTS,
         retryAfterSeconds,
       },
     };
@@ -193,13 +194,16 @@ export async function executeAuthSecurityRequest(
   }
 
   const { count } = await deps.getFailedAttemptsInWindow(emailHash, ipAddress);
-  if (count === ALERT_FAILED_ATTEMPTS || count === ALERT_FAILED_ATTEMPTS_MAX) {
+  if (
+    count === AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD ||
+    count === AUTH_ALERT_FAILED_ATTEMPTS_ESCALATION_THRESHOLD
+  ) {
     await deps.sendSecurityAlertEmail({
       locale: "en",
       recipientEmail: email,
       alertType: "failed_logins",
       failedAttemptsInWindow: count,
-      windowMinutes: Math.floor(LOGIN_WINDOW_SECONDS / 60),
+      windowMinutes: Math.floor(AUTH_LOGIN_WINDOW_SECONDS / 60),
     });
     await deps.writeSecurityLog({
       eventType: "email_alert_failed_logins",
@@ -209,7 +213,7 @@ export async function executeAuthSecurityRequest(
     });
   }
 
-  const shouldAlert = count >= ALERT_FAILED_ATTEMPTS;
+  const shouldAlert = count >= AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD;
   return {
     status: 200,
     body: {
@@ -218,8 +222,8 @@ export async function executeAuthSecurityRequest(
         ? {
             type: "failed_attempts",
             failedAttemptsInWindow: count,
-            windowSeconds: LOGIN_WINDOW_SECONDS,
-            threshold: ALERT_FAILED_ATTEMPTS,
+            windowSeconds: AUTH_LOGIN_WINDOW_SECONDS,
+            threshold: AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD,
           }
         : null,
     },

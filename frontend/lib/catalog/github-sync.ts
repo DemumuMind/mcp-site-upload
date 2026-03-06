@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { withRequestCachePolicy } from "@/lib/cache/policy";
 import { withRetry } from "@/lib/api/fetch-with-retry";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { AuthType, ServerStatus, VerificationLevel } from "@/lib/types";
@@ -232,13 +233,12 @@ async function fetchGithubRepos(maxPages: number, token: string | null): Promise
         () =>
           fetch(
             `https://api.github.com/search/repositories?q=${query}&sort=updated&order=desc&per_page=${DEFAULT_PER_PAGE}&page=${currentPage}`,
-            {
+            withRequestCachePolicy("providerSearch", {
               headers: {
                 Accept: "application/vnd.github+json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
               },
-              cache: "no-store",
-            },
+            }),
           ),
         { maxRetries: 2, baseDelayMs: 1000 },
       );

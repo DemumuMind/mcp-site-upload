@@ -1,5 +1,6 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { withRequestCachePolicy } from "../cache/policy.ts";
 import type { HealthStatus } from "@/lib/types";
 
 const blockedHostnames = new Set([
@@ -157,13 +158,15 @@ async function fetchProbe(url: URL, deps: FetchProbeDeps): Promise<Response> {
     let currentUrl = new URL(url.toString());
     const maxRedirects = 3;
     for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
-      const response = await deps.fetchImpl(currentUrl.toString(), {
-        method: "GET",
-        redirect: "manual",
-        cache: "no-store",
-        signal: controller.signal,
-        headers: { "user-agent": "demumumind-mcp-health-check/1.0" },
-      });
+      const response = await deps.fetchImpl(
+        currentUrl.toString(),
+        withRequestCachePolicy("operationalProbe", {
+          method: "GET",
+          redirect: "manual",
+          signal: controller.signal,
+          headers: { "user-agent": "demumumind-mcp-health-check/1.0" },
+        }),
+      );
 
       const location = response.headers.get("location");
       if (!location || response.status < 300 || response.status >= 400) {

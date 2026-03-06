@@ -1,5 +1,6 @@
 import { isIP } from "node:net";
 import { lookup } from "node:dns/promises";
+import { withRequestCachePolicy } from "./cache/policy.ts";
 
 const INTERNAL_UI_PROBE_HEADER = "x-demumumind-probe-ui";
 const INTERNAL_UI_PROBE_VALUE = "1";
@@ -80,13 +81,15 @@ async function probeUrl(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetchImpl(targetUrl.toString(), {
-      method: "GET",
-      signal: controller.signal,
-      cache: "no-store",
-      redirect: "manual",
-      headers: { "user-agent": "demumumind-mcp-connection-test/1.0" },
-    });
+    const response = await fetchImpl(
+      targetUrl.toString(),
+      withRequestCachePolicy("operationalProbe", {
+        method: "GET",
+        signal: controller.signal,
+        redirect: "manual",
+        headers: { "user-agent": "demumumind-mcp-connection-test/1.0" },
+      }),
+    );
     return {
       status: 200,
       body: {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { withRequestCachePolicy } from "@/lib/cache/policy";
 import {
   areCatalogQueriesEqual,
   buildCatalogQueryV2SearchParams,
@@ -418,7 +419,10 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
         const queryString = buildCatalogQueryV2SearchParams(queryState).toString();
         const response = await fetch(
           queryString.length > 0 ? `/api/catalog/search?${queryString}` : "/api/catalog/search",
-          { method: "GET", signal: controller.signal, cache: "no-store" },
+          withRequestCachePolicy("interactiveSearch", {
+            method: "GET",
+            signal: controller.signal,
+          }),
         );
         if (!response.ok) {
           const clientError = await getCatalogSearchClientError(response);

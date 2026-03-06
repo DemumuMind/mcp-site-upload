@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { withRequestCachePolicy } from "@/lib/cache/policy";
 import { normalizeBlogSlug, normalizeSlugList } from "@/lib/blog/slug";
 type ExaSearchResult = {
     title: string;
@@ -233,7 +234,7 @@ async function searchWithExa({ query, additionalQueries, startPublishedDate, max
     if (!exaApiKey) {
         throw new Error("EXA_API_KEY is not configured. Add EXA_API_KEY to environment variables for deep research.");
     }
-    const response = await fetch("https://api.exa.ai/search", {
+    const response = await fetch("https://api.exa.ai/search", withRequestCachePolicy("providerSearch", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -250,8 +251,7 @@ async function searchWithExa({ query, additionalQueries, startPublishedDate, max
                 text: true,
             },
         }),
-        cache: "no-store",
-    });
+    }));
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Exa search failed (${response.status}): ${errorText}`);

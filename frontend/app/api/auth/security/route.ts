@@ -1,12 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { AUTH_LOGIN_WINDOW_SECONDS } from "@/lib/cache/policy";
 import { executeAuthSecurityRequest } from "@/lib/auth-security-core";
 import { writeAuthSecurityLog } from "@/lib/auth-security-log";
 import { sendSecurityAlertEmail } from "@/lib/email/notifications";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
-
-const LOGIN_WINDOW_SECONDS = 15 * 60;
 
 function getClientIpAddress(request: NextRequest): string | null {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -30,7 +29,7 @@ async function getFailedAttemptsInWindow(
     return { count: 0, oldestCreatedAt: null };
   }
 
-  const sinceIso = new Date(Date.now() - LOGIN_WINDOW_SECONDS * 1000).toISOString();
+  const sinceIso = new Date(Date.now() - AUTH_LOGIN_WINDOW_SECONDS * 1000).toISOString();
 
   const countQuery = adminClient
     .from("auth_security_events")
