@@ -1,6 +1,4 @@
 import { timingSafeEqual } from "node:crypto";
-import type { NextRequest } from "next/server";
-
 function toBuffer(value: string): Buffer {
   return Buffer.from(value, "utf8");
 }
@@ -14,7 +12,7 @@ function safeEqual(left: string, right: string): boolean {
   return timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-export function extractBearerToken(request: NextRequest): string | null {
+export function extractBearerToken(request: Request): string | null {
   const authHeader = request.headers.get("authorization");
   if (!authHeader) {
     return null;

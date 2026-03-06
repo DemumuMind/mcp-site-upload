@@ -57,6 +57,9 @@ jobs:
       - name: API docs contract check
         run: npm run check:api-docs
 
+      - name: API route change discipline
+        run: npm run check:api-discipline
+
       - name: Lint
         if: ${{ inputs.runLint }}
         run: npm run lint

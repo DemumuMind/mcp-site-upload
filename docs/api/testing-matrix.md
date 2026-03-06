@@ -42,5 +42,5 @@ This file records how API routes are covered today so new work can extend the ri
   - `npm run build`
 
 ## Remaining gaps
-- Admin routes mostly have auth or core coverage, but not all have live success-path smoke due to session/token requirements.
-- OpenAPI is intentionally lightweight; if SDK generation or stricter contract tooling is needed, promote `openapi-lite.yaml` into a fuller spec.
+- Admin routes now support explicit API bearer-token success-path testing, but broader seeded admin-session scenarios are still optional.
+- `openapi.yaml` is fuller than `openapi-lite.yaml`, but still not a schema-first generated source of truth.

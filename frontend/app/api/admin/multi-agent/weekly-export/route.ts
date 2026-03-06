@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { resolveAdminAccess } from "@/lib/admin-access";
+import { resolveAdminApiAccess } from "@/lib/admin-access";
 import { buildMultiAgentWeeklyCsv, getWeeklyExportSinceIso, type MultiAgentExportRow } from "@/lib/multi-agent/weekly-export-core";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-export async function GET() {
-  const access = await resolveAdminAccess();
+export async function GET(request: Request) {
+  const access = await resolveAdminApiAccess(request);
   if (!access.actor) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

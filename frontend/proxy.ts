@@ -123,13 +123,15 @@ export async function proxy(request: NextRequest) {
       const { data, error } = await proxyClient.supabaseClient.auth.getUser();
 
       if (!error && data.user) {
-        const role = await getAdminRoleForUser(proxyClient.supabaseClient, data.user.id);
+        const roleResult = await getAdminRoleForUser(proxyClient.supabaseClient, data.user.id);
 
-        if (role) {
+        if (roleResult.ok) {
           return proxyClient.getResponse();
         }
 
-        return NextResponse.redirect(getAdminLoginRedirectUrl(request, "forbidden"));
+        return NextResponse.redirect(
+          getAdminLoginRedirectUrl(request, roleResult.reason === "lookup_error" ? "config" : "forbidden"),
+        );
       }
     }
 

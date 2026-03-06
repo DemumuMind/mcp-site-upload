@@ -25,6 +25,8 @@ Owner: BE Lead
 
 Machine-readable inventory:
 - `docs/api/endpoint-inventory-v2.json`
+- `docs/api/openapi-lite.yaml`
+- `docs/api/openapi.yaml`
 
 ## Error model baseline
 - `401`: Unauthorized
@@ -33,6 +35,6 @@ Machine-readable inventory:
 - `500`: Internal error
 
 ## Next steps
-- Add machine-readable OpenAPI document for canonical admin/catalog/task routes.
+- Keep `openapi-lite.yaml` and `openapi.yaml` aligned with the route inventory.
 - Add route-level smoke coverage for `/api/admin/blog-v2/*` handlers if admin API browser tests become part of CI.
 - Keep new backend route changes aligned with `docs/api/backend-route-standard.md`.

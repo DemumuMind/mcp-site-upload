@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { resolveAdminAccess } from "@/lib/admin-access";
+import { resolveAdminApiAccess } from "@/lib/admin-access";
 import { publishBlogV2Draft } from "@/lib/blog-v2/pipeline/draft";
 import { blogV2PublishInputSchema } from "@/lib/blog-v2/pipeline/types";
 import { executeAdminJsonRoute } from "@/lib/blog-v2/route-core";
@@ -9,7 +9,7 @@ import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const access = await resolveAdminAccess();
+  const access = await resolveAdminApiAccess(request);
   if (!access.actor) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }

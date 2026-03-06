@@ -14,6 +14,15 @@ export type AdminActorContext = {
     role?: AdminRole;
     label?: string;
 };
+export type AdminRoleLookupResult =
+    | {
+        ok: true;
+        role: AdminRole;
+    }
+    | {
+        ok: false;
+        reason: "not_found" | "lookup_error" | "invalid_role";
+    };
 function parseBooleanEnv(value: string | undefined, fallbackValue: boolean): boolean {
     if (value === undefined) {
         return fallbackValue;
@@ -89,9 +98,9 @@ export function toAdminRole(value: string | null | undefined): AdminRole | null 
     }
     return null;
 }
-export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId: string): Promise<AdminRole | null> {
+export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId: string): Promise<AdminRoleLookupResult> {
     if (!userId) {
-        return null;
+        return { ok: false, reason: "not_found" };
     }
     try {
         const { data, error } = await supabaseClient
@@ -106,10 +115,10 @@ export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId
                 code: error.code,
                 message: error.message,
             });
-            return null;
+            return { ok: false, reason: "lookup_error" };
         }
         if (!data) {
-            return null;
+            return { ok: false, reason: "not_found" };
         }
         const normalizedRole = toAdminRole(data.role);
         if (!normalizedRole && data.role) {
@@ -117,8 +126,15 @@ export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId
                 userId,
                 role: data.role,
             });
+            return { ok: false, reason: "invalid_role" };
         }
-        return normalizedRole;
+        if (!normalizedRole) {
+            return { ok: false, reason: "not_found" };
+        }
+        return {
+            ok: true,
+            role: normalizedRole,
+        };
     }
     catch (error) {
         const message = error instanceof Error ? error.message : "Unknown error";
@@ -126,6 +142,6 @@ export async function getAdminRoleForUser(supabaseClient: SupabaseClient, userId
             userId,
             message,
         });
-        return null;
+        return { ok: false, reason: "lookup_error" };
     }
 }
