@@ -1,6 +1,7 @@
 import { applyServerCatalogDefaults } from "@/lib/server-catalog-defaults";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthType, HealthStatus, McpServer, ServerStatus, VerificationLevel, } from "@/lib/types";
+
 type SupabaseServerRow = {
     id: string;
     created_at: string | null;
@@ -22,6 +23,77 @@ type SupabaseServerRow = {
     health_checked_at: string | null;
     health_error: string | null;
 };
+
+const localFallbackServers: McpServer[] = [
+    applyServerCatalogDefaults({
+        id: "local-fallback-github",
+        createdAt: "2026-03-06T00:00:00.000Z",
+        name: "GitHub MCP",
+        slug: "github",
+        description: "Repository and workflow operations for engineering teams validating MCP integrations locally.",
+        serverUrl: "https://github.com/modelcontextprotocol/servers",
+        category: "Developer Tools",
+        authType: "oauth",
+        tags: ["local-fallback", "github", "developer-tools", "catalog-preview"],
+        repoUrl: "https://github.com/modelcontextprotocol/servers",
+        maintainer: {
+            name: "DemumuMind Preview",
+        },
+        status: "active",
+        verificationLevel: "official",
+        healthStatus: "healthy",
+        healthCheckedAt: "2026-03-06T00:00:00.000Z",
+        tools: [],
+    }),
+    applyServerCatalogDefaults({
+        id: "local-fallback-postgres",
+        createdAt: "2026-03-05T00:00:00.000Z",
+        name: "Postgres MCP",
+        slug: "postgres",
+        description: "SQL-first data exploration and schema inspection for teams testing integrations without production data.",
+        serverUrl: "https://www.postgresql.org/docs/",
+        category: "Databases",
+        authType: "api_key",
+        tags: ["local-fallback", "postgres", "data", "catalog-preview"],
+        repoUrl: "https://www.postgresql.org/docs/",
+        maintainer: {
+            name: "DemumuMind Preview",
+        },
+        status: "active",
+        verificationLevel: "partner",
+        healthStatus: "healthy",
+        healthCheckedAt: "2026-03-06T00:00:00.000Z",
+        tools: [],
+    }),
+    applyServerCatalogDefaults({
+        id: "local-fallback-playwright",
+        createdAt: "2026-03-04T00:00:00.000Z",
+        name: "Playwright MCP",
+        slug: "playwright",
+        description: "Browser automation and UI verification surface for local QA, smoke checks, and release rehearsal.",
+        serverUrl: "https://playwright.dev/",
+        category: "Developer Tools",
+        authType: "none",
+        tags: ["local-fallback", "playwright", "testing", "catalog-preview"],
+        repoUrl: "https://playwright.dev/",
+        maintainer: {
+            name: "DemumuMind Preview",
+        },
+        status: "active",
+        verificationLevel: "community",
+        healthStatus: "healthy",
+        healthCheckedAt: "2026-03-06T00:00:00.000Z",
+        tools: [],
+    }),
+];
+
+function shouldUseLocalCatalogFallback(): boolean {
+    return process.env.NODE_ENV !== "production";
+}
+
+export function getLocalFallbackServers(): McpServer[] {
+    return localFallbackServers;
+}
 function toAuthType(value: string | null): AuthType {
     if (value === "oauth" || value === "api_key" || value === "none") {
         return value;
@@ -78,7 +150,7 @@ function mapSupabaseRow(row: SupabaseServerRow): McpServer {
 export async function getActiveServers(): Promise<McpServer[]> {
     const supabaseClient = createSupabaseServerClient();
     if (!supabaseClient) {
-        return [];
+        return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
     }
     try {
         const { data, error } = await supabaseClient
@@ -88,12 +160,16 @@ export async function getActiveServers(): Promise<McpServer[]> {
             .order("created_at", { ascending: false })
             .range(0, 4999);
         if (error || !data) {
-            return [];
+            return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
         }
-        return (data as SupabaseServerRow[]).map(mapSupabaseRow);
+        const servers = (data as SupabaseServerRow[]).map(mapSupabaseRow);
+        if (servers.length === 0 && shouldUseLocalCatalogFallback()) {
+            return localFallbackServers;
+        }
+        return servers;
     }
     catch {
-        return [];
+        return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
     }
 }
 export async function getPendingServers(): Promise<McpServer[]> {

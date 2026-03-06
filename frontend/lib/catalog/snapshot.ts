@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { inferServerLanguage } from "@/lib/catalog-taxonomy";
 import { getCategoryEntries } from "@/lib/catalog/facets";
-import { getActiveServers } from "@/lib/servers";
+import { getActiveServers, getLocalFallbackServers } from "@/lib/servers";
 import type { McpServer } from "@/lib/types";
 type CatalogSnapshotOptions = {
     featuredLimit?: number;
@@ -88,7 +88,10 @@ export function buildCatalogSnapshot(servers: McpServer[], options: CatalogSnaps
     };
 }
 export async function getCatalogSnapshot(options: CatalogSnapshotOptions = {}): Promise<CatalogSnapshot> {
-    const servers = options.bypassCache ? await getActiveServers() : await getCachedActiveServers();
+    const resolvedServers = options.bypassCache ? await getActiveServers() : await getCachedActiveServers();
+    const servers = resolvedServers.length === 0 && process.env.NODE_ENV !== "production"
+        ? getLocalFallbackServers()
+        : resolvedServers;
     return buildCatalogSnapshot(servers, options);
 }
 
