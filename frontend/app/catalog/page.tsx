@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageFrame } from "@/components/page-templates";
 import { Button } from "@/components/ui/button";
 import { CatalogSection } from "@/components/catalog-section";
-import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
+import { getCatalogPageViewModel, type CatalogPageSearchParams } from "@/lib/catalog/page-view-model";
 import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-index";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -19,10 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function CatalogPage() {
+type CatalogPageProps = {
+  searchParams: Promise<CatalogPageSearchParams>;
+};
+
+export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const locale = await getLocale();
   const sectionCopy = getSectionLocaleCopy(getSectionIndex("catalog"), locale);
-  const catalogSnapshot = await getCatalogSnapshot();
+  const pageViewModel = await getCatalogPageViewModel(await searchParams);
 
   return (
     <PageFrame variant="directory">
@@ -60,10 +64,10 @@ export default async function CatalogPage() {
                   <p className="text-[11px] tracking-[0.22em] text-muted-foreground uppercase">{tr(locale, "Catalog signal", "Catalog signal")}</p>
                   <div className="mt-5 grid gap-px border-y border-border/60 bg-border/60 sm:grid-cols-2 xl:grid-cols-4">
                     {[
-                      { label: tr(locale, "Active servers", "Active servers"), value: catalogSnapshot.totalServers.toLocaleString("en-US") },
-                      { label: tr(locale, "Published tools", "Published tools"), value: catalogSnapshot.totalTools.toLocaleString("en-US") },
-                      { label: tr(locale, "Categories", "Categories"), value: catalogSnapshot.totalCategories.toLocaleString("en-US") },
-                      { label: tr(locale, "Featured", "Featured"), value: catalogSnapshot.featuredServers.length.toLocaleString("en-US") },
+                      { label: tr(locale, "Active servers", "Active servers"), value: pageViewModel.summary.totalServers.toLocaleString("en-US") },
+                      { label: tr(locale, "Published tools", "Published tools"), value: pageViewModel.summary.totalTools.toLocaleString("en-US") },
+                      { label: tr(locale, "Categories", "Categories"), value: pageViewModel.summary.totalCategories.toLocaleString("en-US") },
+                      { label: tr(locale, "Featured", "Featured"), value: pageViewModel.summary.featuredServers.length.toLocaleString("en-US") },
                     ].map((metric) => (
                       <div key={metric.label} className="bg-background px-4 py-4">
                         <p className="text-[10px] tracking-[0.16em] text-muted-foreground uppercase">{metric.label}</p>
@@ -90,7 +94,10 @@ export default async function CatalogPage() {
 
         <section>
           <div className="section-shell py-8 sm:py-10">
-            <CatalogSection initialServers={catalogSnapshot.servers} />
+            <CatalogSection
+              initialQuery={pageViewModel.initialQuery}
+              initialResult={pageViewModel.initialResult}
+            />
           </div>
         </section>
       </main>

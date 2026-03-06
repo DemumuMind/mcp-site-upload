@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { withRequestCachePolicy } from "@/lib/cache/policy";
 import {
@@ -13,10 +13,9 @@ import {
   getCatalogSearchClientError,
   type CatalogSearchClientError,
 } from "@/components/catalog-section/catalog-search-client-error";
-import { runCatalogSearch } from "@/lib/catalog/server-search";
 import { tr, type Locale } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
-import type { AuthType, HealthStatus, McpServer, VerificationLevel } from "@/lib/types";
+import type { AuthType, HealthStatus, VerificationLevel } from "@/lib/types";
 
 type AuthTypeOption = {
   value: AuthType;
@@ -66,19 +65,35 @@ function getResponseMessage(error: unknown): string {
   return "Unknown request error";
 }
 
-export function useCatalogController(initialServers: McpServer[], locale: Locale) {
+export function useCatalogController(
+  initialQuery: CatalogQueryV2,
+  initialResult: CatalogSearchResult,
+  locale: Locale,
+) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const parsedQueryFromUrl = useMemo(() => parseCatalogQueryV2(searchParams), [searchParams]);
+  const lastResolvedQueryStringRef = useRef(serializeCatalogQueryV2(initialQuery));
+  const lastRequestKeyRef = useRef(serializeCatalogQueryV2(initialQuery));
+  const pendingUrlQueryStringRef = useRef<string | null>(null);
 
-  const [queryState, setQueryState] = useState<CatalogQueryV2>(parsedQueryFromUrl);
-  const [searchInputValue, setSearchInputValue] = useState(parsedQueryFromUrl.query);
+  const [queryState, setQueryState] = useState<CatalogQueryV2>(initialQuery);
+  const [searchInputValue, setSearchInputValue] = useState(initialQuery.query);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [requestError, setRequestError] = useState<CatalogSearchClientError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CatalogSearchResult>(() =>
-    runCatalogSearch(initialServers, parsedQueryFromUrl),
+  const [result, setResult] = useState<CatalogSearchResult>(initialResult);
+
+  const replaceUrl = useCallback(
+    (nextQuery: CatalogQueryV2) => {
+      const nextQueryString = serializeCatalogQueryV2(nextQuery);
+      pendingUrlQueryStringRef.current = nextQueryString;
+      router.replace(nextQueryString.length > 0 ? `${pathname}?${nextQueryString}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router],
   );
 
   const authTypeOptions = useMemo<AuthTypeOption[]>(
@@ -195,18 +210,15 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
       if (areCatalogQueriesEqual(nextQuery, queryState)) return;
 
       setQueryState(nextQuery);
-      setResult(runCatalogSearch(initialServers, nextQuery));
       setRequestError(null);
 
       const nextQueryString = serializeCatalogQueryV2(nextQuery);
       const currentQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
       if (nextQueryString === currentQueryString) return;
 
-      router.replace(nextQueryString.length > 0 ? `${pathname}?${nextQueryString}` : pathname, {
-        scroll: false,
-      });
+      replaceUrl(nextQuery);
     },
-    [initialServers, parsedQueryFromUrl, pathname, queryState, router],
+    [parsedQueryFromUrl, queryState, replaceUrl],
   );
 
   const clearSearchQuery = useCallback(() => {
@@ -391,17 +403,19 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
     const canonicalQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
     const currentQueryString = searchParams.toString();
     if (canonicalQueryString === currentQueryString) return;
-    router.replace(canonicalQueryString.length > 0 ? `${pathname}?${canonicalQueryString}` : pathname, {
-      scroll: false,
-    });
-  }, [parsedQueryFromUrl, pathname, router, searchParams]);
+    replaceUrl(parsedQueryFromUrl);
+  }, [parsedQueryFromUrl, replaceUrl, searchParams]);
 
   useEffect(() => {
+    const parsedQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
+    if (pendingUrlQueryStringRef.current === parsedQueryString) {
+      pendingUrlQueryStringRef.current = null;
+    }
+    if (pendingUrlQueryStringRef.current !== null) return;
     if (areCatalogQueriesEqual(parsedQueryFromUrl, queryState)) return;
     setQueryState(parsedQueryFromUrl);
     setSearchInputValue(parsedQueryFromUrl.query);
-    setResult(runCatalogSearch(initialServers, parsedQueryFromUrl));
-  }, [initialServers, parsedQueryFromUrl, queryState]);
+  }, [parsedQueryFromUrl, queryState]);
 
   useEffect(() => {
     if (searchInputValue === queryState.query) return;
@@ -412,8 +426,12 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
   }, [commitQuery, queryState.query, searchInputValue]);
 
   useEffect(() => {
+    const currentQueryString = serializeCatalogQueryV2(queryState);
+    if (currentQueryString === lastResolvedQueryStringRef.current) return;
+
     const controller = new AbortController();
     async function fetchCatalogResult() {
+      lastRequestKeyRef.current = currentQueryString;
       setIsLoading(true);
       try {
         const queryString = buildCatalogQueryV2SearchParams(queryState).toString();
@@ -433,8 +451,22 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
           throw thrownError;
         }
         const payload = (await response.json()) as CatalogSearchResult;
+        if (controller.signal.aborted || lastRequestKeyRef.current !== currentQueryString) return;
+
+        const resolvedQuery = payload.appliedFilters;
+        const resolvedQueryString = serializeCatalogQueryV2(resolvedQuery);
+        lastResolvedQueryStringRef.current = resolvedQueryString;
         setResult(payload);
         setRequestError(null);
+
+        if (!areCatalogQueriesEqual(resolvedQuery, queryState)) {
+          setQueryState(resolvedQuery);
+          setSearchInputValue(resolvedQuery.query);
+        }
+
+        if (resolvedQueryString !== serializeCatalogQueryV2(parsedQueryFromUrl)) {
+          replaceUrl(resolvedQuery);
+        }
       } catch (error) {
         if (controller.signal.aborted) return;
         if (
@@ -457,7 +489,7 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
     }
     void fetchCatalogResult();
     return () => controller.abort();
-  }, [queryState]);
+  }, [parsedQueryFromUrl, queryState, replaceUrl]);
 
   useEffect(() => {
     if (!isMobileFiltersOpen) return;

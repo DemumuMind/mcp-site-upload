@@ -10,13 +10,14 @@ import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { useCatalogController } from "@/components/catalog-section/use-catalog-controller";
 import { tr } from "@/lib/i18n";
-import type { McpServer } from "@/lib/types";
+import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
 
 type CatalogSectionProps = {
-  initialServers: McpServer[];
+  initialQuery: CatalogQueryV2;
+  initialResult: CatalogSearchResult;
 };
 
-export function CatalogSection({ initialServers }: CatalogSectionProps) {
+export function CatalogSection({ initialQuery, initialResult }: CatalogSectionProps) {
   const locale = useLocale();
   const {
     queryState,
@@ -40,7 +41,7 @@ export function CatalogSection({ initialServers }: CatalogSectionProps) {
     handleViewModeChange,
     handleClearAllFilters,
     taxonomyPanelCommonProps,
-  } = useCatalogController(initialServers, locale);
+  } = useCatalogController(initialQuery, initialResult, locale);
 
   return (
     <div className="space-y-4">

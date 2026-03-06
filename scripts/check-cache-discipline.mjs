@@ -6,6 +6,7 @@ import path from "node:path";
 
 const SCAN_ROOTS = ["frontend", "scripts"];
 const CODE_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs"]);
+const CACHE_DISCIPLINE_SCRIPT_FILE = "scripts/check-cache-discipline.mjs";
 const NEXT_CACHE_RUNTIME_FILE = "frontend/lib/cache/next-runtime.ts";
 const INVALIDATION_HELPER_FILE = "frontend/lib/cache/invalidation.ts";
 
@@ -56,6 +57,7 @@ function collectViolations(filePath) {
       source,
       /cache:\s*["']no-store["']/,
       'Use `withRequestCachePolicy(...)` instead of inline `cache: "no-store"`.',
+      (currentFilePath) => currentFilePath === CACHE_DISCIPLINE_SCRIPT_FILE,
     ),
     ...toLineViolations(
       filePath,
