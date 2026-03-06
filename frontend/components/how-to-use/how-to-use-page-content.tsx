@@ -43,10 +43,9 @@ export function HowToUsePageContent({
       content.scenarios.find((scenario) => scenario.id === "quick_start")?.id ??
       content.scenarios[0]?.id ??
       "quick_start",
-    [content.scenarios]
+    [content.scenarios],
   );
-  const [selectedPersona, setSelectedPersona] =
-    useState<HowToUsePersona>(defaultPersona);
+  const [selectedPersona, setSelectedPersona] = useState<HowToUsePersona>(defaultPersona);
   const sentMilestonesRef = useRef(new Set<number>());
 
   useEffect(() => {
@@ -58,8 +57,7 @@ export function HowToUsePageContent({
       const documentElement = document.documentElement;
       const scrollRange = documentElement.scrollHeight - window.innerHeight;
       const scrollTop = window.scrollY || documentElement.scrollTop;
-      const progress =
-        scrollRange > 0 ? Math.round((scrollTop / scrollRange) * 100) : 100;
+      const progress = scrollRange > 0 ? Math.round((scrollTop / scrollRange) * 100) : 100;
 
       for (const milestone of scrollMilestones) {
         if (progress >= milestone && !sentMilestonesRef.current.has(milestone)) {
@@ -82,14 +80,9 @@ export function HowToUsePageContent({
   }, [locale]);
 
   const selectedScenario =
-    content.scenarios.find((scenario) => scenario.id === selectedPersona) ??
-    content.scenarios[0];
+    content.scenarios.find((scenario) => scenario.id === selectedPersona) ?? content.scenarios[0];
 
-  function trackCtaClick(
-    action: HowToUseLocaleAction,
-    source: string,
-    persona?: HowToUsePersona
-  ) {
+  function trackCtaClick(action: HowToUseLocaleAction, source: string, persona?: HowToUsePersona) {
     trackConsented("how_to_use_cta_clicked", {
       locale,
       cta_id: action.id,
@@ -119,7 +112,7 @@ export function HowToUsePageContent({
 
       <div className="relative z-10">
         <BlurFade delay={0.2}>
-          <section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+          <section className="section-shell py-6 sm:py-8">
             <PersonaSelector
               title={content.scenarioSection.title}
               description={content.scenarioSection.description}
@@ -136,18 +129,18 @@ export function HowToUsePageContent({
               }}
             />
             {selectedScenario ? (
-              <ScenarioSteps
-                scenario={selectedScenario}
-                onPrimaryCtaClick={(action, persona) =>
-                  trackCtaClick(action, "scenario", persona)
-                }
-              />
+              <div className="pt-6 sm:pt-8">
+                <ScenarioSteps
+                  scenario={selectedScenario}
+                  onPrimaryCtaClick={(action, persona) => trackCtaClick(action, "scenario", persona)}
+                />
+              </div>
             ) : null}
           </section>
         </BlurFade>
 
         <BlurFade delay={0.3}>
-          <section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+          <section className="section-shell border-t border-border/60 py-8 sm:py-10">
             <ClientReference
               title={content.clientReference.title}
               description={content.clientReference.description}
@@ -165,7 +158,7 @@ export function HowToUsePageContent({
         </BlurFade>
 
         <BlurFade delay={0.4}>
-          <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
+          <section className="section-shell border-t border-border/60 py-8 sm:py-10">
             <HowToConnectSection
               serverName={sampleServerName}
               serverUrl={sampleServerUrl}
@@ -180,17 +173,23 @@ export function HowToUsePageContent({
         </BlurFade>
 
         <BlurFade delay={0.5}>
-          <HowToUseTrustChecksSection trustChecks={content.trustChecks} />
+          <section className="border-t border-border/60 py-8 sm:py-10">
+            <div className="section-shell">
+              <HowToUseTrustChecksSection trustChecks={content.trustChecks} />
+            </div>
+          </section>
         </BlurFade>
 
         <BlurFade delay={0.6}>
-          <HowToUseTroubleshootingSection
-            troubleshooting={content.troubleshooting}
-          />
+          <section className="border-t border-border/60 py-8 sm:py-10">
+            <div className="section-shell">
+              <HowToUseTroubleshootingSection troubleshooting={content.troubleshooting} />
+            </div>
+          </section>
         </BlurFade>
 
         <BlurFade delay={0.7}>
-          <section className="mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6">
+          <section className="section-shell border-t border-border/60 pb-16 pt-8 sm:pb-20 sm:pt-10">
             <CtaRail
               title={content.ctaRail.title}
               description={content.ctaRail.description}
@@ -203,7 +202,7 @@ export function HowToUsePageContent({
                 {tr(
                   locale,
                   "Track clicks and completion milestones in analytics to compare conversion before and after redesign.",
-                  "Track clicks and completion milestones in analytics to compare conversion before and after redesign."
+                  "Track clicks and completion milestones in analytics to compare conversion before and after redesign.",
                 )}
               </span>
             </div>

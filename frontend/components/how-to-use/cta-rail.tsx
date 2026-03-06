@@ -1,29 +1,42 @@
-﻿"use client";
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { HowToUseLocaleAction } from "@/lib/content/how-to-use";
 import { cn } from "@/lib/utils";
+
 type CtaRailProps = {
-    title: string;
-    description: string;
-    actions: HowToUseLocaleAction[];
-    onActionClick: (action: HowToUseLocaleAction) => void;
+  title: string;
+  description: string;
+  actions: HowToUseLocaleAction[];
+  onActionClick: (action: HowToUseLocaleAction) => void;
 };
+
 export function CtaRail({ title, description, actions, onActionClick }: CtaRailProps) {
-    return (<div className="rounded-3xl border border-primary/30 bg-[linear-gradient(90deg,hsl(var(--card)),hsl(var(--muted)))] p-6 sm:p-10">
-      <h3 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{title}</h3>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
+  return (
+    <div className="border border-border/60 px-6 py-8 sm:px-8 sm:py-10">
+      <p className="text-[11px] tracking-[0.22em] text-primary uppercase">Next step</p>
+      <h3 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">{title}</h3>
+      <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        {actions.map((action) => (<Button key={action.id} asChild variant={action.variant === "primary" ? "default" : "outline"} className={cn("h-11 rounded-xl", action.variant === "primary"
-                ? "bg-primary px-6 text-primary-foreground hover:bg-primary/90"
-                : "border-border bg-card px-6 text-foreground hover:bg-accent")}>
+        {actions.map((action) => (
+          <Button
+            key={action.id}
+            asChild
+            variant={action.variant === "primary" ? "default" : "outline"}
+            className={cn(
+              "h-11 rounded-none px-6",
+              action.variant === "primary" ? "" : "border-border/80 bg-transparent",
+            )}
+          >
             <Link href={action.href} onClick={() => onActionClick(action)}>
               {action.label}
-              <ArrowRight className="size-4"/>
+              <ArrowRight className="size-4" />
             </Link>
-          </Button>))}
+          </Button>
+        ))}
       </div>
-    </div>);
+    </div>
+  );
 }
-

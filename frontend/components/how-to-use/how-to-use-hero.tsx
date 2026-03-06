@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ListChecks, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowRight, ListChecks } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 import type { HowToUseLocaleAction } from "@/lib/content/how-to-use";
 import type { SectionLocaleCopy } from "@/lib/content/section-index";
@@ -26,59 +24,45 @@ export function HowToUseHero({
   onHeroCatalogClick,
 }: HowToUseHeroProps) {
   return (
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-6 pt-10 sm:px-6 sm:pt-14">
-      <BlurFade delay={0.1}>
-        <div className="relative overflow-hidden space-y-5 rounded-2xl border border-border bg-card/70 p-6 shadow-2xl shadow-primary/5 backdrop-blur-sm sm:p-10">
-          <BorderBeam size={300} duration={12} delay={0} />
-          <Badge className="w-fit border-primary/35 bg-primary/10 text-primary">
-            <Sparkles className="size-3" />
-            {sectionCopy?.eyebrow ??
-              tr(
-                locale,
-                "Developer-First Onboarding",
-                "Developer-First Onboarding"
-              )}
-          </Badge>
-
-          <div className="space-y-3">
-            <h1 className="font-serif text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
+    <section className="relative isolate overflow-hidden border-b border-border/60">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.18),transparent_24%),radial-gradient(circle_at_84%_16%,hsl(var(--accent)/0.14),transparent_18%),linear-gradient(180deg,hsl(var(--surface-1)),hsl(var(--background))_68%)]" />
+      <div className="section-shell min-h-[72vh] py-16 sm:py-20 lg:py-24">
+        <BlurFade delay={0.1}>
+          <div className="max-w-5xl">
+            <p className="text-xs font-semibold tracking-[0.24em] text-primary uppercase">
+              {sectionCopy?.eyebrow ?? tr(locale, "DemumuMind Setup", "DemumuMind Setup")}
+            </p>
+            <p className="mt-5 font-serif text-[clamp(3.2rem,10vw,7rem)] leading-none tracking-[-0.06em] text-foreground">
+              DemumuMind
+            </p>
+            <h1 className="mt-4 text-balance text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl lg:text-6xl">
               {sectionCopy?.heroTitle ?? tr(locale, "Setup Guide", "Setup Guide")}
             </h1>
-            <p className="max-w-4xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               {sectionCopy?.heroDescription ??
                 tr(
                   locale,
                   "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.",
-                  "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely."
+                  "A practical playbook to connect MCP servers, validate trust and auth signals, and move to production safely.",
                 )}
             </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button asChild size="lg" className="h-11 rounded-none px-6">
+                <Link href={heroCatalogAction.href} onClick={onHeroCatalogClick}>
+                  {heroCatalogAction.label}
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-11 rounded-none border-border/80 bg-transparent px-6">
+                <Link href="#scenario-paths">
+                  <ListChecks className="size-4" />
+                  {secondaryLabel}
+                </Link>
+              </Button>
+            </div>
           </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              asChild
-              size="lg"
-              className="h-11 rounded-md px-6 shadow-[0_0_25px_-5px_rgba(246,166,35,0.4)]"
-            >
-              <Link href={heroCatalogAction.href} onClick={onHeroCatalogClick}>
-                {heroCatalogAction.label}
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="h-11 rounded-md border-border bg-background text-foreground hover:bg-muted/50"
-            >
-              <Link href="#scenario-paths">
-                <ListChecks className="size-4" />
-                {secondaryLabel}
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </BlurFade>
+        </BlurFade>
+      </div>
     </section>
   );
 }
