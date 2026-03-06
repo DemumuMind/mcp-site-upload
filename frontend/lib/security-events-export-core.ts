@@ -1,5 +1,5 @@
-import { csvEscape } from "./api/auth-helpers.ts";
-import { maskEmail, maskIpAddress } from "./security/data-protection.ts";
+import { csvEscape } from "./api/auth-helpers";
+import { maskEmail, maskIpAddress } from "./security/data-protection";
 
 export type SecurityExportRow = {
   created_at: string | null;
