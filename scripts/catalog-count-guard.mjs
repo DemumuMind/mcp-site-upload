@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { withRequestCachePolicy } from "./_shared/cache-policy.mjs";
+
 const DEFAULT_SEARCH_PATH = "/api/catalog/search?page=1&pageSize=1";
 const DEFAULT_MIN_TOTAL = 1000;
 const DEFAULT_TIMEOUT_MS = 12000;
@@ -64,14 +66,16 @@ async function fetchCatalogSearch(url, timeoutMs) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, {
-      method: "GET",
-      cache: "no-store",
-      headers: {
-        accept: "application/json",
-      },
-      signal: controller.signal,
-    });
+    return await fetch(
+      url,
+      withRequestCachePolicy("apiNoStore", {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+        signal: controller.signal,
+      }),
+    );
   } finally {
     clearTimeout(timeout);
   }

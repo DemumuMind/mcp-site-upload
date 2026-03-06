@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { withRequestCachePolicy } from "./_shared/cache-policy.mjs";
+
 const args = parseArgs(process.argv.slice(2));
 const baseUrlInput =
   args["base-url"] || process.env.SMOKE_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL;
@@ -72,14 +74,17 @@ async function checkEndpoint(path, expectedStatuses, name, options = {}) {
   const startedAt = Date.now();
 
   try {
-    const response = await fetch(`${baseUrl}${path}`, {
-      method: options.method || "GET",
-      redirect: "follow",
-      headers: {
-        "user-agent": "demumumind-mcp-ops-health-report/1.0",
-        ...(options.headers || {}),
-      },
-    });
+    const response = await fetch(
+      `${baseUrl}${path}`,
+      withRequestCachePolicy("apiNoStore", {
+        method: options.method || "GET",
+        redirect: "follow",
+        headers: {
+          "user-agent": "demumumind-mcp-ops-health-report/1.0",
+          ...(options.headers || {}),
+        },
+      }),
+    );
 
     const durationMs = Date.now() - startedAt;
     const ok = expectedStatuses.includes(response.status);

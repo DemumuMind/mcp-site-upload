@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { applyServerCatalogDefaults } from "@/lib/server-catalog-defaults";
+import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthType, HealthStatus, McpServer, ServerStatus, VerificationLevel, } from "@/lib/types";
@@ -153,7 +155,12 @@ function mapSupabaseRow(row: SupabaseServerRow): McpServer {
         tools: [],
     });
 }
-export async function getActiveServers(): Promise<McpServer[]> {
+
+type ServerQueryOptions = {
+    bypassCache?: boolean;
+};
+
+async function readActiveServersFromSource(): Promise<McpServer[]> {
     const supabaseClient = getCatalogReadClient();
     if (!supabaseClient) {
         return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
@@ -178,7 +185,7 @@ export async function getActiveServers(): Promise<McpServer[]> {
         return shouldUseLocalCatalogFallback() ? localFallbackServers : [];
     }
 }
-export async function getPendingServers(): Promise<McpServer[]> {
+async function readPendingServersFromSource(): Promise<McpServer[]> {
     const supabaseClient = getCatalogReadClient();
     if (!supabaseClient) {
         return [];
@@ -198,26 +205,30 @@ export async function getPendingServers(): Promise<McpServer[]> {
         return [];
     }
 }
-export async function getServerBySlug(slug: string): Promise<McpServer | null> {
+const getCachedActiveServers = unstable_cache(async () => readActiveServersFromSource(), ["servers-active"], {
+    revalidate: getServerDataRevalidateSeconds("catalogActiveServers"),
+    tags: [CACHE_TAGS.catalogServers],
+});
+
+const getCachedPendingServers = unstable_cache(async () => readPendingServersFromSource(), ["servers-pending"], {
+    revalidate: getServerDataRevalidateSeconds("adminDashboard"),
+    tags: [CACHE_TAGS.adminDashboard],
+});
+
+export async function getActiveServers(options: ServerQueryOptions = {}): Promise<McpServer[]> {
+    return options.bypassCache ? readActiveServersFromSource() : getCachedActiveServers();
+}
+
+export async function getPendingServers(options: ServerQueryOptions = {}): Promise<McpServer[]> {
+    return options.bypassCache ? readPendingServersFromSource() : getCachedPendingServers();
+}
+
+export async function getServerBySlug(slug: string, options: ServerQueryOptions = {}): Promise<McpServer | null> {
     const normalizedSlug = slug.trim().toLowerCase();
-    const supabaseClient = getCatalogReadClient();
-    if (!supabaseClient) {
+    if (!normalizedSlug) {
         return null;
     }
-    try {
-        const { data, error } = await supabaseClient
-            .from("servers")
-            .select("id, created_at, name, slug, description, server_url, category, auth_type, tags, repo_url, maintainer, status, verification_level, health_status, health_checked_at, health_error")
-            .eq("slug", normalizedSlug)
-            .eq("status", "active")
-            .limit(1)
-            .maybeSingle();
-        if (error || !data) {
-            return null;
-        }
-        return mapSupabaseRow(data as SupabaseServerRow);
-    }
-    catch {
-        return null;
-    }
+
+    const activeServers = await getActiveServers(options);
+    return activeServers.find((server) => server.slug.trim().toLowerCase() === normalizedSlug) ?? null;
 }

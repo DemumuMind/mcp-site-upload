@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
 import { getActiveServers } from "@/lib/servers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { HealthStatus } from "@/lib/types";
@@ -103,6 +105,19 @@ export type AdminSecurityFilters = {
     pageSize?: number;
     sortBy?: "created_at" | "event_type" | "email" | "ip_address";
     sortOrder?: "asc" | "desc";
+};
+
+type ResolvedAdminSecurityFilters = {
+    eventType: string;
+    emailQuery: string;
+    fromDate: string;
+    toDate: string;
+    fromTs: string;
+    toTs: string;
+    page: number;
+    pageSize: number;
+    sortBy: "created_at" | "event_type" | "email" | "ip_address";
+    sortOrder: "asc" | "desc";
 };
 type SettingsRow = {
     status_update_interval_sec: number | null;
@@ -300,7 +315,22 @@ function toAuditTargetLabel(row: AuditRow): string {
     }
     return `${targetType}:${targetId}`;
 }
-export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters): Promise<AdminDashboardSnapshot> {
+function normalizeAdminSecurityFilters(filters?: AdminSecurityFilters): ResolvedAdminSecurityFilters {
+    return {
+        eventType: filters?.eventType?.trim() ?? "",
+        emailQuery: filters?.emailQuery?.trim() ?? "",
+        fromDate: filters?.fromDate?.trim() ?? "",
+        toDate: filters?.toDate?.trim() ?? "",
+        fromTs: filters?.fromTs?.trim() ?? "",
+        toTs: filters?.toTs?.trim() ?? "",
+        page: Math.max(filters?.page ?? 1, 1),
+        pageSize: Math.max(10, Math.min(filters?.pageSize ?? 50, 200)),
+        sortBy: filters?.sortBy ?? "created_at",
+        sortOrder: filters?.sortOrder === "asc" ? "asc" : "desc",
+    };
+}
+
+async function readAdminDashboardSnapshot(filters: ResolvedAdminSecurityFilters): Promise<AdminDashboardSnapshot> {
     const activeServers = await getActiveServers();
     const activeServerCount = activeServers.length;
     const adminClient = createSupabaseAdminClient();
@@ -317,23 +347,23 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
     let totalSecurityEvents = 0;
     let multiAgentRuns24h: MultiAgentRunRow[] = [];
     let multiAgentRuns7d: MultiAgentRunRow[] = [];
-    const securityPageSize = Math.max(10, Math.min(filters?.pageSize ?? 50, 200));
-    const securityPage = Math.max(filters?.page ?? 1, 1);
-    const securitySortBy = filters?.sortBy ?? "created_at";
-    const securitySortOrder = filters?.sortOrder === "asc" ? "asc" : "desc";
+    const securityPageSize = filters.pageSize;
+    const securityPage = filters.page;
+    const securitySortBy = filters.sortBy;
+    const securitySortOrder = filters.sortOrder;
     if (adminClient) {
         const since24hIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        const securityFromIso = filters?.fromTs || toStartOfDayIso(filters?.fromDate);
-        const securityToIso = filters?.toTs || toEndOfDayIso(filters?.toDate);
+        const securityFromIso = filters.fromTs || toStartOfDayIso(filters.fromDate || undefined);
+        const securityToIso = filters.toTs || toEndOfDayIso(filters.toDate || undefined);
         let securityEventsQuery = adminClient
             .from("auth_security_events")
             .select("id, created_at, event_type, user_id, email, ip_address", { count: "exact" })
             .order(securitySortBy, { ascending: securitySortOrder === "asc" })
             .range((securityPage - 1) * securityPageSize, securityPage * securityPageSize - 1);
-        if (filters?.eventType && filters.eventType !== "all") {
+        if (filters.eventType && filters.eventType !== "all") {
             securityEventsQuery = securityEventsQuery.eq("event_type", filters.eventType);
         }
-        if (filters?.emailQuery) {
+        if (filters.emailQuery) {
             securityEventsQuery = securityEventsQuery.ilike("email", `%${filters.emailQuery}%`);
         }
         if (securityFromIso) {
@@ -607,4 +637,17 @@ export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters):
             recentRuns,
         },
     };
+}
+
+const getCachedAdminDashboardSnapshot = unstable_cache(
+    async (filters: ResolvedAdminSecurityFilters) => readAdminDashboardSnapshot(filters),
+    ["admin-dashboard-snapshot"],
+    {
+        revalidate: getServerDataRevalidateSeconds("adminDashboard"),
+        tags: [CACHE_TAGS.adminDashboard],
+    },
+);
+
+export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters): Promise<AdminDashboardSnapshot> {
+    return getCachedAdminDashboardSnapshot(normalizeAdminSecurityFilters(filters));
 }

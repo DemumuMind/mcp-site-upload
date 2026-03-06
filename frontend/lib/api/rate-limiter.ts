@@ -1,3 +1,5 @@
+import { getRateLimitPolicy } from "@/lib/cache/policy";
+
 type RateLimitResult = {
   allowed: boolean;
   remaining: number;
@@ -12,9 +14,9 @@ export type RateLimitConfig = {
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
 export const RATE_LIMITS: Record<"public" | "admin" | "cron", RateLimitConfig> = {
-  public: { windowMs: 60_000, maxRequests: 120 },
-  admin: { windowMs: 60_000, maxRequests: 240 },
-  cron: { windowMs: 60_000, maxRequests: 30 },
+  public: getRateLimitPolicy("public"),
+  admin: getRateLimitPolicy("admin"),
+  cron: getRateLimitPolicy("cron"),
 };
 
 function cleanupExpired(now: number): void {

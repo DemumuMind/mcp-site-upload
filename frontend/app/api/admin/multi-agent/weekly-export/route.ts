@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveAdminApiAccess } from "@/lib/admin-access";
+import { buildCacheControlHeader } from "@/lib/cache/policy";
 import { buildMultiAgentWeeklyCsv, getWeeklyExportSinceIso, type MultiAgentExportRow } from "@/lib/multi-agent/weekly-export-core";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="multi-agent-weekly-${new Date().toISOString().slice(0, 10)}.csv"`,
-      "Cache-Control": "no-store",
+      "Cache-Control": buildCacheControlHeader("exportNoStore"),
     },
   });
 }

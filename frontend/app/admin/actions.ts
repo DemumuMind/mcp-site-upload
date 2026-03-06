@@ -1,6 +1,5 @@
 "use server";
 import { cookies } from "next/headers";
-import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminAccess, resolveAdminAccess } from "@/lib/admin-access";
 import { ADMIN_SESSION_COOKIE, getAdminAccessToken, getAdminTokenActorLabel, isTokenAdminAuthEnabled, isValidAdminToken, type AdminActorContext, } from "@/lib/admin-auth";
@@ -8,9 +7,8 @@ import { writeAdminAuditLog } from "@/lib/admin-audit";
 import { createAdminBlogRun, updateAdminBlogRun, type AdminBlogRunStatus, } from "@/lib/admin-blog-runs";
 import { parseTagList } from "@/lib/blog/automation";
 import { createBlogV2Draft, publishBlogV2Draft } from "@/lib/blog-v2/pipeline/draft";
-import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
+import { invalidateAdminDashboardCaches, invalidateBlogCaches, invalidateCatalogCaches } from "@/lib/cache/invalidation";
 import { normalizeInternalPath } from "@/lib/auth-redirects";
-import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/auth-server";
 import type { ServerStatus } from "@/lib/types";
@@ -168,13 +166,11 @@ export async function moderateServerStatusAction(formData: FormData) {
             nextStatus,
         },
     });
-    revalidatePath("/");
-    revalidatePath("/catalog");
-    revalidatePath("/categories");
-    revalidatePath("/how-to-use");
-    revalidatePath("/sitemap.xml");
-    revalidatePath("/admin");
-    updateTag(CATALOG_SERVERS_CACHE_TAG);
+    invalidateCatalogCaches({
+        origin: "action",
+        includeAdmin: true,
+    });
+    invalidateAdminDashboardCaches("action");
     redirect(withQueryParam(returnPath, "success", nextStatus));
 }
 export async function saveAdminDashboardSettingsAction(formData: FormData) {
@@ -214,7 +210,7 @@ export async function saveAdminDashboardSettingsAction(formData: FormData) {
             notifyWebhookIntegrations,
         },
     });
-    revalidatePath("/admin");
+    invalidateAdminDashboardCaches("action");
     redirect(withQueryParam(returnPath, "success", "settings"));
 }
 export async function saveAdminDashboardMetricsAction(formData: FormData) {
@@ -248,7 +244,7 @@ export async function saveAdminDashboardMetricsAction(formData: FormData) {
             uptimePercent,
         },
     });
-    revalidatePath("/admin");
+    invalidateAdminDashboardCaches("action");
     redirect(withQueryParam(returnPath, "success", "metrics"));
 }
 export async function createAdminSystemEventAction(formData: FormData) {
@@ -290,7 +286,7 @@ export async function createAdminSystemEventAction(formData: FormData) {
             occurredAt,
         },
     });
-    revalidatePath("/admin");
+    invalidateAdminDashboardCaches("action");
     redirect(withQueryParam(returnPath, "success", "event_created"));
 }
 export async function deleteAdminSystemEventAction(formData: FormData) {
@@ -310,7 +306,7 @@ export async function deleteAdminSystemEventAction(formData: FormData) {
         targetType: "dashboard_event",
         targetId: eventId,
     });
-    revalidatePath("/admin");
+    invalidateAdminDashboardCaches("action");
     redirect(withQueryParam(returnPath, "success", "event_deleted"));
 }
 async function finalizeBlogRunStatus(params: {
@@ -410,11 +406,11 @@ export async function createBlogPostFromDeepResearchAction(formData: FormData) {
                 sourceCount: result.sourceCount,
             },
         });
-        revalidatePath("/blog");
-        revalidatePath(`/blog/${result.slug}`);
-        revalidatePath("/sitemap.xml");
-        revalidatePath("/admin/blog");
-        updateTag(BLOG_POSTS_CACHE_TAG);
+        invalidateBlogCaches({
+            origin: "action",
+            slugs: [result.slug],
+            includeAdmin: true,
+        });
         redirect(`/admin/blog?success=created&slug=${encodeURIComponent(result.slug)}&research=${encodeURIComponent(draft.researchPacketId)}&sources=${result.sourceCount}`);
     }
     catch (error) {

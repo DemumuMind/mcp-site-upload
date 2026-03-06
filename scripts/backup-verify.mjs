@@ -2,22 +2,27 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import {
+  getOperationPolicy,
+} from "./_shared/cache-policy.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const manifestPath = path.resolve(
   args.manifest || process.env.BACKUP_MANIFEST_PATH || "ops/backup-manifest.json",
 );
 const maxAgeHours = parsePositiveNumber(
-  args["max-age-hours"] || process.env.BACKUP_MAX_AGE_HOURS || "26",
-  26,
+  args["max-age-hours"] || process.env.BACKUP_MAX_AGE_HOURS || String(getOperationPolicy("backupFreshnessHours") || 26),
+  Number(getOperationPolicy("backupFreshnessHours") || 26),
 );
 const maxRestoreDrillAgeDays = parsePositiveNumber(
-  args["max-restore-drill-age-days"] || process.env.BACKUP_MAX_RESTORE_DRILL_AGE_DAYS || "45",
-  45,
+  args["max-restore-drill-age-days"] ||
+    process.env.BACKUP_MAX_RESTORE_DRILL_AGE_DAYS ||
+    String(getOperationPolicy("backupRestoreDrillMaxAgeDays") || 45),
+  Number(getOperationPolicy("backupRestoreDrillMaxAgeDays") || 45),
 );
 const expectedRetentionDays = parsePositiveNumber(
-  process.env.BACKUP_RETENTION_DAYS || "30",
-  30,
+  process.env.BACKUP_RETENTION_DAYS || String(getOperationPolicy("backupRetentionDays") || 30),
+  Number(getOperationPolicy("backupRetentionDays") || 30),
 );
 const jsonOutput = args.json === true;
 

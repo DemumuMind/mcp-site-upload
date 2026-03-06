@@ -1,10 +1,9 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { resolveAdminApiAccess } from "@/lib/admin-access";
+import { invalidateBlogCaches } from "@/lib/cache/invalidation";
 import { publishBlogV2Draft } from "@/lib/blog-v2/pipeline/draft";
 import { blogV2PublishInputSchema } from "@/lib/blog-v2/pipeline/types";
 import { executeAdminJsonRoute } from "@/lib/blog-v2/route-core";
-import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +22,10 @@ export async function POST(request: Request) {
     executionErrorMessage: "Publish failed.",
     run: async (input) => {
       const result = await publishBlogV2Draft(input);
-      revalidatePath("/blog");
-      revalidatePath(`/blog/${result.slug}`);
-      revalidatePath("/sitemap.xml");
-      revalidateTag(BLOG_POSTS_CACHE_TAG, "max");
+      invalidateBlogCaches({
+        origin: "route",
+        slugs: [result.slug],
+      });
       return result;
     },
     shapeSuccess: (result) => ({

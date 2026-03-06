@@ -1,7 +1,8 @@
 import type { RulesHistoryItem, RulesPreset } from "@/lib/tools/rules-engine";
+import { TOOLS_RULES_HISTORY_STORAGE_KEY, TOOLS_RULES_PRESETS_STORAGE_KEY } from "@/lib/cache/policy";
 
-const PRESETS_STORAGE_KEY = "tools.rules.presets.v1";
-const HISTORY_STORAGE_KEY = "tools.rules.history.v1";
+const PRESETS_STORAGE_KEY = TOOLS_RULES_PRESETS_STORAGE_KEY;
+const HISTORY_STORAGE_KEY = TOOLS_RULES_HISTORY_STORAGE_KEY;
 
 const MAX_PRESETS = 20;
 const MAX_HISTORY_ITEMS = 30;

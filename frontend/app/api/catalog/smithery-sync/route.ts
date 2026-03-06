@@ -1,9 +1,8 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { invalidateCatalogCaches } from "@/lib/cache/invalidation";
 import { executeCatalogSmitherySync } from "@/lib/catalog/smithery-sync-core";
 import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
-import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 
 export const dynamic = "force-dynamic";
 
@@ -18,13 +17,10 @@ const handlers = withCronAuth(
         };
       },
       onSuccess: async (result) => {
-        revalidatePath("/");
-        revalidatePath("/catalog");
-        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
-
-        for (const slug of result.changedSlugs.slice(0, 100)) {
-          revalidatePath(`/server/${slug}`);
-        }
+        invalidateCatalogCaches({
+          origin: "route",
+          changedSlugs: result.changedSlugs.slice(0, 100),
+        });
       },
       logInfo: (event, details) => logger.info(event, details),
       logError: (event, details) => logger.error(event, details),

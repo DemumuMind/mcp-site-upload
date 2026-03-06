@@ -1,7 +1,7 @@
-import { unstable_cache } from "next/cache";
+import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
 import { inferServerLanguage } from "@/lib/catalog-taxonomy";
 import { getCategoryEntries } from "@/lib/catalog/facets";
-import { getActiveServers, getLocalFallbackServers } from "@/lib/servers";
+import { getActiveServers, getLocalFallbackServers, getServerBySlug } from "@/lib/servers";
 import type { McpServer } from "@/lib/types";
 type CatalogSnapshotOptions = {
     featuredLimit?: number;
@@ -25,8 +25,8 @@ export type CatalogSnapshot = {
         number
     ]>;
 };
-export const CATALOG_SERVERS_CACHE_TAG = "catalog-servers";
-export const CATALOG_SERVERS_REVALIDATE_SECONDS = 300;
+export const CATALOG_SERVERS_CACHE_TAG = CACHE_TAGS.catalogServers;
+export const CATALOG_SERVERS_REVALIDATE_SECONDS = getServerDataRevalidateSeconds("catalogActiveServers");
 function sortFacetEntries(entries: Array<[
     string,
     number
@@ -52,10 +52,6 @@ function getLanguageEntries(servers: McpServer[]): Array<[
     }
     return sortFacetEntries([...languageCountMap.entries()]);
 }
-const getCachedActiveServers = unstable_cache(async () => getActiveServers(), ["catalog-active-servers"], {
-    revalidate: CATALOG_SERVERS_REVALIDATE_SECONDS,
-    tags: [CATALOG_SERVERS_CACHE_TAG],
-});
 function isGithubRepoUrl(repoUrl?: string): boolean {
     if (!repoUrl)
         return false;
@@ -88,13 +84,17 @@ export function buildCatalogSnapshot(servers: McpServer[], options: CatalogSnaps
     };
 }
 export async function getCatalogSnapshot(options: CatalogSnapshotOptions = {}): Promise<CatalogSnapshot> {
-    const resolvedServers = options.bypassCache ? await getActiveServers() : await getCachedActiveServers();
+    const resolvedServers = await getActiveServers({
+        bypassCache: options.bypassCache,
+    });
     const servers = resolvedServers.length === 0 && process.env.NODE_ENV !== "production"
         ? getLocalFallbackServers()
         : resolvedServers;
     return buildCatalogSnapshot(servers, options);
 }
 
-export async function clearCatalogSnapshotRedisCache(): Promise<void> {
-    // Redis cache layer is optional in this environment; no-op keeps API handlers compatible.
+export async function getCatalogServerBySlug(slug: string, options: CatalogSnapshotOptions = {}): Promise<McpServer | null> {
+    return getServerBySlug(slug, {
+        bypassCache: options.bypassCache,
+    });
 }

@@ -1,3 +1,5 @@
+import { withNextFetchCache } from "@/lib/cache/policy";
+
 type GithubRepoRef = {
   owner: string;
   repo: string;
@@ -68,9 +70,9 @@ export async function getGithubDetails(repoUrl?: string): Promise<{
   const headers = getHeaders();
   const repoEndpoint = `https://api.github.com/repos/${ref.owner}/${ref.repo}`;
   const [repoRes, commitsRes, releasesRes] = await Promise.all([
-    fetch(repoEndpoint, { headers, next: { revalidate: 1800 } }),
-    fetch(`${repoEndpoint}/commits?per_page=5`, { headers, next: { revalidate: 1800 } }),
-    fetch(`${repoEndpoint}/releases?per_page=5`, { headers, next: { revalidate: 1800 } }),
+    fetch(repoEndpoint, withNextFetchCache("githubRepoDetails", { headers })),
+    fetch(`${repoEndpoint}/commits?per_page=5`, withNextFetchCache("githubRepoDetails", { headers })),
+    fetch(`${repoEndpoint}/releases?per_page=5`, withNextFetchCache("githubRepoDetails", { headers })),
   ]);
 
   const stats = repoRes.ok
@@ -120,7 +122,7 @@ export async function getGithubReadme(repoUrl?: string): Promise<GithubReadme | 
   const readmeEndpoint = `https://api.github.com/repos/${ref.owner}/${ref.repo}/readme`;
 
   try {
-    const res = await fetch(readmeEndpoint, { headers, next: { revalidate: 3600 } });
+    const res = await fetch(readmeEndpoint, withNextFetchCache("githubReadme", { headers }));
     if (!res.ok) return null;
 
     const json = await res.json();

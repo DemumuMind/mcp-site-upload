@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "serverData": {
+    "catalogActiveServers": {
+      "tag": "catalog-servers",
+      "revalidateSeconds": 300
+    },
+    "blogSnapshot": {
+      "tag": "blog-posts",
+      "revalidateSeconds": 300
+    },
+    "adminDashboard": {
+      "tag": "admin-dashboard",
+      "revalidateSeconds": 30
+    },
+    "githubRepoDetails": {
+      "tag": "github-repo-details",
+      "revalidateSeconds": 1800
+    },
+    "githubReadme": {
+      "tag": "github-readme",
+      "revalidateSeconds": 3600
+    }
+  },
+  "http": {
+    "publicDocument": {
+      "visibility": "public",
+      "maxAgeSeconds": 3600,
+      "staleWhileRevalidateSeconds": 86400
+    },
+    "apiNoStore": {
+      "noStore": true,
+      "noCache": true,
+      "mustRevalidate": true
+    },
+    "exportNoStore": {
+      "noStore": true
+    }
+  },
+  "storage": {
+    "cookieConsent": {
+      "choiceLocalStorageKey": "demumumind-cookie-consent",
+      "profileLocalStorageKey": "demumumind-cookie-consent-profile",
+      "choiceCookieKey": "demumumind_cookie_consent",
+      "profileCookieKey": "demumumind_cookie_consent_profile",
+      "changeEvent": "demumumind-cookie-consent-change",
+      "openEvent": "demumumind-cookie-consent-open",
+      "maxAgeSeconds": 31536000
+    },
+    "submitServerDraft": {
+      "localStorageKey": "demumumind-submit-server-draft-v2"
+    },
+    "toolsRules": {
+      "presetsLocalStorageKey": "tools.rules.presets.v1",
+      "historyLocalStorageKey": "tools.rules.history.v1"
+    }
+  },
+  "rateLimits": {
+    "public": {
+      "windowMs": 60000,
+      "maxRequests": 120
+    },
+    "admin": {
+      "windowMs": 60000,
+      "maxRequests": 240
+    },
+    "cron": {
+      "windowMs": 60000,
+      "maxRequests": 30
+    }
+  },
+  "operations": {
+    "catalogAutoSyncLockTtlSeconds": 900,
+    "catalogSyncAllLockTtlSeconds": 1800,
+    "backupFreshnessHours": 26,
+    "backupRestoreDrillMaxAgeDays": 45,
+    "backupRetentionDays": 30,
+    "imageMinimumCacheTtlSeconds": 2678400
+  }
+}

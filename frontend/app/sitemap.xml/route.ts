@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllBlogV2SitemapEntriesHybrid } from "@/lib/blog-v2/hybrid";
+import { buildCacheControlHeader } from "@/lib/cache/policy";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 type StaticSitemapRoute = {
     path: string;
@@ -96,7 +97,7 @@ export async function GET() {
         status: 200,
         headers: {
             "Content-Type": "application/xml; charset=utf-8",
-            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            "Cache-Control": buildCacheControlHeader("publicDocument"),
         },
     });
 }

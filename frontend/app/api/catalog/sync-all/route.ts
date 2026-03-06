@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { invalidateCatalogCaches } from "@/lib/cache/invalidation";
+import { CATALOG_SYNC_ALL_LOCK_TTL_SECONDS } from "@/lib/cache/policy";
 import { executeCatalogSyncAll } from "@/lib/catalog/sync-all-core";
 import { runCatalogGithubSync } from "@/lib/catalog/github-sync";
 import { runFullHealthCheck } from "@/lib/catalog/health";
 import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
-import { CATALOG_SERVERS_CACHE_TAG, clearCatalogSnapshotRedisCache } from "@/lib/catalog/snapshot";
 import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
 import {
   acquireCatalogSyncLock,
@@ -19,7 +19,6 @@ import {
 export const dynamic = "force-dynamic";
 
 const SYNC_ALL_LOCK_KEY = "catalog:sync-all";
-const SYNC_ALL_LOCK_TTL_SECONDS = 30 * 60;
 
 const handlers = withCronAuth(
   async (_request, { logger }) => {
@@ -31,7 +30,7 @@ const handlers = withCronAuth(
           {
             lockKey: SYNC_ALL_LOCK_KEY,
             holderId: lockHolderId,
-            ttlSeconds: SYNC_ALL_LOCK_TTL_SECONDS,
+            ttlSeconds: CATALOG_SYNC_ALL_LOCK_TTL_SECONDS,
           },
           { logger },
         ),
@@ -58,15 +57,10 @@ const handlers = withCronAuth(
       runNpmSync: () => runCatalogNpmSync(),
       runHealthCheck: () => runFullHealthCheck(),
       clearCaches: async (changedSlugs) => {
-        await clearCatalogSnapshotRedisCache();
-        revalidatePath("/", "layout");
-        revalidatePath("/catalog", "page");
-        revalidatePath("/categories", "page");
-        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
-
-        for (const slug of changedSlugs.slice(0, 100)) {
-          revalidatePath(`/server/${slug}`, "page");
-        }
+        invalidateCatalogCaches({
+          origin: "route",
+          changedSlugs: changedSlugs.slice(0, 100),
+        });
       },
       logger,
     });

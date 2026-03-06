@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { revalidatePath, revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { invalidateCatalogCaches } from "@/lib/cache/invalidation";
+import { CATALOG_AUTO_SYNC_LOCK_TTL_SECONDS } from "@/lib/cache/policy";
 import { executeCatalogAutoSync } from "@/lib/catalog/auto-sync-core";
 import { runCatalogGithubSync } from "@/lib/catalog/github-sync";
-import { CATALOG_SERVERS_CACHE_TAG, clearCatalogSnapshotRedisCache } from "@/lib/catalog/snapshot";
 import {
   acquireCatalogSyncLock,
   finishCatalogSyncRun,
@@ -20,7 +20,6 @@ export const dynamic = "force-dynamic";
 const DEFAULT_MAX_PAGES = 120;
 const MAX_GITHUB_SEARCH_PAGES = 200;
 const AUTO_SYNC_LOCK_KEY = "catalog:auto-sync";
-const AUTO_SYNC_LOCK_TTL_SECONDS = 15 * 60;
 
 const handlers = withCronAuth(
   async (request: NextRequest, { logger }) => {
@@ -34,7 +33,7 @@ const handlers = withCronAuth(
           {
             lockKey: AUTO_SYNC_LOCK_KEY,
             holderId: lockHolderId,
-            ttlSeconds: AUTO_SYNC_LOCK_TTL_SECONDS,
+            ttlSeconds: CATALOG_AUTO_SYNC_LOCK_TTL_SECONDS,
           },
           { logger },
         ),
@@ -68,15 +67,10 @@ const handlers = withCronAuth(
         }),
       runSync: ({ maxPages }) => runCatalogGithubSync({ maxPages }),
       clearCaches: async (result) => {
-        revalidatePath("/");
-        revalidatePath("/catalog");
-        revalidatePath("/categories");
-        revalidatePath("/sitemap.xml");
-        await clearCatalogSnapshotRedisCache();
-        for (const slug of result.changedSlugs.slice(0, 400)) {
-          revalidatePath(`/server/${slug}`);
-        }
-        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
+        invalidateCatalogCaches({
+          origin: "route",
+          changedSlugs: result.changedSlugs.slice(0, 400),
+        });
       },
       logger,
       nodeEnv: process.env.NODE_ENV,

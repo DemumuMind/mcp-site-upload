@@ -1,8 +1,16 @@
+import fs from "node:fs";
 import path from "node:path";
 import type { NextConfig } from "next";
 import { withContentlayer } from "next-contentlayer2";
 
 const distDir = process.env.NEXT_DIST_DIR?.trim();
+const cachePolicyPath = path.join(__dirname, "lib", "cache", "repo-cache-policy.json");
+const cachePolicy = JSON.parse(fs.readFileSync(cachePolicyPath, "utf8")) as {
+  operations?: {
+    imageMinimumCacheTtlSeconds?: number;
+  };
+};
+const imageMinimumCacheTtlSeconds = cachePolicy.operations?.imageMinimumCacheTtlSeconds ?? 60 * 60 * 24 * 31;
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -36,7 +44,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [320, 420, 640, 768, 1024, 1200, 1536],
     imageSizes: [16, 24, 32, 48, 64, 72, 96, 128, 256],
-    minimumCacheTTL: 60 * 60 * 24 * 31,
+    minimumCacheTTL: imageMinimumCacheTtlSeconds,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [

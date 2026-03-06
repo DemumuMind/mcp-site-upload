@@ -1,11 +1,10 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { invalidateBlogCaches } from "@/lib/cache/invalidation";
 import { runAutoPublishBatch } from "@/lib/blog/auto-publish";
 import { executeBlogAutoPublish } from "@/lib/blog/auto-publish-core";
 import { isBlogV2Enabled } from "@/lib/blog-v2/flags";
-import { BLOG_POSTS_CACHE_TAG } from "@/lib/blog/service";
 
 export const dynamic = "force-dynamic";
 
@@ -44,12 +43,10 @@ const handlers = withCronAuth(
         }),
       runBatch: runAutoPublishBatch,
       clearCaches: async (result) => {
-        revalidatePath("/blog");
-        revalidatePath("/sitemap.xml");
-        for (const createdPost of result.created) {
-          revalidatePath(`/blog/${createdPost.slug}`);
-        }
-        revalidateTag(BLOG_POSTS_CACHE_TAG, "max");
+        invalidateBlogCaches({
+          origin: "route",
+          slugs: result.created.map((createdPost) => createdPost.slug),
+        });
       },
     });
 

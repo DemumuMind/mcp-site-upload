@@ -1,3 +1,22 @@
+import {
+  COOKIE_CONSENT_COOKIE_KEY,
+  COOKIE_CONSENT_EVENT,
+  COOKIE_CONSENT_MAX_AGE_SECONDS,
+  COOKIE_CONSENT_OPEN_EVENT,
+  COOKIE_CONSENT_PROFILE_COOKIE_KEY,
+  COOKIE_CONSENT_PROFILE_STORAGE_KEY,
+  COOKIE_CONSENT_STORAGE_KEY,
+} from "@/lib/cache/policy";
+export {
+  COOKIE_CONSENT_COOKIE_KEY,
+  COOKIE_CONSENT_EVENT,
+  COOKIE_CONSENT_MAX_AGE_SECONDS,
+  COOKIE_CONSENT_OPEN_EVENT,
+  COOKIE_CONSENT_PROFILE_COOKIE_KEY,
+  COOKIE_CONSENT_PROFILE_STORAGE_KEY,
+  COOKIE_CONSENT_STORAGE_KEY,
+};
+
 export type CookieConsentChoice = "all" | "necessary";
 
 export type CookieConsentProfile = {
@@ -5,17 +24,6 @@ export type CookieConsentProfile = {
   preferences: boolean;
   analytics: boolean;
 };
-
-export const COOKIE_CONSENT_STORAGE_KEY = "demumumind-cookie-consent";
-export const COOKIE_CONSENT_PROFILE_STORAGE_KEY = "demumumind-cookie-consent-profile";
-
-export const COOKIE_CONSENT_COOKIE_KEY = "demumumind_cookie_consent";
-export const COOKIE_CONSENT_PROFILE_COOKIE_KEY = "demumumind_cookie_consent_profile";
-
-export const COOKIE_CONSENT_EVENT = "demumumind-cookie-consent-change";
-export const COOKIE_CONSENT_OPEN_EVENT = "demumumind-cookie-consent-open";
-
-export const COOKIE_CONSENT_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export const DEFAULT_COOKIE_CONSENT_PROFILE: CookieConsentProfile = Object.freeze({
   necessary: true,

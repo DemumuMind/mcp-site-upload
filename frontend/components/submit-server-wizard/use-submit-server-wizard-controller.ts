@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { submitServerAction } from "@/app/actions";
+import { SUBMIT_SERVER_DRAFT_STORAGE_KEY } from "@/lib/cache/policy";
 import { getSubmissionSchema, type SubmissionInput } from "@/lib/submission-schema";
 import { tr, type Locale } from "@/lib/i18n";
 
@@ -20,7 +21,7 @@ export const defaultFormValues: SubmissionInput = {
   repoUrl: "",
 };
 
-export const DRAFT_STORAGE_KEY = "demumumind-submit-server-draft-v2";
+export const DRAFT_STORAGE_KEY = SUBMIT_SERVER_DRAFT_STORAGE_KEY;
 
 export const wizardSteps = [
   { title: "Basics", description: "Identity and short product context." },

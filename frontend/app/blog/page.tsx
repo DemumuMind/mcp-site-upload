@@ -5,8 +5,6 @@ import { getSectionIndex, getSectionLocaleCopy } from "@/lib/content/section-ind
 import { getLocale } from "@/lib/i18n-server";
 import { tr } from "@/lib/i18n";
 
-export const dynamic = "force-dynamic";
-
 type BlogPageProps = {
   searchParams: Promise<{
     tag?: string;

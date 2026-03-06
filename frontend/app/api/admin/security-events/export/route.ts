@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { withAdminAuth } from "@/lib/api/with-auth";
+import { buildCacheControlHeader } from "@/lib/cache/policy";
 import { buildSecurityEventsCsv, parseSecurityEventsExportQuery } from "@/lib/security-events-export-core";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -68,7 +69,7 @@ export const GET = withAdminAuth(
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="auth-security-events-${new Date().toISOString().slice(0, 10)}.csv"`,
-        "Cache-Control": "no-store",
+        "Cache-Control": buildCacheControlHeader("exportNoStore"),
       },
     });
   },

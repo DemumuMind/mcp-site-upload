@@ -1,8 +1,17 @@
+import { unstable_cache } from "next/cache";
+import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
 import { blogPosts as diskBlogPosts, blogTags as diskBlogTags } from "@/lib/blog/content";
 import { getBlogPostsFromSupabase } from "@/lib/blog/supabase-store";
 import type { BlogPost, BlogTag } from "@/lib/blog/types";
 import { normalizeBlogSeriesSlug, normalizeBlogSlug, toTitleFromSlug } from "@/lib/blog/slug";
-export const BLOG_POSTS_CACHE_TAG = "blog-posts";
+
+type BlogSnapshotOptions = {
+    bypassCache?: boolean;
+};
+
+export const BLOG_POSTS_CACHE_TAG = CACHE_TAGS.blogPosts;
+export const BLOG_POSTS_REVALIDATE_SECONDS = getServerDataRevalidateSeconds("blogSnapshot");
+
 type BlogSnapshot = {
     posts: BlogPost[];
     tags: BlogTag[];
@@ -83,8 +92,14 @@ async function buildBlogSnapshot(): Promise<BlogSnapshot> {
         tags,
     };
 }
-async function getBlogSnapshot(): Promise<BlogSnapshot> {
-    return buildBlogSnapshot();
+
+const getCachedBlogSnapshot = unstable_cache(async () => buildBlogSnapshot(), ["blog-snapshot"], {
+    revalidate: BLOG_POSTS_REVALIDATE_SECONDS,
+    tags: [BLOG_POSTS_CACHE_TAG],
+});
+
+async function getBlogSnapshot(options: BlogSnapshotOptions = {}): Promise<BlogSnapshot> {
+    return options.bypassCache ? buildBlogSnapshot() : getCachedBlogSnapshot();
 }
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
     const snapshot = await getBlogSnapshot();

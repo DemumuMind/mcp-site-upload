@@ -8,8 +8,6 @@ import {
   getRelatedBlogV2PostsHybrid,
 } from "@/lib/blog-v2/hybrid";
 
-export const dynamic = "force-dynamic";
-
 type BlogArticlePageProps = {
   params: Promise<{
     slug: string;

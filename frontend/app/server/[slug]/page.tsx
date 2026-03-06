@@ -16,10 +16,10 @@ import { PageFrame } from "@/components/page-templates";
 import { ServerLogo } from "@/components/server-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCatalogServerBySlug, getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { getGithubDetails } from "@/lib/github-server-details";
 import { tr } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { getActiveServers, getServerBySlug } from "@/lib/servers";
 import type { AuthType, VerificationLevel } from "@/lib/types";
 
 import {
@@ -54,7 +54,7 @@ const verificationIconConfig: Record<VerificationLevel, typeof ShieldCheck> = {
 export async function generateMetadata({ params }: ServerDetailPageProps): Promise<Metadata> {
   const locale = await getLocale();
   const { slug } = await params;
-  const mcpServer = await getServerBySlug(slug);
+  const mcpServer = await getCatalogServerBySlug(slug);
 
   if (!mcpServer) {
     return {
@@ -89,17 +89,19 @@ export async function generateMetadata({ params }: ServerDetailPageProps): Promi
 export default async function ServerDetailPage({ params }: ServerDetailPageProps) {
   const locale = await getLocale();
   const { slug } = await params;
-  const mcpServer = await getServerBySlug(slug);
+  const mcpServer = await getCatalogServerBySlug(slug);
 
   if (!mcpServer) {
     notFound();
   }
 
-  const { stats: githubStats, activity: githubActivity } = await getGithubDetails(mcpServer.repoUrl);
-  const allServers = await getActiveServers();
+  const [{ stats: githubStats, activity: githubActivity }, catalogSnapshot] = await Promise.all([
+    getGithubDetails(mcpServer.repoUrl),
+    getCatalogSnapshot(),
+  ]);
   const viewModel = buildServerDetailViewModel({
     mcpServer,
-    allServers,
+    allServers: catalogSnapshot.servers,
     githubActivity,
   });
 

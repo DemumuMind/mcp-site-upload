@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildCacheControlHeader } from "@/lib/cache/policy";
 function absoluteUrl(path: string, siteUrl: string) {
     return new URL(path, siteUrl).toString();
 }
@@ -43,7 +44,7 @@ export function GET() {
         status: 200,
         headers: {
             "Content-Type": "text/plain; charset=utf-8",
-            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            "Cache-Control": buildCacheControlHeader("publicDocument"),
         },
     });
 }
