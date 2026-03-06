@@ -1,50 +1,39 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { executeCatalogNpmSync } from "@/lib/catalog/npm-sync-core";
 import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
 import { CATALOG_SERVERS_CACHE_TAG } from "@/lib/catalog/snapshot";
 
 export const dynamic = "force-dynamic";
 
 const handlers = withCronAuth(
-  async (request, { logger }) => {
-    try {
-      logger.info("catalog.npm_sync.start");
+  async (_request, { logger }) => {
+    const response = await executeCatalogNpmSync({
+      runSync: async () => {
+        const result = await runCatalogNpmSync();
+        return {
+          ok: result.failed === 0,
+          ...result,
+        };
+      },
+      onSuccess: async (result) => {
+        revalidatePath("/", "layout");
+        revalidatePath("/catalog", "page");
+        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
 
-      const result = await runCatalogNpmSync();
+        for (const slug of result.changedSlugs.slice(0, 100)) {
+          revalidatePath(`/server/${slug}`);
+        }
+      },
+      logInfo: (event, details) => logger.info(event, details),
+      logError: (event, details) => logger.error(event, details),
+    });
 
-      // Сброс кэша для обновления данных на сайте
-      revalidatePath("/", "layout");
-      revalidatePath("/catalog", "page");
-      revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
-
-      for (const slug of result.changedSlugs.slice(0, 100)) {
-        revalidatePath(`/server/${slug}`);
-      }
-
-      logger.info("catalog.npm_sync.completed", {
-        created: result.created,
-        updated: result.updated,
-        failed: result.failed
-      });
-
-      return NextResponse.json({
-        ok: result.failed === 0,
-        ...result
-      });
-    } catch (error) {
-      logger.error("catalog.npm_sync.error", {
-        message: error instanceof Error ? error.message : "Unknown error"
-      });
-
-      return NextResponse.json({
-        ok: false,
-        error: "Internal sync error"
-      }, { status: 500 });
-    }
+    return NextResponse.json(response.body, { status: response.status });
   },
   ["CATALOG_AUTOSYNC_CRON_SECRET", "CRON_SECRET"],
-  "catalog.npm_sync"
+  "catalog.npm_sync",
 );
 
 export const GET = handlers.GET;

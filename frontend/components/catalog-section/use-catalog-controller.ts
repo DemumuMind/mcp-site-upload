@@ -8,7 +8,10 @@ import {
   parseCatalogQueryV2,
   serializeCatalogQueryV2,
 } from "@/lib/catalog/query-v2";
-import { getCatalogSearchErrorMessage } from "@/components/catalog-section/catalog-search-client-error";
+import {
+  getCatalogSearchClientError,
+  type CatalogSearchClientError,
+} from "@/components/catalog-section/catalog-search-client-error";
 import { runCatalogSearch } from "@/lib/catalog/server-search";
 import { tr, type Locale } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
@@ -71,7 +74,7 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
   const [queryState, setQueryState] = useState<CatalogQueryV2>(parsedQueryFromUrl);
   const [searchInputValue, setSearchInputValue] = useState(parsedQueryFromUrl.query);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [requestError, setRequestError] = useState<string | null>(null);
+  const [requestError, setRequestError] = useState<CatalogSearchClientError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CatalogSearchResult>(() =>
     runCatalogSearch(initialServers, parsedQueryFromUrl),
@@ -418,14 +421,32 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
           { method: "GET", signal: controller.signal, cache: "no-store" },
         );
         if (!response.ok) {
-          throw new Error(await getCatalogSearchErrorMessage(response));
+          const clientError = await getCatalogSearchClientError(response);
+          const thrownError = new Error(clientError.message) as Error & {
+            catalogSearchClientError?: CatalogSearchClientError;
+          };
+          thrownError.catalogSearchClientError = clientError;
+          throw thrownError;
         }
         const payload = (await response.json()) as CatalogSearchResult;
         setResult(payload);
         setRequestError(null);
       } catch (error) {
         if (controller.signal.aborted) return;
-        setRequestError(getResponseMessage(error));
+        if (
+          error instanceof Error &&
+          "catalogSearchClientError" in error &&
+          (error as { catalogSearchClientError?: CatalogSearchClientError }).catalogSearchClientError
+        ) {
+          setRequestError(
+            (error as { catalogSearchClientError: CatalogSearchClientError }).catalogSearchClientError,
+          );
+        } else {
+          setRequestError({
+            message: getResponseMessage(error),
+            code: "unknown",
+          });
+        }
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }

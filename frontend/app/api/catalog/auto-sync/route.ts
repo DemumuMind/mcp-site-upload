@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseNumber, parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { createCatalogCronErrorBody } from "@/lib/catalog/cron-route-response";
 import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
 import { CATALOG_SERVERS_CACHE_TAG, clearCatalogSnapshotRedisCache } from "@/lib/catalog/snapshot";
 import {
@@ -152,8 +153,7 @@ const handlers = withCronAuth(
 
         if (!lock.acquired) {
             return NextResponse.json({
-                ok: false,
-                error: "Catalog auto-sync is already running.",
+                ...createCatalogCronErrorBody("Catalog auto-sync is already running.", "already_running"),
                 lock: {
                     key: AUTO_SYNC_LOCK_KEY,
                     lockedUntil: lock.lockedUntil ?? null,
@@ -225,8 +225,7 @@ const handlers = withCronAuth(
             if (isNetworkFetchFailure(error)) {
                 finalStatus = "partial";
                 return NextResponse.json({
-                    ok: false,
-                    error: "Catalog auto-sync partially unavailable due to GitHub network failure.",
+                    ...createCatalogCronErrorBody("Catalog auto-sync partially unavailable due to GitHub network failure.", "partial_failure"),
                     debug,
                     alerting: {
                         status: "partial",
@@ -246,8 +245,7 @@ const handlers = withCronAuth(
 
             finalStatus = "error";
             return NextResponse.json({
-                ok: false,
-                error: "Catalog auto-sync failed before completion.",
+                ...createCatalogCronErrorBody("Catalog auto-sync failed before completion.", "internal_error"),
                 debug,
                 alerting: {
                     status: "error",

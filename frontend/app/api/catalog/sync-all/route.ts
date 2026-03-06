@@ -2,11 +2,12 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { withCronAuth } from "@/lib/api/with-auth";
+import { createCatalogCronErrorBody, toCatalogCronErrorMessage } from "@/lib/catalog/cron-route-response";
 import { runCatalogGithubSync, type CatalogSyncResult } from "@/lib/catalog/github-sync";
-import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
-import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
 import { runFullHealthCheck } from "@/lib/catalog/health";
+import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
 import { CATALOG_SERVERS_CACHE_TAG, clearCatalogSnapshotRedisCache } from "@/lib/catalog/snapshot";
+import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
 import {
   acquireCatalogSyncLock,
   finishCatalogSyncRun,
@@ -40,7 +41,10 @@ type UnifiedSourceResult = CatalogSyncResult | { error: string };
 
 type SyncAllFinalStatus = "success" | "partial" | "error";
 
-function getMetricValue(source: UnifiedSourceResult | undefined, metric: "created" | "updated" | "failed"): number {
+function getMetricValue(
+  source: UnifiedSourceResult | undefined,
+  metric: "created" | "updated" | "failed",
+): number {
   if (!source || "error" in source) {
     return 0;
   }
@@ -51,7 +55,10 @@ function hasSourceError(source: UnifiedSourceResult | undefined): boolean {
   return Boolean(source && "error" in source);
 }
 
-function toSourceFailures(source: string, result: UnifiedSourceResult | undefined): { source: string; entityKey: string; stage: string; reason: string }[] {
+function toSourceFailures(
+  source: string,
+  result: UnifiedSourceResult | undefined,
+): { source: string; entityKey: string; stage: string; reason: string }[] {
   if (!result) {
     return [];
   }
@@ -80,14 +87,16 @@ const handlers = withCronAuth(
     );
 
     if (!lock.acquired) {
-      return NextResponse.json({
-        ok: false,
-        error: "Catalog sync-all is already running.",
-        lock: {
-          key: SYNC_ALL_LOCK_KEY,
-          lockedUntil: lock.lockedUntil ?? null,
+      return NextResponse.json(
+        {
+          ...createCatalogCronErrorBody("Catalog sync-all is already running.", "already_running"),
+          lock: {
+            key: SYNC_ALL_LOCK_KEY,
+            lockedUntil: lock.lockedUntil ?? null,
+          },
         },
-      }, { status: 409 });
+        { status: 409 },
+      );
     }
 
     const runId = await startCatalogSyncRun(
@@ -104,143 +113,154 @@ const handlers = withCronAuth(
     let failures: { source: string; entityKey: string; stage: string; reason: string }[] = [];
 
     try {
-    logger.info("catalog.unified_sync.start");
+      logger.info("catalog.unified_sync.start");
 
-    const executedAt = new Date().toISOString();
-    const changedSlugs = new Set<string>();
+      const executedAt = new Date().toISOString();
+      const changedSlugs = new Set<string>();
+      const results: {
+        github?: UnifiedSourceResult;
+        smithery?: UnifiedSourceResult;
+        npm?: UnifiedSourceResult;
+      } = {};
 
-    // Результаты по источникам
-    const results: {
-      github?: UnifiedSourceResult;
-      smithery?: UnifiedSourceResult;
-      npm?: UnifiedSourceResult;
-    } = {};
-
-    // 1. GitHub Sync
-    try {
-      logger.info("catalog.unified_sync.github.start");
-      const githubResult = await runCatalogGithubSync({ maxPages: 5 });
-      results.github = githubResult;
-      githubResult.changedSlugs.forEach(slug => changedSlugs.add(slug));
-    } catch (error) {
-      logger.error("catalog.unified_sync.github.error", { message: (error as Error).message });
-      results.github = { error: (error as Error).message };
-    }
-
-    // 2. Smithery Sync
-    try {
-      logger.info("catalog.unified_sync.smithery.start");
-      const smitheryResult = await runCatalogSmitherySync();
-      results.smithery = smitheryResult;
-      smitheryResult.changedSlugs.forEach(slug => changedSlugs.add(slug));
-    } catch (error) {
-      logger.error("catalog.unified_sync.smithery.error", { message: (error as Error).message });
-      results.smithery = { error: (error as Error).message };
-    }
-
-    // 3. NPM Sync
-    try {
-      logger.info("catalog.unified_sync.npm.start");
-      const npmResult = await runCatalogNpmSync();
-      results.npm = npmResult;
-      npmResult.changedSlugs.forEach(slug => changedSlugs.add(slug));
-    } catch (error) {
-      logger.error("catalog.unified_sync.npm.error", { message: (error as Error).message });
-      results.npm = { error: (error as Error).message };
-    }
-
-    // 4. Health Check
-    try {
-      logger.info("catalog.unified_sync.health_check.start");
-      await runFullHealthCheck();
-    } catch (error) {
-      logger.error("catalog.unified_sync.health_check.error", { message: (error as Error).message });
-    }
-
-    // Подсчет итогов
-    const summary = {
-      totalCreated:
-        getMetricValue(results.github, "created") +
-        getMetricValue(results.smithery, "created") +
-        getMetricValue(results.npm, "created"),
-      totalUpdated:
-        getMetricValue(results.github, "updated") +
-        getMetricValue(results.smithery, "updated") +
-        getMetricValue(results.npm, "updated"),
-      totalFailed:
-        getMetricValue(results.github, "failed") +
-        getMetricValue(results.smithery, "failed") +
-        getMetricValue(results.npm, "failed"),
-    };
-
-    // Инвалидация кэша
-    if (changedSlugs.size > 0) {
-      await clearCatalogSnapshotRedisCache();
-      revalidatePath("/", "layout");
-      revalidatePath("/catalog", "page");
-      revalidatePath("/categories", "page");
-      revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
-
-      // Ограничиваем количество ревалидаций путей серверов для производительности
-      const slugsToRevalidate = Array.from(changedSlugs).slice(0, 100);
-      for (const slug of slugsToRevalidate) {
-        revalidatePath(`/server/${slug}`, "page");
+      try {
+        logger.info("catalog.unified_sync.github.start");
+        const githubResult = await runCatalogGithubSync({ maxPages: 5 });
+        results.github = githubResult;
+        githubResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
+      } catch (error) {
+        const message = toCatalogCronErrorMessage(error, "Unknown GitHub sync error");
+        logger.error("catalog.unified_sync.github.error", { message });
+        results.github = { error: message };
       }
-    }
 
-    const ok =
-      !hasSourceError(results.github) &&
-      !hasSourceError(results.smithery) &&
-      !hasSourceError(results.npm) &&
-      summary.totalFailed === 0;
+      try {
+        logger.info("catalog.unified_sync.smithery.start");
+        const smitheryResult = await runCatalogSmitherySync();
+        results.smithery = smitheryResult;
+        smitheryResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
+      } catch (error) {
+        const message = toCatalogCronErrorMessage(error, "Unknown Smithery sync error");
+        logger.error("catalog.unified_sync.smithery.error", { message });
+        results.smithery = { error: message };
+      }
 
-    const sourceErrors = [
-      hasSourceError(results.github) ? "github" : null,
-      hasSourceError(results.smithery) ? "smithery" : null,
-      hasSourceError(results.npm) ? "npm" : null,
-    ].filter((value): value is string => Boolean(value));
+      try {
+        logger.info("catalog.unified_sync.npm.start");
+        const npmResult = await runCatalogNpmSync();
+        results.npm = npmResult;
+        npmResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
+      } catch (error) {
+        const message = toCatalogCronErrorMessage(error, "Unknown npm sync error");
+        logger.error("catalog.unified_sync.npm.error", { message });
+        results.npm = { error: message };
+      }
 
-    if (ok) {
-      finalStatus = "success";
-    } else if (sourceErrors.length === 3) {
-      finalStatus = "error";
-    } else {
-      finalStatus = "partial";
-    }
+      try {
+        logger.info("catalog.unified_sync.health_check.start");
+        await runFullHealthCheck();
+      } catch (error) {
+        logger.error("catalog.unified_sync.health_check.error", {
+          message: toCatalogCronErrorMessage(error, "Unknown health-check error"),
+        });
+      }
 
-    if (sourceErrors.length > 0) {
-      errorSummary = `Source errors: ${sourceErrors.join(", ")}.`;
-    }
+      const summary = {
+        totalCreated:
+          getMetricValue(results.github, "created") +
+          getMetricValue(results.smithery, "created") +
+          getMetricValue(results.npm, "created"),
+        totalUpdated:
+          getMetricValue(results.github, "updated") +
+          getMetricValue(results.smithery, "updated") +
+          getMetricValue(results.npm, "updated"),
+        totalFailed:
+          getMetricValue(results.github, "failed") +
+          getMetricValue(results.smithery, "failed") +
+          getMetricValue(results.npm, "failed"),
+      };
 
-    counters = {
-      githubCreated: getMetricValue(results.github, "created"),
-      githubUpdated: getMetricValue(results.github, "updated"),
-      githubFailed: getMetricValue(results.github, "failed"),
-      smitheryCreated: getMetricValue(results.smithery, "created"),
-      smitheryUpdated: getMetricValue(results.smithery, "updated"),
-      smitheryFailed: getMetricValue(results.smithery, "failed"),
-      npmCreated: getMetricValue(results.npm, "created"),
-      npmUpdated: getMetricValue(results.npm, "updated"),
-      npmFailed: getMetricValue(results.npm, "failed"),
-      totalCreated: summary.totalCreated,
-      totalUpdated: summary.totalUpdated,
-      totalFailed: summary.totalFailed,
-    };
+      if (changedSlugs.size > 0) {
+        await clearCatalogSnapshotRedisCache();
+        revalidatePath("/", "layout");
+        revalidatePath("/catalog", "page");
+        revalidatePath("/categories", "page");
+        revalidateTag(CATALOG_SERVERS_CACHE_TAG, "max");
 
-    failures = [
-      ...toSourceFailures("github", results.github),
-      ...toSourceFailures("smithery", results.smithery),
-      ...toSourceFailures("npm", results.npm),
-    ];
+        const slugsToRevalidate = Array.from(changedSlugs).slice(0, 100);
+        for (const slug of slugsToRevalidate) {
+          revalidatePath(`/server/${slug}`, "page");
+        }
+      }
 
-    logger.info("catalog.unified_sync.completed", summary);
+      const ok =
+        !hasSourceError(results.github) &&
+        !hasSourceError(results.smithery) &&
+        !hasSourceError(results.npm) &&
+        summary.totalFailed === 0;
 
-    return NextResponse.json({
-      ok,
-      executedAt,
-      sources: results,
-      summary
-    } as UnifiedSyncResult);
+      const sourceErrors = [
+        hasSourceError(results.github) ? "github" : null,
+        hasSourceError(results.smithery) ? "smithery" : null,
+        hasSourceError(results.npm) ? "npm" : null,
+      ].filter((value): value is string => Boolean(value));
+
+      if (ok) {
+        finalStatus = "success";
+      } else if (sourceErrors.length === 3) {
+        finalStatus = "error";
+      } else {
+        finalStatus = "partial";
+      }
+
+      if (sourceErrors.length > 0) {
+        errorSummary = `Source errors: ${sourceErrors.join(", ")}.`;
+      }
+
+      counters = {
+        githubCreated: getMetricValue(results.github, "created"),
+        githubUpdated: getMetricValue(results.github, "updated"),
+        githubFailed: getMetricValue(results.github, "failed"),
+        smitheryCreated: getMetricValue(results.smithery, "created"),
+        smitheryUpdated: getMetricValue(results.smithery, "updated"),
+        smitheryFailed: getMetricValue(results.smithery, "failed"),
+        npmCreated: getMetricValue(results.npm, "created"),
+        npmUpdated: getMetricValue(results.npm, "updated"),
+        npmFailed: getMetricValue(results.npm, "failed"),
+        totalCreated: summary.totalCreated,
+        totalUpdated: summary.totalUpdated,
+        totalFailed: summary.totalFailed,
+      };
+
+      failures = [
+        ...toSourceFailures("github", results.github),
+        ...toSourceFailures("smithery", results.smithery),
+        ...toSourceFailures("npm", results.npm),
+      ];
+
+      logger.info("catalog.unified_sync.completed", summary);
+
+      const errorBody = ok
+        ? {}
+        : createCatalogCronErrorBody(
+            sourceErrors.length === 3
+              ? "Catalog sync-all failed across all sources."
+              : "Catalog sync-all completed with partial source failures.",
+            sourceErrors.length === 3 ? "internal_error" : "partial_failure",
+          );
+
+      return NextResponse.json(
+        {
+          ok,
+          ...errorBody,
+          executedAt,
+          sources: results,
+          summary,
+        } as UnifiedSyncResult & Partial<ReturnType<typeof createCatalogCronErrorBody>>,
+        {
+          status: finalStatus === "error" ? 500 : finalStatus === "partial" ? 207 : 200,
+        },
+      );
     } finally {
       const durationMs = Date.now() - startedAtMs;
       if (runId) {
@@ -285,7 +305,7 @@ const handlers = withCronAuth(
     }
   },
   ["CATALOG_AUTOSYNC_CRON_SECRET", "CRON_SECRET"],
-  "catalog.unified_sync"
+  "catalog.unified_sync",
 );
 
 export const GET = handlers.GET;

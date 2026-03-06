@@ -16,7 +16,10 @@ export function ResultsSummary({
   firstVisibleIndex: number;
   lastVisibleIndex: number;
   isLoading: boolean;
-  requestError: string | null;
+  requestError: {
+    message: string;
+    code: "invalid_request" | "internal_error" | "unknown";
+  } | null;
 }) {
   return (
     <div className="space-y-1 text-sm text-foreground">
@@ -39,11 +42,17 @@ export function ResultsSummary({
       {requestError ? (
         <p className="inline-flex items-center gap-1.5 text-xs text-rose-200">
           <AlertCircle className="size-3.5" />
-          {tr(
-            locale,
-            "Could not sync latest catalog results. Showing the latest available snapshot.",
-            "Could not sync latest catalog results. Showing the latest available snapshot.",
-          )}
+          {requestError.code === "invalid_request"
+            ? tr(
+                locale,
+                "Some filters were invalid, so the nearest valid catalog view is shown.",
+                "Some filters were invalid, so the nearest valid catalog view is shown.",
+              )
+            : tr(
+                locale,
+                "Could not sync latest catalog results. Showing the latest available snapshot.",
+                "Could not sync latest catalog results. Showing the latest available snapshot.",
+              )}
         </p>
       ) : null}
     </div>
