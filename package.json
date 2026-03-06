@@ -16,6 +16,7 @@
     "check:utf8:strict": "node scripts/check-utf8.mjs --strict-missing",
     "check:api-docs": "node scripts/check-api-docs.mjs",
     "check:api-discipline": "node scripts/check-api-change-discipline.mjs",
+    "check:cache-discipline": "node scripts/check-cache-discipline.mjs",
     "check:migrations": "node scripts/check-migration-prefixes.mjs",
     "check:cycles": "node scripts/check-import-cycles.mjs",
     "lint": "eslint .",

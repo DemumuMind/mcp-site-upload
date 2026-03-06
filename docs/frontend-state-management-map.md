@@ -22,6 +22,8 @@
 - Single source of truth: `frontend/lib/cache/repo-cache-policy.json`.
 - Runtime adapters:
   - `frontend/lib/cache/policy.ts` exposes TTL, tags, headers, rate-limit windows, cookie/localStorage keys, and operational freshness values.
+  - `frontend/lib/cache/server-data-cache.ts` builds shared `unstable_cache(...)` config from the registry.
+  - `frontend/lib/cache/next-runtime.ts` is the only direct import boundary for Next cache APIs.
   - `frontend/lib/cache/invalidation.ts` is the only place that should orchestrate tag/path invalidation for catalog, blog, and admin domains.
   - `scripts/_shared/cache-policy.mjs` reads the same registry for non-frontend scripts.
 - Current cache tags:
@@ -41,6 +43,7 @@
 - Cookie consent remains dual-written to cookie + localStorage by design so SSR and client hydration stay aligned.
 
 ## Verification Gate
+- `npm run check:cache-discipline`
 - `npm run check:utf8`
 - `npm run lint`
 - `npm run build`

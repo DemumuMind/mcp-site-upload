@@ -17,15 +17,20 @@
 ## Runtime Adapters
 - `frontend/lib/cache/policy.ts`
   - Server data TTL/tag lookup
+  - Invalidation domain policy lookup
   - Fetch cache helpers
   - `Cache-Control` header builders
   - Rate-limit config lookup
   - Browser storage key constants
   - Operational freshness/TTL constants
+- `frontend/lib/cache/server-data-cache.ts`
+  - Shared `unstable_cache(...)` config builder for server read models
+- `frontend/lib/cache/next-runtime.ts`
+  - Single import boundary for Next cache runtime APIs
 - `frontend/lib/cache/invalidation.ts`
-  - Catalog invalidation
-  - Blog invalidation
-  - Admin dashboard invalidation
+  - Registry-backed catalog invalidation
+  - Registry-backed blog invalidation
+  - Registry-backed admin dashboard invalidation
 - `scripts/_shared/cache-policy.mjs`
   - Reads the same JSON registry for scripts and ops tooling
 
@@ -51,6 +56,7 @@
 - Admin mutations must invalidate through `invalidateAdminDashboardCaches(...)`.
 - Server Actions use immediate tag updates through the invalidation helper.
 - Route Handlers use `revalidateTag(..., "max")` through the same helper.
+- Base invalidation paths and tag mapping live in `frontend/lib/cache/repo-cache-policy.json`.
 
 ## Script Rules
 - Scripts that need no-store fetch semantics or freshness thresholds must read them from `scripts/_shared/cache-policy.mjs`.
@@ -58,6 +64,12 @@
   - `scripts/catalog-count-guard.mjs`
   - `scripts/ops-health-report.mjs`
   - `scripts/backup-verify.mjs`
+
+## Guardrails
+- `npm run check:cache-discipline`
+  - fails new inline `cache: "no-store"` in source files
+  - fails direct `next/cache` imports outside `frontend/lib/cache/next-runtime.ts`
+  - fails direct `revalidatePath(...)`, `revalidateTag(...)`, and `updateTag(...)` outside `frontend/lib/cache/invalidation.ts`
 
 ## Extension Rules
 1. Add the new policy or key to `frontend/lib/cache/repo-cache-policy.json`.
