@@ -31,4 +31,5 @@ Owner: BE Lead
 
 ## Next steps
 - Add machine-readable OpenAPI document for canonical admin/catalog/task routes.
-- Add contract tests for all `/api/admin/blog-v2/*` handlers.
+- Add route-level smoke coverage for `/api/admin/blog-v2/*` handlers if admin API browser tests become part of CI.
+- Keep new backend route changes aligned with `docs/api/backend-route-standard.md`.
