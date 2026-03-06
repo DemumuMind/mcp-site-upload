@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseCatalogQueryV2 } from "@/lib/catalog/query-v2";
-import { classifyCatalogSearchError } from "@/lib/catalog/search-route-error";
+import { executeCatalogSearchRequest } from "@/lib/catalog/search-route-core";
 import { getCatalogSnapshot } from "@/lib/catalog/snapshot";
 import { runCatalogSearch } from "@/lib/catalog/server-search";
 export const dynamic = "force-dynamic";
@@ -10,18 +10,14 @@ const NO_STORE_HEADERS = {
 };
 
 export async function GET(request: NextRequest) {
-  try {
-    const query = parseCatalogQueryV2(request.nextUrl.searchParams);
-    const snapshot = await getCatalogSnapshot({ bypassCache: true });
-    const result = runCatalogSearch(snapshot.servers, query);
-    return NextResponse.json(result, {
-      headers: NO_STORE_HEADERS,
-    });
-  } catch (error) {
-    const response = classifyCatalogSearchError(error);
-    return NextResponse.json(response.body, {
-      status: response.status,
-      headers: NO_STORE_HEADERS,
-    });
-  }
+  const response = await executeCatalogSearchRequest(request.nextUrl.searchParams, {
+    parseQuery: parseCatalogQueryV2,
+    getSnapshot: () => getCatalogSnapshot({ bypassCache: true }),
+    runSearch: runCatalogSearch,
+  });
+
+  return NextResponse.json(response.body, {
+    status: response.status,
+    headers: NO_STORE_HEADERS,
+  });
 }

@@ -8,6 +8,7 @@ import {
   parseCatalogQueryV2,
   serializeCatalogQueryV2,
 } from "@/lib/catalog/query-v2";
+import { getCatalogSearchErrorMessage } from "@/components/catalog-section/catalog-search-client-error";
 import { runCatalogSearch } from "@/lib/catalog/server-search";
 import { tr, type Locale } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
@@ -416,7 +417,9 @@ export function useCatalogController(initialServers: McpServer[], locale: Locale
           queryString.length > 0 ? `/api/catalog/search?${queryString}` : "/api/catalog/search",
           { method: "GET", signal: controller.signal, cache: "no-store" },
         );
-        if (!response.ok) throw new Error(`Failed to load catalog (${response.status})`);
+        if (!response.ok) {
+          throw new Error(await getCatalogSearchErrorMessage(response));
+        }
         const payload = (await response.json()) as CatalogSearchResult;
         setResult(payload);
         setRequestError(null);
