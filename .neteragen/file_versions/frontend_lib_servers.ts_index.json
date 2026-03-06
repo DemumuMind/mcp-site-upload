@@ -1,0 +1,19 @@
+{
+  "file_name": "frontend/lib/servers.ts",
+  "revisions": [
+    {
+      "revision_id": "d5dbe200-3c98-4f98-a7ca-86163eb5a963",
+      "metadata": {
+        "timestamp": "2026-03-06T22:36:34.311749",
+        "type": "cache_version",
+        "source": "initial_from_disk",
+        "size": 8693,
+        "is_reverted": false,
+        "git_branch_name": "main",
+        "agent_name": "Many",
+        "description": null
+      },
+      "saved_at": "2026-03-06T22:36:34.330999"
+    }
+  ]
+}
