@@ -17,9 +17,14 @@
         { "method": "GET", "path": "/api/catalog/search", "auth": "public" },
         { "method": "GET", "path": "/api/catalog/automation-status", "auth": "cron" },
         { "method": "GET", "path": "/api/catalog/health-check", "auth": "cron" },
+        { "method": "POST", "path": "/api/catalog/health-check", "auth": "cron" },
+        { "method": "GET", "path": "/api/catalog/auto-sync", "auth": "cron" },
         { "method": "POST", "path": "/api/catalog/auto-sync", "auth": "cron" },
+        { "method": "GET", "path": "/api/catalog/npm-sync", "auth": "cron" },
         { "method": "POST", "path": "/api/catalog/npm-sync", "auth": "cron" },
+        { "method": "GET", "path": "/api/catalog/smithery-sync", "auth": "cron" },
         { "method": "POST", "path": "/api/catalog/smithery-sync", "auth": "cron" },
+        { "method": "GET", "path": "/api/catalog/sync-all", "auth": "cron" },
         { "method": "POST", "path": "/api/catalog/sync-all", "auth": "cron" }
       ]
     },
@@ -35,6 +40,13 @@
     {
       "name": "blog",
       "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/blog/auto-publish",
+          "auth": "cron",
+          "deprecated": true,
+          "successor": "/api/admin/blog-v2/*"
+        },
         {
           "method": "POST",
           "path": "/api/blog/auto-publish",
@@ -58,6 +70,7 @@
       "endpoints": [
         { "method": "GET", "path": "/api/health", "auth": "public" },
         { "method": "GET", "path": "/api/health-check", "auth": "cron" },
+        { "method": "POST", "path": "/api/health-check", "auth": "cron" },
         { "method": "POST", "path": "/api/server/{slug}/probe", "auth": "probe-secret-or-ui-header" }
       ]
     }

@@ -3,9 +3,9 @@ info:
   title: DemumuMind API Lite
   version: 2026-03-06
   description: >
-    Lightweight contract snapshot for the most important production routes.
-    This is not a fully exhaustive spec; it captures stable boundary shapes
-    and auth expectations for the main public, cron, admin, and task endpoints.
+    Lightweight contract snapshot for the current production API surface.
+    This is not a full schema-first spec, but it tracks stable route paths,
+    auth expectations, and high-level response semantics.
 servers:
   - url: https://demumumind.example
 paths:
@@ -19,34 +19,76 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+  /api/health-check:
+    get:
+      summary: Run full health-check job
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Health-check result
+        "500":
+          description: Internal error
+    post:
+      summary: Run full health-check job
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Health-check result
+        "500":
+          description: Internal error
   /api/catalog/search:
     get:
       summary: Search catalog entries
       responses:
         "200":
           description: Search results
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  pageSize:
-                    type: integer
-                  totalPages:
-                    type: integer
         "400":
           description: Invalid request
         "500":
           description: Internal error
+  /api/catalog/automation-status:
+    get:
+      summary: Read catalog automation runtime status
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Automation status payload
+  /api/catalog/health-check:
+    get:
+      summary: Run catalog health check
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Catalog health-check result
+        "500":
+          description: Internal error
+    post:
+      summary: Run catalog health check
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Catalog health-check result
+        "500":
+          description: Internal error
   /api/catalog/auto-sync:
+    get:
+      summary: Run catalog GitHub auto-sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "207":
+          description: Partial sync failure
+        "409":
+          description: Lock already held
+        "500":
+          description: Internal error
     post:
       summary: Run catalog GitHub auto-sync
       security:
@@ -60,7 +102,58 @@ paths:
           description: Lock already held
         "500":
           description: Internal error
+  /api/catalog/npm-sync:
+    get:
+      summary: Run catalog NPM sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "500":
+          description: Internal error
+    post:
+      summary: Run catalog NPM sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "500":
+          description: Internal error
+  /api/catalog/smithery-sync:
+    get:
+      summary: Run catalog Smithery sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "500":
+          description: Internal error
+    post:
+      summary: Run catalog Smithery sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "500":
+          description: Internal error
   /api/catalog/sync-all:
+    get:
+      summary: Run full catalog sync
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Sync completed
+        "207":
+          description: Partial sync failure
+        "409":
+          description: Lock already held
+        "500":
+          description: Internal error
     post:
       summary: Run full catalog sync
       security:
@@ -130,6 +223,111 @@ paths:
                 $ref: "#/components/schemas/AuthSecurityResponse"
         "400":
           description: Invalid JSON, email, or action
+  /api/cookie-consent:
+    get:
+      summary: Read cookie consent state
+      responses:
+        "200":
+          description: Consent state
+    post:
+      summary: Store cookie consent state
+      responses:
+        "200":
+          description: Consent saved
+        "400":
+          description: Invalid JSON or consent payload
+    delete:
+      summary: Clear cookie consent state
+      responses:
+        "200":
+          description: Consent cleared
+  /api/blog/auto-publish:
+    get:
+      summary: Deprecated blog v1 auto-publish
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Batch completed
+        "207":
+          description: Partial batch failure
+        "409":
+          description: Disabled by blog v2 flag
+        "500":
+          description: Internal error
+    post:
+      summary: Deprecated blog v1 auto-publish
+      security:
+        - bearerCron: []
+      responses:
+        "200":
+          description: Batch completed
+        "207":
+          description: Partial batch failure
+        "409":
+          description: Disabled by blog v2 flag
+        "500":
+          description: Internal error
+  /api/admin/blog-v2/generate:
+    post:
+      summary: Generate blog v2 draft
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: Draft and preview payload
+        "400":
+          description: Invalid JSON
+        "401":
+          description: Unauthorized
+        "422":
+          description: Invalid payload
+        "500":
+          description: Draft generation failure
+  /api/admin/blog-v2/preview:
+    post:
+      summary: Preview blog v2 draft
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: Preview payload
+        "400":
+          description: Invalid JSON
+        "401":
+          description: Unauthorized
+        "422":
+          description: Invalid payload
+        "500":
+          description: Preview failure
+  /api/admin/blog-v2/publish:
+    post:
+      summary: Publish blog v2 draft
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: Publish result
+        "400":
+          description: Invalid JSON
+        "401":
+          description: Unauthorized
+        "422":
+          description: Invalid payload
+        "500":
+          description: Publish failure
+  /api/admin/multi-agent/weekly-export:
+    get:
+      summary: Export weekly multi-agent telemetry
+      security:
+        - bearerAdmin: []
+      responses:
+        "200":
+          description: CSV export
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
   /api/admin/security-events/export:
     get:
       summary: Export security events CSV
@@ -144,18 +342,46 @@ paths:
           description: Unauthorized
         "500":
           description: Internal error
-  /api/admin/multi-agent/weekly-export:
-    get:
-      summary: Export weekly multi-agent telemetry
-      security:
-        - bearerAdmin: []
+  /api/multi-agent/demo:
+    post:
+      summary: Run public multi-agent demo pipeline
       responses:
         "200":
-          description: CSV export
+          description: Demo result
+        "400":
+          description: Invalid request body
         "401":
           description: Unauthorized
+        "429":
+          description: Rate limited
         "500":
-          description: Internal error
+          description: Internal execution error
+  /api/multi-agent/health:
+    get:
+      summary: Read multi-agent runtime health
+      responses:
+        "200":
+          description: Multi-agent health payload
+  /api/server/{slug}/probe:
+    post:
+      summary: Probe a server URL safely
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Probe result
+        "400":
+          description: Invalid or unsafe server URL
+        "401":
+          description: Unauthorized
+        "404":
+          description: Server not found
+        "502":
+          description: Probe request failed
 components:
   securitySchemes:
     bearerCron:

@@ -3,6 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const docsDir = path.join(root, "docs", "api");
+const apiRoutesDir = path.join(root, "frontend", "app", "api");
 
 const requiredFiles = [
   "backend-route-standard.md",
@@ -13,17 +14,28 @@ const requiredFiles = [
   "testing-matrix.md",
 ];
 
-const requiredPaths = [
-  "/api/health",
-  "/api/catalog/search",
-  "/api/catalog/auto-sync",
-  "/api/catalog/sync-all",
-  "/api/tasks",
-  "/api/tasks/{id}",
-  "/api/auth/security",
-  "/api/admin/security-events/export",
-  "/api/admin/multi-agent/weekly-export",
-];
+function normalizeApiRoutePathFromFile(filePath) {
+  const relative = path.relative(apiRoutesDir, filePath).replaceAll("\\", "/");
+  const withoutSuffix = relative.replace(/\/route\.ts$/, "");
+  const withParams = withoutSuffix.replace(/\[([^\]]+)\]/g, "{$1}");
+  return `/api/${withParams}`;
+}
+
+async function collectApiRoutePaths(dir) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const paths = [];
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      paths.push(...(await collectApiRoutePaths(fullPath)));
+      continue;
+    }
+    if (entry.isFile() && entry.name === "route.ts") {
+      paths.push(normalizeApiRoutePathFromFile(fullPath));
+    }
+  }
+  return paths;
+}
 
 async function main() {
   for (const file of requiredFiles) {
@@ -50,12 +62,13 @@ async function main() {
   );
 
   const openApiRaw = await fs.readFile(openApiPath, "utf8");
-  for (const requiredPath of requiredPaths) {
-    if (!inventoryPaths.has(requiredPath)) {
-      throw new Error(`endpoint-inventory-v2.json is missing ${requiredPath}`);
+  const actualRoutePaths = await collectApiRoutePaths(apiRoutesDir);
+  for (const routePath of actualRoutePaths) {
+    if (!inventoryPaths.has(routePath)) {
+      throw new Error(`endpoint-inventory-v2.json is missing ${routePath}`);
     }
-    if (!openApiRaw.includes(requiredPath)) {
-      throw new Error(`openapi-lite.yaml is missing ${requiredPath}`);
+    if (!openApiRaw.includes(routePath)) {
+      throw new Error(`openapi-lite.yaml is missing ${routePath}`);
     }
   }
 
