@@ -58,6 +58,15 @@ test.describe("Catalog automation API", () => {
     expect(typeof body.error).toBe("string");
   });
 
+  test("POST /api/catalog/smithery-sync without token returns 401", async ({ request }) => {
+    const response = await request.post("/api/catalog/smithery-sync");
+
+    expect(response.status()).toBe(401);
+    const body = await response.json();
+    expect(body).toMatchObject({ ok: false });
+    expect(typeof body.error).toBe("string");
+  });
+
   test("GET /api/catalog/health-check without token returns 401", async ({ request }) => {
     const response = await request.get("/api/catalog/health-check");
 
