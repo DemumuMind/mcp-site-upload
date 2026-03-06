@@ -5,6 +5,15 @@ function runGit(args) {
 }
 
 function getChangedFiles() {
+  try {
+    const workingTreeDiff = runGit(["diff", "--name-only", "HEAD"]);
+    if (workingTreeDiff) {
+      return workingTreeDiff.split(/\r?\n/).filter(Boolean);
+    }
+  } catch {
+    // Fall through to commit-based detection.
+  }
+
   const baseRef = process.env.GITHUB_BASE_REF?.trim();
   try {
     if (baseRef) {
