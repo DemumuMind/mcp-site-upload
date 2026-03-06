@@ -1,5 +1,5 @@
 import { revalidatePath, revalidateTag, updateTag } from "./next-runtime.ts";
-import { CACHE_TAGS } from "./policy.ts";
+import { getInvalidationPolicy, getServerDataTag } from "./policy.ts";
 
 export type MutationOrigin = "action" | "route";
 
@@ -47,8 +47,12 @@ function dedupeValues(values: string[]): string[] {
   return [...uniqueValues];
 }
 
-function buildSlugPaths(basePath: "/server" | "/blog", slugs: string[]): string[] {
-  return dedupeValues(slugs).map((slug) => `${basePath}/${slug}`);
+function buildEntityPaths(entityPathPrefix: string | undefined, slugs: string[]): string[] {
+  if (!entityPathPrefix) {
+    return [];
+  }
+
+  return dedupeValues(slugs).map((slug) => `${entityPathPrefix}${slug}`);
 }
 
 export function applyInvalidationPlan(
@@ -74,18 +78,16 @@ export function buildCatalogInvalidationPlan({
   changedSlugs = [],
   includeAdmin = false,
 }: InvalidateCatalogCachesInput): CacheInvalidationPlan {
+  const policy = getInvalidationPolicy("catalog");
+
   return {
     origin,
     paths: [
-      "/",
-      "/catalog",
-      "/categories",
-      "/how-to-use",
-      "/sitemap.xml",
-      ...buildSlugPaths("/server", changedSlugs),
-      ...(includeAdmin ? ["/admin"] : []),
+      ...policy.basePaths,
+      ...buildEntityPaths(policy.entityPathPrefix, changedSlugs),
+      ...(includeAdmin && policy.adminPath ? [policy.adminPath] : []),
     ],
-    tags: [CACHE_TAGS.catalogServers],
+    tags: [getServerDataTag(policy.serverDataPolicyKey)],
   };
 }
 
@@ -98,15 +100,16 @@ export function buildBlogInvalidationPlan({
   slugs = [],
   includeAdmin = false,
 }: InvalidateBlogCachesInput): CacheInvalidationPlan {
+  const policy = getInvalidationPolicy("blog");
+
   return {
     origin,
     paths: [
-      "/blog",
-      "/sitemap.xml",
-      ...buildSlugPaths("/blog", slugs),
-      ...(includeAdmin ? ["/admin/blog"] : []),
+      ...policy.basePaths,
+      ...buildEntityPaths(policy.entityPathPrefix, slugs),
+      ...(includeAdmin && policy.adminPath ? [policy.adminPath] : []),
     ],
-    tags: [CACHE_TAGS.blogPosts],
+    tags: [getServerDataTag(policy.serverDataPolicyKey)],
   };
 }
 
@@ -115,10 +118,12 @@ export function invalidateBlogCaches(input: InvalidateBlogCachesInput): void {
 }
 
 export function buildAdminDashboardInvalidationPlan(origin: MutationOrigin): CacheInvalidationPlan {
+  const policy = getInvalidationPolicy("adminDashboard");
+
   return {
     origin,
-    paths: ["/admin"],
-    tags: [CACHE_TAGS.adminDashboard],
+    paths: [...policy.basePaths],
+    tags: [getServerDataTag(policy.serverDataPolicyKey)],
   };
 }
 

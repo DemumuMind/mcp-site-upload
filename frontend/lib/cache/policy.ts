@@ -26,6 +26,13 @@ type MemoryCachePolicy = {
   ttlSeconds: number;
 };
 
+type InvalidationPolicy = {
+  basePaths: string[];
+  entityPathPrefix?: string;
+  adminPath?: string;
+  serverDataPolicyKey: ServerDataPolicyKey;
+};
+
 type CookieConsentStoragePolicy = {
   choiceLocalStorageKey: string;
   profileLocalStorageKey: string;
@@ -91,6 +98,11 @@ type RepoCachePolicy = {
     howToUsePaths: MemoryCachePolicy;
     sectionIndex: MemoryCachePolicy;
   };
+  invalidation: {
+    catalog: InvalidationPolicy;
+    blog: InvalidationPolicy;
+    adminDashboard: InvalidationPolicy;
+  };
   storage: {
     cookieConsent: CookieConsentStoragePolicy;
     submitServerDraft: SubmitServerDraftStoragePolicy;
@@ -111,6 +123,7 @@ type ServerDataPolicyKey = keyof RepoCachePolicy["serverData"];
 type HttpPolicyKey = keyof RepoCachePolicy["http"];
 type RequestPolicyKey = keyof RepoCachePolicy["requests"];
 type MemoryPolicyKey = keyof RepoCachePolicy["memory"];
+type InvalidationPolicyKey = keyof RepoCachePolicy["invalidation"];
 type RateLimitPolicyKey = keyof RepoCachePolicy["rateLimits"];
 type SecurityPolicyKey = keyof RepoCachePolicy["security"];
 type OperationPolicyKey = keyof RepoCachePolicy["operations"];
@@ -199,6 +212,10 @@ export function getMemoryPolicy(policyKey: MemoryPolicyKey): MemoryCachePolicy {
 
 export function getMemoryTtlSeconds(policyKey: MemoryPolicyKey): number {
   return getMemoryPolicy(policyKey).ttlSeconds;
+}
+
+export function getInvalidationPolicy(policyKey: InvalidationPolicyKey): InvalidationPolicy {
+  return repoCachePolicy.invalidation[policyKey];
 }
 
 export function getRateLimitPolicy(policyKey: RateLimitPolicyKey): RateLimitPolicy {

@@ -62,6 +62,24 @@
       "ttlSeconds": 60
     }
   },
+  "invalidation": {
+    "catalog": {
+      "basePaths": ["/", "/catalog", "/categories", "/how-to-use", "/sitemap.xml"],
+      "entityPathPrefix": "/server/",
+      "adminPath": "/admin",
+      "serverDataPolicyKey": "catalogActiveServers"
+    },
+    "blog": {
+      "basePaths": ["/blog", "/sitemap.xml"],
+      "entityPathPrefix": "/blog/",
+      "adminPath": "/admin/blog",
+      "serverDataPolicyKey": "blogSnapshot"
+    },
+    "adminDashboard": {
+      "basePaths": ["/admin"],
+      "serverDataPolicyKey": "adminDashboard"
+    }
+  },
   "storage": {
     "cookieConsent": {
       "choiceLocalStorageKey": "demumumind-cookie-consent",

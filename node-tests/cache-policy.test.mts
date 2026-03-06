@@ -17,6 +17,7 @@ import {
   COOKIE_CONSENT_COOKIE_KEY,
   COOKIE_CONSENT_PROFILE_STORAGE_KEY,
   getMemoryTtlSeconds,
+  getInvalidationPolicy,
   getRateLimitPolicy,
   getRequestCachePolicy,
   getSecurityPolicy,
@@ -66,6 +67,22 @@ test("cache registry keeps browser storage and ops freshness values centralized"
 test("memory and auth-security values are sourced from the shared cache registry", () => {
   assert.equal(getMemoryTtlSeconds("howToUsePaths"), 60);
   assert.equal(getMemoryTtlSeconds("sectionIndex"), 60);
+  assert.deepEqual(getInvalidationPolicy("catalog"), {
+    basePaths: ["/", "/catalog", "/categories", "/how-to-use", "/sitemap.xml"],
+    entityPathPrefix: "/server/",
+    adminPath: "/admin",
+    serverDataPolicyKey: "catalogActiveServers",
+  });
+  assert.deepEqual(getInvalidationPolicy("blog"), {
+    basePaths: ["/blog", "/sitemap.xml"],
+    entityPathPrefix: "/blog/",
+    adminPath: "/admin/blog",
+    serverDataPolicyKey: "blogSnapshot",
+  });
+  assert.deepEqual(getInvalidationPolicy("adminDashboard"), {
+    basePaths: ["/admin"],
+    serverDataPolicyKey: "adminDashboard",
+  });
   assert.deepEqual(getSecurityPolicy("auth"), {
     loginWindowSeconds: 900,
     maxFailedAttempts: 5,
