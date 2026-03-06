@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { buildServerDataCacheConfig } from "../frontend/lib/cache/server-data-cache.ts";
 import {
   AUTH_ALERT_FAILED_ATTEMPTS_ESCALATION_THRESHOLD,
   AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD,
@@ -75,6 +76,17 @@ test("memory and auth-security values are sourced from the shared cache registry
   assert.equal(AUTH_MAX_FAILED_ATTEMPTS, 5);
   assert.equal(AUTH_ALERT_FAILED_ATTEMPTS_THRESHOLD, 3);
   assert.equal(AUTH_ALERT_FAILED_ATTEMPTS_ESCALATION_THRESHOLD, 5);
+});
+
+test("server data cache configs are derived from the shared registry", () => {
+  assert.deepEqual(buildServerDataCacheConfig("catalogActiveServers"), {
+    revalidate: 300,
+    tags: ["catalog-servers"],
+  });
+  assert.deepEqual(buildServerDataCacheConfig("adminDashboard"), {
+    revalidate: 30,
+    tags: ["admin-dashboard"],
+  });
 });
 
 test("rate-limit presets are sourced from the shared cache policy registry", () => {

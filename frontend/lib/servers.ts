@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { applyServerCatalogDefaults } from "@/lib/server-catalog-defaults";
-import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
+import { buildServerDataCacheConfig } from "@/lib/cache/server-data-cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AuthType, HealthStatus, McpServer, ServerStatus, VerificationLevel, } from "@/lib/types";
@@ -205,15 +205,17 @@ async function readPendingServersFromSource(): Promise<McpServer[]> {
         return [];
     }
 }
-const getCachedActiveServers = unstable_cache(async () => readActiveServersFromSource(), ["servers-active"], {
-    revalidate: getServerDataRevalidateSeconds("catalogActiveServers"),
-    tags: [CACHE_TAGS.catalogServers],
-});
+const getCachedActiveServers = unstable_cache(
+    async () => readActiveServersFromSource(),
+    ["servers-active"],
+    buildServerDataCacheConfig("catalogActiveServers"),
+);
 
-const getCachedPendingServers = unstable_cache(async () => readPendingServersFromSource(), ["servers-pending"], {
-    revalidate: getServerDataRevalidateSeconds("adminDashboard"),
-    tags: [CACHE_TAGS.adminDashboard],
-});
+const getCachedPendingServers = unstable_cache(
+    async () => readPendingServersFromSource(),
+    ["servers-pending"],
+    buildServerDataCacheConfig("adminDashboard"),
+);
 
 export async function getActiveServers(options: ServerQueryOptions = {}): Promise<McpServer[]> {
     return options.bypassCache ? readActiveServersFromSource() : getCachedActiveServers();

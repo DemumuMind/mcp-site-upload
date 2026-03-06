@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { CACHE_TAGS, getServerDataRevalidateSeconds } from "@/lib/cache/policy";
+import { buildServerDataCacheConfig } from "@/lib/cache/server-data-cache";
 import { getActiveServers } from "@/lib/servers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { HealthStatus } from "@/lib/types";
@@ -642,10 +642,7 @@ async function readAdminDashboardSnapshot(filters: ResolvedAdminSecurityFilters)
 const getCachedAdminDashboardSnapshot = unstable_cache(
     async (filters: ResolvedAdminSecurityFilters) => readAdminDashboardSnapshot(filters),
     ["admin-dashboard-snapshot"],
-    {
-        revalidate: getServerDataRevalidateSeconds("adminDashboard"),
-        tags: [CACHE_TAGS.adminDashboard],
-    },
+    buildServerDataCacheConfig("adminDashboard"),
 );
 
 export async function getAdminDashboardSnapshot(filters?: AdminSecurityFilters): Promise<AdminDashboardSnapshot> {
