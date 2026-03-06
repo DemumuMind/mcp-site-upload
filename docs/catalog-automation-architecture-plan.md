@@ -1,198 +1,119 @@
-# План в 1 файл: архитектура автоматизации каталога
+# Catalog Automation Architecture Plan
 
-## 1) Цель и контекст
+## Purpose
+This document is the catalog automation architecture plan after the repository-wide cache refactor.
 
-Маршрут `http://localhost:3000/catalog` уже работает как витрина с SSR-снапшотом, фильтрами, URL-синхронизацией и API-поиском. Задача этого плана: зафиксировать целевую end-to-end архитектуру автоматизации каталога с учетом уже внедренного, снизить операционные риски и определить поэтапную реализацию.
+It has two jobs:
+- describe the current runtime architecture as it exists today
+- mark future options separately so they are not confused with shipped behavior
 
-## 2) Что уже внедрено (as-is)
+## Runtime Root
+- Application runtime code lives under `frontend/*`.
+- Route handlers live under `frontend/app/api/*`.
+- Domain and cache code live under `frontend/lib/*`.
+- Operational scripts live under `scripts/*`.
 
-### UI и чтение каталога
-- Страница каталога: `app/catalog/page.tsx`.
-- Клиентская логика каталога и фильтров: `components/catalog-section.tsx`, `components/catalog-filter-bar.tsx`, `components/catalog-taxonomy-panel.tsx`.
-- API поиска: `app/api/catalog/search/route.ts`.
-- Поисковая и фильтрационная логика: `lib/catalog/server-search.ts`, `lib/catalog/filtering.ts`, `lib/catalog/sorting.ts`, `lib/catalog/facets.ts`, `lib/catalog/query-v2.ts`.
-- Чтение активных серверов из Supabase + нормализация: `lib/servers.ts`.
-- Snapshot/L2 кеш: `lib/catalog/snapshot.ts`.
+Any older documentation that references bare `app/*` or `lib/*` paths is stale and should be read as `frontend/app/*` and `frontend/lib/*`.
 
-### Автоматизация ingest/sync
-- Основной cron ingest: `app/api/catalog/auto-sync/route.ts` -> `lib/catalog/github-sync.ts`.
-- Дополнительные источники: `app/api/catalog/smithery-sync/route.ts` + `lib/catalog/smithery-sync.ts`, `app/api/catalog/npm-sync/route.ts` + `lib/catalog/npm-sync.ts`.
-- Агрегированный sync: `app/api/catalog/sync-all/route.ts`.
-- Health и статус автоматизации: `app/api/catalog/health-check/route.ts`, `app/api/catalog/automation-status/route.ts`.
-- Расписание cron: `vercel.json` (в проде регулярно запускается только `/api/catalog/auto-sync`).
+## Current As-Is Architecture
 
-### Данные и операционный контур
-- Базовая схема и индексы: `supabase/migrations/20260208071000_init_mcp_catalog.sql`.
-- Health-поля в БД: `supabase/migrations/20260208074000_server_health_checks.sql`.
-- Seed и исправления seed-данных: `supabase/migrations/20260208080000_seed_top_mcp_servers.sql` и последующие fix migrations.
-- Мониторинг в CI/GitHub Actions: `.github/workflows/catalog-automation-status.yml`, `.github/workflows/catalog-count-guard.yml`.
+### Catalog serving path
+- Active catalog data is read through `frontend/lib/servers.ts`.
+- Catalog snapshot helpers live in `frontend/lib/catalog/snapshot.ts`.
+- Search is served from `frontend/app/api/catalog/search/route.ts`.
+- Catalog pages and route handlers run inside the `frontend/*` runtime root.
 
-## 3) Основные проблемы текущей архитектуры
+### Unified cache layer
+- Source of truth: `frontend/lib/cache/repo-cache-policy.json`
+- Runtime adapter: `frontend/lib/cache/policy.ts`
+- Runtime invalidation helper: `frontend/lib/cache/invalidation.ts`
+- Script adapter: `scripts/_shared/cache-policy.mjs`
 
-1. Несогласованность лимитов и поведения между кодом и документацией (часть env-переменных задокументирована, но не влияет на runtime).
-2. Нет распределенного lock/idempotency ключа на запуск cron-sync, возможны гонки параллельных запусков.
-3. В prod-cron регулярно синхронизируется только GitHub auto-sync; NPM/Smithery/health не встроены в единый стабильный график.
-4. Неполная защита ручных правок от перезаписи внешними sync-процессами.
-5. Недостаточное тестовое покрытие API-роутов автоматизации (`app/api/catalog/*` в основном без контрактных интеграционных тестов).
-6. In-memory rate limiting не распределен по инстансам (ограничение размывается в горизонтальном масштабе).
+The catalog runtime no longer owns ad-hoc cache constants in multiple files. Tags, TTLs, HTTP cache headers, browser storage keys, rate limits, and operational TTLs are defined in the shared registry and consumed through adapters.
 
-## 4) Целевая архитектура (to-be)
+### Current catalog cache contract
+- Catalog server data policy key: `catalogActiveServers`
+- Catalog cache tag: `catalog-servers`
+- Catalog revalidate TTL: `300` seconds
+- `invalidateCatalogCaches(...)` is the single invalidation entry point for catalog mutations
 
-### 4.1 Принципы
-- Idempotent-by-default для каждого sync-run.
-- Source-aware upsert: данные хранят происхождение и правила приоритета источников.
-- Safe-by-default: защита от массовой деградации, SSRF, случайной деактивации/очистки.
-- Observable-by-default: статус, метрики, аудит-runов и алерты.
+Current catalog invalidation revalidates:
+- `/`
+- `/catalog`
+- `/categories`
+- `/how-to-use`
+- `/sitemap.xml`
+- affected `/server/[slug]` paths
+- optional `/admin` when a mutation also affects admin views
 
-### 4.2 Логические слои
+### Catalog automation endpoints
+- `frontend/app/api/catalog/auto-sync/route.ts`
+  - GitHub-only sync path
+  - uses `CATALOG_AUTO_SYNC_LOCK_TTL_SECONDS` from the shared cache policy
+  - clears catalog caches through `invalidateCatalogCaches(...)`
+- `frontend/app/api/catalog/sync-all/route.ts`
+  - orchestration path for GitHub, NPM, Smithery, and health checks
+  - uses `CATALOG_SYNC_ALL_LOCK_TTL_SECONDS` from the shared cache policy
+  - clears catalog caches through the same invalidation helper
+- `frontend/app/api/catalog/automation-status/route.ts`
+  - reports cron readiness, recent runs, and active locks
+  - reads schedules from `vercel.json`
 
-1. **Ingestion Layer**
-   - Коннекторы источников: GitHub, NPM, Smithery.
-   - Каждый коннектор возвращает единый нормализованный контракт `CatalogCandidate`.
+### Current scheduling model
+Production cron scheduling is wired to `/api/catalog/sync-all` in `vercel.json`.
 
-2. **Normalization & Scoring Layer**
-   - Нормализация slug/url/title/tags/auth/transport/tools.
-   - Дедупликация по `slug` + вторичный ключ (`repo_url`/нормализованный хост+путь).
-   - Выставление `quality_score` и `confidence` с объяснимыми причинами.
+Current scheduled UTC runs:
+- `01:45`
+- `07:45`
+- `13:45`
+- `19:45`
 
-3. **Persistence Layer**
-   - Upsert в `servers` с конфликтом по `slug`.
-   - Поля provenance: `source_last`, `source_updated_at`, `managed_by_automation`.
-   - Политики merge, где manual-поля защищены от автоматического перезаписывания.
+`/api/catalog/auto-sync` still exists for GitHub-only execution and manual or narrow-scope operational use, but it is not the primary production orchestrator anymore.
 
-4. **Orchestration Layer**
-   - Единая точка запуска `sync-all` как оркестратор.
-   - Поэтапные run-стадии: fetch -> normalize -> validate -> upsert -> stale-policy -> revalidate/cache purge.
-   - Run lock + idempotency key на запуск.
+## Current Non-Goals
+- There is no shipped Redis L2 cache in the current runtime.
+- There is no separate distributed catalog cache layer beyond the Next.js cache/tag model and the shared policy registry.
+- There is no second cache registry for scripts or backend utilities.
 
-5. **Serving Layer**
-   - Snapshot + Redis L2 для чтения каталога.
-   - API `/api/catalog/search` использует стабильный контракт ответа и версии schema.
+If Redis, external KV, or another L2 cache is discussed elsewhere, treat it as future design only unless code in `frontend/lib/cache/*` or `scripts/_shared/cache-policy.mjs` explicitly implements it.
 
-6. **Health/Monitoring Layer**
-   - Единый health pipeline для каталога.
-   - Audit-таблица запусков и ошибок по стадиям.
-   - Automation-status endpoint отражает последние N run-ов и SLO.
+## Data And Control Flow
+1. Cron or an authenticated manual request calls `/api/catalog/sync-all` or `/api/catalog/auto-sync`.
+2. The route acquires a sync lock using TTLs from `frontend/lib/cache/repo-cache-policy.json`.
+3. Source-specific sync code fetches and normalizes upstream data.
+4. Catalog rows are inserted or updated in Supabase-backed storage.
+5. The route records run status and failures in the sync run store.
+6. The route invalidates catalog read models through `invalidateCatalogCaches(...)`.
+7. Next.js cache tags and affected paths are revalidated.
 
-### 4.3 Поток данных (целевой)
+## Source Roles
+- GitHub remains the source behind `auto-sync`.
+- `sync-all` is the current orchestration entry point for GitHub, NPM, and Smithery.
+- Health checks remain part of the orchestration path, not a separate cache system.
+- Optional Scrapy output is diagnostics only and not part of the runtime cache layer.
 
-1. Cron/ручной вызов -> `POST /api/catalog/sync-all`.
-2. Оркестратор берет distributed lock (`run_id`, `started_at`, `source_scope`).
-3. Параллельный fetch из источников с ограничениями по времени и ретраями.
-4. Нормализация, дедупликация, quality-gates.
-5. Idempotent upsert + selective merge (manual-safe).
-6. Safety checks: max stale ratio, min active baseline, failure budget.
-7. Обновление snapshot/cache + revalidate.
-8. Запись результатов в `catalog_sync_runs` и `catalog_sync_failures`.
-9. Публикация статуса в `/api/catalog/automation-status` и алерт при деградации.
+## Future Options
+The items below are design targets, not current implementation:
 
-## 5) Модель данных (минимальные расширения)
+### Optional distributed cache
+- Redis or another distributed cache may be added later for cross-instance hot data.
+- If added, it must remain behind the shared policy registry and not introduce parallel TTL sources.
+- Mutation code must still invalidate through `frontend/lib/cache/invalidation.ts`.
 
-### 5.1 Таблицы
-- `catalog_sync_runs`
-  - `id`, `started_at`, `finished_at`, `trigger`, `status`, `sources`, `fetched`, `upserted`, `failed`, `stale_marked`, `duration_ms`, `error_summary`.
-- `catalog_sync_failures`
-  - `id`, `run_id`, `source`, `entity_key`, `stage`, `error_code`, `error_message_sanitized`, `payload_hash`.
+### Stronger automation guarantees
+- broader contract tests for automation endpoints
+- more explicit failure budgets and alert thresholds
+- tighter source-aware merge policies for manual vs automated fields
 
-### 5.2 Расширение `servers`
-- `source_last text`.
-- `source_updated_at timestamptz`.
-- `managed_by_automation boolean`.
-- `manual_lock_fields jsonb` (опционально: перечень полей, которые нельзя авто-перезаписывать).
+### Operational follow-up
+- more test coverage for invalidation behavior
+- clearer dashboards around recent runs and active locks
+- additional documentation when new cache domains are introduced
 
-## 6) Политики merge и stale
+## Migration Note
+Older phrases such as:
+- `app/api/catalog/*`
+- `lib/catalog/*`
+- `Snapshot + Redis L2`
 
-1. При конфликте manual vs automation приоритет у manual-полей (описание, curated tags, moderation status).
-2. Automation может обновлять только whitelist полей по source policy.
-3. Stale-mark выполняется только при выполнении safety-гардов:
-   - `active_after_sync >= min_active_baseline`.
-   - `stale_mark_ratio <= max_stale_mark_ratio`.
-4. Удаление/архивация записей только через grace period и только для `managed_by_automation=true`.
-
-## 7) API-контракты автоматизации
-
-### `POST /api/catalog/sync-all`
-- Вход: `{ sources?: ["github"|"npm"|"smithery"], dryRun?: boolean, pageLimit?: number }`.
-- Выход: `{ runId, status, stages, counters, warnings, failures[] }`.
-
-### `GET /api/catalog/automation-status`
-- Выход: `{ now, health, lastRun, lastSuccessAt, slo, recentRuns[] }`.
-
-### `GET /api/catalog/search`
-- Версионирование ответа: `schemaVersion`.
-- Стабильные поля facet/filter/pagination для обратной совместимости UI.
-
-## 8) Безопасность
-
-1. Все maintenance endpoints под `CRON_SECRET`/служебной авторизацией.
-2. SSRF-safe health checks (allowlist/deny private ranges/timeout/bounded redirects).
-3. Санитизация ошибок в API-ответах и audit-логах.
-4. Ограничение blast radius: feature flags для stale cleanup и destructive-операций.
-5. Секреты только через env, без логирования чувствительных значений.
-
-## 9) Наблюдаемость и SLO
-
-### Метрики
-- `sync_run_success_rate`.
-- `sync_duration_p95`.
-- `catalog_active_count`.
-- `failed_entities_ratio`.
-- `stale_mark_ratio`.
-
-### SLO (предложение)
-- Успешный daily sync >= 99% (скользящие 30 дней).
-- `automation-status` всегда доступен (>= 99.9%).
-- Доля частичных запусков (`207`) <= 5% в неделю.
-
-### Алерты
-- Нет успешного sync > 24ч.
-- Падение `catalog_active_count` ниже baseline-порога.
-- Рост `failed_entities_ratio` выше порога.
-
-## 10) Тестовая стратегия (обязательная для автоматизации)
-
-1. Unit: нормализация/дедуп/merge-policy в `lib/catalog/*`.
-2. Integration: контракт и авторизация для всех `app/api/catalog/*` automation endpoints.
-3. E2E: smoke для `/catalog` + сценарии URL/filter + пустые результаты.
-4. Ops smoke: проверка `/api/catalog/automation-status` и count guard на целевом окружении.
-5. Регрессии на safety guards (stale ratio, baseline floor, partial failures).
-
-## 11) План внедрения (итеративно)
-
-### Этап 1: Stabilize
-- Ввести `catalog_sync_runs` + run-level аудит.
-- Добавить distributed lock для `sync-all` и `auto-sync`.
-- Устранить расхождения env/docs/code по лимитам и safety-переменным.
-
-### Этап 2: Source-aware merge
-- Добавить provenance-поля в `servers`.
-- Реализовать whitelist merge-policy и защиту manual-полей.
-- Перевести автоматические процессы на `sync-all` как единую точку оркестрации.
-
-### Этап 3: Reliability and observability
-- Встроить NPM/Smithery в регулярный график или в orchestrated run.
-- Добавить алерты и SLO-дашборд.
-- Закрыть integration-тестами все automation endpoints.
-
-### Этап 4: Optimization
-- Улучшить дедуп по repo identity/host normalization.
-- Оптимизировать кеш-инвалидацию и latency поиска.
-- Добавить controlled backfill/replay механизм.
-
-## 12) Verification Gate для изменений этой зоны
-
-Минимум перед merge:
-1. `npm run check:utf8`
-2. `npm run lint`
-3. `npm run build`
-4. `npm run test -- tests/catalog-filters.spec.ts`
-5. `npm run verify:dashboard:metrics -- --base-url <env-url>`
-6. `npm run catalog:count:guard -- --base-url <env-url> --min-total <threshold>`
-
-## 13) Критерии готовности архитектуры
-
-- Нет гонок при параллельных cron-запусках.
-- Ручные правки не теряются из-за ingest.
-- Любой sync-run воспроизводим и трассируем по `run_id`.
-- Статус автоматизации показывает операционную правду (не только last ping).
-- UI `/catalog` сохраняет стабильный контракт фильтров/фасетов при внутренних изменениях автоматизации.
+should be interpreted as historical drift. The current runtime root is `frontend/*`, and Redis/L2 is not a shipped part of the catalog cache architecture today.

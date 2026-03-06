@@ -1,60 +1,143 @@
 # Catalog Automation Runbook
 
 ## Goal
-Keep the MCP catalog auto-filled from GitHub MCP repositories with zero local file fallback.
+Keep the catalog populated through the current `frontend/*` runtime without introducing a second cache policy system.
 
-## Endpoint
+The catalog automation stack now depends on the shared cache layer:
+- `frontend/lib/cache/repo-cache-policy.json`
+- `frontend/lib/cache/policy.ts`
+- `frontend/lib/cache/invalidation.ts`
+- `scripts/_shared/cache-policy.mjs`
+
+## Runtime Root
+- Route handlers: `frontend/app/api/catalog/*`
+- Domain logic: `frontend/lib/catalog/*`
+- Shared cache adapters: `frontend/lib/cache/*`
+- Script and ops consumers: `scripts/*`
+
+Any older references to bare `app/*` or `lib/*` paths are outdated.
+
+## Active Endpoints
 - `GET/POST /api/catalog/auto-sync`
-- Auth header: `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
+  - GitHub-only sync path
+  - useful for manual runs, focused debugging, or narrow operational use
+- `GET/POST /api/catalog/sync-all`
+  - current production orchestrator
+  - runs GitHub, NPM, Smithery, and health-check stages
+- `GET /api/catalog/automation-status`
+  - reports schedules, readiness, recent runs, and active locks
 
-## Data source
+Auth header for protected endpoints:
+- `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
+
+## Data Sources
 - GitHub Search API (`topic:mcp-server`)
-- Source is fixed to GitHub in current architecture.
-- Optional offline crawler snapshot via Scrapy (`tools/python`, spider: `mcp_registry`) for diagnostics and source comparison.
+- NPM sync
+- Smithery sync
+- Optional offline Scrapy snapshot for diagnostics only
 
-## Runtime settings
-- `CATALOG_AUTOSYNC_MAX_PAGES` (default `10`, max `10`)
-- `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` (required)
-- `GITHUB_TOKEN` (optional but recommended for higher GitHub API limits)
+Source responsibilities:
+- `auto-sync` currently runs GitHub only
+- `sync-all` is the unified orchestration entry point for GitHub, NPM, and Smithery
+- Scrapy output is not part of the runtime cache path and does not act as L2 cache
+
+## Cache And Invalidation
+
+### Source of truth
+- Catalog cache policy key: `catalogActiveServers`
+- Catalog tag: `catalog-servers`
+- Catalog TTL: `300` seconds
+
+These values come from `frontend/lib/cache/repo-cache-policy.json` and are consumed through `frontend/lib/cache/policy.ts`.
+
+### Mutation flow
+Catalog mutations must invalidate through `invalidateCatalogCaches(...)` in `frontend/lib/cache/invalidation.ts`.
+
+Current catalog invalidation revalidates:
+- `/`
+- `/catalog`
+- `/categories`
+- `/how-to-use`
+- `/sitemap.xml`
+- changed `/server/[slug]` pages
+- optional `/admin`
+
+### Operational TTLs
+- `CATALOG_AUTO_SYNC_LOCK_TTL_SECONDS = 900`
+- `CATALOG_SYNC_ALL_LOCK_TTL_SECONDS = 1800`
+
+Both values are read from the shared cache registry rather than being owned by route-local constants.
+
+### Script-side consumers
+Operational scripts that need cache headers or freshness settings must read them from `scripts/_shared/cache-policy.mjs`.
+
+Current examples:
+- `scripts/catalog-count-guard.mjs`
+- `scripts/ops-health-report.mjs`
+- `scripts/backup-verify.mjs`
 
 ## Scheduling
-`vercel.json` runs sync 4 times/day:
+`vercel.json` currently schedules `POST /api/catalog/sync-all` four times per day:
 - `01:45` UTC
 - `07:45` UTC
 - `13:45` UTC
 - `19:45` UTC
 
-## Safety model
-- New GitHub-derived items are inserted as `active`.
-- Existing rows are updated **only** if they contain `registry-auto` tag.
-- Manual rows are never overwritten by this pipeline.
-- Stale cleanup changes only `registry-auto` rows and marks missing entries as `rejected`.
-- Stale cleanup runs after sync completes and applies grace-mode (`registry-stale-candidate` -> `registry-stale`).
+This replaced the older documentation that described production cron against `/api/catalog/auto-sync`.
 
-## Manual trigger
+## Runtime Settings
+- `CATALOG_AUTOSYNC_MAX_PAGES`
+  - used by `auto-sync`
+  - runtime default in the route is `120`
+  - accepted max in the route is `200`
+- `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET`
+  - required for protected maintenance endpoints
+- `GITHUB_TOKEN`
+  - optional but recommended for GitHub API limits
+
+## Safety Model
+- Sync routes run under authenticated cron or manual access only.
+- Sync runs take a lock before execution.
+- Run status and failures are recorded through the sync run store.
+- Cache invalidation happens after successful mutation stages through the shared helper.
+- Manual or diagnostics tooling should not introduce separate cache invalidation paths.
+
+## Manual Triggers
+
+GitHub-only run:
 ```bash
 curl -X POST "https://your-domain/api/catalog/auto-sync?pages=120" \
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
 ```
 
-## Optional Scrapy snapshot
+Unified run:
+```bash
+curl -X POST "https://your-domain/api/catalog/sync-all" \
+  -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
+```
 
+## Optional Scrapy Snapshot
 ```bash
 npm run py:scrapy:registry
 ```
 
 - Output: `docs/mcp-registry-scrapy.json`
-- Purpose: diagnostics and source parity checks; does not change production runtime ingest path.
+- Purpose: diagnostics and source comparison only
+- Not used as runtime fallback
+- Not a deployed Redis/L2 or second cache layer
 
-## CI alerting for sudden catalog drops
+## Monitoring
 - Workflow: `.github/workflows/catalog-count-guard.yml`
-- Recommended repository vars:
-  - `CATALOG_GUARD_ENABLED=true`
-  - `CATALOG_GUARD_MIN_TOTAL=1000` (tune for your expected baseline)
-  - `SMOKE_BASE_URL=https://your-domain`
+- Health and readiness endpoint: `GET /api/catalog/automation-status`
+- Route responses and logs should be treated as the source of operational truth for recent runs and failures
 
-## Response signals
-Important fields in response JSON:
+Recommended repository variables:
+- `CATALOG_GUARD_ENABLED=true`
+- `CATALOG_GUARD_MIN_TOTAL=1000`
+- `SMOKE_BASE_URL=https://your-domain`
+
+## Response Signals
+Important response fields from sync routes:
 - `created`, `updated`
 - `staleCleanupApplied`, `staleCleanupReason`
 - `staleCandidates`, `staleMarked`, `staleFailed`
@@ -63,38 +146,28 @@ Important fields in response JSON:
 - `changedSlugs[]`
 - `alerting.status` (`ok` | `partial` | `error`)
 - `alerting.shouldWarn`, `alerting.shouldPage`
-- `alerting.signalCount`, `alerting.signals[]` with `code`, `severity`, `message`, and optional `value`/`threshold`
+- `alerting.signalCount`, `alerting.signals[]`
 
 HTTP status:
 - `200` when `alerting.status` is `ok` or `partial`
 - `207` when `alerting.status` is `error`
 
-## Monitoring and alerting
-- The route now emits structured logs with `event: "catalog.auto_sync.completed"` and includes `alertStatus`, `signals`, and failure counts.
-- Warning conditions (partial): stale cleanup skipped, stale cleanup capped, low coverage ratio.
-- Error conditions: any sync failure (`failed > 0`) or unhandled route error.
-- Recommended alert wiring:
-  1. Filter logs by `event = catalog.auto_sync.completed`.
-  2. Trigger warning alert when `shouldWarn=true`.
-  3. Trigger paging alert when `shouldPage=true` or when response has `alerting.status=error`.
-  4. Include `alerting.signals[]` and `failures[]` in incident payload.
-
 ## Rollback
-1. Disable cron jobs for `/api/catalog/auto-sync` in `vercel.json`.
-2. Optionally disable stale cleanup via `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED=false`.
+1. Disable the relevant cron entries in `vercel.json`.
+2. Optionally disable stale cleanup through environment configuration if the incident requires it.
 3. Redeploy.
-4. Optional data rollback in Supabase:
-   - filter rows with tag `registry-auto`
-   - restore status for required rows manually.
+4. If needed, perform data repair in Supabase for automation-managed rows.
 
-## Quick status (checks 1/2/3)
+## Quick Status
 Use:
 - `GET /api/catalog/automation-status`
-- Auth header: `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
 
-Response includes:
-1. `checks.cronConfigured` — cron schedule exists for `/api/catalog/auto-sync`
-2. `checks.secretConfigured` — `CATALOG_AUTOSYNC_CRON_SECRET` or `CRON_SECRET` is set
-3. `checks.runtimeReady` — Supabase/runtime check passes
+Auth header:
+- `Authorization: Bearer <CATALOG_AUTOSYNC_CRON_SECRET|CRON_SECRET>`
 
-If all three are `true`, auto-fill is configured and operational.
+The response includes checks for:
+- cron schedule presence
+- secret configuration
+- runtime readiness
+- recent runs
+- active locks

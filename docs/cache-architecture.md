@@ -6,6 +6,11 @@
 - One script-side adapter for Node operational scripts.
 - No new ad-hoc TTLs, tags, `Cache-Control` strings, or browser storage keys outside the shared layer.
 
+## Runtime Root
+- Application runtime code lives under `frontend/*`.
+- Older references to bare `app/*` or `lib/*` paths are stale and should be read as `frontend/app/*` and `frontend/lib/*`.
+- Operational scripts consume the same registry from `scripts/*`.
+
 ## Source Of Truth
 - Registry file: `frontend/lib/cache/repo-cache-policy.json`
 
@@ -23,6 +28,11 @@
   - Admin dashboard invalidation
 - `scripts/_shared/cache-policy.mjs`
   - Reads the same JSON registry for scripts and ops tooling
+
+## Current Reality
+- The current cache layer is registry-driven and tag-based.
+- Redis, external KV, or another L2 cache is not part of the shipped implementation today.
+- If a future L2 cache is introduced, it must remain behind the same registry and invalidation APIs.
 
 ## Cached Read Models
 - Catalog:
