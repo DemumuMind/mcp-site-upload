@@ -15,6 +15,12 @@ import {
   normalizeCatalogQueryV2,
   serializeCatalogQueryV2,
 } from "@/lib/catalog/query-v2";
+import {
+  createCatalogShortlistItem,
+  normalizeCatalogShortlistItem,
+  shouldEnableCatalogCompare,
+  type CatalogShortlistItem,
+} from "@/lib/catalog/compare";
 import { tr, type Locale } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
 import type {
@@ -49,17 +55,7 @@ export type ActiveFilterChip = {
   label: string;
   onRemove: () => void;
 };
-
-export type CatalogShortlistItem = {
-  slug: string;
-  name: string;
-  href: string;
-  description: string;
-  category: string;
-  authType: AuthType;
-  verificationLevel: VerificationLevel;
-  toolsCount: number;
-};
+export type { CatalogShortlistItem } from "@/lib/catalog/compare";
 
 const SHORTLIST_STORAGE_KEY = "demumumind.catalog.shortlist.v1";
 const SHORTLIST_SYNC_EVENT = "demumumind:catalog-shortlist-sync";
@@ -102,41 +98,6 @@ function buildPaginationEntries(currentPage: number, totalPages: number): Pagina
   return entries;
 }
 
-function toCatalogShortlistItem(server: McpServer): CatalogShortlistItem {
-  return {
-    slug: server.slug,
-    name: server.name,
-    href: `/server/${server.slug}`,
-    description: server.description,
-    category: server.category,
-    authType: server.authType,
-    verificationLevel: server.verificationLevel,
-    toolsCount: server.tools.length,
-  };
-}
-
-function isCatalogShortlistItem(value: unknown): value is CatalogShortlistItem {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const candidate = value as Partial<CatalogShortlistItem>;
-  return (
-    typeof candidate.slug === "string" &&
-    typeof candidate.name === "string" &&
-    typeof candidate.href === "string" &&
-    typeof candidate.description === "string" &&
-    typeof candidate.category === "string" &&
-    (candidate.authType === "none" ||
-      candidate.authType === "oauth" ||
-      candidate.authType === "api_key") &&
-    (candidate.verificationLevel === "community" ||
-      candidate.verificationLevel === "partner" ||
-      candidate.verificationLevel === "official") &&
-    typeof candidate.toolsCount === "number"
-  );
-}
-
 function readShortlistFromStorage(): CatalogShortlistItem[] {
   if (typeof window === "undefined") {
     return EMPTY_SHORTLIST;
@@ -157,7 +118,10 @@ function readShortlistFromStorage(): CatalogShortlistItem[] {
       return EMPTY_SHORTLIST;
     }
 
-    const nextSnapshot = parsed.filter(isCatalogShortlistItem).slice(0, SHORTLIST_LIMIT);
+    const nextSnapshot = parsed
+      .map(normalizeCatalogShortlistItem)
+      .filter((item): item is CatalogShortlistItem => item !== null)
+      .slice(0, SHORTLIST_LIMIT);
     const nextSerialized = JSON.stringify(nextSnapshot);
 
     if (nextSerialized === cachedShortlistSerialized) {
@@ -226,6 +190,7 @@ export function useCatalogController(
   const lastAppliedQueryRef = useRef(currentQuery.query);
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isMobileCompareOpen, setIsMobileCompareOpen] = useState(false);
   const shortlist = useSyncExternalStore(
     subscribeToShortlistStore,
     readShortlistFromStorage,
@@ -301,8 +266,11 @@ export function useCatalogController(
     };
   }, [searchDebounceTimeoutId]);
 
+  const isCompareAvailable = shouldEnableCatalogCompare(shortlist);
+  const isMobileCompareVisible = isMobileCompareOpen && isCompareAvailable && !isMobileFiltersOpen;
+
   useEffect(() => {
-    if (!isMobileFiltersOpen) {
+    if (!isMobileFiltersOpen && !isMobileCompareVisible) {
       return;
     }
 
@@ -312,7 +280,7 @@ export function useCatalogController(
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [isMobileFiltersOpen]);
+  }, [isMobileCompareVisible, isMobileFiltersOpen]);
 
   const authTypeOptions = useMemo<AuthTypeOption[]>(
     () => [
@@ -634,12 +602,16 @@ export function useCatalogController(
       const alreadySaved = shortlist.some((item) => item.slug === server.slug);
       const nextShortlist = alreadySaved
         ? shortlist.filter((item) => item.slug !== server.slug)
-        : [toCatalogShortlistItem(server), ...shortlist].slice(0, SHORTLIST_LIMIT);
+        : [createCatalogShortlistItem(server), ...shortlist].slice(0, SHORTLIST_LIMIT);
 
       writeShortlistToStorage(nextShortlist);
     },
     [shortlist],
   );
+
+  const clearShortlist = useCallback(() => {
+    writeShortlistToStorage(EMPTY_SHORTLIST);
+  }, []);
 
   const shortlistSlugSet = useMemo(
     () => new Set(shortlist.map((item) => item.slug)),
@@ -675,6 +647,8 @@ export function useCatalogController(
     setSearchInputValue: handleSearchInputChange,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
+    isMobileCompareOpen: isMobileCompareVisible,
+    setIsMobileCompareOpen,
     requestError: null,
     isLoading: isPending,
     result: currentResult,
@@ -693,7 +667,9 @@ export function useCatalogController(
     taxonomyPanelCommonProps,
     shortlist,
     shortlistCount: shortlist.length,
+    isCompareAvailable,
     isServerSaved: (slug: string) => shortlistSlugSet.has(slug),
     toggleShortlist,
+    clearShortlist,
   };
 }

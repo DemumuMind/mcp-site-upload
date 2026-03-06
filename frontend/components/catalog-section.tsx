@@ -1,5 +1,6 @@
 "use client";
 
+import { CatalogComparePanel, CatalogMobileCompareDock } from "@/components/catalog/catalog-compare-panel";
 import { CatalogInsightsPanel } from "@/components/catalog/catalog-insights-panel";
 import { CatalogShortlist } from "@/components/catalog/catalog-shortlist";
 import { ActiveFilterChips } from "@/components/catalog-section/active-filter-chips";
@@ -12,6 +13,7 @@ import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { useCatalogController } from "@/components/catalog-section/use-catalog-controller";
 import { tr } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
 import type { McpServer } from "@/lib/types";
 
@@ -39,6 +41,8 @@ export function CatalogSection({
     setSearchInputValue,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
+    isMobileCompareOpen,
+    setIsMobileCompareOpen,
     requestError,
     isLoading,
     result,
@@ -57,8 +61,10 @@ export function CatalogSection({
     taxonomyPanelCommonProps,
     shortlist,
     shortlistCount,
+    isCompareAvailable,
     isServerSaved,
     toggleShortlist,
+    clearShortlist,
   } = useCatalogController(initialQuery, initialResult, locale);
 
   return (
@@ -111,7 +117,10 @@ export function CatalogSection({
           onSortDirectionChange={handleSortDirectionChange}
           onPageSizeChange={handlePageSizeChange}
           onViewModeChange={handleViewModeChange}
-          onToggleMobileFilters={() => setIsMobileFiltersOpen(current => !current)}
+          onToggleMobileFilters={() => {
+            setIsMobileCompareOpen(false);
+            setIsMobileFiltersOpen(current => !current);
+          }}
         />
       </div>
 
@@ -148,7 +157,7 @@ export function CatalogSection({
         </>
       ) : null}
 
-      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+      <div className={cn("grid gap-5", isCompareAvailable ? "xl:grid-cols-[280px_minmax(0,1fr)_420px]" : "xl:grid-cols-[280px_minmax(0,1fr)_320px]")}>
         <div className="hidden xl:block">
           <CatalogTaxonomyPanel mode="filters" {...taxonomyPanelCommonProps} />
         </div>
@@ -180,9 +189,28 @@ export function CatalogSection({
             topTagEntries={topTagEntries}
             hasActiveFilters={hasActiveFilters}
           />
-          <CatalogShortlist locale={locale} items={shortlist} />
+          <div className="hidden xl:block">
+            {isCompareAvailable ? (
+              <CatalogComparePanel locale={locale} items={shortlist} onClearShortlist={clearShortlist} />
+            ) : (
+              <CatalogShortlist locale={locale} items={shortlist} />
+            )}
+          </div>
+          <div className="xl:hidden">
+            {isCompareAvailable ? null : <CatalogShortlist locale={locale} items={shortlist} />}
+          </div>
         </div>
       </div>
+
+      {isCompareAvailable ? (
+        <CatalogMobileCompareDock
+          locale={locale}
+          items={shortlist}
+          isOpen={isMobileCompareOpen}
+          onOpenChange={setIsMobileCompareOpen}
+          onClearShortlist={clearShortlist}
+        />
+      ) : null}
     </div>
   );
 }
