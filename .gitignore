@@ -52,6 +52,7 @@ baseline-*.png
 current-*.png
 logo-redesign-home-full.png
 playwright-home.png
+.worktrees/
 supabase/.temp/
 ops/backup-manifest.json
 
