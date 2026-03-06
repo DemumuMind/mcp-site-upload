@@ -1,0 +1,11 @@
+[13:01:01] WARN: Embedded PostgreSQL port is in use; using next free port (requestedPort=54329, selectedPort=54330)
+[13:01:01] INFO: Using embedded PostgreSQL because no DATABASE_URL set (dataDir=C:\Users\Romanchello\.paperclip\instances\default\db, port=54330)
+[13:01:01] INFO: Embedded PostgreSQL cluster already exists (C:\Users\Romanchello\.paperclip\instances\default\db\PG_VERSION); skipping init
+[13:01:01] WARN: Removing stale embedded PostgreSQL lock file
+[13:01:12] ERROR: Embedded PostgreSQL failed; showing buffered startup logs
+    phase: "start"
+    recentLogs: [
+      "2026-03-06 16:01:12.488 MSK [21320] FATAL:  pre-existing shared memory block is still in use",
+      "2026-03-06 16:01:12.488 MSK [21320] HINT:  Check if there are any old server processes still running, and terminate them.",
+      "2026-03-06 16:01:12.489 MSK [21320] LOG:  database system is shut down"
+    ]
