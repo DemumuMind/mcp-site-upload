@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-03-06T00:00:00.000Z",
+  "groups": [
+    {
+      "name": "admin",
+      "endpoints": [
+        { "method": "POST", "path": "/api/admin/blog-v2/generate", "auth": "admin" },
+        { "method": "POST", "path": "/api/admin/blog-v2/preview", "auth": "admin" },
+        { "method": "POST", "path": "/api/admin/blog-v2/publish", "auth": "admin" },
+        { "method": "GET", "path": "/api/admin/multi-agent/weekly-export", "auth": "admin" },
+        { "method": "GET", "path": "/api/admin/security-events/export", "auth": "admin" }
+      ]
+    },
+    {
+      "name": "catalog",
+      "endpoints": [
+        { "method": "GET", "path": "/api/catalog/search", "auth": "public" },
+        { "method": "GET", "path": "/api/catalog/automation-status", "auth": "cron" },
+        { "method": "GET", "path": "/api/catalog/health-check", "auth": "cron" },
+        { "method": "POST", "path": "/api/catalog/auto-sync", "auth": "cron" },
+        { "method": "POST", "path": "/api/catalog/npm-sync", "auth": "cron" },
+        { "method": "POST", "path": "/api/catalog/smithery-sync", "auth": "cron" },
+        { "method": "POST", "path": "/api/catalog/sync-all", "auth": "cron" }
+      ]
+    },
+    {
+      "name": "auth-security",
+      "endpoints": [
+        { "method": "POST", "path": "/api/auth/security", "auth": "public" },
+        { "method": "GET", "path": "/api/cookie-consent", "auth": "public" },
+        { "method": "POST", "path": "/api/cookie-consent", "auth": "public" },
+        { "method": "DELETE", "path": "/api/cookie-consent", "auth": "public" }
+      ]
+    },
+    {
+      "name": "blog",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/blog/auto-publish",
+          "auth": "cron",
+          "deprecated": true,
+          "successor": "/api/admin/blog-v2/*"
+        }
+      ]
+    },
+    {
+      "name": "tasks-multi-agent",
+      "endpoints": [
+        { "method": "POST", "path": "/api/tasks", "auth": "bearer" },
+        { "method": "GET", "path": "/api/tasks/{id}", "auth": "bearer" },
+        { "method": "POST", "path": "/api/multi-agent/demo", "auth": "bearer-or-dev" },
+        { "method": "GET", "path": "/api/multi-agent/health", "auth": "public" }
+      ]
+    },
+    {
+      "name": "health-and-probe",
+      "endpoints": [
+        { "method": "GET", "path": "/api/health", "auth": "public" },
+        { "method": "GET", "path": "/api/health-check", "auth": "cron" },
+        { "method": "POST", "path": "/api/server/{slug}/probe", "auth": "probe-secret-or-ui-header" }
+      ]
+    }
+  ]
+}

@@ -23,6 +23,9 @@ Owner: BE Lead
 - Tasks/Multi-agent: `/api/tasks/*`, `/api/multi-agent/*`
 - Server probes: `/api/server/[slug]/probe`
 
+Machine-readable inventory:
+- `docs/api/endpoint-inventory-v2.json`
+
 ## Error model baseline
 - `401`: Unauthorized
 - `400`: Invalid payload
