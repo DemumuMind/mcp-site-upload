@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/cache/next-runtime";
 import { buildServerDataCacheConfig } from "@/lib/cache/server-data-cache";
 import { blogPosts as diskBlogPosts, blogTags as diskBlogTags } from "@/lib/blog/content";
 import { getBlogPostsFromSupabase } from "@/lib/blog/supabase-store";

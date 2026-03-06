@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag, updateTag } from "next/cache.js";
+import { revalidatePath, revalidateTag, updateTag } from "./next-runtime.ts";
 import { CACHE_TAGS } from "./policy.ts";
 
 export type MutationOrigin = "action" | "route";

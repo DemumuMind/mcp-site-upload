@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/cache/next-runtime";
 import { buildServerDataCacheConfig } from "@/lib/cache/server-data-cache";
 import { getActiveServers } from "@/lib/servers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
