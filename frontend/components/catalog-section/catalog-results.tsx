@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PaginationEntry } from "@/components/catalog-section/use-catalog-controller";
 import { getServerScore, getServerTrustScore } from "@/lib/catalog/sorting";
 import { tr, type Locale } from "@/lib/i18n";
+import type { McpServer } from "@/lib/types";
 import type { CatalogSearchResult, CatalogQueryV2 } from "@/lib/catalog/types";
 
 export function CatalogResults({
@@ -16,6 +17,8 @@ export function CatalogResults({
   paginationEntries,
   onSetCatalogPage,
   onClearAllFilters,
+  isServerSaved,
+  onToggleShortlist,
 }: {
   locale: Locale;
   result: CatalogSearchResult;
@@ -23,10 +26,12 @@ export function CatalogResults({
   paginationEntries: PaginationEntry[];
   onSetCatalogPage: (page: number) => void;
   onClearAllFilters: () => void;
+  isServerSaved: (slug: string) => boolean;
+  onToggleShortlist: (server: McpServer) => void;
 }) {
   if (result.total === 0) {
     return (
-      <Card className="border-border bg-card shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
+      <Card className="rounded-[1.6rem] border-border bg-card shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <SearchX className="size-4 text-muted-foreground" />
@@ -54,7 +59,7 @@ export function CatalogResults({
 
   return (
     <div className="space-y-5">
-      <div className={queryState.layout === "grid" ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
+      <div className={queryState.layout === "grid" ? "grid gap-4 md:grid-cols-2 2xl:grid-cols-3" : "space-y-3"}>
         {result.items.map(mcpServer => (
           <ServerCard
             key={mcpServer.id}
@@ -62,6 +67,8 @@ export function CatalogResults({
             viewMode={queryState.layout}
             score={getServerScore(mcpServer, queryState.query)}
             trustScore={getServerTrustScore(mcpServer)}
+            isSaved={isServerSaved(mcpServer.slug)}
+            onToggleSave={onToggleShortlist}
           />
         ))}
       </div>

@@ -125,6 +125,15 @@ test.describe("Catalog query v2 filters", () => {
     await expect(page.getByText("GitHub linked")).toHaveCount(0);
   });
 
+  test("renders featured picks and shortlist workspace panels", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    await expect(page.getByRole("heading", { name: "Featured picks" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Shortlist" })).toBeVisible();
+    await expect(page.getByText("Save servers to compare them later.")).toBeVisible();
+  });
+
   test("shows submit server CTA in result area", async ({ page }) => {
     await setLocaleCookies(page, "en");
     await page.goto("/catalog");
@@ -154,48 +163,26 @@ test.describe("Catalog query v2 filters", () => {
     expect(logoCount).toBeGreaterThanOrEqual(1);
   });
 
-  test("empty state offers reset and submit actions", async ({ page }) => {
+  test("empty state offers reset and submit actions for a zero-result route", async ({ page }) => {
     await setLocaleCookies(page, "en");
-    await page.route("**/api/catalog/search**", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          items: [],
-          total: 0,
-          page: 1,
-          pageSize: 12,
-          totalPages: 1,
-          facets: {
-            categoryEntries: [],
-            tagEntries: [],
-            authTypeCounts: { none: 0, oauth: 0, api_key: 0 },
-            verificationCounts: { community: 0, partner: 0, official: 0 },
-            healthCounts: { unknown: 0, healthy: 0, degraded: 0, down: 0 },
-            toolsRange: { min: 0, max: 0 },
-          },
-          appliedFilters: {
-            page: 1,
-            pageSize: 12,
-            query: "",
-            categories: [],
-            auth: [],
-            tags: [],
-            verification: [],
-            health: [],
-            toolsMin: null,
-            toolsMax: null,
-            sortBy: "rating",
-            sortDir: "desc",
-            layout: "grid",
-          },
-        }),
-      });
-    });
-    await page.goto("/catalog");
+    await page.goto("/catalog?query=zzznosuchmcp");
 
     await expect(page.getByText("No tools found")).toBeVisible();
     await expect(page.getByRole("button", { name: "Reset all filters" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Submit server" }).last()).toHaveAttribute("href", "/submit-server");
+  });
+
+  test("persists a shortlist across reloads", async ({ page }) => {
+    await setLocaleCookies(page, "en");
+    await page.goto("/catalog");
+
+    await page.getByRole("button", { name: "Save card" }).first().click();
+
+    await expect(page.getByRole("heading", { name: "Shortlist" })).toBeVisible();
+    await expect(page.getByText("1 saved")).toBeVisible();
+
+    await page.reload();
+
+    await expect(page.getByText("1 saved")).toBeVisible();
   });
 });

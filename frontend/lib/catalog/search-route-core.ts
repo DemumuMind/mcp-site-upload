@@ -58,7 +58,7 @@ function isApiErrorLike(error: unknown): error is ApiErrorLike {
   );
 }
 
-function classifyCatalogSearchError(error: unknown): CatalogSearchRouteFailure {
+export function classifyCatalogSearchError(error: unknown): CatalogSearchRouteFailure {
   if (isApiErrorLike(error) && error.statusCode >= 400 && error.statusCode < 500) {
     return {
       status: error.statusCode,

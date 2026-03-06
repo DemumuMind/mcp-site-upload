@@ -1,21 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { withRequestCachePolicy } from "@/lib/cache/policy";
 import {
   areCatalogQueriesEqual,
-  buildCatalogQueryV2SearchParams,
-  parseCatalogQueryV2,
+  normalizeCatalogQueryV2,
   serializeCatalogQueryV2,
 } from "@/lib/catalog/query-v2";
-import {
-  getCatalogSearchClientError,
-  type CatalogSearchClientError,
-} from "@/components/catalog-section/catalog-search-client-error";
 import { tr, type Locale } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
-import type { AuthType, HealthStatus, VerificationLevel } from "@/lib/types";
+import type {
+  AuthType,
+  HealthStatus,
+  McpServer,
+  VerificationLevel,
+} from "@/lib/types";
 
 type AuthTypeOption = {
   value: AuthType;
@@ -43,82 +50,293 @@ export type ActiveFilterChip = {
   onRemove: () => void;
 };
 
+export type CatalogShortlistItem = {
+  slug: string;
+  name: string;
+  href: string;
+  description: string;
+  category: string;
+  authType: AuthType;
+  verificationLevel: VerificationLevel;
+  toolsCount: number;
+};
+
+const SHORTLIST_STORAGE_KEY = "demumumind.catalog.shortlist.v1";
+const SHORTLIST_SYNC_EVENT = "demumumind:catalog-shortlist-sync";
+const SHORTLIST_LIMIT = 6;
+const EMPTY_SHORTLIST: CatalogShortlistItem[] = [];
+
+let cachedShortlistSerialized = "[]";
+let cachedShortlistSnapshot: CatalogShortlistItem[] = EMPTY_SHORTLIST;
+
 function toggleListValue<T extends string>(values: T[], value: T): T[] {
-  if (values.includes(value)) return values.filter(item => item !== value);
+  if (values.includes(value)) {
+    return values.filter((item) => item !== value);
+  }
+
   return [...values, value];
 }
 
 function buildPaginationEntries(currentPage: number, totalPages: number): PaginationEntry[] {
-  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
   const entries: PaginationEntry[] = [1];
   const leftBoundary = Math.max(2, currentPage - 1);
   const rightBoundary = Math.min(totalPages - 1, currentPage + 1);
-  if (leftBoundary > 2) entries.push("ellipsis");
-  for (let page = leftBoundary; page <= rightBoundary; page += 1) entries.push(page);
-  if (rightBoundary < totalPages - 1) entries.push("ellipsis");
+
+  if (leftBoundary > 2) {
+    entries.push("ellipsis");
+  }
+
+  for (let page = leftBoundary; page <= rightBoundary; page += 1) {
+    entries.push(page);
+  }
+
+  if (rightBoundary < totalPages - 1) {
+    entries.push("ellipsis");
+  }
+
   entries.push(totalPages);
   return entries;
 }
 
-function getResponseMessage(error: unknown): string {
-  if (error instanceof Error && error.message.trim().length > 0) return error.message;
-  return "Unknown request error";
+function toCatalogShortlistItem(server: McpServer): CatalogShortlistItem {
+  return {
+    slug: server.slug,
+    name: server.name,
+    href: `/server/${server.slug}`,
+    description: server.description,
+    category: server.category,
+    authType: server.authType,
+    verificationLevel: server.verificationLevel,
+    toolsCount: server.tools.length,
+  };
+}
+
+function isCatalogShortlistItem(value: unknown): value is CatalogShortlistItem {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Partial<CatalogShortlistItem>;
+  return (
+    typeof candidate.slug === "string" &&
+    typeof candidate.name === "string" &&
+    typeof candidate.href === "string" &&
+    typeof candidate.description === "string" &&
+    typeof candidate.category === "string" &&
+    (candidate.authType === "none" ||
+      candidate.authType === "oauth" ||
+      candidate.authType === "api_key") &&
+    (candidate.verificationLevel === "community" ||
+      candidate.verificationLevel === "partner" ||
+      candidate.verificationLevel === "official") &&
+    typeof candidate.toolsCount === "number"
+  );
+}
+
+function readShortlistFromStorage(): CatalogShortlistItem[] {
+  if (typeof window === "undefined") {
+    return EMPTY_SHORTLIST;
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(SHORTLIST_STORAGE_KEY);
+    if (!rawValue) {
+      cachedShortlistSerialized = "[]";
+      cachedShortlistSnapshot = EMPTY_SHORTLIST;
+      return EMPTY_SHORTLIST;
+    }
+
+    const parsed = JSON.parse(rawValue) as unknown;
+    if (!Array.isArray(parsed)) {
+      cachedShortlistSerialized = "[]";
+      cachedShortlistSnapshot = EMPTY_SHORTLIST;
+      return EMPTY_SHORTLIST;
+    }
+
+    const nextSnapshot = parsed.filter(isCatalogShortlistItem).slice(0, SHORTLIST_LIMIT);
+    const nextSerialized = JSON.stringify(nextSnapshot);
+
+    if (nextSerialized === cachedShortlistSerialized) {
+      return cachedShortlistSnapshot;
+    }
+
+    cachedShortlistSerialized = nextSerialized;
+    cachedShortlistSnapshot = nextSnapshot;
+    return cachedShortlistSnapshot;
+  } catch {
+    cachedShortlistSerialized = "[]";
+    cachedShortlistSnapshot = EMPTY_SHORTLIST;
+    return EMPTY_SHORTLIST;
+  }
+}
+
+function subscribeToShortlistStore(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  const handleStorage = (event: Event) => {
+    if (event instanceof StorageEvent && event.key !== SHORTLIST_STORAGE_KEY) {
+      return;
+    }
+
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(SHORTLIST_SYNC_EVENT, handleStorage);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(SHORTLIST_SYNC_EVENT, handleStorage);
+  };
+}
+
+function writeShortlistToStorage(nextShortlist: CatalogShortlistItem[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    cachedShortlistSerialized = JSON.stringify(nextShortlist);
+    cachedShortlistSnapshot = nextShortlist;
+    window.localStorage.setItem(SHORTLIST_STORAGE_KEY, JSON.stringify(nextShortlist));
+    window.dispatchEvent(new Event(SHORTLIST_SYNC_EVENT));
+  } catch {
+    // Ignore storage failures; shortlist stays non-persistent.
+  }
 }
 
 export function useCatalogController(
-  initialQuery: CatalogQueryV2,
-  initialResult: CatalogSearchResult,
+  currentQuery: CatalogQueryV2,
+  currentResult: CatalogSearchResult,
   locale: Locale,
 ) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const parsedQueryFromUrl = useMemo(() => parseCatalogQueryV2(searchParams), [searchParams]);
-  const lastResolvedQueryStringRef = useRef(serializeCatalogQueryV2(initialQuery));
-  const lastRequestKeyRef = useRef(serializeCatalogQueryV2(initialQuery));
-  const pendingUrlQueryStringRef = useRef<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [pendingQueryString, setPendingQueryString] = useState<string | null>(null);
+  const [searchDebounceTimeoutId, setSearchDebounceTimeoutId] = useState<number | null>(null);
+  const [searchInputValue, setSearchInputValue] = useState(currentQuery.query);
+  const lastAppliedQueryRef = useRef(currentQuery.query);
 
-  const [queryState, setQueryState] = useState<CatalogQueryV2>(initialQuery);
-  const [searchInputValue, setSearchInputValue] = useState(initialQuery.query);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [requestError, setRequestError] = useState<CatalogSearchClientError | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CatalogSearchResult>(initialResult);
+  const shortlist = useSyncExternalStore(
+    subscribeToShortlistStore,
+    readShortlistFromStorage,
+    () => EMPTY_SHORTLIST,
+  );
 
-  const replaceUrl = useCallback(
-    (nextQuery: CatalogQueryV2) => {
+  useEffect(() => {
+    if (lastAppliedQueryRef.current === currentQuery.query) {
+      return;
+    }
+    lastAppliedQueryRef.current = currentQuery.query;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchInputValue(currentQuery.query);
+  }, [currentQuery.query]);
+
+  const navigateToQuery = useCallback(
+    (nextState: Partial<CatalogQueryV2>) => {
+      const nextQuery = normalizeCatalogQueryV2({ ...currentQuery, ...nextState });
+
+      if (areCatalogQueriesEqual(nextQuery, currentQuery)) {
+        return;
+      }
+
       const nextQueryString = serializeCatalogQueryV2(nextQuery);
-      pendingUrlQueryStringRef.current = nextQueryString;
-      router.replace(nextQueryString.length > 0 ? `${pathname}?${nextQueryString}` : pathname, {
-        scroll: false,
+      setPendingQueryString(nextQueryString);
+      startTransition(() => {
+        router.replace(nextQueryString.length > 0 ? `${pathname}?${nextQueryString}` : pathname, {
+          scroll: false,
+        });
       });
     },
-    [pathname, router],
+    [currentQuery, pathname, router, startTransition],
   );
+
+  useEffect(() => {
+    const canonicalQueryString = serializeCatalogQueryV2(currentQuery);
+    const currentQueryString = searchParams.toString();
+
+    if (pendingQueryString === currentQueryString) {
+      return;
+    }
+
+    if (pendingQueryString === canonicalQueryString) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPendingQueryString(null);
+    }
+
+    if (canonicalQueryString === currentQueryString) {
+      return;
+    }
+
+    startTransition(() => {
+      router.replace(
+        canonicalQueryString.length > 0 ? `${pathname}?${canonicalQueryString}` : pathname,
+        { scroll: false },
+      );
+    });
+  }, [currentQuery, pathname, pendingQueryString, router, searchParams, startTransition]);
+
+  useEffect(() => {
+    const canonicalQueryString = serializeCatalogQueryV2(currentQuery);
+    if (pendingQueryString === canonicalQueryString) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPendingQueryString(null);
+    }
+  }, [currentQuery, pendingQueryString]);
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceTimeoutId !== null) {
+        window.clearTimeout(searchDebounceTimeoutId);
+      }
+    };
+  }, [searchDebounceTimeoutId]);
+
+  useEffect(() => {
+    if (!isMobileFiltersOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileFiltersOpen]);
 
   const authTypeOptions = useMemo<AuthTypeOption[]>(
     () => [
       {
         value: "none",
         label: tr(locale, "No auth", "No auth"),
-        count: result.facets.authTypeCounts.none,
+        count: currentResult.facets.authTypeCounts.none,
       },
       {
         value: "oauth",
         label: tr(locale, "OAuth", "OAuth"),
-        count: result.facets.authTypeCounts.oauth,
+        count: currentResult.facets.authTypeCounts.oauth,
       },
       {
         value: "api_key",
         label: tr(locale, "API key", "API key"),
-        count: result.facets.authTypeCounts.api_key,
+        count: currentResult.facets.authTypeCounts.api_key,
       },
     ],
     [
+      currentResult.facets.authTypeCounts.api_key,
+      currentResult.facets.authTypeCounts.none,
+      currentResult.facets.authTypeCounts.oauth,
       locale,
-      result.facets.authTypeCounts.none,
-      result.facets.authTypeCounts.oauth,
-      result.facets.authTypeCounts.api_key,
     ],
   );
 
@@ -127,24 +345,24 @@ export function useCatalogController(
       {
         value: "official",
         label: tr(locale, "Official", "Official"),
-        count: result.facets.verificationCounts.official,
+        count: currentResult.facets.verificationCounts.official,
       },
       {
         value: "partner",
         label: tr(locale, "Partner", "Partner"),
-        count: result.facets.verificationCounts.partner,
+        count: currentResult.facets.verificationCounts.partner,
       },
       {
         value: "community",
         label: tr(locale, "Community", "Community"),
-        count: result.facets.verificationCounts.community,
+        count: currentResult.facets.verificationCounts.community,
       },
     ],
     [
+      currentResult.facets.verificationCounts.community,
+      currentResult.facets.verificationCounts.official,
+      currentResult.facets.verificationCounts.partner,
       locale,
-      result.facets.verificationCounts.official,
-      result.facets.verificationCounts.partner,
-      result.facets.verificationCounts.community,
     ],
   );
 
@@ -153,129 +371,126 @@ export function useCatalogController(
       {
         value: "healthy",
         label: tr(locale, "Healthy", "Healthy"),
-        count: result.facets.healthCounts.healthy,
+        count: currentResult.facets.healthCounts.healthy,
       },
       {
         value: "unknown",
         label: tr(locale, "Unknown", "Unknown"),
-        count: result.facets.healthCounts.unknown,
+        count: currentResult.facets.healthCounts.unknown,
       },
       {
         value: "degraded",
         label: tr(locale, "Degraded", "Degraded"),
-        count: result.facets.healthCounts.degraded,
+        count: currentResult.facets.healthCounts.degraded,
       },
       {
         value: "down",
         label: tr(locale, "Down", "Down"),
-        count: result.facets.healthCounts.down,
+        count: currentResult.facets.healthCounts.down,
       },
     ],
     [
+      currentResult.facets.healthCounts.degraded,
+      currentResult.facets.healthCounts.down,
+      currentResult.facets.healthCounts.healthy,
+      currentResult.facets.healthCounts.unknown,
       locale,
-      result.facets.healthCounts.healthy,
-      result.facets.healthCounts.unknown,
-      result.facets.healthCounts.degraded,
-      result.facets.healthCounts.down,
     ],
   );
 
   const activeFilterCount =
-    queryState.categories.length +
-    queryState.auth.length +
-    queryState.tags.length +
-    queryState.verification.length +
-    queryState.health.length +
-    (queryState.toolsMin !== null ? 1 : 0) +
-    (queryState.toolsMax !== null ? 1 : 0);
+    currentQuery.categories.length +
+    currentQuery.auth.length +
+    currentQuery.tags.length +
+    currentQuery.verification.length +
+    currentQuery.health.length +
+    (currentQuery.toolsMin !== null ? 1 : 0) +
+    (currentQuery.toolsMax !== null ? 1 : 0);
 
   const paginationEntries = useMemo(
-    () => buildPaginationEntries(result.page, result.totalPages),
-    [result.page, result.totalPages],
+    () => buildPaginationEntries(currentResult.page, currentResult.totalPages),
+    [currentResult.page, currentResult.totalPages],
   );
 
-  const firstVisibleIndex = result.total === 0 ? 0 : (result.page - 1) * result.pageSize + 1;
-  const lastVisibleIndex = Math.min(result.page * result.pageSize, result.total);
-
-  const commitQuery = useCallback(
-    (nextState: Partial<CatalogQueryV2>) => {
-      const nextQuery: CatalogQueryV2 = { ...queryState, ...nextState };
-      if (
-        nextQuery.toolsMin !== null &&
-        nextQuery.toolsMax !== null &&
-        nextQuery.toolsMin > nextQuery.toolsMax
-      ) {
-        [nextQuery.toolsMin, nextQuery.toolsMax] = [nextQuery.toolsMax, nextQuery.toolsMin];
-      }
-      if (areCatalogQueriesEqual(nextQuery, queryState)) return;
-
-      setQueryState(nextQuery);
-      setRequestError(null);
-
-      const nextQueryString = serializeCatalogQueryV2(nextQuery);
-      const currentQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
-      if (nextQueryString === currentQueryString) return;
-
-      replaceUrl(nextQuery);
-    },
-    [parsedQueryFromUrl, queryState, replaceUrl],
-  );
+  const firstVisibleIndex = currentResult.total === 0 ? 0 : (currentResult.page - 1) * currentResult.pageSize + 1;
+  const lastVisibleIndex = Math.min(currentResult.page * currentResult.pageSize, currentResult.total);
 
   const clearSearchQuery = useCallback(() => {
     setSearchInputValue("");
-    commitQuery({ page: 1, query: "" });
-  }, [commitQuery]);
+    if (searchDebounceTimeoutId !== null) {
+      window.clearTimeout(searchDebounceTimeoutId);
+      setSearchDebounceTimeoutId(null);
+    }
+    navigateToQuery({ page: 1, query: "" });
+  }, [navigateToQuery, searchDebounceTimeoutId]);
+  const handleSearchInputChange = useCallback(
+    (value: string) => {
+      setSearchInputValue(value);
+      if (searchDebounceTimeoutId !== null) {
+        window.clearTimeout(searchDebounceTimeoutId);
+      }
+      const nextTimeoutId = window.setTimeout(() => {
+        navigateToQuery({ page: 1, query: value });
+      }, 220);
+      setSearchDebounceTimeoutId(nextTimeoutId);
+    },
+    [navigateToQuery, searchDebounceTimeoutId],
+  );
 
   const handleSortFieldChange = useCallback(
-    (value: CatalogQueryV2["sortBy"]) => commitQuery({ page: 1, sortBy: value }),
-    [commitQuery],
+    (value: CatalogQueryV2["sortBy"]) => navigateToQuery({ page: 1, sortBy: value }),
+    [navigateToQuery],
   );
   const handleSortDirectionChange = useCallback(
-    (value: CatalogQueryV2["sortDir"]) => commitQuery({ page: 1, sortDir: value }),
-    [commitQuery],
+    (value: CatalogQueryV2["sortDir"]) => navigateToQuery({ page: 1, sortDir: value }),
+    [navigateToQuery],
   );
   const handlePageSizeChange = useCallback(
-    (value: number) => commitQuery({ page: 1, pageSize: value }),
-    [commitQuery],
+    (value: number) => navigateToQuery({ page: 1, pageSize: value }),
+    [navigateToQuery],
   );
   const handleViewModeChange = useCallback(
-    (value: CatalogQueryV2["layout"]) => commitQuery({ layout: value }),
-    [commitQuery],
+    (value: CatalogQueryV2["layout"]) => navigateToQuery({ layout: value }),
+    [navigateToQuery],
   );
   const handleToggleCategory = useCallback(
     (category: string) =>
-      commitQuery({ page: 1, categories: toggleListValue(queryState.categories, category) }),
-    [commitQuery, queryState.categories],
+      navigateToQuery({ page: 1, categories: toggleListValue(currentQuery.categories, category) }),
+    [currentQuery.categories, navigateToQuery],
   );
   const handleToggleAuthType = useCallback(
-    (authType: AuthType) => commitQuery({ page: 1, auth: toggleListValue(queryState.auth, authType) }),
-    [commitQuery, queryState.auth],
+    (authType: AuthType) => navigateToQuery({ page: 1, auth: toggleListValue(currentQuery.auth, authType) }),
+    [currentQuery.auth, navigateToQuery],
   );
   const handleToggleVerificationLevel = useCallback(
     (value: VerificationLevel) =>
-      commitQuery({ page: 1, verification: toggleListValue(queryState.verification, value) }),
-    [commitQuery, queryState.verification],
+      navigateToQuery({ page: 1, verification: toggleListValue(currentQuery.verification, value) }),
+    [currentQuery.verification, navigateToQuery],
   );
   const handleToggleHealthStatus = useCallback(
-    (value: HealthStatus) => commitQuery({ page: 1, health: toggleListValue(queryState.health, value) }),
-    [commitQuery, queryState.health],
+    (value: HealthStatus) => navigateToQuery({ page: 1, health: toggleListValue(currentQuery.health, value) }),
+    [currentQuery.health, navigateToQuery],
   );
   const handleToggleTag = useCallback(
-    (tag: string) => commitQuery({ page: 1, tags: toggleListValue(queryState.tags, tag) }),
-    [commitQuery, queryState.tags],
+    (tag: string) => navigateToQuery({ page: 1, tags: toggleListValue(currentQuery.tags, tag) }),
+    [currentQuery.tags, navigateToQuery],
   );
   const handleToolsMinChange = useCallback(
-    (value: number | null) => commitQuery({ page: 1, toolsMin: value }),
-    [commitQuery],
+    (value: number | null) => navigateToQuery({ page: 1, toolsMin: value }),
+    [navigateToQuery],
   );
   const handleToolsMaxChange = useCallback(
-    (value: number | null) => commitQuery({ page: 1, toolsMax: value }),
-    [commitQuery],
+    (value: number | null) => navigateToQuery({ page: 1, toolsMax: value }),
+    [navigateToQuery],
   );
 
   const handleClearAllFilters = useCallback(() => {
     setSearchInputValue("");
-    commitQuery({
+    if (searchDebounceTimeoutId !== null) {
+      window.clearTimeout(searchDebounceTimeoutId);
+      setSearchDebounceTimeoutId(null);
+    }
+    navigateToQuery({
       page: 1,
       query: "",
       categories: [],
@@ -286,106 +501,122 @@ export function useCatalogController(
       toolsMin: null,
       toolsMax: null,
     });
-  }, [commitQuery]);
+  }, [navigateToQuery, searchDebounceTimeoutId]);
 
   const applyQuickFilter = useCallback(
     (type: "official" | "healthy" | "no_auth") => {
       if (type === "official") {
-        commitQuery({
+        navigateToQuery({
           page: 1,
-          verification: queryState.verification.includes("official") ? [] : ["official"],
+          verification: currentQuery.verification.includes("official") ? [] : ["official"],
         });
         return;
       }
+
       if (type === "healthy") {
-        commitQuery({
+        navigateToQuery({
           page: 1,
-          health: queryState.health.includes("healthy") ? [] : ["healthy"],
+          health: currentQuery.health.includes("healthy") ? [] : ["healthy"],
         });
         return;
       }
-      commitQuery({
+
+      navigateToQuery({
         page: 1,
-        auth: queryState.auth.includes("none") ? [] : ["none"],
+        auth: currentQuery.auth.includes("none") ? [] : ["none"],
       });
     },
-    [commitQuery, queryState.auth, queryState.health, queryState.verification],
+    [currentQuery.auth, currentQuery.health, currentQuery.verification, navigateToQuery],
   );
 
   const setCatalogPage = useCallback(
     (pageNumber: number) => {
-      const normalizedPage = Math.min(Math.max(pageNumber, 1), result.totalPages);
-      if (normalizedPage === result.page) return;
-      commitQuery({ page: normalizedPage });
+      const normalizedPage = Math.min(Math.max(pageNumber, 1), currentResult.totalPages);
+
+      if (normalizedPage === currentResult.page) {
+        return;
+      }
+
+      navigateToQuery({ page: normalizedPage });
     },
-    [commitQuery, result.page, result.totalPages],
+    [currentResult.page, currentResult.totalPages, navigateToQuery],
   );
 
   const activeFilterChips = useMemo<ActiveFilterChip[]>(() => {
     const chips: ActiveFilterChip[] = [];
-    if (queryState.query.trim().length > 0) {
+
+    if (currentQuery.query.trim().length > 0) {
       chips.push({
         key: "query",
-        label: tr(locale, `Search: ${queryState.query}`, `Search: ${queryState.query}`),
+        label: tr(locale, `Search: ${currentQuery.query}`, `Search: ${currentQuery.query}`),
         onRemove: clearSearchQuery,
       });
     }
-    queryState.categories.forEach((category) => {
+
+    currentQuery.categories.forEach((category) => {
       chips.push({
         key: `category-${category}`,
         label: category,
         onRemove: () => handleToggleCategory(category),
       });
     });
-    queryState.auth.forEach((authType) => {
-      const option = authTypeOptions.find(item => item.value === authType);
+
+    currentQuery.auth.forEach((authType) => {
+      const option = authTypeOptions.find((item) => item.value === authType);
       chips.push({
         key: `auth-${authType}`,
         label: `${tr(locale, "Auth", "Auth")}: ${option?.label ?? authType}`,
         onRemove: () => handleToggleAuthType(authType),
       });
     });
-    queryState.verification.forEach((verification) => {
-      const option = verificationOptions.find(item => item.value === verification);
+
+    currentQuery.verification.forEach((verification) => {
+      const option = verificationOptions.find((item) => item.value === verification);
       chips.push({
         key: `verification-${verification}`,
         label: `${tr(locale, "Verification", "Verification")}: ${option?.label ?? verification}`,
         onRemove: () => handleToggleVerificationLevel(verification),
       });
     });
-    queryState.health.forEach((health) => {
-      const option = healthOptions.find(item => item.value === health);
+
+    currentQuery.health.forEach((health) => {
+      const option = healthOptions.find((item) => item.value === health);
       chips.push({
         key: `health-${health}`,
         label: `${tr(locale, "Health", "Health")}: ${option?.label ?? health}`,
         onRemove: () => handleToggleHealthStatus(health),
       });
     });
-    queryState.tags.forEach((tag) => {
+
+    currentQuery.tags.forEach((tag) => {
       chips.push({
         key: `tag-${tag}`,
         label: `#${tag}`,
         onRemove: () => handleToggleTag(tag),
       });
     });
-    if (queryState.toolsMin !== null) {
+
+    if (currentQuery.toolsMin !== null) {
       chips.push({
         key: "tools-min",
-        label: tr(locale, `Tools >= ${queryState.toolsMin}`, `Tools >= ${queryState.toolsMin}`),
+        label: tr(locale, `Tools >= ${currentQuery.toolsMin}`, `Tools >= ${currentQuery.toolsMin}`),
         onRemove: () => handleToolsMinChange(null),
       });
     }
-    if (queryState.toolsMax !== null) {
+
+    if (currentQuery.toolsMax !== null) {
       chips.push({
         key: "tools-max",
-        label: tr(locale, `Tools <= ${queryState.toolsMax}`, `Tools <= ${queryState.toolsMax}`),
+        label: tr(locale, `Tools <= ${currentQuery.toolsMax}`, `Tools <= ${currentQuery.toolsMax}`),
         onRemove: () => handleToolsMaxChange(null),
       });
     }
+
     return chips;
   }, [
     authTypeOptions,
     clearSearchQuery,
+    currentQuery,
     handleToggleAuthType,
     handleToggleCategory,
     handleToggleHealthStatus,
@@ -395,124 +626,39 @@ export function useCatalogController(
     handleToolsMinChange,
     healthOptions,
     locale,
-    queryState,
     verificationOptions,
   ]);
 
-  useEffect(() => {
-    const canonicalQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
-    const currentQueryString = searchParams.toString();
-    if (canonicalQueryString === currentQueryString) return;
-    replaceUrl(parsedQueryFromUrl);
-  }, [parsedQueryFromUrl, replaceUrl, searchParams]);
+  const toggleShortlist = useCallback(
+    (server: McpServer) => {
+      const alreadySaved = shortlist.some((item) => item.slug === server.slug);
+      const nextShortlist = alreadySaved
+        ? shortlist.filter((item) => item.slug !== server.slug)
+        : [toCatalogShortlistItem(server), ...shortlist].slice(0, SHORTLIST_LIMIT);
 
-  useEffect(() => {
-    const parsedQueryString = serializeCatalogQueryV2(parsedQueryFromUrl);
-    if (pendingUrlQueryStringRef.current === parsedQueryString) {
-      pendingUrlQueryStringRef.current = null;
-    }
-    if (pendingUrlQueryStringRef.current !== null) return;
-    if (areCatalogQueriesEqual(parsedQueryFromUrl, queryState)) return;
-    setQueryState(parsedQueryFromUrl);
-    setSearchInputValue(parsedQueryFromUrl.query);
-  }, [parsedQueryFromUrl, queryState]);
+      writeShortlistToStorage(nextShortlist);
+    },
+    [shortlist],
+  );
 
-  useEffect(() => {
-    if (searchInputValue === queryState.query) return;
-    const timeoutId = window.setTimeout(() => {
-      commitQuery({ page: 1, query: searchInputValue });
-    }, 260);
-    return () => window.clearTimeout(timeoutId);
-  }, [commitQuery, queryState.query, searchInputValue]);
-
-  useEffect(() => {
-    const currentQueryString = serializeCatalogQueryV2(queryState);
-    if (currentQueryString === lastResolvedQueryStringRef.current) return;
-
-    const controller = new AbortController();
-    async function fetchCatalogResult() {
-      lastRequestKeyRef.current = currentQueryString;
-      setIsLoading(true);
-      try {
-        const queryString = buildCatalogQueryV2SearchParams(queryState).toString();
-        const response = await fetch(
-          queryString.length > 0 ? `/api/catalog/search?${queryString}` : "/api/catalog/search",
-          withRequestCachePolicy("interactiveSearch", {
-            method: "GET",
-            signal: controller.signal,
-          }),
-        );
-        if (!response.ok) {
-          const clientError = await getCatalogSearchClientError(response);
-          const thrownError = new Error(clientError.message) as Error & {
-            catalogSearchClientError?: CatalogSearchClientError;
-          };
-          thrownError.catalogSearchClientError = clientError;
-          throw thrownError;
-        }
-        const payload = (await response.json()) as CatalogSearchResult;
-        if (controller.signal.aborted || lastRequestKeyRef.current !== currentQueryString) return;
-
-        const resolvedQuery = payload.appliedFilters;
-        const resolvedQueryString = serializeCatalogQueryV2(resolvedQuery);
-        lastResolvedQueryStringRef.current = resolvedQueryString;
-        setResult(payload);
-        setRequestError(null);
-
-        if (!areCatalogQueriesEqual(resolvedQuery, queryState)) {
-          setQueryState(resolvedQuery);
-          setSearchInputValue(resolvedQuery.query);
-        }
-
-        if (resolvedQueryString !== serializeCatalogQueryV2(parsedQueryFromUrl)) {
-          replaceUrl(resolvedQuery);
-        }
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        if (
-          error instanceof Error &&
-          "catalogSearchClientError" in error &&
-          (error as { catalogSearchClientError?: CatalogSearchClientError }).catalogSearchClientError
-        ) {
-          setRequestError(
-            (error as { catalogSearchClientError: CatalogSearchClientError }).catalogSearchClientError,
-          );
-        } else {
-          setRequestError({
-            message: getResponseMessage(error),
-            code: "unknown",
-          });
-        }
-      } finally {
-        if (!controller.signal.aborted) setIsLoading(false);
-      }
-    }
-    void fetchCatalogResult();
-    return () => controller.abort();
-  }, [parsedQueryFromUrl, queryState, replaceUrl]);
-
-  useEffect(() => {
-    if (!isMobileFiltersOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isMobileFiltersOpen]);
+  const shortlistSlugSet = useMemo(
+    () => new Set(shortlist.map((item) => item.slug)),
+    [shortlist],
+  );
 
   const taxonomyPanelCommonProps = {
-    categoryEntries: result.facets.categoryEntries,
-    selectedCategories: queryState.categories,
+    categoryEntries: currentResult.facets.categoryEntries,
+    selectedCategories: currentQuery.categories,
     authTypeOptions,
-    selectedAuthTypes: queryState.auth,
+    selectedAuthTypes: currentQuery.auth,
     verificationOptions,
-    selectedVerificationLevels: queryState.verification,
+    selectedVerificationLevels: currentQuery.verification,
     healthOptions,
-    selectedHealthStatuses: queryState.health,
-    toolsMin: queryState.toolsMin,
-    toolsMax: queryState.toolsMax,
-    tagEntries: result.facets.tagEntries,
-    selectedTags: queryState.tags,
+    selectedHealthStatuses: currentQuery.health,
+    toolsMin: currentQuery.toolsMin,
+    toolsMax: currentQuery.toolsMax,
+    tagEntries: currentResult.facets.tagEntries,
+    selectedTags: currentQuery.tags,
     onToggleCategory: handleToggleCategory,
     onToggleAuthType: handleToggleAuthType,
     onToggleVerificationLevel: handleToggleVerificationLevel,
@@ -524,20 +670,19 @@ export function useCatalogController(
   };
 
   return {
-    queryState,
+    queryState: currentQuery,
     searchInputValue,
-    setSearchInputValue,
+    setSearchInputValue: handleSearchInputChange,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
-    requestError,
-    isLoading,
-    result,
+    requestError: null,
+    isLoading: isPending,
+    result: currentResult,
     activeFilterCount,
     paginationEntries,
     firstVisibleIndex,
     lastVisibleIndex,
     activeFilterChips,
-    clearSearchQuery,
     applyQuickFilter,
     setCatalogPage,
     handleSortFieldChange,
@@ -546,5 +691,9 @@ export function useCatalogController(
     handleViewModeChange,
     handleClearAllFilters,
     taxonomyPanelCommonProps,
+    shortlist,
+    shortlistCount: shortlist.length,
+    isServerSaved: (slug: string) => shortlistSlugSet.has(slug),
+    toggleShortlist,
   };
 }

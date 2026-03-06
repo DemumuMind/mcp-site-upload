@@ -1,5 +1,7 @@
 "use client";
 
+import { CatalogInsightsPanel } from "@/components/catalog/catalog-insights-panel";
+import { CatalogShortlist } from "@/components/catalog/catalog-shortlist";
 import { ActiveFilterChips } from "@/components/catalog-section/active-filter-chips";
 import { CatalogResults } from "@/components/catalog-section/catalog-results";
 import { QuickFilters } from "@/components/catalog-section/quick-filters";
@@ -11,13 +13,25 @@ import { Button } from "@/components/ui/button";
 import { useCatalogController } from "@/components/catalog-section/use-catalog-controller";
 import { tr } from "@/lib/i18n";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
+import type { McpServer } from "@/lib/types";
 
 type CatalogSectionProps = {
   initialQuery: CatalogQueryV2;
   initialResult: CatalogSearchResult;
+  featuredServers: McpServer[];
+  topCategoryEntries: Array<[string, number]>;
+  topTagEntries: Array<[string, number]>;
+  hasActiveFilters: boolean;
 };
 
-export function CatalogSection({ initialQuery, initialResult }: CatalogSectionProps) {
+export function CatalogSection({
+  initialQuery,
+  initialResult,
+  featuredServers,
+  topCategoryEntries,
+  topTagEntries,
+  hasActiveFilters,
+}: CatalogSectionProps) {
   const locale = useLocale();
   const {
     queryState,
@@ -41,11 +55,49 @@ export function CatalogSection({ initialQuery, initialResult }: CatalogSectionPr
     handleViewModeChange,
     handleClearAllFilters,
     taxonomyPanelCommonProps,
+    shortlist,
+    shortlistCount,
+    isServerSaved,
+    toggleShortlist,
   } = useCatalogController(initialQuery, initialResult, locale);
 
   return (
-    <div className="space-y-4">
-      <div className="sticky top-14 z-30 rounded-2xl border border-border bg-card/86 p-2 shadow-[0_18px_44px_-26px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
+    <div className="space-y-5">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            {tr(locale, "Current view", "Current view")}
+          </p>
+          <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">
+            {queryState.query.trim().length > 0 ? queryState.query : tr(locale, "All servers", "All servers")}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {hasActiveFilters
+              ? tr(locale, "The workspace is narrowed by active filters.", "The workspace is narrowed by active filters.")
+              : tr(locale, "Use the controls below to tighten the result set.", "Use the controls below to tighten the result set.")}
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            {tr(locale, "Visible now", "Visible now")}
+          </p>
+          <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">{result.total}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {tr(locale, "Servers in the active slice before you open details.", "Servers in the active slice before you open details.")}
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            {tr(locale, "Shortlist", "Shortlist")}
+          </p>
+          <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">{shortlistCount}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {tr(locale, "Saved candidates persist across reloads on this device.", "Saved candidates persist across reloads on this device.")}
+          </p>
+        </div>
+      </div>
+
+      <div className="sticky top-14 z-30 rounded-[1.6rem] border border-border bg-card/88 p-2 shadow-[0_20px_48px_-30px_rgba(15,23,42,0.9)] backdrop-blur sm:top-16 sm:p-3">
         <CatalogFilterBar
           searchQuery={searchInputValue}
           sortField={queryState.sortBy}
@@ -80,7 +132,7 @@ export function CatalogSection({ initialQuery, initialResult }: CatalogSectionPr
         <>
           <button
             type="button"
-            className="fixed inset-0 z-40 bg-card backdrop-blur-[1.5px] lg:hidden"
+            className="fixed inset-0 z-40 bg-background/70 backdrop-blur-[1.5px] lg:hidden"
             onClick={() => setIsMobileFiltersOpen(false)}
             aria-label={tr(locale, "Close filters", "Close filters")}
           />
@@ -96,13 +148,15 @@ export function CatalogSection({ initialQuery, initialResult }: CatalogSectionPr
         </>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-        <CatalogTaxonomyPanel mode="filters" className="hidden lg:block" {...taxonomyPanelCommonProps} />
+      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+        <div className="hidden xl:block">
+          <CatalogTaxonomyPanel mode="filters" {...taxonomyPanelCommonProps} />
+        </div>
 
-        <div>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-2.5">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-[1.4rem] border border-border bg-card p-3">
             <p className="text-xs text-muted-foreground">{tr(locale, "Can't find your MCP server?", "Can't find your MCP server?")}</p>
-            <Button asChild size="sm" className="h-8 rounded-lg px-3">
+            <Button asChild size="sm" className="h-9 rounded-xl px-3.5">
               <a href="/submit-server">{tr(locale, "Submit server", "Submit server")}</a>
             </Button>
           </div>
@@ -113,7 +167,20 @@ export function CatalogSection({ initialQuery, initialResult }: CatalogSectionPr
             paginationEntries={paginationEntries}
             onSetCatalogPage={setCatalogPage}
             onClearAllFilters={handleClearAllFilters}
+            isServerSaved={isServerSaved}
+            onToggleShortlist={toggleShortlist}
           />
+        </div>
+
+        <div className="space-y-5 xl:sticky xl:top-24 xl:h-fit">
+          <CatalogInsightsPanel
+            locale={locale}
+            featuredServers={featuredServers}
+            topCategoryEntries={topCategoryEntries}
+            topTagEntries={topTagEntries}
+            hasActiveFilters={hasActiveFilters}
+          />
+          <CatalogShortlist locale={locale} items={shortlist} />
         </div>
       </div>
     </div>
