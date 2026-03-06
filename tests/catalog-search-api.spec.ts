@@ -18,4 +18,27 @@ test.describe("Catalog search API", () => {
       appliedFilters: expect.any(Object),
     });
   });
+
+  test("GET /api/catalog/search preserves repeated auth params in the normalized payload", async ({ request }) => {
+    const response = await request.get("/api/catalog/search?auth=none&auth=oauth");
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    expect(body.appliedFilters?.auth).toEqual(["none", "oauth"]);
+  });
+
+  test("GET /api/catalog/search tolerates malformed percent-encoded query values without crashing", async ({ request }) => {
+    const response = await request.get("/api/catalog/search?query=%E0%A4%A");
+
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    expect(body).toMatchObject({
+      items: expect.any(Array),
+      appliedFilters: expect.objectContaining({
+        query: expect.any(String),
+      }),
+    });
+  });
 });

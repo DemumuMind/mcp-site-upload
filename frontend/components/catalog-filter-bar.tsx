@@ -120,7 +120,7 @@ export function CatalogFilterBar({
           type="button"
           size="sm"
           variant="outline"
-          className="h-10 rounded-xl border-border bg-card text-foreground hover:bg-accent lg:hidden"
+          className="h-10 rounded-xl border-border bg-card text-foreground hover:bg-accent xl:hidden"
           onClick={onToggleMobileFilters}
           aria-label={tr(locale, "Open filters", "Open filters")}
           aria-expanded={isMobileFiltersOpen}
