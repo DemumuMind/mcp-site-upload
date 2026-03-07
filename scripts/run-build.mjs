@@ -1,22 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
 import path from "node:path";
-import dotenv from "dotenv";
+import { loadRootEnvFiles, syncNextProjectEnvFiles } from "./_shared/next-env.mjs";
 
 const frontendDir = path.join(process.cwd(), "frontend");
-
-const envFiles = [".env", ".env.local"];
-for (const file of envFiles) {
-  const filePath = path.join(process.cwd(), file);
-  if (!existsSync(filePath)) {
-    continue;
-  }
-
-  dotenv.config({
-    path: filePath,
-    override: file === ".env.local",
-  });
-}
+loadRootEnvFiles(process.cwd());
+syncNextProjectEnvFiles(process.cwd());
 
 const env = {
   ...process.env,

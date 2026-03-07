@@ -8,7 +8,7 @@
   },
   "scripts": {
     "predev": "node scripts/patch-contentlayer-win-warning.mjs",
-    "dev": "next dev frontend --webpack -p 3000",
+    "dev": "node scripts/dev-with-env.mjs -p 3000",
     "prebuild": "node scripts/patch-contentlayer-win-warning.mjs",
     "build": "node scripts/run-build.mjs",
     "start": "node scripts/start-with-env.mjs",
