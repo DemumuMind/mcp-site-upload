@@ -170,9 +170,7 @@ export function CatalogSection({
             </Button>
           </div>
           <div className="xl:hidden">
-            {isCompareAvailable ? (
-              <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
-            ) : null}
+            <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
           </div>
           <CatalogResults
             locale={locale}
@@ -186,30 +184,20 @@ export function CatalogSection({
           />
         </div>
 
-        <div className="space-y-5 xl:sticky xl:top-24 xl:h-fit">
+        <div className="hidden space-y-5 xl:sticky xl:top-24 xl:block xl:h-fit">
+          <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
+          <CatalogInsightsPanel
+            locale={locale}
+            featuredServers={featuredServers}
+            topCategoryEntries={topCategoryEntries}
+            topTagEntries={topTagEntries}
+            hasActiveFilters={hasActiveFilters}
+          />
           {isCompareAvailable ? (
-            <div className="hidden xl:block">
-              <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
-            </div>
+            <CatalogComparePanel locale={locale} items={shortlist} onClearShortlist={clearShortlist} />
           ) : (
-            <CatalogInsightsPanel
-              locale={locale}
-              featuredServers={featuredServers}
-              topCategoryEntries={topCategoryEntries}
-              topTagEntries={topTagEntries}
-              hasActiveFilters={hasActiveFilters}
-            />
+            <CatalogShortlist locale={locale} items={shortlist} />
           )}
-          <div className="hidden xl:block">
-            {isCompareAvailable ? (
-              <CatalogComparePanel locale={locale} items={shortlist} onClearShortlist={clearShortlist} />
-            ) : (
-              <CatalogShortlist locale={locale} items={shortlist} />
-            )}
-          </div>
-          <div className="xl:hidden">
-            {isCompareAvailable ? null : <CatalogShortlist locale={locale} items={shortlist} />}
-          </div>
         </div>
       </div>
 
