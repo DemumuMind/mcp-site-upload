@@ -1,6 +1,6 @@
 "use client";
 
-import { CatalogComparePanel, CatalogMobileCompareDock } from "@/components/catalog/catalog-compare-panel";
+import { CatalogComparePanel, CatalogCompareSupportStack, CatalogMobileCompareDock } from "@/components/catalog/catalog-compare-panel";
 import { CatalogInsightsPanel } from "@/components/catalog/catalog-insights-panel";
 import { CatalogShortlist } from "@/components/catalog/catalog-shortlist";
 import { ActiveFilterChips } from "@/components/catalog-section/active-filter-chips";
@@ -169,6 +169,11 @@ export function CatalogSection({
               <a href="/submit-server">{tr(locale, "Submit server", "Submit server")}</a>
             </Button>
           </div>
+          <div className="xl:hidden">
+            {isCompareAvailable ? (
+              <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
+            ) : null}
+          </div>
           <CatalogResults
             locale={locale}
             result={result}
@@ -182,13 +187,19 @@ export function CatalogSection({
         </div>
 
         <div className="space-y-5 xl:sticky xl:top-24 xl:h-fit">
-          <CatalogInsightsPanel
-            locale={locale}
-            featuredServers={featuredServers}
-            topCategoryEntries={topCategoryEntries}
-            topTagEntries={topTagEntries}
-            hasActiveFilters={hasActiveFilters}
-          />
+          {isCompareAvailable ? (
+            <div className="hidden xl:block">
+              <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
+            </div>
+          ) : (
+            <CatalogInsightsPanel
+              locale={locale}
+              featuredServers={featuredServers}
+              topCategoryEntries={topCategoryEntries}
+              topTagEntries={topTagEntries}
+              hasActiveFilters={hasActiveFilters}
+            />
+          )}
           <div className="hidden xl:block">
             {isCompareAvailable ? (
               <CatalogComparePanel locale={locale} items={shortlist} onClearShortlist={clearShortlist} />

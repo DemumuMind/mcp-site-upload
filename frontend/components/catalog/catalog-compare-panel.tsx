@@ -10,6 +10,7 @@ import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from "@/components/u
 import { cn } from "@/lib/utils";
 import {
   buildCatalogCompareItems,
+  getCatalogCompareSupportCopy,
   type CatalogShortlistItem,
 } from "@/lib/catalog/compare";
 import { tr, type Locale } from "@/lib/i18n";
@@ -23,6 +24,12 @@ type CatalogComparePanelProps = {
 type CatalogMobileCompareDockProps = CatalogComparePanelProps & {
   isOpen: boolean;
   onOpenChange: (nextOpen: boolean) => void;
+};
+
+type CatalogCompareSupportStackProps = {
+  locale: Locale;
+  hasActiveFilters: boolean;
+  className?: string;
 };
 
 type CompareMetricRow = {
@@ -87,6 +94,46 @@ function formatHealthLabel(healthStatus: CatalogShortlistItem["healthStatus"]) {
 
 function useCompareItems(items: CatalogShortlistItem[]) {
   return useMemo(() => buildCatalogCompareItems(items).slice(0, 3), [items]);
+}
+
+export function CatalogCompareSupportStack({
+  locale,
+  hasActiveFilters,
+  className,
+}: CatalogCompareSupportStackProps) {
+  const copy = getCatalogCompareSupportCopy(hasActiveFilters);
+
+  return (
+    <div className={cn("space-y-3", className)}>
+      <section className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/80 shadow-[0_18px_48px_-34px_rgba(0,0,0,0.6)]">
+        <div className="px-5 py-5">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-primary uppercase">
+            {tr(locale, copy.featuredEyebrow, copy.featuredEyebrow)}
+          </p>
+          <h2 className="mt-3 text-lg font-semibold tracking-[-0.03em] text-foreground">
+            {tr(locale, copy.featuredTitle, copy.featuredTitle)}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {tr(locale, copy.featuredDescription, copy.featuredDescription)}
+          </p>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/80 shadow-[0_18px_48px_-34px_rgba(0,0,0,0.6)]">
+        <div className="px-5 py-5">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-primary uppercase">
+            {tr(locale, copy.shortlistEyebrow, copy.shortlistEyebrow)}
+          </p>
+          <h2 className="mt-3 text-lg font-semibold tracking-[-0.03em] text-foreground">
+            {tr(locale, copy.shortlistTitle, copy.shortlistTitle)}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {tr(locale, copy.shortlistDescription, copy.shortlistDescription)}
+          </p>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 export function CatalogComparePanel({

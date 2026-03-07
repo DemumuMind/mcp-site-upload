@@ -6,6 +6,7 @@ import * as compareModule from "../frontend/lib/catalog/compare.ts";
 const {
   buildCatalogCompareItems,
   createCatalogShortlistItem,
+  getCatalogCompareSupportCopy,
   normalizeCatalogShortlistItem,
   shouldEnableCatalogCompare,
 } = compareModule;
@@ -92,4 +93,26 @@ test("ranks shortlist items for trust plus fit compare state", () => {
   assert.ok(compareItems[1].compareScore > compareItems[2].compareScore);
   assert.equal(shouldEnableCatalogCompare(shortlist), true);
   assert.equal(shouldEnableCatalogCompare(shortlist.slice(0, 1)), false);
+});
+
+test("returns compact support copy for compare layouts", () => {
+  const supportCopy = getCatalogCompareSupportCopy(false);
+  const narrowedCopy = getCatalogCompareSupportCopy(true);
+
+  assert.equal(supportCopy.featuredEyebrow, "Featured picks");
+  assert.equal(supportCopy.featuredTitle, "Start here");
+  assert.equal(
+    supportCopy.featuredDescription,
+    "Start with proven anchors, then branch into narrower fits from the workspace filters.",
+  );
+  assert.equal(supportCopy.shortlistEyebrow, "Shortlist");
+  assert.equal(supportCopy.shortlistTitle, "Shortlist");
+  assert.equal(
+    supportCopy.shortlistDescription,
+    "Save servers to compare them later.",
+  );
+  assert.equal(
+    narrowedCopy.featuredDescription,
+    "Keep one high-trust server in view while narrowing the result set.",
+  );
 });

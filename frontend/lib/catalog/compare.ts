@@ -21,8 +21,30 @@ export type CatalogCompareItem = CatalogShortlistItem & {
   verdict: string;
 };
 
+export type CatalogCompareSupportCopy = {
+  featuredEyebrow: string;
+  featuredTitle: string;
+  featuredDescription: string;
+  shortlistEyebrow: string;
+  shortlistTitle: string;
+  shortlistDescription: string;
+};
+
 export function shouldEnableCatalogCompare(items: CatalogShortlistItem[]): boolean {
   return items.length >= 2;
+}
+
+export function getCatalogCompareSupportCopy(hasActiveFilters: boolean): CatalogCompareSupportCopy {
+  return {
+    featuredEyebrow: "Featured picks",
+    featuredTitle: "Start here",
+    featuredDescription: hasActiveFilters
+      ? "Keep one high-trust server in view while narrowing the result set."
+      : "Start with proven anchors, then branch into narrower fits from the workspace filters.",
+    shortlistEyebrow: "Shortlist",
+    shortlistTitle: "Shortlist",
+    shortlistDescription: "Save servers to compare them later.",
+  };
 }
 
 export function createCatalogShortlistItem(server: McpServer): CatalogShortlistItem {
