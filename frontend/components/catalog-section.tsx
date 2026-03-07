@@ -1,7 +1,6 @@
 "use client";
 
 import { CatalogComparePanel, CatalogCompareSupportStack, CatalogMobileCompareDock } from "@/components/catalog/catalog-compare-panel";
-import { CatalogInsightsPanel } from "@/components/catalog/catalog-insights-panel";
 import { CatalogShortlist } from "@/components/catalog/catalog-shortlist";
 import { ActiveFilterChips } from "@/components/catalog-section/active-filter-chips";
 import { CatalogResults } from "@/components/catalog-section/catalog-results";
@@ -12,6 +11,7 @@ import { CatalogTaxonomyPanel } from "@/components/catalog-taxonomy-panel";
 import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { useCatalogController } from "@/components/catalog-section/use-catalog-controller";
+import { getCatalogCompareReadinessCopy } from "@/lib/catalog/compare";
 import { tr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { CatalogQueryV2, CatalogSearchResult } from "@/lib/catalog/types";
@@ -29,9 +29,6 @@ type CatalogSectionProps = {
 export function CatalogSection({
   initialQuery,
   initialResult,
-  featuredServers,
-  topCategoryEntries,
-  topTagEntries,
   hasActiveFilters,
 }: CatalogSectionProps) {
   const locale = useLocale();
@@ -66,9 +63,17 @@ export function CatalogSection({
     toggleShortlist,
     clearShortlist,
   } = useCatalogController(initialQuery, initialResult, locale);
+  const compareReadinessCopy = getCatalogCompareReadinessCopy(shortlistCount);
+
+  const handleCompareFocus = () => {
+    const compareRail = document.getElementById("catalog-compare-rail");
+    if (compareRail) {
+      compareRail.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
-    <div className="space-y-5">
+    <div id="catalog-workspace" className="space-y-5">
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
           <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
@@ -79,8 +84,8 @@ export function CatalogSection({
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
             {hasActiveFilters
-              ? tr(locale, "The workspace is narrowed by active filters.", "The workspace is narrowed by active filters.")
-              : tr(locale, "Use the controls below to tighten the result set.", "Use the controls below to tighten the result set.")}
+              ? tr(locale, "Use compare to keep shortlist signal readable while narrowing the workspace.", "Use compare to keep shortlist signal readable while narrowing the workspace.")
+              : tr(locale, "Use compare to turn shortlist signal into a decision, not a bookmark pile.", "Use compare to turn shortlist signal into a decision, not a bookmark pile.")}
           </p>
         </div>
         <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
@@ -89,16 +94,28 @@ export function CatalogSection({
           </p>
           <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">{result.total}</p>
           <p className="mt-2 text-sm text-muted-foreground">
-            {tr(locale, "Servers in the active slice before you open details.", "Servers in the active slice before you open details.")}
+            {tr(locale, "Trust, health, auth and tool-depth stay readable before you open detail pages.", "Trust, health, auth and tool-depth stay readable before you open detail pages.")}
           </p>
         </div>
-        <div className="rounded-[1.5rem] border border-border/70 bg-card px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]">
-          <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-            {tr(locale, "Shortlist", "Shortlist")}
-          </p>
-          <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">{shortlistCount}</p>
+        <div className={cn(
+          "rounded-[1.5rem] border px-4 py-4 shadow-[0_16px_40px_-28px_hsl(var(--foreground)/0.55)]",
+          isCompareAvailable ? "border-primary/25 bg-primary/5" : "border-border/70 bg-card",
+        )}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold tracking-[0.16em] text-primary uppercase">
+                {tr(locale, compareReadinessCopy.eyebrow, compareReadinessCopy.eyebrow)}
+              </p>
+              <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">
+                {tr(locale, compareReadinessCopy.title, compareReadinessCopy.title)}
+              </p>
+            </div>
+            <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
+              {shortlistCount}
+            </span>
+          </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            {tr(locale, "Saved candidates persist across reloads on this device.", "Saved candidates persist across reloads on this device.")}
+            {tr(locale, compareReadinessCopy.description, compareReadinessCopy.description)}
           </p>
         </div>
       </div>
@@ -110,6 +127,8 @@ export function CatalogSection({
           sortDirection={queryState.sortDir}
           pageSize={queryState.pageSize}
           viewMode={queryState.layout}
+          compareCount={shortlistCount}
+          isCompareAvailable={isCompareAvailable}
           activeFilterCount={activeFilterCount}
           isMobileFiltersOpen={isMobileFiltersOpen}
           onSearchQueryChange={setSearchInputValue}
@@ -117,6 +136,7 @@ export function CatalogSection({
           onSortDirectionChange={handleSortDirectionChange}
           onPageSizeChange={handlePageSizeChange}
           onViewModeChange={handleViewModeChange}
+          onCompareClick={handleCompareFocus}
           onToggleMobileFilters={() => {
             setIsMobileCompareOpen(false);
             setIsMobileFiltersOpen(current => !current);
@@ -184,15 +204,8 @@ export function CatalogSection({
           />
         </div>
 
-        <div className="hidden space-y-5 xl:sticky xl:top-24 xl:block xl:h-fit">
+        <div id="catalog-compare-rail" className="hidden space-y-5 xl:sticky xl:top-24 xl:block xl:h-fit">
           <CatalogCompareSupportStack locale={locale} hasActiveFilters={hasActiveFilters} />
-          <CatalogInsightsPanel
-            locale={locale}
-            featuredServers={featuredServers}
-            topCategoryEntries={topCategoryEntries}
-            topTagEntries={topTagEntries}
-            hasActiveFilters={hasActiveFilters}
-          />
           {isCompareAvailable ? (
             <CatalogComparePanel locale={locale} items={shortlist} onClearShortlist={clearShortlist} />
           ) : (

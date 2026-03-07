@@ -4,8 +4,10 @@ import test from "node:test";
 import * as compareModule from "../frontend/lib/catalog/compare.ts";
 
 const {
+  buildCatalogComparePreview,
   buildCatalogCompareItems,
   createCatalogShortlistItem,
+  getCatalogCompareReadinessCopy,
   getCatalogCompareSupportCopy,
   normalizeCatalogShortlistItem,
   shouldEnableCatalogCompare,
@@ -115,4 +117,83 @@ test("returns compact support copy for compare layouts", () => {
     narrowedCopy.featuredDescription,
     "Keep one high-trust server in view while narrowing the result set.",
   );
+});
+
+test("builds a compare-first preview from featured servers for the catalog hero", () => {
+  const previewItems = buildCatalogComparePreview([
+    {
+      id: "a11y",
+      name: "A11y MCP Tools",
+      slug: "a11y-mcp-tools",
+      description: "Accessibility evidence capture and diagnosis",
+      serverUrl: "https://example.com/a11y",
+      category: "Developer Tools",
+      authType: "none",
+      tags: ["accessibility", "developer-tools"],
+      repoUrl: "https://github.com/example/a11y",
+      status: "active",
+      verificationLevel: "official",
+      healthStatus: "healthy",
+      tools: ["scan", "audit", "report", "capture", "diff"],
+    },
+    {
+      id: "memory",
+      name: "0gmem",
+      slug: "0gmem",
+      description: "Long-term memory retrieval for agent workflows",
+      serverUrl: "https://example.com/0gmem",
+      category: "Search",
+      authType: "none",
+      tags: ["memory", "search"],
+      status: "active",
+      verificationLevel: "community",
+      healthStatus: "healthy",
+      tools: ["retrieve", "memorize", "score", "hydrate"],
+    },
+    {
+      id: "adguard",
+      name: "Adguard Home",
+      slug: "adguard-home",
+      description: "AdGuard Home REST API for infrastructure operations",
+      serverUrl: "https://example.com/adguard",
+      category: "Developer Tools",
+      authType: "api_key",
+      tags: ["infra", "operations"],
+      repoUrl: "https://github.com/example/adguard",
+      status: "active",
+      verificationLevel: "community",
+      healthStatus: "unknown",
+      tools: ["dns", "blocklists", "stats", "clients", "rules"],
+    },
+  ]);
+
+  assert.deepEqual(previewItems.map((item) => item.slug), [
+    "a11y-mcp-tools",
+    "0gmem",
+    "adguard-home",
+  ]);
+  assert.equal(previewItems[0]?.verdict, "Best overall");
+  assert.equal(previewItems[0]?.bestUse, "Quick adoption");
+  assert.equal(previewItems[0]?.toolsCount, 5);
+});
+
+test("returns compare-readiness copy for both baseline and active shortlist states", () => {
+  const baselineCopy = getCatalogCompareReadinessCopy(0);
+  const activeCopy = getCatalogCompareReadinessCopy(3);
+
+  assert.equal(baselineCopy.eyebrow, "Compare ready");
+  assert.equal(baselineCopy.title, "Save 2 servers");
+  assert.equal(
+    baselineCopy.description,
+    "The right rail turns into an active compare workspace once your shortlist reaches two servers.",
+  );
+  assert.equal(baselineCopy.ctaLabel, "Compare (0)");
+
+  assert.equal(activeCopy.eyebrow, "Compare threshold reached");
+  assert.equal(activeCopy.title, "Open compare");
+  assert.equal(
+    activeCopy.description,
+    "The right rail is now expanded into an active compare workspace instead of a passive shortlist tile.",
+  );
+  assert.equal(activeCopy.ctaLabel, "Compare (3)");
 });

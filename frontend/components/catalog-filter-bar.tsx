@@ -25,6 +25,8 @@ type CatalogFilterBarProps = {
   sortDirection: CatalogSortDirection;
   pageSize: number;
   viewMode: CatalogViewMode;
+  compareCount: number;
+  isCompareAvailable: boolean;
   activeFilterCount: number;
   isMobileFiltersOpen: boolean;
   onSearchQueryChange: (value: string) => void;
@@ -32,6 +34,7 @@ type CatalogFilterBarProps = {
   onSortDirectionChange: (value: CatalogSortDirection) => void;
   onPageSizeChange: (value: number) => void;
   onViewModeChange: (value: CatalogViewMode) => void;
+  onCompareClick: () => void;
   onToggleMobileFilters: () => void;
 };
 
@@ -41,6 +44,8 @@ export function CatalogFilterBar({
   sortDirection,
   pageSize,
   viewMode,
+  compareCount,
+  isCompareAvailable,
   activeFilterCount,
   isMobileFiltersOpen,
   onSearchQueryChange,
@@ -48,6 +53,7 @@ export function CatalogFilterBar({
   onSortDirectionChange,
   onPageSizeChange,
   onViewModeChange,
+  onCompareClick,
   onToggleMobileFilters,
 }: CatalogFilterBarProps) {
   const locale = useLocale();
@@ -116,6 +122,21 @@ export function CatalogFilterBar({
       </Select>
 
       <div className="flex items-center justify-end gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={isCompareAvailable ? "default" : "outline"}
+          className={cn(
+            "hidden h-10 rounded-xl px-4 lg:inline-flex",
+            isCompareAvailable
+              ? "shadow-[0_18px_40px_-24px_hsl(var(--primary)/0.8)]"
+              : "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary",
+          )}
+          onClick={onCompareClick}
+        >
+          {tr(locale, `Compare (${compareCount})`, `Compare (${compareCount})`)}
+        </Button>
+
         <Button
           type="button"
           size="sm"

@@ -30,6 +30,13 @@ export type CatalogCompareSupportCopy = {
   shortlistDescription: string;
 };
 
+export type CatalogCompareReadinessCopy = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  ctaLabel: string;
+};
+
 export function shouldEnableCatalogCompare(items: CatalogShortlistItem[]): boolean {
   return items.length >= 2;
 }
@@ -45,6 +52,28 @@ export function getCatalogCompareSupportCopy(hasActiveFilters: boolean): Catalog
     shortlistTitle: "Shortlist",
     shortlistDescription: "Save servers to compare them later.",
   };
+}
+
+export function getCatalogCompareReadinessCopy(shortlistCount: number): CatalogCompareReadinessCopy {
+  if (shortlistCount >= 2) {
+    return {
+      eyebrow: "Compare threshold reached",
+      title: "Open compare",
+      description: "The right rail is now expanded into an active compare workspace instead of a passive shortlist tile.",
+      ctaLabel: `Compare (${shortlistCount})`,
+    };
+  }
+
+  return {
+    eyebrow: "Compare ready",
+    title: "Save 2 servers",
+    description: "The right rail turns into an active compare workspace once your shortlist reaches two servers.",
+    ctaLabel: `Compare (${shortlistCount})`,
+  };
+}
+
+export function buildCatalogComparePreview(servers: McpServer[]): CatalogCompareItem[] {
+  return buildCatalogCompareItems(servers.map(createCatalogShortlistItem)).slice(0, 3);
 }
 
 export function createCatalogShortlistItem(server: McpServer): CatalogShortlistItem {
