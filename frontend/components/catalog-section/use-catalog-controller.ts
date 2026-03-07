@@ -642,6 +642,7 @@ export function useCatalogController(
     onToolsMinChange: handleToolsMinChange,
     onToolsMaxChange: handleToolsMaxChange,
     onToggleTag: handleToggleTag,
+    onApplyQuickFilter: applyQuickFilter,
     onClearAll: handleClearAllFilters,
   };
 

@@ -4,7 +4,6 @@ import { CatalogComparePanel, CatalogCompareSupportStack, CatalogMobileCompareDo
 import { CatalogShortlist } from "@/components/catalog/catalog-shortlist";
 import { ActiveFilterChips } from "@/components/catalog-section/active-filter-chips";
 import { CatalogResults } from "@/components/catalog-section/catalog-results";
-import { QuickFilters } from "@/components/catalog-section/quick-filters";
 import { ResultsSummary } from "@/components/catalog-section/results-summary";
 import { CatalogFilterBar } from "@/components/catalog-filter-bar";
 import { CatalogTaxonomyPanel } from "@/components/catalog-taxonomy-panel";
@@ -48,7 +47,6 @@ export function CatalogSection({
     firstVisibleIndex,
     lastVisibleIndex,
     activeFilterChips,
-    applyQuickFilter,
     setCatalogPage,
     handleSortFieldChange,
     handleSortDirectionChange,
@@ -145,8 +143,6 @@ export function CatalogSection({
       </div>
 
       <ActiveFilterChips locale={locale} chips={activeFilterChips} onClearAll={handleClearAllFilters} />
-
-      <QuickFilters locale={locale} applyQuickFilter={applyQuickFilter} />
 
       <ResultsSummary
         locale={locale}
