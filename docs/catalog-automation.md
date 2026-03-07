@@ -3,6 +3,10 @@
 ## Goal
 Keep the catalog populated through the current `frontend/*` runtime without introducing a second cache policy system.
 
+Primary architectural rule:
+- `public.servers` remains the only runtime/public source of truth.
+- External registries are ingestion inputs, never live runtime read dependencies.
+
 The catalog automation stack now depends on the shared cache layer:
 - `frontend/lib/cache/repo-cache-policy.json`
 - `frontend/lib/cache/policy.ts`
@@ -23,7 +27,10 @@ Any older references to bare `app/*` or `lib/*` paths are outdated.
   - useful for manual runs, focused debugging, or narrow operational use
 - `GET/POST /api/catalog/sync-all`
   - current production orchestrator
-  - runs GitHub, NPM, Smithery, and health-check stages
+  - runs staged ingestion for GitHub, Smithery, npm, PyPI, OCI, Registry corroboration, then health-check
+- `POST /api/catalog/github-webhook`
+  - validates GitHub signature
+  - stores replay-safe queue entries for targeted GitHub reingest
 - `GET /api/catalog/automation-status`
   - reports schedules, readiness, recent runs, and active locks
 
@@ -34,12 +41,19 @@ Auth header for protected endpoints:
 - GitHub Search API (`topic:mcp-server`)
 - NPM sync
 - Smithery sync
+- PyPI JSON API
+- OCI metadata (GHCR first, Docker Hub only for explicit refs)
+- Official MCP Registry as corroboration-only source
 - Optional offline Scrapy snapshot for diagnostics only
 
 Source responsibilities:
 - `auto-sync` currently runs GitHub only
-- `sync-all` is the unified orchestration entry point for GitHub, NPM, and Smithery
+- `sync-all` is the unified orchestration entry point for GitHub, NPM, Smithery, PyPI, OCI, and Registry corroboration
+- queued GitHub webhook deliveries are consumed by the standalone external worker
 - Scrapy output is not part of the runtime cache path and does not act as L2 cache
+
+Detailed architecture reference:
+- `docs/catalog-ingestion-architecture.md`
 
 ## Cache And Invalidation
 
@@ -94,13 +108,18 @@ This replaced the older documentation that described production cron against `/a
   - required for protected maintenance endpoints
 - `GITHUB_TOKEN`
   - optional but recommended for GitHub API limits
+  - also used for GHCR metadata calls when OCI refs point to `ghcr.io`
 
 ## Safety Model
 - Sync routes run under authenticated cron or manual access only.
 - Sync runs take a lock before execution.
 - Run status and failures are recorded through the sync run store.
+- Source fetch state, raw payload snapshots, source linkage, and verification runs are persisted separately from runtime rows.
+- GitHub webhook deliveries are stored in a replay-safe queue before they are consumed by ingestion.
+- The webhook route only queues deliveries; processing lives in the standalone worker runtime.
 - Cache invalidation happens after successful mutation stages through the shared helper.
 - Manual or diagnostics tooling should not introduce separate cache invalidation paths.
+- Manual rows are not overwritten by automation-managed candidates.
 
 ## Manual Triggers
 
@@ -114,6 +133,11 @@ Unified run:
 ```bash
 curl -X POST "https://your-domain/api/catalog/sync-all" \
   -H "Authorization: Bearer $CATALOG_AUTOSYNC_CRON_SECRET"
+```
+
+External GitHub webhook worker:
+```bash
+npm run catalog:webhook:worker -- --base-url https://your-domain
 ```
 
 ## Optional Scrapy Snapshot
@@ -139,10 +163,9 @@ Recommended repository variables:
 ## Response Signals
 Important response fields from sync routes:
 - `created`, `updated`
-- `staleCleanupApplied`, `staleCleanupReason`
-- `staleCandidates`, `staleMarked`, `staleFailed`
-- `skippedManual`, `skippedInvalid`
-- `failed`, `failures[]`
+- `published`, `quarantined`
+- `staleCleanupApplied`, `staleCleanupReason`, `staleCandidates`, `staleMarked`
+- `failed`, `failures[]`, `sources`
 - `changedSlugs[]`
 - `alerting.status` (`ok` | `partial` | `error`)
 - `alerting.shouldWarn`, `alerting.shouldPage`
@@ -154,9 +177,9 @@ HTTP status:
 
 ## Rollback
 1. Disable the relevant cron entries in `vercel.json`.
-2. Optionally disable stale cleanup through environment configuration if the incident requires it.
-3. Redeploy.
-4. If needed, perform data repair in Supabase for automation-managed rows.
+2. Redeploy the previous application revision.
+3. If needed, repair `public.servers` only; runtime does not depend on replaying external registries.
+4. Use `server_sources`, `source_candidates_raw`, and `verification_runs` for debugging and replay decisions.
 
 ## Quick Status
 Use:
@@ -171,3 +194,6 @@ The response includes checks for:
 - runtime readiness
 - recent runs
 - active locks
+
+Webhook replay runbook:
+- `docs/runbooks/catalog-github-webhook-replay.md`

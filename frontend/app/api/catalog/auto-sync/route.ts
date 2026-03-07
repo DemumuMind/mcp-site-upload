@@ -6,7 +6,7 @@ import { withCronAuth } from "@/lib/api/with-auth";
 import { invalidateCatalogCaches } from "@/lib/cache/invalidation";
 import { CATALOG_AUTO_SYNC_LOCK_TTL_SECONDS } from "@/lib/cache/policy";
 import { executeCatalogAutoSync } from "@/lib/catalog/auto-sync-core";
-import { runCatalogGithubSync } from "@/lib/catalog/github-sync";
+import { runCatalogIngestion } from "@/lib/catalog/ingestion";
 import {
   acquireCatalogSyncLock,
   finishCatalogSyncRun,
@@ -65,7 +65,13 @@ const handlers = withCronAuth(
           min: 1,
           max: MAX_GITHUB_SEARCH_PAGES,
         }),
-      runSync: ({ maxPages }) => runCatalogGithubSync({ maxPages }),
+      runSync: ({ maxPages, runId }) =>
+        runCatalogIngestion({
+          runId,
+          sourceTypes: ["github"],
+          githubMaxPages: maxPages,
+          logger,
+        }),
       clearCaches: async (result) => {
         invalidateCatalogCaches({
           origin: "route",

@@ -1,7 +1,7 @@
 type HealthCheckResult = unknown;
 
 type CatalogHealthCheckDeps = {
-  runHealthCheck: () => Promise<HealthCheckResult[] | undefined>;
+  runHealthCheck: () => Promise<HealthCheckResult | undefined>;
   logInfo?: (event: string, details?: Record<string, unknown>) => void;
   logError?: (event: string, details?: Record<string, unknown>) => void;
 };
@@ -30,7 +30,7 @@ export async function executeCatalogHealthCheck(
       body: {
         ok: true;
         checkedCount: number;
-        results: HealthCheckResult[] | undefined;
+        results: HealthCheckResult | undefined;
       };
     }
   | {
@@ -42,13 +42,18 @@ export async function executeCatalogHealthCheck(
 
   try {
     const results = await deps.runHealthCheck();
-    deps.logInfo?.("catalog.health_check.completed", { count: results?.length ?? 0 });
+    const checkedCount = Array.isArray(results)
+      ? results.length
+      : typeof results === "object" && results !== null && "total" in results && typeof (results as { total?: unknown }).total === "number"
+        ? Number((results as { total?: number }).total)
+        : 0;
+    deps.logInfo?.("catalog.health_check.completed", { count: checkedCount });
 
     return {
       status: 200,
       body: {
         ok: true,
-        checkedCount: results?.length ?? 0,
+        checkedCount,
         results,
       },
     };

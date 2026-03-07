@@ -1,13 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { parseNumberEnv } from "@/lib/api/auth-helpers";
 import { withCronAuth } from "@/lib/api/with-auth";
 import { invalidateCatalogCaches } from "@/lib/cache/invalidation";
 import { CATALOG_SYNC_ALL_LOCK_TTL_SECONDS } from "@/lib/cache/policy";
+import { runCatalogIngestion } from "@/lib/catalog/ingestion";
 import { executeCatalogSyncAll } from "@/lib/catalog/sync-all-core";
-import { runCatalogGithubSync } from "@/lib/catalog/github-sync";
 import { runFullHealthCheck } from "@/lib/catalog/health";
-import { runCatalogNpmSync } from "@/lib/catalog/npm-sync";
-import { runCatalogSmitherySync } from "@/lib/catalog/smithery-sync";
 import {
   acquireCatalogSyncLock,
   finishCatalogSyncRun,
@@ -19,6 +18,8 @@ import {
 export const dynamic = "force-dynamic";
 
 const SYNC_ALL_LOCK_KEY = "catalog:sync-all";
+const DEFAULT_SYNC_ALL_GITHUB_PAGES = 120;
+const MAX_GITHUB_SEARCH_PAGES = 200;
 
 const handlers = withCronAuth(
   async (_request, { logger }) => {
@@ -38,7 +39,7 @@ const handlers = withCronAuth(
         startCatalogSyncRun(
           {
             trigger: "catalog.unified_sync",
-            sourceScope: ["github", "smithery", "npm"],
+            sourceScope: ["github", "smithery", "npm", "pypi", "oci", "registry"],
           },
           { logger },
         ),
@@ -52,9 +53,16 @@ const handlers = withCronAuth(
           },
           { logger },
         ),
-      runGithubSync: () => runCatalogGithubSync({ maxPages: 5 }),
-      runSmitherySync: () => runCatalogSmitherySync(),
-      runNpmSync: () => runCatalogNpmSync(),
+      runSync: ({ runId }) =>
+        runCatalogIngestion({
+          runId,
+          sourceTypes: ["github", "smithery", "npm", "pypi", "oci", "registry"],
+          githubMaxPages: parseNumberEnv("CATALOG_AUTOSYNC_MAX_PAGES", DEFAULT_SYNC_ALL_GITHUB_PAGES, {
+            min: 1,
+            max: MAX_GITHUB_SEARCH_PAGES,
+          }),
+          logger,
+        }),
       runHealthCheck: () => runFullHealthCheck(),
       clearCaches: async (changedSlugs) => {
         invalidateCatalogCaches({

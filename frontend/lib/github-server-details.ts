@@ -1,4 +1,4 @@
-import { withNextFetchCache } from "@/lib/cache/policy";
+import { withNextFetchCache } from "./cache/policy.ts";
 
 type GithubRepoRef = {
   owner: string;

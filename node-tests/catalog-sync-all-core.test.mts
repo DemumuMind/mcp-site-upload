@@ -13,19 +13,14 @@ function createBaseDeps() {
     finishRun: async () => undefined,
     recordFailures: async () => undefined,
     releaseLock: async () => undefined,
-    runGithubSync: async () => {
-      throw new Error("not configured");
-    },
-    runSmitherySync: async () => {
-      throw new Error("not configured");
-    },
-    runNpmSync: async () => {
+    runSync: async () => {
       throw new Error("not configured");
     },
     runHealthCheck: async () => undefined,
     clearCaches: async () => undefined,
     logger: {
       info: () => undefined,
+      warn: () => undefined,
       error: () => undefined,
     },
     now: (() => {
@@ -62,56 +57,60 @@ test("sync-all core returns 409 when the lock is already held", async () => {
 test("sync-all core returns 207 when only some sources fail", async () => {
   const response = await executeCatalogSyncAll({
     ...createBaseDeps(),
-    runGithubSync: async () => ({
+    runSync: async () => ({
+      executedAt: "2026-03-07T00:00:00.000Z",
+      sourceTypes: ["github", "smithery", "npm"],
       created: 1,
       updated: 0,
+      published: 1,
+      quarantined: 0,
+      rejected: 0,
       failed: 0,
-      fetchedRecords: 1,
-      fetchedPages: 1,
-      candidates: 1,
-      queuedForUpsert: 1,
-      skippedManual: 0,
-      skippedInvalid: 0,
       failures: [],
       changedSlugs: ["one"],
-      staleCleanupEnabled: false,
-      staleCleanupApplied: false,
-      staleCappedCount: 0,
-      staleCoverageRatio: null,
-      minStaleBaselineRatio: 0.5,
-      staleCleanupReason: null,
-      staleBaselineCount: 0,
-      maxStaleMarkRatio: 0,
       staleCandidates: 0,
-      staleGraceMarked: 0,
+      staleMarked: 0,
       staleRejectedAfterGrace: 0,
-    }),
-    runSmitherySync: async () => {
-      throw new Error("smithery unavailable");
-    },
-    runNpmSync: async () => ({
-      created: 1,
-      updated: 0,
-      failed: 0,
-      fetchedRecords: 1,
-      fetchedPages: 1,
-      candidates: 1,
-      queuedForUpsert: 1,
-      skippedManual: 0,
-      skippedInvalid: 0,
-      failures: [],
-      changedSlugs: ["two"],
-      staleCleanupEnabled: false,
       staleCleanupApplied: false,
-      staleCappedCount: 0,
-      staleCoverageRatio: null,
-      minStaleBaselineRatio: 0.5,
       staleCleanupReason: null,
-      staleBaselineCount: 0,
-      maxStaleMarkRatio: 0,
-      staleCandidates: 0,
-      staleGraceMarked: 0,
-      staleRejectedAfterGrace: 0,
+      sources: {
+        github: {
+          fetched: 1,
+          normalized: 1,
+          published: 1,
+          quarantined: 0,
+          rejected: 0,
+          failed: 0,
+          fullSweepCompleted: true,
+        },
+        smithery: {
+          fetched: 0,
+          normalized: 0,
+          published: 0,
+          quarantined: 0,
+          rejected: 0,
+          failed: 1,
+          fullSweepCompleted: false,
+        },
+        npm: {
+          fetched: 0,
+          normalized: 0,
+          published: 0,
+          quarantined: 0,
+          rejected: 0,
+          failed: 0,
+          fullSweepCompleted: true,
+        },
+      },
+      metricsByStage: {
+        fetched: 1,
+        normalized: 1,
+        verified: 1,
+        published: 1,
+        quarantined: 0,
+        rejected: 0,
+        stale: 0,
+      },
     }),
   });
 
@@ -123,18 +122,44 @@ test("sync-all core returns 207 when only some sources fail", async () => {
 test("sync-all core returns 500 when all sources fail", async () => {
   const response = await executeCatalogSyncAll({
     ...createBaseDeps(),
-    runGithubSync: async () => {
-      throw new Error("github failed");
-    },
-    runSmitherySync: async () => {
-      throw new Error("smithery failed");
-    },
-    runNpmSync: async () => {
-      throw new Error("npm failed");
-    },
+    runSync: async () => ({
+      executedAt: "2026-03-07T00:00:00.000Z",
+      sourceTypes: ["github", "smithery", "npm"],
+      created: 0,
+      updated: 0,
+      published: 0,
+      quarantined: 0,
+      rejected: 0,
+      failed: 3,
+      failures: [
+        { source: "github", entityKey: "github", stage: "fetch", reason: "github failed" },
+        { source: "smithery", entityKey: "smithery", stage: "fetch", reason: "smithery failed" },
+        { source: "npm", entityKey: "npm", stage: "fetch", reason: "npm failed" },
+      ],
+      changedSlugs: [],
+      staleCandidates: 0,
+      staleMarked: 0,
+      staleRejectedAfterGrace: 0,
+      staleCleanupApplied: false,
+      staleCleanupReason: null,
+      sources: {
+        github: { fetched: 0, normalized: 0, published: 0, quarantined: 0, rejected: 0, failed: 1, fullSweepCompleted: false },
+        smithery: { fetched: 0, normalized: 0, published: 0, quarantined: 0, rejected: 0, failed: 1, fullSweepCompleted: false },
+        npm: { fetched: 0, normalized: 0, published: 0, quarantined: 0, rejected: 0, failed: 1, fullSweepCompleted: false },
+      },
+      metricsByStage: {
+        fetched: 0,
+        normalized: 0,
+        verified: 0,
+        published: 0,
+        quarantined: 0,
+        rejected: 0,
+        stale: 0,
+      },
+    }),
   });
 
   assert.equal(response.status, 500);
   assert.equal(response.body.code, "internal_error");
-  assert.equal(response.body.error, "Catalog sync-all failed across all sources.");
+  assert.equal(response.body.error, "Catalog sync-all failed across all selected sources.");
 });

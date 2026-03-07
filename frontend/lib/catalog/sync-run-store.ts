@@ -1,9 +1,10 @@
-import type { Logger } from "@/lib/api/logger";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { Logger } from "../api/logger.ts";
+import { createSupabaseAdminClient } from "../supabase/admin.ts";
 
 const RUNS_TABLE = "catalog_sync_runs";
 const FAILURES_TABLE = "catalog_sync_failures";
 const LOCKS_TABLE = "catalog_sync_locks";
+const GITHUB_WEBHOOK_DELIVERIES_TABLE = "catalog_github_webhook_deliveries";
 
 type StoreContext = {
   logger?: Logger;
@@ -35,6 +36,10 @@ type FinishRunInput = {
   upserted?: number;
   failed?: number;
   staleMarked?: number;
+  published?: number;
+  quarantined?: number;
+  stageMetrics?: Record<string, number>;
+  alertingSummary?: Record<string, unknown>;
   errorSummary?: string;
 };
 
@@ -63,7 +68,11 @@ export type CatalogSyncRunRow = {
   upserted: number;
   failed: number;
   staleMarked: number;
+  published: number;
+  quarantined: number;
   durationMs: number | null;
+  stageMetrics: Record<string, unknown> | null;
+  alertingSummary: Record<string, unknown> | null;
   errorSummary: string | null;
 };
 
@@ -100,6 +109,13 @@ function safeNumber(value: number | undefined): number {
     return 0;
   }
   return Math.floor(value);
+}
+
+function safeJson<T extends Record<string, unknown> | undefined>(value: T): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+  return value;
 }
 
 export async function acquireCatalogSyncLock(
@@ -271,6 +287,10 @@ export async function finishCatalogSyncRun(
         upserted: safeNumber(input.upserted),
         failed: safeNumber(input.failed),
         stale_marked: safeNumber(input.staleMarked),
+        published: safeNumber(input.published),
+        quarantined: safeNumber(input.quarantined),
+        stage_metrics: safeJson(input.stageMetrics),
+        alerting_summary: safeJson(input.alertingSummary),
         error_summary: input.errorSummary ?? null,
       })
       .eq("id", input.runId);
@@ -340,7 +360,7 @@ export async function getRecentCatalogSyncRuns(
     const boundedLimit = Math.max(1, Math.min(limit, 50));
     const { data, error } = await adminClient
       .from(RUNS_TABLE)
-      .select("id, trigger, status, started_at, finished_at, fetched, upserted, failed, stale_marked, duration_ms, error_summary")
+      .select("id, trigger, status, started_at, finished_at, fetched, upserted, failed, stale_marked, published, quarantined, duration_ms, stage_metrics, alerting_summary, error_summary")
       .order("started_at", { ascending: false })
       .limit(boundedLimit);
 
@@ -359,7 +379,11 @@ export async function getRecentCatalogSyncRuns(
       upserted: row.upserted ?? 0,
       failed: row.failed ?? 0,
       staleMarked: row.stale_marked ?? 0,
+      published: row.published ?? 0,
+      quarantined: row.quarantined ?? 0,
       durationMs: row.duration_ms,
+      stageMetrics: row.stage_metrics ?? {},
+      alertingSummary: row.alerting_summary ?? {},
       errorSummary: row.error_summary,
     }));
 
@@ -401,5 +425,33 @@ export async function getActiveCatalogSyncLocks(
   } catch (error) {
     logWarn(context, "catalog.sync_store.locks.read_exception", { message: getErrorMessage(error) });
     return { degraded: true, data: [] };
+  }
+}
+
+export async function getQueuedGithubWebhookDeliveryCount(
+  context: StoreContext = {},
+): Promise<number> {
+  const adminClient = createSupabaseAdminClient();
+  if (!adminClient) {
+    return 0;
+  }
+
+  try {
+    const { count, error } = await adminClient
+      .from(GITHUB_WEBHOOK_DELIVERIES_TABLE)
+      .select("id", { count: "exact", head: true })
+      .eq("status", "queued");
+
+    if (error) {
+      logWarn(context, "catalog.sync_store.github_webhook.count_error", { message: error.message });
+      return 0;
+    }
+
+    return count ?? 0;
+  } catch (error) {
+    logWarn(context, "catalog.sync_store.github_webhook.count_exception", {
+      message: getErrorMessage(error),
+    });
+    return 0;
   }
 }

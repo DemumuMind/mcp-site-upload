@@ -1,0 +1,32 @@
+name: Catalog GitHub Webhook Worker
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  drain-github-webhook-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Drain queued GitHub webhook deliveries
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SMOKE_BASE_URL || vars.NEXT_PUBLIC_SITE_URL }}
+          CATALOG_AUTOSYNC_CRON_SECRET: ${{ secrets.CATALOG_AUTOSYNC_CRON_SECRET }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
+          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+        run: npm run catalog:webhook:worker

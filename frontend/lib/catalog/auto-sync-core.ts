@@ -1,4 +1,4 @@
-import type { CatalogSyncResult } from "./github-sync";
+import type { CatalogSyncResult } from "./ingestion.ts";
 
 export type AutoSyncAlertSignal = {
   code: string;
@@ -58,7 +58,7 @@ type AutoSyncDeps = {
   releaseLock: () => Promise<void>;
   parseEnvMaxPages: () => number;
   parseMaxPages: (value: string | null, fallback: number) => number;
-  runSync: (input: { maxPages: number }) => Promise<CatalogSyncResult>;
+  runSync: (input: { maxPages: number; runId: string | null }) => Promise<CatalogSyncResult>;
   clearCaches: (result: CatalogSyncResult) => Promise<void>;
   logger: {
     warn: (event: string, details?: Record<string, unknown>) => void;
@@ -117,32 +117,20 @@ function buildAlertingSignals(result: CatalogSyncResult): AutoSyncAlerting {
       threshold: 0,
     });
   }
-  if (result.staleCleanupEnabled && !result.staleCleanupApplied) {
+  if (!result.staleCleanupApplied && result.staleCleanupReason) {
     signals.push({
       code: "STALE_CLEANUP_SKIPPED",
       severity: "warning",
       message: result.staleCleanupReason ?? "Stale cleanup skipped.",
     });
   }
-  if (result.staleCappedCount > 0) {
+  if (result.staleCandidates > result.staleMarked) {
     signals.push({
-      code: "STALE_CLEANUP_CAPPED",
+      code: "STALE_CLEANUP_DEFERRED",
       severity: "warning",
-      message: "Stale cleanup deferred candidates due to per-run cap.",
-      value: result.staleCappedCount,
+      message: "Some stale candidates were not mutated in this run.",
+      value: result.staleCandidates - result.staleMarked,
       threshold: 0,
-    });
-  }
-  if (
-    typeof result.staleCoverageRatio === "number" &&
-    result.staleCoverageRatio < result.minStaleBaselineRatio
-  ) {
-    signals.push({
-      code: "LOW_STALE_COVERAGE_RATIO",
-      severity: "warning",
-      message: "Fetched coverage is below stale cleanup safety threshold.",
-      value: result.staleCoverageRatio,
-      threshold: result.minStaleBaselineRatio,
     });
   }
   const hasError = signals.some((signal) => signal.severity === "error");
@@ -165,7 +153,7 @@ function toResultCounters(result: CatalogSyncResult): Record<string, number> {
     created: result.created,
     updated: result.updated,
     failed: result.failed,
-    fetchedRecords: result.fetchedRecords,
+    fetchedRecords: result.metricsByStage.fetched ?? 0,
   };
 }
 
@@ -218,7 +206,7 @@ export async function executeCatalogAutoSync(
 
     for (let attempt = 1; attempt <= NETWORK_RETRY_ATTEMPTS; attempt += 1) {
       try {
-        result = await deps.runSync({ maxPages });
+        result = await deps.runSync({ maxPages, runId });
         lastError = null;
         break;
       } catch (error) {
@@ -307,9 +295,9 @@ export async function executeCatalogAutoSync(
     finalStatus = toRunStatus(alerting.status);
     finalCounters = toResultCounters(result);
     failureRows = result.failures.map((failure) => ({
-      source: "github",
-      entityKey: failure.slug,
-      stage: "upsert",
+      source: failure.source,
+      entityKey: failure.entityKey,
+      stage: failure.stage,
       errorMessageSanitized: failure.reason,
     }));
 
@@ -340,24 +328,16 @@ export async function executeCatalogAutoSync(
         ...result,
         alerting,
         safety: {
-          coverage: {
-            ratio: result.staleCoverageRatio,
-            minRequiredRatio: result.minStaleBaselineRatio,
-            baselineCount: result.staleBaselineCount,
-          },
-          staleCap: {
-            maxPerRunRatio: result.maxStaleMarkRatio,
-            totalCandidates: result.staleCandidates,
-            deferredCount: result.staleCappedCount,
-            processedCount: result.staleCandidates - result.staleCappedCount,
-          },
-          graceMode: {
-            markedAsCandidates: result.staleGraceMarked,
+          stale: {
+            applied: result.staleCleanupApplied,
+            reason: result.staleCleanupReason,
+            candidates: result.staleCandidates,
+            marked: result.staleMarked,
             rejectedAfterGrace: result.staleRejectedAfterGrace,
           },
         },
         settings: {
-          source: "github",
+          sourceTypes: result.sourceTypes,
           maxPages,
         },
       },

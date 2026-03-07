@@ -68,7 +68,6 @@ Detailed env management guide: [`docs/environment-variables.md`](docs/environmen
 | `CATALOG_AUTOSYNC_CRON_SECRET` | recommended | bearer token for `/api/catalog/auto-sync` |
 | `CRON_SECRET` | one of two required | shared Vercel Cron-compatible alias for all cron endpoints |
 | `EXA_API_KEY` | required for blog automation | deep research provider key for auto blog posts |
-| `CATALOG_AUTOSYNC_REGISTRY_URL` | optional | MCP Registry base URL override |
 | `CATALOG_AUTOSYNC_PAGE_LIMIT` | optional | page size per registry fetch (default `100`) |
 | `CATALOG_AUTOSYNC_MAX_PAGES` | optional | max pages per sync run (default `120`) |
 | `CATALOG_AUTOSYNC_STALE_CLEANUP_ENABLED` | optional | enable stale auto-row cleanup (default `true`) |
@@ -77,6 +76,8 @@ Detailed env management guide: [`docs/environment-variables.md`](docs/environmen
 | `CATALOG_AUTOSYNC_QUALITY_FILTER_ENABLED` | optional | filter obvious test/staging/template entries (default `true`) |
 | `CATALOG_AUTOSYNC_ALLOWLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to force-allow entries |
 | `CATALOG_AUTOSYNC_DENYLIST_PATTERNS` | optional | comma-separated wildcard/regex patterns to auto-reject noisy entries |
+| `CATALOG_GITHUB_README_ENRICH_LIMIT` | optional | max README fetches per GitHub ingestion run (default `40`) |
+| `GITHUB_WEBHOOK_SECRET` | optional | shared secret for `/api/catalog/github-webhook` signature validation |
 | `SERVER_PROBE_SECRET` | optional | bearer token for direct calls to `/api/server/[slug]/probe` (UI call includes internal trusted header and remains allowed) |
 | `MULTI_AGENT_DEMO_SECRET` | optional (recommended in production) | bearer token for `/api/multi-agent/demo`; if unset, endpoint stays open (use only in trusted environments) |
 | `MULTI_AGENT_ADAPTIVE_ENABLED` | optional | enable adaptive worker/mode selection (`1` default, set `0` for fixed full-mesh) |
@@ -198,23 +199,54 @@ npm run catalog:registry:stats -- --limit 100 --pages 120
 
 Useful to quickly verify how many entries are currently visible in MCP Registry and whether your page window is truncating results.
 
+Behavior:
+- GitHub-only operational path
+- useful for manual/debug runs and focused recovery
+- leaves manually curated rows unchanged
+- does not act as the production multi-source orchestrator
+
+## Catalog Sync-All
+
+Endpoint:
+- `GET/POST /api/catalog/sync-all`
+
+Behavior:
+- production multi-source orchestrator
+- runtime/public source of truth remains `public.servers`
+- stages: fetch -> raw snapshot -> normalize -> dedupe -> verify -> publish -> stale -> invalidate
+- providers:
+  - GitHub Search API
+  - Smithery
+  - npm
+  - PyPI
+  - OCI metadata (GHCR first, Docker Hub on explicit refs only)
+  - official MCP Registry as corroboration-only source
+- weak candidates stay in ingestion support tables and are not published automatically
+- published automation-managed rows still carry `registry-auto`
+- manual rows are protected from overwrite
+- GitHub stale cleanup remains two-step and only runs on healthy full sweeps
+
 Default Vercel cron schedule:
 - `01:45` UTC
 - `07:45` UTC
 - `13:45` UTC
 - `19:45` UTC
 
+Operational references:
+- `docs/catalog-automation.md`
+- `docs/catalog-ingestion-architecture.md`
+
+## Catalog GitHub Webhook
+
+Endpoint:
+- `POST /api/catalog/github-webhook`
+
 Behavior:
-- pulls MCP servers from the public MCP Registry API
-- creates new `active` catalog entries automatically
-- applies denylist/allowlist moderation patterns (allowlist overrides denylist)
-- filters obvious low-quality records (test/demo/staging/template signals)
-- updates only previously auto-managed rows (`registry-auto` tag)
-- uses two-step stale cleanup for safety: first marks missing rows as `registry-stale-candidate`, rejects only if still missing on next healthy sync
-- stale cleanup runs only after a full pagination sweep (safety guard)
-- stale cleanup is skipped if fetched coverage is below `CATALOG_AUTOSYNC_MIN_STALE_BASELINE_RATIO`
-- stale cleanup per-run volume is capped by `CATALOG_AUTOSYNC_MAX_STALE_MARK_RATIO`
-- leaves manually curated rows unchanged
+- validates `X-Hub-Signature-256` using `GITHUB_WEBHOOK_SECRET`
+- accepts `push`, `release`, and `repository` events
+- stores replay-safe deliveries in a durable queue
+- does not run full sync inline
+- queued deliveries are drained by the standalone external worker
 
 Moderation pattern syntax:
 - wildcard patterns (e.g. `ai-smithery-*-test*`)
@@ -229,6 +261,7 @@ npm run check:utf8:strict
 npm run lint
 npm run build
 npm run start
+npm run catalog:webhook:worker -- --base-url https://your-domain
 npm run smoke:check -- https://your-domain
 npm run ops:health-report -- --base-url https://your-domain
 npm run ops:backup-verify
@@ -338,6 +371,7 @@ Workflow: `.github/workflows/deploy-smoke-check.yml`
 | `.github/workflows/deploy.yml` | Deploy orchestration to Vercel + post-deploy smoke |
 | `.github/workflows/nightly-smoke.yml` | Scheduled smoke checks against configured environment |
 | `.github/workflows/deploy-smoke-check.yml` | Manual smoke rerun/fallback workflow |
+| `.github/workflows/catalog-github-webhook-worker.yml` | External GitHub webhook queue drain worker |
 | `.github/workflows/supabase-migrations.yml` | Auto/manual Supabase migration push to remote DB |
 
 - Repository variables controlling execution:
@@ -377,6 +411,7 @@ Required repository secret for Supabase migration workflow:
 - Restore runbook: `docs/runbooks/restore.md`
 - Security runbook: `docs/runbooks/security.md`
 - Catalog automation runbook: `docs/catalog-automation.md`
+- Catalog GitHub webhook replay runbook: `docs/runbooks/catalog-github-webhook-replay.md`
 - Admin dashboard analytics rollout: `docs/runbooks/admin-dashboard-analytics-rollout.md`
 - Admin role seed + rollout: `docs/runbooks/admin-role-seed-rollout.md`
 - Admin role seed SQL (staging/prod): `docs/runbooks/sql/admin-role-seed-staging-prod.sql`

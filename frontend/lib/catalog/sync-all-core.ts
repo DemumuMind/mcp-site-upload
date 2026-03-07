@@ -1,6 +1,4 @@
-import type { CatalogSyncResult } from "./github-sync";
-
-type UnifiedSourceResult = CatalogSyncResult | { error: string };
+import type { CatalogSyncResult } from "./ingestion.ts";
 
 export type SyncAllFinalStatus = "success" | "partial" | "error";
 
@@ -27,6 +25,10 @@ type SyncAllDeps = {
     upserted?: number;
     failed?: number;
     staleMarked?: number;
+    published?: number;
+    quarantined?: number;
+    stageMetrics?: Record<string, number>;
+    alertingSummary?: Record<string, unknown>;
     errorSummary?: string;
   }) => Promise<void>;
   recordFailures: (input: {
@@ -40,13 +42,12 @@ type SyncAllDeps = {
     limit: number;
   }) => Promise<void>;
   releaseLock: () => Promise<void>;
-  runGithubSync: () => Promise<CatalogSyncResult>;
-  runSmitherySync: () => Promise<CatalogSyncResult>;
-  runNpmSync: () => Promise<CatalogSyncResult>;
+  runSync: (input: { runId: string | null }) => Promise<CatalogSyncResult>;
   runHealthCheck: () => Promise<unknown>;
   clearCaches: (changedSlugs: string[]) => Promise<void>;
   logger: {
     info: (event: string, details?: Record<string, unknown>) => void;
+    warn?: (event: string, details?: Record<string, unknown>) => void;
     error: (event: string, details?: Record<string, unknown>) => void;
   };
   now?: () => number;
@@ -68,38 +69,6 @@ function toSyncAllErrorMessage(error: unknown, fallback: string): string {
     return error.message;
   }
   return fallback;
-}
-
-function getMetricValue(
-  source: UnifiedSourceResult | undefined,
-  metric: "created" | "updated" | "failed",
-): number {
-  if (!source || "error" in source) {
-    return 0;
-  }
-  return source[metric];
-}
-
-function hasSourceError(source: UnifiedSourceResult | undefined): boolean {
-  return Boolean(source && "error" in source);
-}
-
-function toSourceFailures(
-  source: string,
-  result: UnifiedSourceResult | undefined,
-): { source: string; entityKey: string; stage: string; errorMessageSanitized: string }[] {
-  if (!result) {
-    return [];
-  }
-  if ("error" in result) {
-    return [{ source, entityKey: source, stage: "sync", errorMessageSanitized: result.error }];
-  }
-  return result.failures.map((failure) => ({
-    source,
-    entityKey: failure.slug,
-    stage: "upsert",
-    errorMessageSanitized: failure.reason,
-  }));
 }
 
 const MAX_RECORDED_FAILURES = 200;
@@ -126,146 +95,105 @@ export async function executeCatalogSyncAll(
   const runId = await deps.startRun();
   let finalStatus: SyncAllFinalStatus = "error";
   let errorSummary: string | undefined;
-  let counters: Record<string, number> = {};
-  let failures: { source: string; entityKey: string; stage: string; errorMessageSanitized: string }[] = [];
+  let finalResult: CatalogSyncResult | null = null;
+  const recordedFailures: { source: string; entityKey: string; stage: string; errorMessageSanitized: string }[] = [];
 
   try {
     deps.logger.info("catalog.unified_sync.start");
-
-    const executedAt = new Date().toISOString();
-    const changedSlugs = new Set<string>();
-    const results: {
-      github?: UnifiedSourceResult;
-      smithery?: UnifiedSourceResult;
-      npm?: UnifiedSourceResult;
-    } = {};
-
-    try {
-      deps.logger.info("catalog.unified_sync.github.start");
-      const githubResult = await deps.runGithubSync();
-      results.github = githubResult;
-      githubResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
-    } catch (error) {
-      const message = toSyncAllErrorMessage(error, "Unknown GitHub sync error");
-      deps.logger.error("catalog.unified_sync.github.error", { message });
-      results.github = { error: message };
-    }
-
-    try {
-      deps.logger.info("catalog.unified_sync.smithery.start");
-      const smitheryResult = await deps.runSmitherySync();
-      results.smithery = smitheryResult;
-      smitheryResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
-    } catch (error) {
-      const message = toSyncAllErrorMessage(error, "Unknown Smithery sync error");
-      deps.logger.error("catalog.unified_sync.smithery.error", { message });
-      results.smithery = { error: message };
-    }
-
-    try {
-      deps.logger.info("catalog.unified_sync.npm.start");
-      const npmResult = await deps.runNpmSync();
-      results.npm = npmResult;
-      npmResult.changedSlugs.forEach((slug) => changedSlugs.add(slug));
-    } catch (error) {
-      const message = toSyncAllErrorMessage(error, "Unknown npm sync error");
-      deps.logger.error("catalog.unified_sync.npm.error", { message });
-      results.npm = { error: message };
-    }
+    const result = await deps.runSync({ runId });
+    finalResult = result;
 
     try {
       deps.logger.info("catalog.unified_sync.health_check.start");
       await deps.runHealthCheck();
     } catch (error) {
-      deps.logger.error("catalog.unified_sync.health_check.error", {
-        message: toSyncAllErrorMessage(error, "Unknown health-check error"),
+      const message = toSyncAllErrorMessage(error, "Unknown health-check error");
+      deps.logger.error("catalog.unified_sync.health_check.error", { message });
+      recordedFailures.push({
+        source: "health",
+        entityKey: "catalog-health-check",
+        stage: "health_check",
+        errorMessageSanitized: message,
       });
     }
 
-    const summary = {
-      totalCreated:
-        getMetricValue(results.github, "created") +
-        getMetricValue(results.smithery, "created") +
-        getMetricValue(results.npm, "created"),
-      totalUpdated:
-        getMetricValue(results.github, "updated") +
-        getMetricValue(results.smithery, "updated") +
-        getMetricValue(results.npm, "updated"),
-      totalFailed:
-        getMetricValue(results.github, "failed") +
-        getMetricValue(results.smithery, "failed") +
-        getMetricValue(results.npm, "failed"),
-    };
-
-    if (changedSlugs.size > 0) {
-      await deps.clearCaches(Array.from(changedSlugs));
+    if (result.changedSlugs.length > 0) {
+      await deps.clearCaches(result.changedSlugs);
     }
 
-    const ok =
-      !hasSourceError(results.github) &&
-      !hasSourceError(results.smithery) &&
-      !hasSourceError(results.npm) &&
-      summary.totalFailed === 0;
+    recordedFailures.push(
+      ...result.failures.map((failure) => ({
+        source: failure.source,
+        entityKey: failure.entityKey,
+        stage: failure.stage,
+        errorMessageSanitized: failure.reason,
+      })),
+    );
 
-    const sourceErrors = [
-      hasSourceError(results.github) ? "github" : null,
-      hasSourceError(results.smithery) ? "smithery" : null,
-      hasSourceError(results.npm) ? "npm" : null,
-    ].filter((value): value is string => Boolean(value));
+    const failedProviders = Object.values(result.sources).filter((source) => (source?.failed ?? 0) > 0).length;
+    const totalProviders = result.sourceTypes.length;
+    const ok = failedProviders === 0 && result.failed === 0;
 
     if (ok) {
       finalStatus = "success";
-    } else if (sourceErrors.length === 3) {
+    } else if (
+      totalProviders > 0 &&
+      failedProviders === totalProviders &&
+      result.published === 0 &&
+      result.created === 0 &&
+      result.updated === 0
+    ) {
       finalStatus = "error";
     } else {
       finalStatus = "partial";
     }
 
-    if (sourceErrors.length > 0) {
-      errorSummary = `Source errors: ${sourceErrors.join(", ")}.`;
+    if (recordedFailures.length > 0) {
+      errorSummary = `${recordedFailures.length} stage failures recorded.`;
     }
 
-    counters = {
-      githubCreated: getMetricValue(results.github, "created"),
-      githubUpdated: getMetricValue(results.github, "updated"),
-      githubFailed: getMetricValue(results.github, "failed"),
-      smitheryCreated: getMetricValue(results.smithery, "created"),
-      smitheryUpdated: getMetricValue(results.smithery, "updated"),
-      smitheryFailed: getMetricValue(results.smithery, "failed"),
-      npmCreated: getMetricValue(results.npm, "created"),
-      npmUpdated: getMetricValue(results.npm, "updated"),
-      npmFailed: getMetricValue(results.npm, "failed"),
-      totalCreated: summary.totalCreated,
-      totalUpdated: summary.totalUpdated,
-      totalFailed: summary.totalFailed,
-    };
-
-    failures = [
-      ...toSourceFailures("github", results.github),
-      ...toSourceFailures("smithery", results.smithery),
-      ...toSourceFailures("npm", results.npm),
-    ];
-
-    deps.logger.info("catalog.unified_sync.completed", summary);
-
-    const errorBody = ok
-      ? {}
-      : createSyncAllErrorBody(
-          sourceErrors.length === 3
-            ? "Catalog sync-all failed across all sources."
-            : "Catalog sync-all completed with partial source failures.",
-          sourceErrors.length === 3 ? "internal_error" : "partial_failure",
-        );
+    const responseStatus = finalStatus === "error" ? 500 : finalStatus === "partial" ? 207 : 200;
+    const responseBody =
+      finalStatus === "success"
+        ? {}
+        : createSyncAllErrorBody(
+            finalStatus === "error"
+              ? "Catalog sync-all failed across all selected sources."
+              : "Catalog sync-all completed with partial source failures.",
+            finalStatus === "error" ? "internal_error" : "partial_failure",
+          );
 
     return {
-      status: finalStatus === "error" ? 500 : finalStatus === "partial" ? 207 : 200,
+      status: responseStatus,
       body: {
         ok,
-        ...errorBody,
-        executedAt,
-        sources: results,
-        summary,
+        ...responseBody,
+        executedAt: result.executedAt,
+        summary: {
+          created: result.created,
+          updated: result.updated,
+          published: result.published,
+          quarantined: result.quarantined,
+          failed: result.failed,
+          staleCandidates: result.staleCandidates,
+          staleMarked: result.staleMarked,
+        },
+        sources: result.sources,
+        failures: result.failures,
+        alerting: {
+          status: finalStatus === "success" ? "ok" : finalStatus,
+          shouldWarn: finalStatus !== "success",
+          shouldPage: finalStatus === "error",
+        },
       },
+    };
+  } catch (error) {
+    const message = toSyncAllErrorMessage(error, "Catalog sync-all failed before completion.");
+    errorSummary = message;
+    deps.logger.error("catalog.unified_sync.unhandled_error", { message });
+    return {
+      status: 500,
+      body: createSyncAllErrorBody("Catalog sync-all failed before completion.", "internal_error"),
     };
   } finally {
     const durationMs = (deps.now ?? Date.now)() - startedAtMs;
@@ -274,17 +202,24 @@ export async function executeCatalogSyncAll(
         runId,
         status: finalStatus,
         durationMs,
-        fetched: (counters.totalCreated ?? 0) + (counters.totalUpdated ?? 0) + (counters.totalFailed ?? 0),
-        upserted: (counters.totalCreated ?? 0) + (counters.totalUpdated ?? 0),
-        failed: counters.totalFailed,
-        staleMarked: 0,
+        fetched: finalResult?.metricsByStage.fetched ?? 0,
+        upserted: (finalResult?.created ?? 0) + (finalResult?.updated ?? 0),
+        failed: finalResult?.failed ?? recordedFailures.length,
+        staleMarked: finalResult?.staleMarked ?? 0,
+        published: finalResult?.published ?? 0,
+        quarantined: finalResult?.quarantined ?? 0,
+        stageMetrics: finalResult?.metricsByStage ?? {},
+        alertingSummary: {
+          status: finalStatus === "success" ? "ok" : finalStatus,
+          failures: recordedFailures.length,
+        },
         errorSummary,
       });
 
-      if (failures.length > 0) {
+      if (recordedFailures.length > 0) {
         await deps.recordFailures({
           runId,
-          failures,
+          failures: recordedFailures,
           limit: MAX_RECORDED_FAILURES,
         });
       }

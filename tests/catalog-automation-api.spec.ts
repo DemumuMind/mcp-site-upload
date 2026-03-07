@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { createHmac } from "node:crypto";
 
 const cronToken = process.env.CATALOG_AUTOSYNC_CRON_SECRET || process.env.CRON_SECRET;
+const githubWebhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 
 test.describe("Catalog automation API", () => {
   test("GET /api/catalog/automation-status without token returns 401", async ({ request }) => {
@@ -84,5 +86,66 @@ test.describe("Catalog automation API", () => {
     const body = await response.json();
     expect(body).toMatchObject({ ok: false });
     expect(typeof body.error).toBe("string");
+  });
+
+  test("POST /api/catalog/cache-invalidate without token returns 401", async ({ request }) => {
+    const response = await request.post("/api/catalog/cache-invalidate", {
+      data: {
+        changedSlugs: ["github"],
+      },
+    });
+
+    expect(response.status()).toBe(401);
+    const body = await response.json();
+    expect(body).toMatchObject({ ok: false });
+    expect(typeof body.error).toBe("string");
+  });
+
+  test("POST /api/catalog/github-webhook validates signature behavior", async ({ request }) => {
+    const payload = JSON.stringify({
+      repository: {
+        full_name: "example/example-mcp",
+        html_url: "https://github.com/example/example-mcp",
+      },
+    });
+
+    if (!githubWebhookSecret) {
+      const response = await request.post("/api/catalog/github-webhook", {
+        headers: {
+          "content-type": "application/json",
+        },
+        data: payload,
+      });
+
+      expect(response.status()).toBe(503);
+      return;
+    }
+
+    const invalid = await request.post("/api/catalog/github-webhook", {
+      headers: {
+        "content-type": "application/json",
+        "x-github-event": "push",
+        "x-github-delivery": "delivery-invalid",
+        "x-hub-signature-256": "sha256=invalid",
+      },
+      data: payload,
+    });
+
+    expect(invalid.status()).toBe(401);
+
+    const signature = `sha256=${createHmac("sha256", githubWebhookSecret).update(payload).digest("hex")}`;
+    const valid = await request.post("/api/catalog/github-webhook", {
+      headers: {
+        "content-type": "application/json",
+        "x-github-event": "push",
+        "x-github-delivery": `delivery-${Date.now()}`,
+        "x-hub-signature-256": signature,
+      },
+      data: payload,
+    });
+
+    expect(valid.status()).toBe(202);
+    const body = await valid.json();
+    expect(body).toMatchObject({ ok: true, eventType: "push" });
   });
 });

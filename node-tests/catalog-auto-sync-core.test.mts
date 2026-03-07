@@ -83,3 +83,55 @@ test("auto-sync core returns 500 on non-retryable internal errors", async () => 
   assert.equal(response.body.code, "internal_error");
   assert.equal(response.body.error, "Catalog auto-sync failed before completion.");
 });
+
+test("auto-sync core forwards the created run id into the shared ingestion call", async () => {
+  let observedRunId: string | null = null;
+
+  const response = await executeCatalogAutoSync({
+    ...createBaseDeps(),
+    startRun: async () => "run-42",
+    runSync: async ({ runId }) => {
+      observedRunId = runId;
+      return {
+        executedAt: "2026-03-07T00:00:00.000Z",
+        sourceTypes: ["github"],
+        created: 0,
+        updated: 0,
+        published: 0,
+        quarantined: 0,
+        rejected: 0,
+        failed: 0,
+        changedSlugs: [],
+        failures: [],
+        staleCandidates: 0,
+        staleMarked: 0,
+        staleRejectedAfterGrace: 0,
+        staleCleanupApplied: false,
+        staleCleanupReason: "GitHub stale cleanup skipped because the search window did not exhaust all matching pages.",
+        sources: {
+          github: {
+            fetched: 1,
+            normalized: 1,
+            published: 0,
+            quarantined: 0,
+            rejected: 0,
+            failed: 0,
+            fullSweepCompleted: false,
+          },
+        },
+        metricsByStage: {
+          fetched: 1,
+          normalized: 1,
+          verified: 0,
+          published: 0,
+          quarantined: 0,
+          rejected: 0,
+          stale: 0,
+        },
+      };
+    },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(observedRunId, "run-42");
+});

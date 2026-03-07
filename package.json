@@ -31,6 +31,7 @@
     "blog:new": "node scripts/blog-new-post.mjs",
     "blog:migrate-mdx": "node scripts/blog-migrate-json-to-mdx.mjs",
     "catalog:count:guard": "node scripts/catalog-count-guard.mjs",
+    "catalog:webhook:worker": "node --experimental-strip-types scripts/catalog-github-webhook-worker.ts",
     "verify:dashboard:metrics": "node scripts/verify-dashboard-metrics.mjs",
     "profile:multi-agent": "node scripts/profile-multi-agent.mjs",
     "git:scope-status": "node scripts/git-scope-status.mjs",
