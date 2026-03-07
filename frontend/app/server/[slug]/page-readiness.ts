@@ -17,25 +17,28 @@ export type ServerReadinessViewModel = {
   checklistItems: ServerReadinessChecklistItem[];
 };
 
+export type ServerReadinessDocsSignal = "verified" | "linked" | "missing";
+
 export function buildServerReadinessViewModel({
   mcpServer,
-  hasLicense,
+  docsSignal,
 }: {
   mcpServer: McpServer;
-  hasLicense: boolean;
+  docsSignal: ServerReadinessDocsSignal;
 }): ServerReadinessViewModel {
   const checklistItems: ServerReadinessChecklistItem[] = [
     buildTrustChecklistItem(mcpServer),
     buildHealthChecklistItem(mcpServer),
     buildAuthChecklistItem(mcpServer),
     buildToolsChecklistItem(mcpServer),
-    buildDocsChecklistItem(mcpServer, hasLicense),
+    buildDocsChecklistItem(docsSignal),
   ];
 
-  const score = clampScore(
+  const status = getOverallStatus(checklistItems);
+  const rawScore = clampScore(
     checklistItems.reduce((total, item) => total + statusScore(item.status), 0),
   );
-  const status = getOverallStatus(checklistItems);
+  const score = status === "blocked" ? Math.min(rawScore, 34) : rawScore;
 
   return {
     score,
@@ -135,11 +138,8 @@ function buildToolsChecklistItem(mcpServer: McpServer): ServerReadinessChecklist
   };
 }
 
-function buildDocsChecklistItem(
-  mcpServer: McpServer,
-  hasLicense: boolean,
-): ServerReadinessChecklistItem {
-  if (mcpServer.repoUrl && hasLicense) {
+function buildDocsChecklistItem(docsSignal: ServerReadinessDocsSignal): ServerReadinessChecklistItem {
+  if (docsSignal === "verified") {
     return {
       key: "docs",
       label: "Source and docs",
@@ -148,11 +148,20 @@ function buildDocsChecklistItem(
     };
   }
 
+  if (docsSignal === "linked") {
+    return {
+      key: "docs",
+      label: "Source and docs",
+      status: "review",
+      detail: "Repository is linked, but license or docs metadata is not verified yet",
+    };
+  }
+
   return {
     key: "docs",
     label: "Source and docs",
     status: "review",
-    detail: "Repository or license context is incomplete",
+    detail: "Repository link is missing, so setup context needs manual review",
   };
 }
 

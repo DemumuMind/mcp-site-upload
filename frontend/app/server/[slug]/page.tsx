@@ -108,7 +108,11 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
   });
   const readinessViewModel = buildServerReadinessViewModel({
     mcpServer,
-    hasLicense: !!githubStats?.license,
+    docsSignal: mcpServer.repoUrl
+      ? githubStats?.license
+        ? "verified"
+        : "linked"
+      : "missing",
   });
 
   const AuthIcon = authIconConfig[mcpServer.authType];

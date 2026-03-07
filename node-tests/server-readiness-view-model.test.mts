@@ -24,7 +24,7 @@ test("marks healthy low-friction verified servers as ready for rollout", () => {
       healthCheckedAt: "2026-03-07T00:00:00.000Z",
       tools: ["list_repositories", "read_file", "open_pr"],
     },
-    hasLicense: true,
+    docsSignal: "verified",
   });
 
   assert.equal(model.score, 100);
@@ -55,7 +55,7 @@ test("downgrades readiness when auth and trust context need review", () => {
       healthStatus: "unknown",
       tools: ["run_query", "describe_table"],
     },
-    hasLicense: false,
+    docsSignal: "linked",
   });
 
   assert.equal(model.status, "review");
@@ -65,4 +65,32 @@ test("downgrades readiness when auth and trust context need review", () => {
   assert.equal(model.checklistItems.find((item) => item.key === "health")?.status, "review");
   assert.equal(model.checklistItems.find((item) => item.key === "trust")?.status, "review");
   assert.equal(model.checklistItems.find((item) => item.key === "docs")?.status, "review");
+});
+
+test("clamps blocked readiness score when health is down", () => {
+  const model = buildServerReadinessViewModel({
+    mcpServer: {
+      id: "blocked-server",
+      name: "Blocked Server",
+      slug: "blocked-server",
+      description: "Health is currently down",
+      serverUrl: "https://example.com/blocked",
+      category: "Developer Tools",
+      authType: "none",
+      tags: ["ops"],
+      repoUrl: "https://github.com/example/blocked",
+      maintainer: { name: "Demo" },
+      status: "active",
+      verificationLevel: "official",
+      healthStatus: "down",
+      tools: ["run"],
+    },
+    docsSignal: "verified",
+  });
+
+  assert.equal(model.status, "blocked");
+  assert.equal(model.statusLabel, "Blocked for rollout");
+  assert.equal(model.recommendedAction, "Resolve trust or health blockers");
+  assert.equal(model.score, 34);
+  assert.equal(model.checklistItems.find((item) => item.key === "health")?.status, "blocked");
 });
