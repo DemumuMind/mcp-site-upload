@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckCircle2, CircleAlert, OctagonAlert } from "lucide-react";
 
 import { ConnectionTestButton } from "@/components/server/connection-test-button";
 import { CopyConfigButton } from "@/components/server/copy-config-button";
@@ -9,6 +10,7 @@ import type { GithubActivity, GithubRepoStats } from "@/lib/github-server-detail
 import { tr, type Locale } from "@/lib/i18n";
 import type { McpServer } from "@/lib/types";
 
+import type { ServerReadinessViewModel } from "./page-readiness";
 import { formatCheckedAt, type CapabilityGroups } from "./page-view-model";
 import { RecentActivityCard, RiskTrustList } from "./page-sections-extra";
 import { OutlineBadge, SectionCard, SectionLabel } from "./section-primitives";
@@ -22,6 +24,85 @@ type HealthSectionProps = CommonSectionProps & {
   healthLabel: string;
   isHealthPending: boolean;
 };
+
+const readinessIconByStatus = {
+  ready: CheckCircle2,
+  review: CircleAlert,
+  blocked: OctagonAlert,
+} as const;
+
+const readinessBadgeClassByStatus = {
+  ready: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
+  review: "border-amber-500/30 bg-amber-500/10 text-amber-200",
+  blocked: "border-rose-500/30 bg-rose-500/10 text-rose-200",
+} as const;
+
+const readinessStatusLabelByStatus = {
+  ready: "Ready",
+  review: "Review",
+  blocked: "Blocked",
+} as const;
+
+export function ReadinessSection({
+  locale,
+  readiness,
+}: {
+  locale: Locale;
+  readiness: ServerReadinessViewModel;
+}) {
+  const StatusIcon = readinessIconByStatus[readiness.status];
+
+  return (
+    <SectionCard>
+      <SectionLabel>{tr(locale, "Readiness checklist", "Readiness checklist")}</SectionLabel>
+      <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="rounded-xl border border-border/60 bg-card/50 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
+                {tr(locale, "Rollout signal", "Rollout signal")}
+              </p>
+              <p className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-foreground">
+                {readiness.score}
+              </p>
+            </div>
+            <OutlineBadge className={readinessBadgeClassByStatus[readiness.status]}>
+              <StatusIcon className="size-3.5" />
+              {tr(locale, readiness.statusLabel, readiness.statusLabel)}
+            </OutlineBadge>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            {tr(locale, readiness.recommendedAction, readiness.recommendedAction)}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-border/60 bg-card/50">
+          <div className="grid gap-px bg-border/60">
+            {readiness.checklistItems.map((item) => {
+              const ItemStatusIcon = readinessIconByStatus[item.status];
+              return (
+                <div key={item.key} className="flex items-start justify-between gap-4 bg-background/80 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {tr(locale, item.label, item.label)}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {tr(locale, item.detail, item.detail)}
+                    </p>
+                  </div>
+                  <OutlineBadge className={readinessBadgeClassByStatus[item.status]}>
+                    <ItemStatusIcon className="size-3.5" />
+                    {tr(locale, readinessStatusLabelByStatus[item.status], readinessStatusLabelByStatus[item.status])}
+                  </OutlineBadge>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </SectionCard>
+  );
+}
 
 export function ServerUrlSection({ locale, mcpServer }: CommonSectionProps) {
   return (

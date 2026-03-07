@@ -28,11 +28,13 @@ import {
   CapabilityGroupsSection,
   GithubStatsSection,
   HealthSection,
+  ReadinessSection,
   RecentActivitySection,
   RiskTrustSection,
   ServerUrlSection,
   SimilarServersSection,
 } from "./page-sections";
+import { buildServerReadinessViewModel } from "./page-readiness";
 import { buildServerDetailViewModel } from "./page-view-model";
 
 type ServerDetailPageProps = {
@@ -103,6 +105,10 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
     mcpServer,
     allServers: catalogSnapshot.servers,
     githubActivity,
+  });
+  const readinessViewModel = buildServerReadinessViewModel({
+    mcpServer,
+    hasLicense: !!githubStats?.license,
   });
 
   const AuthIcon = authIconConfig[mcpServer.authType];
@@ -187,6 +193,7 @@ export default async function ServerDetailPage({ params }: ServerDetailPageProps
         <section>
           <div className="section-shell py-10 sm:py-14">
             <div className="space-y-6 border border-border/60 bg-background/70 p-6 sm:p-8">
+              <ReadinessSection locale={locale} readiness={readinessViewModel} />
               <ServerUrlSection locale={locale} mcpServer={mcpServer} />
               <AvailableToolsSection locale={locale} mcpServer={mcpServer} />
               <CapabilityGroupsSection
